@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saha | ساحة - معاينة حية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #ff6700; border-radius: 10px; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff6700',
+                        secondary: '#222222',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#f2f4f7] text-gray-900">
+
+    <!-- Top Bar -->
+    <div class="bg-white border-b border-gray-200 py-1.5 text-[11px] text-gray-500">
+        <div class="max-w-[1240px] mx-auto px-4 flex justify-between items-center">
+            <div class="flex gap-4"><span>مساعدة</span><span>أعلن معنا</span></div>
+            <div class="flex gap-4 items-center">
+                <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3"></i> الرياض</span>
+                <span class="text-primary font-bold">تسجيل الدخول</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-[1240px] mx-auto px-4 py-4 space-y-4">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center bg-white p-4 rounded-sm border border-gray-200 shadow-sm">
+           <div class="flex items-center gap-8">
+              <div class="flex flex-col leading-none">
+                <h1 class="text-3xl font-black text-primary tracking-tighter">SAHA</h1>
+                <span class="text-[10px] font-bold text-gray-400 tracking-[0.2em] mt-1">S A H A . C O M</span>
+              </div>
+              <nav class="hidden lg:flex gap-6 mt-2 text-sm font-bold">
+                <a href="#" class="text-primary">العقارات</a><a href="#">الوظائف</a><a href="#">السيارات</a>
+              </nav>
+           </div>
+           <button class="bg-primary text-white px-6 py-2.5 font-bold text-sm rounded-sm shadow-lg shadow-primary/20 flex items-center gap-2 hover:scale-105 transition-all">
+              <i data-lucide="plus-square" class="w-4"></i> أضف إعلانك مجاناً
+           </button>
+        </header>
+
+        <!-- Search & Filter -->
+        <div class="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden text-[13px]">
+            <div class="p-3 border-b border-gray-100 flex gap-2">
+                <div class="flex-1 border border-primary/30 p-1 flex items-center">
+                    <div class="px-3 border-l flex items-center gap-1 text-xs bg-gray-50 h-full">الرياض <i data-lucide="chevron-down" class="w-3"></i></div>
+                    <input class="flex-1 px-3 outline-none" placeholder="عن ماذا تبحث اليوم؟">
+                    <button class="bg-primary text-white px-8 py-2 font-bold">بحث</button>
+                </div>
+            </div>
+            <div class="flex border-b border-gray-50 text-xs">
+                <div class="w-24 bg-gray-50 p-2 text-gray-400 font-bold">التصنيف</div>
+                <div class="flex gap-6 p-2 px-4 font-medium"><span class="text-primary">الكل</span><span>وظائف</span><span>عقارات</span><span>سيارات</span><span>خدمات</span></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4">
+            <!-- Sidebar -->
+            <aside class="col-span-3 space-y-4 hidden md:block">
+                <div class="bg-white border border-gray-200 rounded-sm overflow-hidden text-sm">
+                    <div class="bg-primary p-2 text-white font-bold text-xs">تصفح حسب الفئة</div>
+                    <div class="p-2 space-y-2">
+                        <div class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"><i data-lucide="briefcase" class="w-4 text-primary"></i> وظائف وشغور</div>
+                        <div class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"><i data-lucide="home" class="w-4 text-primary"></i> عقارات ومباني</div>
+                        <div class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"><i data-lucide="car" class="w-4 text-primary"></i> سيارات ومحركات</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Feed -->
+            <section class="col-span-12 md:col-span-6 space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Ad Card -->
+                    <div class="bg-white border hover:border-primary transition-all p-1 shadow-sm group">
+                        <div class="aspect-video bg-gray-100 relative mb-2">
+                           <div class="absolute top-2 left-2 bg-blue-500 text-white text-[9px] px-1.5 py-0.5 font-bold">موثوق</div>
+                        </div>
+                        <div class="p-2">
+                            <h3 class="text-xs font-bold group-hover:text-primary mb-1">شقة فاخرة للبيع - حي الملقا</h3>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-sm font-black text-primary">1,250,000 ريال</span>
+                                <span class="text-[10px] text-gray-400">منذ ساعتين</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Ad Card 2 -->
+                    <div class="bg-white border hover:border-primary transition-all p-1 shadow-sm group">
+                        <div class="aspect-video bg-gray-200 relative mb-2">
+                           <div class="absolute top-2 left-2 bg-red-500 text-white text-[9px] px-1.5 py-0.5 font-bold">عاجل</div>
+                        </div>
+                        <div class="p-2">
+                            <h3 class="text-xs font-bold group-hover:text-primary mb-1">مطلوب مبرمج واجهات محترف</h3>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-sm font-black text-primary">15,000 ريال</span>
+                                <span class="text-[10px] text-gray-400">منذ 5 دقائق</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right -->
+            <aside class="col-span-3 space-y-4 hidden lg:block">
+                <div class="bg-white border border-gray-200 p-4 rounded-sm">
+                    <h3 class="text-xs font-bold mb-4 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 text-primary"></i> إعلانات مميزة</h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-2"><div class="w-12 h-10 bg-gray-100 shrink-0"></div><div class="text-[11px] font-bold">فرصة عمل: مدير تواصل</div></div>
+                        <div class="flex gap-2"><div class="w-12 h-10 bg-gray-100 shrink-0"></div><div class="text-[11px] font-bold">فيلا دورين للبيع بالدمام</div></div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-2 flex justify-around md:hidden shadow-2xl">
+        <div class="flex flex-col items-center text-primary"><i data-lucide="home" class="w-5"></i><span class="text-[10px]">الرئيسية</span></div>
+        <div class="flex flex-col items-center text-gray-400"><i data-lucide="search" class="w-5"></i><span class="text-[10px]">بحث</span></div>
+        <div class="flex flex-col items-center -mt-8"><div class="bg-primary p-3 rounded-full text-white shadow-xl border-4 border-white"><i data-lucide="plus-square" class="w-6"></i></div></div>
+        <div class="flex flex-col items-center text-gray-400"><i data-lucide="message-square" class="w-5"></i><span class="text-[10px]">رسائلي</span></div>
+        <div class="flex flex-col items-center text-gray-400"><i data-lucide="user" class="w-5"></i><span class="text-[10px]">حسابي</span></div>
+    </div>
+
+    <script> lucide.createIcons(); </script>
+</body>
+</html>
