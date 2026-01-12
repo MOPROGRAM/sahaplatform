@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Cairo, Tajawal } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/language-context";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -33,7 +34,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="ar" dir="rtl" className={`${inter.variable} ${cairo.variable} ${tajawal.variable}`}>
+        <html className={`${inter.variable} ${cairo.variable} ${tajawal.variable}`}>
             <head>
                 <script src="https://cdn.tailwindcss.com"></script>
                 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -56,6 +57,9 @@ export default function RootLayout({
                             margin: 0;
                             padding: 0;
                         }
+                        [dir="ltr"] body {
+                            font-family: var(--font-inter), -apple-system, "SF Pro", system-ui, sans-serif;
+                        }
                         .glass {
                             background: rgba(255, 255, 255, 0.8);
                             backdrop-filter: blur(20px);
@@ -67,6 +71,8 @@ export default function RootLayout({
                         .font-arabic { font-family: var(--font-cairo), 'Cairo', sans-serif; }
                         @keyframes marquee-slow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
                         .animate-marquee-slow { display: inline-block; white-space: nowrap; animation: marquee-slow 120s linear infinite; }
+                        [dir="ltr"] .animate-marquee-slow { animation: marquee-slow-ltr 120s linear infinite; }
+                        @keyframes marquee-slow-ltr { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
                         @keyframes slide-up-soft { 0%,100% { opacity: 0; } 10%,90% { opacity: 1; } }
                         .animate-card-switch { animation: slide-up-soft 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
                         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -94,7 +100,9 @@ export default function RootLayout({
                 }} />
             </head>
             <body>
-                {children}
+                <LanguageProvider>
+                    {children}
+                </LanguageProvider>
             </body>
         </html>
     );

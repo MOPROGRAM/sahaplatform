@@ -258,11 +258,27 @@ export default function AdsPage({ searchParams }: AdsPageProps) {
                                         </div>
 
                                         <div className="flex items-center gap-2">
-                                            <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-                                                <Heart className="w-4 h-4 text-gray-400" />
+                                            <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add to favorites">
+                                                <Heart className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors" />
                                             </button>
-                                            <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-                                                <Share2 className="w-4 h-4 text-gray-400" />
+                                            <button
+                                                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                                title="Share this ad"
+                                                onClick={() => {
+                                                    if (navigator.share) {
+                                                        navigator.share({
+                                                            title: ad.title,
+                                                            text: ad.description,
+                                                            url: window.location.href,
+                                                        });
+                                                    } else {
+                                                        // Fallback: copy to clipboard
+                                                        navigator.clipboard.writeText(window.location.href);
+                                                        alert('Link copied to clipboard!');
+                                                    }
+                                                }}
+                                            >
+                                                <Share2 className="w-4 h-4 text-gray-400 hover:text-blue-500 transition-colors" />
                                             </button>
                                         </div>
                                     </div>

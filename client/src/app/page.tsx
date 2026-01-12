@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Heart, MessageSquare, PlusCircle, Sparkles, Zap, ChevronLeft, Clock, Image as ImageIcon } from 'lucide-react';
+import { Search, MapPin, Heart, MessageSquare, PlusCircle, Sparkles, Zap, ChevronLeft, Clock, Image as ImageIcon, Globe } from 'lucide-react';
 import { apiService } from '@/lib/api';
+import { useLanguage } from '@/lib/language-context';
 
 interface Ad {
     id: string;
@@ -16,17 +17,18 @@ interface Ad {
 }
 
 export default function HomePage() {
+    const { language, setLanguage, t } = useLanguage();
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentAdIndices, setCurrentAdIndices] = useState([0, 0, 0, 0, 0, 0]);
 
     const categories = [
-        { name: "وظائف", icon: "briefcase", count: "3,600" },
-        { name: "عقارات", icon: "home", count: "8,500" },
-        { name: "سيارات", icon: "car", count: "12,300" },
-        { name: "سلع", icon: "shopping-bag", count: "15,200" },
-        { name: "خدمات", icon: "wrench", count: "4,200" },
-        { name: "اخرى", icon: "layers", count: "2,100" }
+        { name: t('jobs'), icon: "briefcase", key: 'jobs', count: "3,600" },
+        { name: t('realEstate'), icon: "home", key: 'realEstate', count: "8,500" },
+        { name: t('cars'), icon: "car", key: 'cars', count: "12,300" },
+        { name: t('goods'), icon: "shopping-bag", key: 'goods', count: "15,200" },
+        { name: t('services'), icon: "wrench", key: 'services', count: "4,200" },
+        { name: t('other'), icon: "layers", key: 'other', count: "2,100" }
     ];
 
     useEffect(() => {
@@ -97,10 +99,16 @@ export default function HomePage() {
             <div className="py-1 text-[10px] font-bold text-gray-400 shrink-0">
                 <div className="w-full px-4 flex justify-between items-center">
                     <div className="flex gap-4 items-center">
-                        <div className="flex gap-2 text-primary"><span className="cursor-pointer">العربية</span></div>
+                        <button
+                            onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+                            className="flex gap-2 text-primary hover:text-primary-hover transition-colors"
+                        >
+                            <Globe className="w-3 h-3" />
+                            <span>{language === 'ar' ? 'English' : 'العربية'}</span>
+                        </button>
                         <span className="text-gray-200 font-light">|</span>
-                        <span className="hover:text-primary transition-colors cursor-pointer">المساعدة</span>
-                        <span className="text-primary/80 italic font-black cursor-pointer hover:underline">أعلن معنا</span>
+                        <Link href="/help" className="hover:text-primary transition-colors cursor-pointer">{t('help')}</Link>
+                        <Link href="/advertise" className="text-primary/80 italic font-black cursor-pointer hover:underline">{t('advertiseWithUs')}</Link>
                     </div>
                     <div className="flex gap-4 items-center">
                         <span className="flex items-center gap-1.5">
@@ -108,7 +116,7 @@ export default function HomePage() {
                             الرياض
                         </span>
                         <Link href="/login" className="text-secondary font-black cursor-pointer hover:text-primary transition-all">
-                            دخول العميل
+                            {t('login')}
                         </Link>
                     </div>
                 </div>
@@ -128,7 +136,7 @@ export default function HomePage() {
                     <div className="flex-1 max-w-2xl relative group">
                         <input
                             type="text"
-                            placeholder="ابحث عن وظائف، عقارات، سيارات..."
+                            placeholder={t('searchPlaceholder')}
                             className="w-full bg-gray-100 border-none rounded-xl py-2.5 pr-10 pl-4 text-[11px] font-bold text-secondary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-gray-400 group-hover:bg-white group-hover:shadow-md outline-none"
                         />
                         <Search className="w-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-primary transition-colors" />
@@ -154,7 +162,7 @@ export default function HomePage() {
                                 {categories.map((cat, idx) => (
                                     <Link
                                         key={idx}
-                                        href={`/ads?category=${cat.name}`}
+                                        href={`/ads?category=${cat.key}`}
                                         className="px-3 py-2.5 border-b border-white/30 last:border-0 hover:bg-primary/10 cursor-pointer flex justify-between items-center group transition-all duration-300"
                                     >
                                         <span className="text-[12px] font-[700] text-secondary/90 group-hover:text-primary flex items-center gap-2">
@@ -192,7 +200,7 @@ export default function HomePage() {
                         <div className="flex items-center gap-2 px-1 leading-none shrink-0 py-1">
                             <Sparkles className="w-4 text-primary animate-pulse" />
                             <h2 className="text-sm font-[900] text-secondary border-r-3 border-primary pr-3 italic">
-                                أحدث العروض الحصرية
+                                {t('latestOffers')}
                             </h2>
                         </div>
 
