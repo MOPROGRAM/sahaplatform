@@ -145,9 +145,9 @@ export default function HomePage() {
                 {/* Portal Layout */}
                 <div className="grid grid-cols-12 gap-2 h-full overflow-hidden pb-1">
                     {/* Right Sidebar - Categories */}
-                    <aside className="col-span-12 md:col-span-2 space-y-2 h-full overflow-y-auto pr-1">
-                        <div className="bg-white/60 backdrop-blur-md border border-white rounded-xl overflow-hidden shadow-sm">
-                            <div className="bg-secondary p-1.5 text-white text-[9px] font-extrabold text-center uppercase tracking-[0.1em] leading-none">
+                    <aside className="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-2 space-y-2 h-full overflow-y-auto pr-1">
+                        <div className="glass rounded-xl overflow-hidden shadow-lg">
+                            <div className="gradient-secondary p-2 text-white text-[10px] font-extrabold text-center uppercase tracking-[0.1em] leading-none">
                                 بوابة الأقسام
                             </div>
                             <div className="flex flex-col">
@@ -155,16 +155,16 @@ export default function HomePage() {
                                     <Link
                                         key={idx}
                                         href={`/ads?category=${cat.name}`}
-                                        className="px-3 py-2 border-b border-white/50 last:border-0 hover:bg-gray-100/50 cursor-pointer flex justify-between items-center group transition-colors"
+                                        className="px-3 py-2.5 border-b border-white/30 last:border-0 hover:bg-primary/10 cursor-pointer flex justify-between items-center group transition-all duration-300"
                                     >
-                                        <span className="text-[11px] font-[700] text-secondary/80 group-hover:text-primary flex items-center gap-2">
-                                            <svg className="w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <span className="text-[12px] font-[700] text-secondary/90 group-hover:text-primary flex items-center gap-2">
+                                            <svg className="w-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconComponent(cat.icon)} />
                                             </svg>
                                             {cat.name}
                                         </span>
-                                        <span className="text-xs text-gray-400">({cat.count})</span>
-                                        <ChevronLeft className="w-3 text-gray-300 group-hover:text-primary transition-all" />
+                                        <span className="text-xs text-gray-500 font-medium">({cat.count})</span>
+                                        <ChevronLeft className="w-3.5 text-gray-400 group-hover:text-primary transition-all group-hover:translate-x-1" />
                                     </Link>
                                 ))}
                             </div>
@@ -188,94 +188,101 @@ export default function HomePage() {
                     </aside>
 
                     {/* Main Feed */}
-                    <section className="col-span-12 md:col-span-8 flex flex-col gap-2 h-full overflow-y-auto scrollbar-hide px-1">
+                    <section className="col-span-12 sm:col-span-6 md:col-span-7 lg:col-span-8 flex flex-col gap-3 h-full overflow-y-auto scrollbar-hide px-1">
                         <div className="flex items-center gap-2 px-1 leading-none shrink-0 py-1">
-                            <Sparkles className="w-3.5 text-primary" />
-                            <h2 className="text-[12px] font-[900] text-secondary border-r-3 border-primary pr-2 italic">
+                            <Sparkles className="w-4 text-primary animate-pulse" />
+                            <h2 className="text-sm font-[900] text-secondary border-r-3 border-primary pr-3 italic">
                                 أحدث العروض الحصرية
                             </h2>
                         </div>
 
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 pb-14">
-                            {categories.map((category, idx) => {
-                                const mockAds = [
-                                    { title: `${category.name} عاجل جداً`, price: "للتفاوض" },
-                                    { title: `فرصة ${category.name} مميزة`, price: "500 ر.س" },
-                                    { title: `خدمات ${category.name} شاملة`, price: "120 ر.س" },
-                                    { title: `عرض ${category.name} حصري`, price: "2500 ر.س" },
-                                    { title: `منتج ${category.name} ممتاز`, price: "50,000 ر.س" }
-                                ];
-                                const currentAd = mockAds[currentAdIndices[idx]];
+                        {loading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="loading-spinner w-8 h-8 rounded-full"></div>
+                                <span className="mr-3 text-gray-600 font-medium">جارٍ تحميل الإعلانات...</span>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 pb-16">
+                                {categories.map((category, idx) => {
+                                    const mockAds = [
+                                        { title: `${category.name} عاجل جداً`, price: "للتفاوض" },
+                                        { title: `فرصة ${category.name} مميزة`, price: "500 ر.س" },
+                                        { title: `خدمات ${category.name} شاملة`, price: "120 ر.س" },
+                                        { title: `عرض ${category.name} حصري`, price: "2500 ر.س" },
+                                        { title: `منتج ${category.name} ممتاز`, price: "50,000 ر.س" }
+                                    ];
+                                    const currentAd = mockAds[currentAdIndices[idx]];
 
-                                return (
-                                    <div key={idx} className="bg-white/40 backdrop-blur-md border border-white rounded-xl overflow-hidden shadow-xl shadow-black/[0.01] card-hover flex flex-col group/card hover:border-primary/30 transition-colors h-[240px]">
-                                        <div className="bg-white/60 p-1.5 text-secondary text-[11px] font-[900] border-b border-white flex items-center justify-between shrink-0">
-                                            <span className="flex items-center gap-1.5">
-                                                <svg className="w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconComponent(category.icon)} />
-                                                </svg>
-                                                {category.name}
-                                            </span>
-                                        </div>
+                                    return (
+                                        <div key={idx} className="bg-white/40 backdrop-blur-md border border-white rounded-xl overflow-hidden shadow-xl shadow-black/[0.01] card-hover flex flex-col group/card hover:border-primary/30 transition-colors h-[240px]">
+                                            <div className="bg-white/60 p-1.5 text-secondary text-[11px] font-[900] border-b border-white flex items-center justify-between shrink-0">
+                                                <span className="flex items-center gap-1.5">
+                                                    <svg className="w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconComponent(category.icon)} />
+                                                    </svg>
+                                                    {category.name}
+                                                </span>
+                                            </div>
 
-                                        <div className="divide-y divide-gray-50/50 overflow-hidden flex-1">
-                                            {[0, 1, 2].map((i) => (
-                                                <div key={i} className="py-2 px-2 border-b border-white/60 last:border-0 hover:bg-white/60 cursor-pointer flex flex-col gap-0.5 leading-tight group transition-all">
-                                                    <h4 className="text-[10px] font-bold text-secondary/90 line-clamp-1 group-hover:text-primary transition-colors">
-                                                        {category.name} جديد #{i + 1}
-                                                    </h4>
-                                                    <div className="flex justify-between items-center text-[8px] text-gray-400 font-medium select-none">
-                                                        <span className="flex items-center gap-1">
-                                                            <Clock className="w-2.5" />
-                                                            10د
-                                                        </span>
-                                                        <span className="text-primary font-black bg-primary/5 px-1 rounded">1,200 ر.س</span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-primary/5 to-transparent border-t border-b border-gray-100 group/spotlight relative h-[85px] overflow-hidden shrink-0">
-                                            <div className="absolute inset-0 p-2 flex gap-2 animate-card-switch group cursor-pointer hover:bg-white/40 transition-colors">
-                                                <div className="w-[65px] h-full bg-white rounded-md shrink-0 flex items-center justify-center relative overflow-hidden border border-white shadow-sm">
-                                                    <ImageIcon className="w-4 text-gray-300" />
-                                                    <div className="absolute top-0 right-0 bg-primary/90 text-white text-[7px] font-black px-1 py-0 rounded-bl-md shadow-sm">مميز</div>
-                                                </div>
-                                                <div className="flex-1 flex flex-col justify-between py-0.5">
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <h4 className="text-[10px] font-[900] text-secondary line-clamp-2 leading-[1.2] group-hover/spotlight:text-primary transition-colors">
-                                                            {currentAd.title}
+                                            <div className="divide-y divide-gray-50/50 overflow-hidden flex-1">
+                                                {[0, 1, 2].map((i) => (
+                                                    <div key={i} className="py-2 px-2 border-b border-white/60 last:border-0 hover:bg-white/60 cursor-pointer flex flex-col gap-0.5 leading-tight group transition-all">
+                                                        <h4 className="text-[10px] font-bold text-secondary/90 line-clamp-1 group-hover:text-primary transition-colors">
+                                                            {category.name} جديد #{i + 1}
                                                         </h4>
-                                                        <div className="flex items-center gap-2 text-[8px] text-gray-400 font-medium select-none">
-                                                            <span className="flex items-center gap-0.5">
-                                                                <MapPin className="w-2.5 text-gray-300" />
-                                                                الرياض
+                                                        <div className="flex justify-between items-center text-[8px] text-gray-400 font-medium select-none">
+                                                            <span className="flex items-center gap-1">
+                                                                <Clock className="w-2.5" />
+                                                                10د
                                                             </span>
+                                                            <span className="text-primary font-black bg-primary/5 px-1 rounded">1,200 ر.س</span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex justify-between items-end">
-                                                        <span className="text-[10px] font-black text-primary">{currentAd.price}</span>
-                                                        <Link href={`/ads/${idx + 1}`} className="text-[8px] font-bold bg-white border border-gray-100 px-1.5 py-0 rounded shadow-sm hover:border-primary/50 hover:text-primary transition-colors cursor-pointer">
-                                                            التفاصيل
-                                                        </Link>
+                                                ))}
+                                            </div>
+
+                                            <div className="bg-gradient-to-br from-primary/5 to-transparent border-t border-b border-gray-100 group/spotlight relative h-[85px] overflow-hidden shrink-0">
+                                                <div className="absolute inset-0 p-2 flex gap-2 animate-card-switch group cursor-pointer hover:bg-white/40 transition-colors">
+                                                    <div className="w-[65px] h-full bg-white rounded-md shrink-0 flex items-center justify-center relative overflow-hidden border border-white shadow-sm">
+                                                        <ImageIcon className="w-4 text-gray-300" />
+                                                        <div className="absolute top-0 right-0 bg-primary/90 text-white text-[7px] font-black px-1 py-0 rounded-bl-md shadow-sm">مميز</div>
+                                                    </div>
+                                                    <div className="flex-1 flex flex-col justify-between py-0.5">
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <h4 className="text-[10px] font-[900] text-secondary line-clamp-2 leading-[1.2] group-hover/spotlight:text-primary transition-colors">
+                                                                {currentAd.title}
+                                                            </h4>
+                                                            <div className="flex items-center gap-2 text-[8px] text-gray-400 font-medium select-none">
+                                                                <span className="flex items-center gap-0.5">
+                                                                    <MapPin className="w-2.5 text-gray-300" />
+                                                                    الرياض
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex justify-between items-end">
+                                                            <span className="text-[10px] font-black text-primary">{currentAd.price}</span>
+                                                            <Link href={`/ads/${idx + 1}`} className="text-[8px] font-bold bg-white border border-gray-100 px-1.5 py-0 rounded shadow-sm hover:border-primary/50 hover:text-primary transition-colors cursor-pointer">
+                                                                التفاصيل
+                                                            </Link>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div className="py-1 bg-white/30 text-center border-t border-white/50 shrink-0">
-                                            <Link href={`/ads?category=${category.name}`} className="text-[8px] font-extrabold text-gray-400 hover:text-primary uppercase tracking-widest transition-all">
-                                                عرض الكل
-                                            </Link>
+                                            <div className="py-1 bg-white/30 text-center border-t border-white/50 shrink-0">
+                                                <Link href={`/ads?category=${category.name}`} className="text-[8px] font-extrabold text-gray-400 hover:text-primary uppercase tracking-widest transition-all">
+                                                    عرض الكل
+                                                </Link>
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </section>
 
                     {/* Left Sidebar - Featured & Business */}
-                    <aside className="col-span-12 md:col-span-2 space-y-2 h-full overflow-y-auto pl-1">
+                    <aside className="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-2 space-y-2 h-full overflow-y-auto pl-1">
                         <div className="bg-white/60 backdrop-blur-md border border-white rounded-xl p-2.5 shadow-sm">
                             <div className="flex items-center justify-between mb-2">
                                 <h3 className="text-[10px] font-[900] flex items-center gap-1.5 text-secondary leading-none">

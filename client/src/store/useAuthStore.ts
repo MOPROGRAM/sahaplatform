@@ -1,36 +1,96 @@
 import { create } from 'zustand';
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-}
+import { AuthUser, supabase } from '@/lib/auth';
 
 interface AuthState {
-    user: User | null;
-    token: string | null;
-    login: (user: User, token: string) => void;
-    logout: () => void;
-    initialize: () => void;
+    user: AuthUser | null;
+    session: any;
+    loading: boolean;
+    login: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, name: string) => Promise<void>;
+    logout: () => Promise<void>;
+    initialize: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
-    token: null,
-    login: (user, token) => {
-        localStorage.setItem('token', token);
-        set({ user, token });
+    session: null,
+    loading: true,
+    login: async (email, password) => {
+        set({ loading: true });
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) throw error;
+
+            set({
+                user: {
+                    id: data.user.id,
+                    email: data.user.email!,
+                    name: data.user.user_metadata?.name,
+                    role: data.user.user_metadata?.role || 'USER'
+                },
+                session: data.session
+            });
+        } finally {
+            set({ loading: false });
+        }
     },
-    logout: () => {
-        localStorage.removeItem('token');
-        set({ user: null, token: null });
+    register: async (email, password, name) => {
+        set({ loading: true });
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        name,
+                        role: 'USER'
+                    }
+                }
+            });
+
+            if (error) throw error;
+
+            if (data.user) {
+                set({
+                    user: {
+                        id: data.user.id,
+                        email: data.user.email!,
+                        name,
+                        role: 'USER'
+                    },
+                    session: data.session
+                });
+            }
+        } finally {
+            set({ loading: false });
+        }
     },
-    initialize: () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            // TODO: Validate token or decode user from token
-            set({ token });
+    logout: async () => {
+        await supabase.auth.signOut();
+        set({ user: null, session: null });
+    },
+    initialize: async () => {
+        set({ loading: true });
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session?.user) {
+                set({
+                    user: {
+                        id: session.user.id,
+                        email: session.user.email!,
+                        name: session.user.user_metadata?.name,
+                        role: session.user.user_metadata?.role || 'USER'
+                    },
+                    session
+                });
+            }
+        } finally {
+            set({ loading: false });
         }
     },
 }));
