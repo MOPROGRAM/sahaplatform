@@ -93,196 +93,199 @@ const CategoryCard = ({ section }: { section: any }) => {
 export default function HomePage() {
     const categories = [
         {
-            name: "وظائف", icon: <Briefcase size={14} />, items: [
-                { title: "مطلوب مطور React", price: "5000 ر.س" },
-                { title: "مصمم جرافيك", price: "4000 ر.س" },
-                { title: "محاسب", price: "3500 ر.س" }
+            name: "وظائف", icon: <Briefcase size={16} className="text-blue-500" />,
+            items: [
+                { title: "مطور React Senior", price: "15000 ر.س", time: "2س", featured: true },
+                { title: "مصمم UX/UI", price: "12000 ر.س", time: "4س", featured: false }
             ]
         },
         {
-            name: "عقارات", icon: <Home size={14} />, items: [
-                { title: "شقة 3 غرف للإيجار", price: "15000 ر.س" },
-                { title: "فيلا للبيع", price: "1200000 ر.س" },
-                { title: "مكتب تجاري", price: "80000 ر.س" }
+            name: "عقارات", icon: <Home size={16} className="text-green-500" />,
+            items: [
+                { title: "شقة فاخرة - 4 غرف", price: "2800000 ر.س", time: "5د", featured: true },
+                { title: "فيلا مستقلة - 6 غرف", price: "5200000 ر.س", time: "1أ", featured: false }
             ]
         },
         {
-            name: "سيارات", icon: <Car size={14} />, items: [
-                { title: "تويوتا كامري 2020", price: "90000 ر.س" },
-                { title: "هوندا سيفيك", price: "75000 ر.س" },
-                { title: "مرسيدس بنز", price: "200000 ر.س" }
+            name: "سيارات", icon: <Car size={16} className="text-red-500" />,
+            items: [
+                { title: "تويوتا كامري 2024", price: "145000 ر.س", time: "1أ", featured: true },
+                { title: "مرسيدس GLC 2023", price: "320000 ر.س", time: "2أ", featured: false }
             ]
         },
         {
-            name: "سلع", icon: <ShoppingBag size={14} />, items: [
-                { title: "آيفون 15 برو", price: "4500 ر.س" },
-                { title: "لابتوب ديل", price: "3500 ر.س" },
-                { title: "ثلاجة سامسونج", price: "2500 ر.س" }
+            name: "سلع", icon: <ShoppingBag size={16} className="text-purple-500" />,
+            items: [
+                { title: "آيفون 15 برو ماكس", price: "5200 ر.س", time: "3س", featured: true },
+                { title: "لابتوب ماك بوك برو", price: "8500 ر.س", time: "1أ", featured: false }
             ]
         },
         {
-            name: "خدمات", icon: <Wrench size={14} />, items: [
-                { title: "تصليح تكييف", price: "200 ر.س" },
-                { title: "تنظيف منزل", price: "150 ر.س" },
-                { title: "برمجة تطبيق", price: "5000 ر.س" }
+            name: "خدمات", icon: <Wrench size={16} className="text-orange-500" />,
+            items: [
+                { title: "تصميم موقع إلكتروني", price: "2500 ر.س", time: "1أ", featured: true },
+                { title: "تنظيف منزل شامل", price: "150 ر.س", time: "2س", featured: false }
             ]
         },
         {
-            name: "أخرى", icon: <Layers size={14} />, items: [
-                { title: "دراجة هوائية", price: "800 ر.س" },
-                { title: "كتب مدرسية", price: "100 ر.س" },
-                { title: "أثاث مكتبي", price: "1500 ر.س" }
+            name: "أكاديمي", icon: <Layers size={16} className="text-indigo-500" />,
+            items: [
+                { title: "دروس خصوصي رياضيات", price: "80 ر.س/س", time: "1أ", featured: true },
+                { title: "دروس إنجليزي محادثة", price: "100 ر.س/س", time: "3أ", featured: false }
             ]
         }
     ];
 
     return (
-        <div className="mesh-bg min-h-screen text-[#1c1e21] selection:bg-primary/20 antialiased">
-            {/* TOP TICKER */}
-            <div className="glass border-b border-gray-200/50 py-1 overflow-hidden shrink-0 z-50">
-                <div className="animate-marquee-slow whitespace-nowrap flex gap-32 items-center">
-                    <p className="text-[10px] font-bold flex items-center gap-2 text-gray-400">
-                        <span className="bg-yellow-400/90 text-black px-1.5 rounded-sm text-[8px] font-black italic">إعلان ممول</span>
-                        استأجر مكتبك بـ 500 ريال فقط في قلب العاصمة - احجز عبر ساحة | <Link href="#" className="underline text-secondary">التفاصيل</Link>
-                    </p>
-                    <p className="text-[10px] font-bold flex items-center gap-2 text-gray-400">
-                        <span className="bg-primary text-white px-1.5 py-0.5 rounded-sm text-[8px] font-black italic">ساحة بيزنس</span>
-                        باقات مخصصة للمنشآت الصغيرة والمتوسطة بخصم 40% | <Link href="#" className="underline text-primary">اشترك هنا</Link>
-                    </p>
-                </div>
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+            {/* Modern Hero Section */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-secondary/10">
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ff6700" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
 
-            {/* Top Bar Navigation */}
-            <div className="py-1 text-[10px] font-bold text-gray-400 shrink-0">
-                <div className="w-full px-4 flex justify-between items-center">
-                    <div className="flex gap-4 items-center">
-                        <div className="flex gap-2 text-primary"><span className="cursor-pointer">العربية</span></div>
-                        <span className="text-gray-200 font-light">|</span>
-                        <span className="hover:text-primary transition-colors cursor-pointer">المساعدة</span>
-                        <span className="text-primary/80 italic font-black cursor-pointer hover:underline">أعلن معنا</span>
-                    </div>
-                    <div className="flex gap-4 items-center">
-                        <span className="flex items-center gap-1.5"><MapPin size={10} className="text-primary" /> الرياض</span>
-                        <Link href="/login" className="text-secondary font-black hover:text-primary transition-all">دخول العميل</Link>
-                    </div>
-                </div>
-            </div>
-
-            <main className="w-full h-full flex flex-col overflow-hidden px-2 pb-2">
-                {/* Header with Search */}
-                <header className="flex justify-between items-center glass p-2 px-4 rounded-xl mb-2 shadow-xl shadow-black/[0.02] shrink-0 gap-8">
-                    <div className="flex items-center gap-8">
-                        <div className="flex items-baseline gap-1.5 group cursor-pointer">
-                            <h1 className="text-3xl font-[900] text-primary tracking-tighter italic transition-all group-hover:scale-[1.02]">ساحة</h1>
-                        </div>
-                    </div>
-
-                    {/* SEARCH BAR */}
-                    <div className="flex-1 max-w-2xl relative group">
-                        <input type="text" placeholder="ابحث عن وظائف، عقارات، سيارات..."
-                            className="w-full bg-gray-100 border-none rounded-xl py-2.5 pr-10 pl-4 text-[11px] font-bold text-secondary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-gray-400 group-hover:bg-white group-hover:shadow-md outline-none" />
-                        <Search className="w-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-primary transition-colors" />
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <Link href="/post-ad" className="bg-primary hover:bg-[#e65c00] text-white px-5 py-2 font-black text-[10px] rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center gap-2 whitespace-nowrap">
-                            <PlusCircle size={14} /> أضف إعلانك
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+                {/* Navigation Bar */}
+                <nav className="flex justify-between items-center mb-8">
+                    <h1 className="text-4xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        ساحة
+                    </h1>
+                    <div className="flex items-center gap-6">
+                        <Link href="/login" className="text-gray-600 hover:text-primary font-medium transition-colors">
+                            تسجيل الدخول
+                        </Link>
+                        <Link href="/post-ad" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full font-bold hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-105">
+                            أضف إعلانك
                         </Link>
                     </div>
-                </header>
+                </nav>
 
-                {/* PORTAL LAYOUT */}
-                <div className="grid grid-cols-12 gap-2 h-full overflow-hidden pb-1">
-                    {/* RIGHT SIDEBAR */}
-                    <aside className="col-span-12 md:col-span-2 space-y-2 h-full overflow-y-auto pr-1">
-                        <div className="bg-white/60 backdrop-blur-md border border-white rounded-xl overflow-hidden shadow-sm">
-                            <div className="bg-secondary p-1.5 text-white text-[9px] font-extrabold text-center uppercase tracking-[0.1em] leading-none">بوابة الأقسام</div>
-                            <div className="flex flex-col">
-                                {categories.map((cat, i) => (
-                                    <Link key={i} href="#" className="px-3 py-2 border-b border-white/50 last:border-0 hover:bg-gray-100/50 cursor-pointer flex justify-between items-center group transition-colors">
-                                        <span className="text-[11px] font-[700] text-secondary/80 group-hover:text-primary">{cat.name}</span>
-                                        <ChevronLeft size={12} className="text-gray-300 group-hover:text-primary transition-all" />
-                                    </Link>
-                                ))}
+                {/* Hero Content */}
+                <div className="text-center">
+                    <h2 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent mb-6 leading-tight">
+                        ساحة
+                    </h2>
+                    <p className="text-2xl md:text-3xl text-gray-600 font-medium mb-12 max-w-4xl mx-auto leading-relaxed">
+                        منصة الإعلانات الرائدة في الشرق الأوسط - نوفر لك تجربة فريدة في بيع وشراء كل ما تحتاجه
+                    </p>
+
+                    {/* Advanced Search Bar */}
+                    <div className="max-w-4xl mx-auto mb-16">
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
+                            <div className="relative bg-white rounded-3xl shadow-2xl shadow-primary/10 border border-white/50 backdrop-blur-sm overflow-hidden">
+                                <div className="flex items-center p-2">
+                                    <div className="flex-1 flex items-center px-6 py-4">
+                                        <Search size={24} className="text-primary ml-4" />
+                                        <input
+                                            type="text"
+                                            placeholder="ما الذي تبحث عنه اليوم؟ (وظائف، عقارات، سيارات...)"
+                                            className="flex-1 text-xl placeholder:text-gray-400 text-gray-900 bg-transparent outline-none"
+                                        />
+                                    </div>
+                                    <button className="bg-gradient-to-r from-primary to-secondary text-white px-10 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105 mr-2">
+                                        ابحث الآن
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div className="bg-white/60 backdrop-blur-md border border-white p-2.5 rounded-xl shadow-sm">
-                            <h3 className="text-[10px] font-[900] border-r-3 border-primary pr-2 mb-2 leading-none text-secondary">تصفية ذكية</h3>
-                            <div className="space-y-1.5">
-                                <label className="flex items-center gap-2 text-[10px] font-bold text-gray-500 cursor-pointer group hover:text-primary transition-colors">
-                                    <input type="checkbox" className="w-3.5 h-3.5 rounded accent-primary" /> موثوق
-                                </label>
-                                <label className="flex items-center gap-2 text-[10px] font-bold text-gray-500 cursor-pointer group hover:text-primary transition-colors">
-                                    <input type="checkbox" className="w-3.5 h-3.5 rounded accent-primary" /> عاجل
-                                </label>
-                            </div>
-                        </div>
-                    </aside>
+                    </div>
 
-                    {/* CENTER FEED */}
-                    <section className="col-span-12 md:col-span-8 flex flex-col gap-2 h-full overflow-y-auto scrollbar-hide px-1">
-                        <div className="flex items-center gap-2 px-1 leading-none shrink-0 py-1">
-                            <Zap size={12} className="text-primary" />
-                            <h2 className="text-[12px] font-[900] text-secondary border-r-3 border-primary pr-2 italic">أحدث العروض الحصرية</h2>
+                    {/* Statistics */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+                        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/50 hover:shadow-3xl transition-all duration-500 hover:scale-105">
+                            <div className="text-5xl font-black text-primary mb-3">500K+</div>
+                            <div className="text-lg text-gray-600 font-semibold">إعلان نشط</div>
                         </div>
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 pb-14">
-                            {categories.map((section, idx) => (
-                                <CategoryCard key={idx} section={section} />
+                        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/50 hover:shadow-3xl transition-all duration-500 hover:scale-105">
+                            <div className="text-5xl font-black text-secondary mb-3">2M+</div>
+                            <div className="text-lg text-gray-600 font-semibold">مستخدم نشط</div>
+                        </div>
+                        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/50 hover:shadow-3xl transition-all duration-500 hover:scale-105">
+                            <div className="text-5xl font-black text-green-500 mb-3">50K+</div>
+                            <div className="text-lg text-gray-600 font-semibold">صفقة يومية</div>
+                        </div>
+                        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/50 hover:shadow-3xl transition-all duration-500 hover:scale-105">
+                            <div className="text-5xl font-black text-purple-500 mb-3">99.9%</div>
+                            <div className="text-lg text-gray-600 font-semibold">رضا العملاء</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            {/* Categories Section */ }
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+            <h3 className="text-5xl font-black text-gray-900 mb-6">استكشف الفئات</h3>
+            <p className="text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                نوفر لك تشكيلة واسعة من الفئات لتلبية جميع احتياجاتك في البيع والشراء
+            </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {categories.map((category, index) => (
+                <div key={index} className="group cursor-pointer">
+                    <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 border border-gray-200 hover:border-primary/30 shadow-xl hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="p-4 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl group-hover:from-primary/20 group-hover:to-secondary/20 transition-all duration-300">
+                                {category.icon}
+                            </div>
+                            <ChevronLeft size={24} className="text-gray-400 group-hover:text-primary group-hover:scale-110 transition-all duration-300" />
+                        </div>
+
+                        <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary transition-colors">
+                            {category.name}
+                        </h4>
+
+                        <div className="space-y-4">
+                            {category.items.slice(0, 2).map((item, i) => (
+                                <div key={i} className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-4 hover:from-primary/5 hover:to-secondary/5 transition-all duration-300 border border-gray-100 group/item">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h5 className="font-bold text-gray-900 group-hover/item:text-primary transition-colors line-clamp-1 text-lg">
+                                            {item.title}
+                                        </h5>
+                                        {item.featured && (
+                                            <span className="bg-gradient-to-r from-primary to-secondary text-white text-sm px-3 py-1 rounded-full font-medium shadow-lg">
+                                                مميز
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-2xl font-black text-primary">{item.price}</span>
+                                        <span className="text-sm text-gray-500 font-medium">{item.time}</span>
+                                    </div>
+                                </div>
                             ))}
                         </div>
-                    </section>
 
-                    {/* LEFT SIDEBAR */}
-                    <aside className="col-span-12 md:col-span-2 space-y-2 h-full overflow-y-auto pl-1">
-                        <div className="bg-white/60 backdrop-blur-md border border-white p-2.5 rounded-lg shadow-sm">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-[10px] font-[900] flex items-center gap-1.5 text-secondary leading-none"><Zap size={12} className="text-primary" /> مختارة</h3>
-                                <span className="text-[7px] font-black bg-primary text-white px-1 py-0.5 rounded-sm">VIP</span>
-                            </div>
-                            <div className="space-y-1">
-                                {[1, 2, 3].map((_, i) => (
-                                    <div key={i} className="flex gap-2 items-center group cursor-pointer border-b border-white/50 last:border-0 pb-1.5 mb-1.5 last:pb-0 last:mb-0 hover:bg-white rounded-lg transition-all">
-                                        <div className="w-10 h-10 bg-gray-50 rounded shrink-0 border border-white flex items-center justify-center group-hover:bg-primary/5 transition-colors">
-                                            <ImageIcon size={12} className="text-gray-200" />
-                                        </div>
-                                        <div className="flex flex-col leading-tight">
-                                            <h4 className="text-[9px] font-bold group-hover:text-primary transition-colors line-clamp-1">فرصة استثنائية</h4>
-                                            <span className="text-[9px] text-primary font-black mt-0.5">2.5M <span className="text-[7px] opacity-60">ر.س</span></span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* SAHA BIZ WIDGET */}
-                        <div className="bg-gradient-to-br from-[#1c1e21] via-[#2a2d32] to-black p-3 rounded-xl text-white relative overflow-hidden group shadow-md transition-all hover:scale-[1.01] h-[100px] flex flex-col justify-center">
-                            <div className="relative z-10 flex flex-col gap-1">
-                                <h4 className="font-black text-lg italic tracking-tighter leading-none text-primary">ساحة BIZ</h4>
-                                <p className="text-[8px] font-bold opacity-70 leading-relaxed">حلول أعمال متكاملة.</p>
-                                <button className="mt-1.5 bg-primary w-fit px-3 py-1 text-[8px] font-black rounded hover:bg-white hover:text-black transition-all">اشترك</button>
-                            </div>
-                            <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-primary opacity-20 rounded-full blur-2xl group-hover:scale-125 transition-all"></div>
-                        </div>
-
-                        {/* App Download */}
-                        <div className="bg-white/60 backdrop-blur-md border border-white p-2.5 rounded-lg flex items-center justify-between shadow-sm group hover:border-primary/20 transition-all cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-gray-100 rounded shadow-inner flex items-center justify-center shrink-0">
-                                    <QrCode size={14} className="text-secondary" />
-                                </div>
-                                <div className="flex flex-col leading-none">
-                                    <span className="text-[11px] font-black">تطبيق ساحة</span>
-                                    <span className="text-[9px] font-bold text-gray-400 mt-0.5">موبايل</span>
-                                </div>
-                            </div>
-                            <ChevronLeft size={12} className="text-gray-200 group-hover:text-primary transition-all" />
-                        </div>
-                    </aside>
+                        <button className="w-full mt-8 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-primary hover:to-secondary text-gray-700 hover:text-white py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-105">
+                            عرض جميع الإعلانات
+                        </button>
+                    </div>
                 </div>
-            </main>
-
-            {/* Mobile Nav Spacer */}
-            <div className="h-20 lg:hidden"></div>
+            ))}
         </div>
+    </div>
+
+    {/* CTA Section */ }
+    <div className="bg-gradient-to-r from-primary via-primary to-secondary relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div className="text-center text-white">
+                <h4 className="text-5xl font-black mb-6">ابدأ رحلتك مع ساحة اليوم!</h4>
+                <p className="text-2xl mb-12 opacity-90 max-w-4xl mx-auto leading-relaxed">
+                    انضم لآلاف المستخدمين الذين يثقون بنا في بيع وشراء احتياجاتهم اليومية
+                </p>
+                <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                    <Link href="/post-ad" className="bg-white text-primary px-10 py-5 rounded-3xl font-bold text-xl hover:bg-gray-50 transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-3xl">
+                        أضف إعلانك مجاناً
+                    </Link>
+                    <Link href="/login" className="border-2 border-white text-white px-10 py-5 rounded-3xl font-bold text-xl hover:bg-white hover:text-primary transition-all duration-300 hover:scale-105 shadow-xl">
+                        تسجيل الدخول
+                    </Link>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div >
     );
 }
