@@ -1,8 +1,11 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('Seeding database...');
+    console.log('Seeding database with encrypted passwords...');
+
+    const hashedPassword = await bcrypt.hash('password123', 10);
 
     // Create a default user
     const user = await prisma.user.upsert({
@@ -10,7 +13,7 @@ async function main() {
         update: {},
         create: {
             email: 'admin@saha.com',
-            password: 'password123', // In real app, this should be hashed
+            password: hashedPassword,
             name: 'مدير ساحة',
             role: 'ADMIN',
             verified: true,
@@ -22,7 +25,7 @@ async function main() {
         update: {},
         create: {
             email: 'merchant@saha.com',
-            password: 'password123',
+            password: hashedPassword,
             name: 'شركة الرواد العقارية',
             role: 'MERCHANT',
             verified: true,

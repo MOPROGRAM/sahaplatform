@@ -36,7 +36,7 @@ export default function AdDetailsPage() {
                     {/* Gallery Section */}
                     <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-sm overflow-hidden">
                         <div className="aspect-video bg-gray-100 dark:bg-slate-800 relative flex items-center justify-center">
-                            <span className="text-gray-300 text-lg font-bold italic opacity-20 text-[80px] select-none">SAHA IMAGE</span>
+                            <span className="text-gray-300 text-lg font-bold italic opacity-20 text-[80px] select-none">الـسـاحـة</span>
                             <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-sm text-xs font-bold">1 / 8</div>
                         </div>
                         <div className="flex p-2 gap-2 overflow-x-auto bg-gray-50 dark:bg-slate-900 border-t border-gray-100 dark:border-gray-800">

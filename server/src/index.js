@@ -16,8 +16,8 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(helmet());
-app.use(cors());
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: '*' }));
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -27,7 +27,11 @@ app.get('/', (req, res) => {
 });
 
 // Import Modules
+const authRoutes = require('./modules/auth/auth.controller');
 const adRoutes = require('./modules/ads/ad.controller');
+const authMiddleware = require('./middleware/auth');
+
+app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
 
 // Socket.io Logic

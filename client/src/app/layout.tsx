@@ -3,8 +3,8 @@ import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 
 export const metadata: Metadata = {
-    title: "Saha | ساحة - Jobs, Real Estate & Classifieds",
-    description: "High-performance professional classifieds platform in the Middle East.",
+    title: "ساحة - منصة العقارات والوظائف",
+    description: "أكبر منصة احترافية للعقارات والوظائف في الشرق الأوسط.",
 };
 
 export default function RootLayout({

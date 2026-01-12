@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adService = require('./ad.service');
+const authMiddleware = require('../../middleware/auth');
 
 // Get all ads with filters
 router.get('/', async (req, res) => {
@@ -12,11 +13,10 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Post a new ad
-router.post('/', async (req, res) => {
+// Post a new ad (protected)
+router.post('/', authMiddleware, async (req, res) => {
     try {
-        // Note: userId should come from auth middleware
-        const userId = req.body.userId || "mock-user-id";
+        const userId = req.user.id;
         const newAd = await adService.createAd(req.body, userId);
         res.status(201).json(newAd);
     } catch (error) {

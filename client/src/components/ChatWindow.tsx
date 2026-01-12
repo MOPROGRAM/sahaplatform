@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck } from "lucide-react";
+import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 interface Message {
@@ -76,8 +76,8 @@ export default function ChatWindow() {
                         className={`flex ${msg.senderId === 'user' ? 'justify-start' : 'justify-end'}`}
                     >
                         <div className={`max-w-[80%] p-3 rounded-sm text-sm shadow-sm ${msg.senderId === 'user'
-                                ? 'bg-primary text-white rounded-br-none'
-                                : 'bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-bl-none'
+                            ? 'bg-primary text-white rounded-br-none'
+                            : 'bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-bl-none'
                             }`}>
                             <p>{msg.content}</p>
                             <span className={`text-[9px] mt-1 block ${msg.senderId === 'user' ? 'text-white/70' : 'text-gray-400'}`}>
@@ -91,20 +91,36 @@ export default function ChatWindow() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-900">
-                <div className="flex gap-2">
-                    <input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                        placeholder="اكتب رسالتك لـ محمد..."
-                        className="flex-1 bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 rounded-sm text-sm focus:ring-1 ring-primary transition-all"
-                    />
-                    <button
-                        onClick={handleSend}
-                        className="bg-primary text-white p-3 rounded-sm hover:bg-primary-dark transition-all active:scale-95 shadow-lg shadow-primary/20"
-                    >
-                        <Send size={20} className="transform rotate-180" />
-                    </button>
+                <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                        <button className="text-gray-400 hover:text-primary p-2 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-paperclip"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
+                        </button>
+                        <input
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                            placeholder="اكتب رسالتك لـ محمد..."
+                            className="flex-1 bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 rounded-sm text-sm focus:ring-1 ring-primary transition-all"
+                        />
+                        <button
+                            onClick={handleSend}
+                            className="bg-primary text-white p-3 rounded-sm hover:bg-primary-dark transition-all active:scale-95 shadow-lg shadow-primary/20"
+                        >
+                            <Send size={20} className="transform rotate-180" />
+                        </button>
+                    </div>
+                    {/* Job Tools */}
+                    <div className="flex gap-2">
+                        <button className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-600 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all">
+                            <Briefcase size={12} />
+                            إرفاق السيرة الذاتية (CV)
+                        </button>
+                        <button className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-600 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all">
+                            <MapPin size={12} />
+                            مشاركة الموقع الحالي
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

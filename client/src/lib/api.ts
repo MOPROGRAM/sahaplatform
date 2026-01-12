@@ -1,12 +1,17 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return headers;
+};
+
 export const apiService = {
     async get(endpoint: string, params: Record<string, any> = {}) {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`${API_URL}${endpoint}${query ? `?${query}` : ''}`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthHeaders(),
         });
         if (!response.ok) throw new Error('API Error');
         return response.json();
@@ -15,9 +20,7 @@ export const apiService = {
     async post(endpoint: string, data: any) {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data),
         });
         if (!response.ok) throw new Error('API Error');
