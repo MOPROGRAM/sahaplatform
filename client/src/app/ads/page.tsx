@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon } from 'lucide-react';
 import { apiService } from '@/lib/api';
@@ -23,9 +22,12 @@ interface Ad {
     createdAt: string;
 }
 
-export default function AdsPage() {
-    const searchParams = useSearchParams();
-    const category = searchParams.get('category');
+interface AdsPageProps {
+    searchParams: { category?: string };
+}
+
+export default function AdsPage({ searchParams }: AdsPageProps) {
+    const category = searchParams.category;
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
