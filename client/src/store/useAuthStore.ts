@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AuthUser, supabase } from '@/lib/auth';
+import { AuthUser, authService } from '@/lib/auth';
 
 interface AuthState {
     user: AuthUser | null;
@@ -18,21 +18,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     login: async (email, password) => {
         set({ loading: true });
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+            const response = await authService.login(email, password);
 
-            if (error) throw error;
+            authService.setToken(response.token);
+
+            // Decode user info from token (simplified)
+            const user = { id: 'temp', email, name: 'User', role: 'USER' };
 
             set({
-                user: {
-                    id: data.user.id,
-                    email: data.user.email!,
-                    name: data.user.user_metadata?.name,
-                    role: data.user.user_metadata?.role || 'USER'
-                },
-                session: data.session
+                user,
+                session: response.token
             });
         } finally {
             set({ loading: false });
@@ -41,53 +36,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     register: async (email, password, name) => {
         set({ loading: true });
         try {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        name,
-                        role: 'USER'
-                    }
-                }
+            const response = await authService.register(email, password, name);
+
+            // After registration, automatically log in
+            const loginResponse = await authService.login(email, password);
+            authService.setToken(loginResponse.token);
+
+            set({
+                user: {
+                    id: response.user.id,
+                    email: response.user.email,
+                    name: response.user.name,
+                    role: response.user.role || 'USER'
+                },
+                session: loginResponse.token
             });
-
-            if (error) throw error;
-
-            if (data.user) {
-                set({
-                    user: {
-                        id: data.user.id,
-                        email: data.user.email!,
-                        name,
-                        role: 'USER'
-                    },
-                    session: data.session
-                });
-            }
         } finally {
             set({ loading: false });
         }
     },
     logout: async () => {
-        await supabase.auth.signOut();
+        authService.removeToken();
         set({ user: null, session: null });
     },
     initialize: async () => {
         set({ loading: true });
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-
-            if (session?.user) {
-                set({
-                    user: {
-                        id: session.user.id,
-                        email: session.user.email!,
-                        name: session.user.user_metadata?.name,
-                        role: session.user.user_metadata?.role || 'USER'
-                    },
-                    session
-                });
+            const token = authService.getToken();
+            if (token) {
+                // TODO: Validate token with backend
+                set({ session: token });
             }
         } finally {
             set({ loading: false });
