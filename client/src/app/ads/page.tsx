@@ -53,35 +53,8 @@ export default function AdsPage({ searchParams }: AdsPageProps) {
             setAds(data);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
-            // Fallback to mock data
-            setAds([
-                {
-                    id: '1',
-                    title: 'شقة فاخرة في حي العليا',
-                    description: 'شقة 200 متر مربع مع 3 غرف نوم وصالة كبيرة',
-                    price: 2800000,
-                    currency: 'SAR',
-                    category: 'عقارات',
-                    location: 'الرياض',
-                    images: '[]',
-                    isBoosted: true,
-                    author: { name: 'أحمد محمد', verified: true },
-                    createdAt: '2024-01-12T10:00:00Z'
-                },
-                {
-                    id: '2',
-                    title: 'تويوتا كامري 2024',
-                    description: 'سيارة بحالة ممتازة، كيلو 15,000 فقط',
-                    price: 145000,
-                    currency: 'SAR',
-                    category: 'سيارات',
-                    location: 'جدة',
-                    images: '[]',
-                    isBoosted: false,
-                    author: { name: 'سارة أحمد', verified: false },
-                    createdAt: '2024-01-11T15:30:00Z'
-                }
-            ]);
+            // Show empty state when no data available
+            setAds([]);
         } finally {
             setLoading(false);
         }

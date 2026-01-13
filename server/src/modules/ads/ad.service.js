@@ -37,7 +37,19 @@ const createAd = async (adData, userId) => {
     });
 };
 
+const getAdById = async (id) => {
+    return await prisma.ad.findUnique({
+        where: { id },
+        include: {
+            author: {
+                select: { name: true, verified: true, phone: true, location: true }
+            }
+        }
+    });
+};
+
 module.exports = {
     getAllAds,
-    createAd
+    createAd,
+    getAdById
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
     MapPin,
     Calendar,
@@ -15,10 +16,52 @@ import {
     Info
 } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLanguage } from "@/lib/language-context";
+import { apiService } from "@/lib/api";
+
+interface Ad {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    currency: string;
+    category: string;
+    location: string;
+    images: string;
+    isBoosted: boolean;
+    author: {
+        name: string;
+        verified: boolean;
+    };
+    createdAt: string;
+}
 
 export default function AdDetailsPage() {
+    const { language, t } = useLanguage();
+    const params = useParams();
+    const adId = params.id as string;
+
+    const [ad, setAd] = useState<Ad | null>(null);
+    const [loading, setLoading] = useState(true);
     const [showChat, setShowChat] = useState(false);
+
+    useEffect(() => {
+        fetchAdDetails();
+    }, [adId]);
+
+    const fetchAdDetails = async () => {
+        setLoading(true);
+        try {
+            const data = await apiService.get(`/ads/${adId}`);
+            setAd(data);
+        } catch (error) {
+            console.error('Failed to fetch ad details:', error);
+            // Show error state
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="bg-[#f2f4f7] dark:bg-slate-950 min-h-screen pb-12">

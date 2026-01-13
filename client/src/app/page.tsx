@@ -56,12 +56,8 @@ export default function HomePage() {
             setAds(data);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
-            // Fallback to mock data
-            setAds([
-                { id: '1', title: 'شقة فاخرة في حي العليا', price: '2,800,000 ر.س', location: 'الرياض', category: 'عقارات', createdAt: '2024-01-12', featured: true },
-                { id: '2', title: 'تويوتا كامري 2024', price: '145,000 ر.س', location: 'جدة', category: 'سيارات', createdAt: '2024-01-11', featured: true },
-                { id: '3', title: 'آيفون 15 برو ماكس', price: '5,200 ر.س', location: 'الدمام', category: 'سلع', createdAt: '2024-01-10' }
-            ]);
+            // Show empty state when no data available
+            setAds([]);
         } finally {
             setLoading(false);
         }

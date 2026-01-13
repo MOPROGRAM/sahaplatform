@@ -13,6 +13,19 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get ad by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const ad = await adService.getAdById(req.params.id);
+        if (!ad) {
+            return res.status(404).json({ error: 'Ad not found' });
+        }
+        res.json(ad);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Post a new ad (protected)
 router.post('/', authMiddleware, async (req, res) => {
     try {
