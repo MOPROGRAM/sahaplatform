@@ -4,14 +4,18 @@
     "description": "Saha Platform - Multi-language marketplace for Arabic-speaking countries",
     "main": "server/src/index.js",
     "scripts": {
-        "build": "npm run build:client && npm run build:server",
+        "build": "npm run build:client",
         "build:client": "cd client && npm run build",
-        "build:server": "cd server && npm run build",
         "start": "cd server && npm start",
         "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
         "dev:client": "cd client && npm run dev",
         "dev:server": "cd server && npm run dev",
-        "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+        "install:all": "npm install && cd client && npm install",
+        "cf:dev": "wrangler pages dev client/out --local",
+        "cf:deploy": "wrangler pages deploy client/out",
+        "cf:db:create": "wrangler d1 create saha-platform-db",
+        "cf:db:migrate": "wrangler d1 migrations apply saha-platform-db --local",
+        "cf:setup": "npm run cf:db:create && npm run cf:db:migrate",
         "docker:build": "docker build -t saha-platform .",
         "docker:run": "docker run -p 5000:5000 saha-platform",
         "test": "cd server && npm test"
@@ -21,14 +25,15 @@
         "classifieds",
         "arabic",
         "nextjs",
-        "nodejs",
-        "prisma",
-        "postgresql"
+        "cloudflare",
+        "d1",
+        "pages"
     ],
     "author": "Saha Platform Team",
     "license": "MIT",
     "devDependencies": {
-        "concurrently": "^8.2.2"
+        "concurrently": "^8.2.2",
+        "wrangler": "^3.19.0"
     },
     "engines": {
         "node": ">=18.0.0",
