@@ -40,7 +40,7 @@ export default function LoginPage() {
                     <Link href="/" className="text-4xl font-[900] text-primary tracking-tighter italic">
                         ساحة
                     </Link>
-                    <p className="text-gray-600 mt-2">بوابة الخليج العقارية والمهنية</p>
+                    <p className="text-gray-600 mt-2">مساحة واسعة من الفرص</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">

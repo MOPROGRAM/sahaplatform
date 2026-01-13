@@ -24,8 +24,8 @@ const tajawal = Tajawal({
 });
 
 export const metadata: Metadata = {
-    title: "ساحة - بوابة الخليج العقارية والمهنية",
-    description: "بوابة الخليج العقارية والمهنية - منصة شاملة للإعلانات والخدمات",
+    title: "ساحة - مساحة واسعة من الفرص",
+    description: "مساحة واسعة من الفرص - منصة شاملة للإعلانات والخدمات في الشرق الأوسط",
 };
 
 export default function RootLayout({

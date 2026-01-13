@@ -11,6 +11,7 @@ export const translations = {
         logout: 'تسجيل الخروج',
         latestOffers: 'أحدث العروض الحصرية',
         categories: 'بوابة الأقسام',
+        tagline: 'مساحة واسعة من الفرص',
 
         // Categories
         jobs: 'وظائف',
@@ -73,6 +74,7 @@ export const translations = {
         logout: 'Logout',
         latestOffers: 'Latest Exclusive Offers',
         categories: 'Categories Portal',
+        tagline: 'A Vast Space of Opportunities',
 
         // Categories
         jobs: 'Jobs',

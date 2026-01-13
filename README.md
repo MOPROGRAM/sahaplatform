@@ -1,6 +1,6 @@
-# 🚀 Saha (ساحة) - Professional Classifieds Platform
+# 🚀 Saha (ساحة) - A Vast Space of Opportunities
 
-**Saha** is a high-performance, professional marketplace platform for jobs, real estate, and general classifieds. Inspired by the "Chinese Tech-Aesthetic", it focuses on high information density, rapid interaction, and premium visual design.
+**Saha** is a high-performance, professional marketplace platform for jobs, real estate, and general classifieds. A vast space of opportunities connecting buyers and sellers across the Middle East with cutting-edge technology and seamless user experience.
 
 ![Saha Preview](./live-preview.html)
 
