@@ -1,46 +1,32 @@
-# Koyeb deployment configuration for Saha Platform
-# This file defines how your application should be deployed on Koyeb
-
-apiVersion: v1
-kind: App
-
-metadata:
-  name: saha-platform
-
-spec:
-  # Port configuration - Koyeb will expose this port
-  ports:
-    - port: 5000
-      public: true
-      protocol: http
-
-  # Environment variables
-  env:
-    - key: NODE_ENV
-      value: production
-    - key: JWT_SECRET
-      value: your_super_secret_saha_key_2025
-    - key: DATABASE_URL
-      # This will be set by Koyeb when you add a PostgreSQL database
-      # Format: postgresql://user:password@host:port/database
-      value: ""
-
-  # Build configuration - Use Docker for multi-stage build
-  build:
-    docker:
+name: saha-platform
+services:
+  - name: api
+    source:
+      type: git
+      repository: https://github.com/MOPROGRAM/sahaplatform
+      branch: main
+    build:
+      type: docker
       dockerfile: Dockerfile
-
-  # Scaling configuration
-  scaling:
-    min: 1
-    max: 10
-
-  # Health check configuration
-  healthcheck:
-    http:
+    ports:
+      - port: 5000
+        public: true
+        protocol: http
+    environment:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: your_super_secret_saha_key_2025
+      - key: DATABASE_URL
+        value: ""  # Will be set by linked PostgreSQL service
+    healthcheck:
+      type: http
       path: /health
       port: 5000
-    initialDelaySeconds: 30
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 3
+      initial_delay: 30
+      interval: 10
+      timeout: 5
+      failure_threshold: 3
+    scaling:
+      min: 1
+      max: 10
