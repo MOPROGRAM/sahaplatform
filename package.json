@@ -1,0 +1,45 @@
+{
+    "name": "saha-platform",
+    "version": "1.0.0",
+    "description": "Saha Platform - Multi-language marketplace for Arabic-speaking countries",
+    "main": "server/src/index.js",
+    "scripts": {
+        "build": "npm run build:client && npm run build:server",
+        "build:client": "cd client && npm run build",
+        "build:server": "cd server && npm run build",
+        "start": "cd server && npm start",
+        "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+        "dev:client": "cd client && npm run dev",
+        "dev:server": "cd server && npm run dev",
+        "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+        "docker:build": "docker build -t saha-platform .",
+        "docker:run": "docker run -p 5000:5000 saha-platform",
+        "test": "cd server && npm test"
+    },
+    "keywords": [
+        "marketplace",
+        "classifieds",
+        "arabic",
+        "nextjs",
+        "nodejs",
+        "prisma",
+        "postgresql"
+    ],
+    "author": "Saha Platform Team",
+    "license": "MIT",
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=8.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/your-username/saha-platform"
+    },
+    "bugs": {
+        "url": "https://github.com/your-username/saha-platform/issues"
+    },
+    "homepage": "https://github.com/your-username/saha-platform#readme"
+}
