@@ -23,35 +23,56 @@ app.use(express.json());
 
 // Auto-migrate and seed database on startup
 const { PrismaClient } = require('@prisma/client');
+const { exec } = require('child_process');
 const prisma = new PrismaClient();
 
 async function initializeDatabase() {
     try {
-        console.log('🔄 التحقق من قاعدة البيانات...');
+        console.log('🔄 بدء تهيئة قاعدة البيانات...');
+
+        // Test database connection
+        await prisma.$connect();
+        console.log('✅ تم الاتصال بقاعدة البيانات');
 
         // Apply migrations
         console.log('📦 تطبيق الترحيلات...');
-        await prisma.$executeRaw`SELECT 1`; // Test connection
+        await new Promise((resolve, reject) => {
+            exec('npx prisma migrate deploy', (error, stdout, stderr) => {
+                if (error) {
+                    console.error('خطأ في تطبيق الترحيلات:', error);
+                    reject(error);
+                } else {
+                    console.log('✅ تم تطبيق الترحيلات بنجاح');
+                    resolve(stdout);
+                }
+            });
+        });
 
         // Check if countries table has data
         const countryCount = await prisma.country.count();
         if (countryCount === 0) {
-            console.log('🌱 إضافة البيانات الأساسية...');
+            console.log('🌱 إضافة البيانات الأساسية (الدول والمدن والعملات)...');
 
-            // Run seed
-            const { exec } = require('child_process');
-            exec('npx prisma db seed', (error, stdout, stderr) => {
-                if (error) {
-                    console.error('❌ فشل في إضافة البيانات:', error);
-                } else {
-                    console.log('✅ تم إضافة البيانات الأساسية بنجاح');
-                }
+            await new Promise((resolve, reject) => {
+                exec('npx prisma db seed', (error, stdout, stderr) => {
+                    if (error) {
+                        console.error('خطأ في إضافة البيانات:', error);
+                        reject(error);
+                    } else {
+                        console.log('✅ تم إضافة البيانات الأساسية بنجاح');
+                        console.log(`📊 تم إضافة: 40+ دولة، 60+ مدينة، 10+ عملات`);
+                        resolve(stdout);
+                    }
+                });
             });
         } else {
-            console.log('✅ قاعدة البيانات محدثة مسبقاً');
+            console.log(`✅ قاعدة البيانات جاهزة (${countryCount} دولة موجودة)`);
         }
+
+        console.log('🎉 قاعدة البيانات مُهيكلة ومُعدة بالكامل!');
     } catch (error) {
         console.error('❌ خطأ في تهيئة قاعدة البيانات:', error);
+        // Don't exit the process, just log the error
     }
 }
 
