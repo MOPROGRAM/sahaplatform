@@ -30,136 +30,65 @@ app.post('/api/setup-database', async (req, res) => {
     try {
         console.log('🔄 بدء إعداد قاعدة البيانات...');
 
-        // Create tables using raw SQL
-        console.log('📦 إنشاء الجداول...');
+        // Create all tables using raw SQL
+        console.log('📦 إنشاء جميع الجداول...');
 
-        await prisma.$executeRaw`
-            CREATE TABLE IF NOT EXISTS "Currency" (
-                "id" TEXT NOT NULL PRIMARY KEY,
-                "name" TEXT NOT NULL,
-                "nameAr" TEXT NOT NULL,
-                "nameEn" TEXT NOT NULL,
-                "code" TEXT NOT NULL UNIQUE,
-                "symbol" TEXT NOT NULL,
-                "isActive" BOOLEAN NOT NULL DEFAULT true,
-                "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                "updatedAt" TIMESTAMP(3) NOT NULL
-            );
-        `;
+        // Basic tables
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Currency" ("id" TEXT NOT NULL PRIMARY KEY, "name" TEXT NOT NULL, "nameAr" TEXT NOT NULL, "nameEn" TEXT NOT NULL, "code" TEXT NOT NULL UNIQUE, "symbol" TEXT NOT NULL, "isActive" BOOLEAN NOT NULL DEFAULT true, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Country" ("id" TEXT NOT NULL PRIMARY KEY, "name" TEXT NOT NULL, "nameAr" TEXT NOT NULL, "nameEn" TEXT NOT NULL, "code" TEXT NOT NULL UNIQUE, "phoneCode" TEXT NOT NULL, "currencyId" TEXT NOT NULL, "flag" TEXT, "isActive" BOOLEAN NOT NULL DEFAULT true, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "City" ("id" TEXT NOT NULL PRIMARY KEY, "name" TEXT NOT NULL, "nameAr" TEXT NOT NULL, "nameEn" TEXT NOT NULL, "countryId" TEXT NOT NULL, "latitude" REAL, "longitude" REAL, "isActive" BOOLEAN NOT NULL DEFAULT true, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
 
-        await prisma.$executeRaw`
-            CREATE TABLE IF NOT EXISTS "Country" (
-                "id" TEXT NOT NULL PRIMARY KEY,
-                "name" TEXT NOT NULL,
-                "nameAr" TEXT NOT NULL,
-                "nameEn" TEXT NOT NULL,
-                "code" TEXT NOT NULL UNIQUE,
-                "phoneCode" TEXT NOT NULL,
-                "currencyId" TEXT NOT NULL,
-                "flag" TEXT,
-                "isActive" BOOLEAN NOT NULL DEFAULT true,
-                "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                "updatedAt" TIMESTAMP(3) NOT NULL,
-                CONSTRAINT "Country_currencyId_fkey" FOREIGN KEY ("currencyId") REFERENCES "Currency"("id") ON DELETE RESTRICT ON UPDATE CASCADE
-            );
-        `;
+        // Auth tables
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Account" ("id" TEXT NOT NULL PRIMARY KEY, "userId" TEXT NOT NULL, "type" TEXT NOT NULL, "provider" TEXT NOT NULL, "providerAccountId" TEXT NOT NULL, "refresh_token" TEXT, "access_token" TEXT, "expires_at" INTEGER, "token_type" TEXT, "scope" TEXT, "id_token" TEXT, "session_state" TEXT);`;
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Session" ("id" TEXT NOT NULL PRIMARY KEY, "sessionToken" TEXT NOT NULL UNIQUE, "userId" TEXT NOT NULL, "expires" TIMESTAMP(3) NOT NULL);`;
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "User" ("id" TEXT NOT NULL PRIMARY KEY, "name" TEXT, "email" TEXT NOT NULL UNIQUE, "emailVerified" TIMESTAMP(3), "image" TEXT, "password" TEXT, "role" TEXT NOT NULL DEFAULT 'USER', "verified" BOOLEAN NOT NULL DEFAULT false, "phone" TEXT, "phoneVerified" BOOLEAN NOT NULL DEFAULT false, "countryId" TEXT, "cityId" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
 
-        await prisma.$executeRaw`
-            CREATE TABLE IF NOT EXISTS "City" (
-                "id" TEXT NOT NULL PRIMARY KEY,
-                "name" TEXT NOT NULL,
-                "nameAr" TEXT NOT NULL,
-                "nameEn" TEXT NOT NULL,
-                "countryId" TEXT NOT NULL,
-                "latitude" REAL,
-                "longitude" REAL,
-                "isActive" BOOLEAN NOT NULL DEFAULT true,
-                "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                "updatedAt" TIMESTAMP(3) NOT NULL,
-                CONSTRAINT "City_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE
-            );
-        `;
+        // Ads tables
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Ad" ("id" TEXT NOT NULL PRIMARY KEY, "title" TEXT NOT NULL, "titleAr" TEXT, "titleEn" TEXT, "description" TEXT NOT NULL, "descriptionAr" TEXT, "descriptionEn" TEXT, "price" REAL, "currencyId" TEXT NOT NULL DEFAULT 'sar', "category" TEXT NOT NULL, "cityId" TEXT, "latitude" REAL, "longitude" REAL, "images" TEXT NOT NULL DEFAULT '[]', "video" TEXT, "isBoosted" BOOLEAN NOT NULL DEFAULT false, "isActive" BOOLEAN NOT NULL DEFAULT true, "views" INTEGER NOT NULL DEFAULT 0, "authorId" TEXT NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
 
-        await prisma.$executeRaw`
-            CREATE UNIQUE INDEX IF NOT EXISTS "Currency_code_key" ON "Currency"("code");
-        `;
-
-        await prisma.$executeRaw`
-            CREATE UNIQUE INDEX IF NOT EXISTS "Country_code_key" ON "Country"("code");
-        `;
-
-        await prisma.$executeRaw`
-            CREATE UNIQUE INDEX IF NOT EXISTS "City_name_countryId_key" ON "City"("name", "countryId");
-        `;
-
-        console.log('✅ تم إنشاء الجداول');
+        console.log('✅ تم إنشاء جميع الجداول');
 
         // Insert basic data
         console.log('🌱 إدراج البيانات الأساسية...');
 
-        // Currencies
+        // Insert currencies (ignore if exists)
         await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "Currency" (id, code, symbol, name, nameAr, nameEn, "isActive", "createdAt", "updatedAt")
-            VALUES ('sar', 'sar', 'ر.س', 'Saudi Riyal', 'الريال السعودي', 'Saudi Riyal', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            INSERT OR IGNORE INTO "Currency" (id, code, symbol, name, nameAr, nameEn, "isActive")
+            VALUES
+            ('sar', 'sar', 'ر.س', 'Saudi Riyal', 'الريال السعودي', 'Saudi Riyal', true),
+            ('aed', 'aed', 'د.إ', 'UAE Dirham', 'الدرهم الإماراتي', 'UAE Dirham', true),
+            ('egp', 'egp', 'ج.م', 'Egyptian Pound', 'الجنيه المصري', 'Egyptian Pound', true),
+            ('usd', 'usd', '$', 'US Dollar', 'الدولار الأمريكي', 'US Dollar', true);
         `;
 
+        // Insert countries (ignore if exists)
         await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "Currency" (id, code, symbol, name, nameAr, nameEn, "isActive", "createdAt", "updatedAt")
-            VALUES ('aed', 'aed', 'د.إ', 'UAE Dirham', 'الدرهم الإماراتي', 'UAE Dirham', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            INSERT OR IGNORE INTO "Country" (id, code, name, nameAr, nameEn, "phoneCode", "currencyId", flag, "isActive")
+            VALUES
+            ('SA', 'SA', 'Saudi Arabia', 'المملكة العربية السعودية', 'Saudi Arabia', '+966', 'sar', '🇸🇦', true),
+            ('AE', 'AE', 'UAE', 'الإمارات العربية المتحدة', 'UAE', '+971', 'aed', '🇦🇪', true),
+            ('EG', 'EG', 'Egypt', 'مصر', 'Egypt', '+20', 'egp', '🇪🇬', true);
         `;
 
+        // Insert cities (ignore if exists)
         await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "Currency" (id, code, symbol, name, nameAr, nameEn, "isActive", "createdAt", "updatedAt")
-            VALUES ('egp', 'egp', 'ج.م', 'Egyptian Pound', 'الجنيه المصري', 'Egyptian Pound', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        `;
-
-        await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "Currency" (id, code, symbol, name, nameAr, nameEn, "isActive", "createdAt", "updatedAt")
-            VALUES ('usd', 'usd', '$', 'US Dollar', 'الدولار الأمريكي', 'US Dollar', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        `;
-
-        // Countries
-        await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "Country" (id, code, name, nameAr, nameEn, "phoneCode", "currencyId", flag, "isActive", "createdAt", "updatedAt")
-            VALUES ('SA', 'SA', 'Saudi Arabia', 'المملكة العربية السعودية', 'Saudi Arabia', '+966', 'sar', '🇸🇦', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        `;
-
-        await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "Country" (id, code, name, nameAr, nameEn, "phoneCode", "currencyId", flag, "isActive", "createdAt", "updatedAt")
-            VALUES ('AE', 'AE', 'UAE', 'الإمارات العربية المتحدة', 'UAE', '+971', 'aed', '🇦🇪', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        `;
-
-        await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "Country" (id, code, name, nameAr, nameEn, "phoneCode", "currencyId", flag, "isActive", "createdAt", "updatedAt")
-            VALUES ('EG', 'EG', 'Egypt', 'مصر', 'Egypt', '+20', 'egp', '🇪🇬', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        `;
-
-        // Cities
-        await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "City" (id, name, nameAr, nameEn, "countryId", latitude, longitude, "isActive", "createdAt", "updatedAt")
-            VALUES ('riyadh', 'Riyadh', 'الرياض', 'Riyadh', 'SA', 24.7136, 46.6753, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        `;
-
-        await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "City" (id, name, nameAr, nameEn, "countryId", latitude, longitude, "isActive", "createdAt", "updatedAt")
-            VALUES ('dubai', 'Dubai', 'دبي', 'Dubai', 'AE', 25.2048, 55.2708, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        `;
-
-        await prisma.$executeRaw`
-            INSERT OR IGNORE INTO "City" (id, name, nameAr, nameEn, "countryId", latitude, longitude, "isActive", "createdAt", "updatedAt")
-            VALUES ('cairo', 'Cairo', 'القاهرة', 'Cairo', 'EG', 30.0444, 31.2357, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            INSERT OR IGNORE INTO "City" (id, name, nameAr, nameEn, "countryId", latitude, longitude, "isActive")
+            VALUES
+            ('riyadh', 'Riyadh', 'الرياض', 'Riyadh', 'SA', 24.7136, 46.6753, true),
+            ('dubai', 'Dubai', 'دبي', 'Dubai', 'AE', 25.2048, 55.2708, true),
+            ('cairo', 'Cairo', 'القاهرة', 'Cairo', 'EG', 30.0444, 31.2357, true);
         `;
 
         console.log('✅ تم إعداد قاعدة البيانات بالكامل');
 
         res.json({
             success: true,
-            message: 'تم إعداد قاعدة البيانات بالكامل بنجاح',
+            message: 'تم إعداد قاعدة البيانات بالكامل بنجاح! 🎉',
             data: {
                 currencies: 4,
                 countries: 3,
                 cities: 3,
-                tablesCreated: ['Currency', 'Country', 'City']
+                tables: ['Currency', 'Country', 'City', 'Account', 'Session', 'User', 'Ad']
             }
         });
 
