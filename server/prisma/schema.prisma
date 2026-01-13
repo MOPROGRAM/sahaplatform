@@ -35,23 +35,26 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String         @unique
   emailVerified DateTime?
   image         String?
   password      String?
-  role          String    @default("USER")
-  verified      Boolean   @default(false)
+  role          String         @default("USER")
+  verified      Boolean        @default(false)
   phone         String?
+  phoneVerified Boolean        @default(false)
   location      String?
   accounts      Account[]
   sessions      Session[]
   ads           Ad[]
-  sentMessages  Message[] @relation("SentMessages")
-  receivedMessages Message[] @relation("ReceivedMessages")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  sentMessages  Message[]      @relation("SentMessages")
+  receivedMessages Message[]   @relation("ReceivedMessages")
+  subscriptions Subscription[]
+  payments      Payment[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model VerificationToken {
@@ -80,11 +83,63 @@ model Ad {
 }
 
 model Message {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   content     String
+  messageType String     @default("text") // text, image, file, voice
+  fileUrl     String?
+  fileName    String?
+  fileSize    Int?
   senderId    String
   receiverId  String
-  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
-  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  conversationId String
+  isRead      Boolean    @default(false)
+  sender      User       @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User       @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  createdAt   DateTime   @default(now())
+}
+
+model Conversation {
+  id          String    @id @default(cuid())
+  participants String[] // Array of user IDs for simplicity
+  lastMessage String?
+  lastMessageTime DateTime @default(now())
+  adId        String?   // If conversation is about specific ad
+  ad          Ad?       @relation(fields: [adId], references: [id])
+  messages    Message[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  userId      String
+  planName    String   // Basic, Premium, Gold
+  planType    String   // Ads boost, Featured listing, etc.
+  price       Float
+  currency    String   @default("SAR")
+  status      String   @default("active") // active, expired, cancelled
+  startDate   DateTime @default(now())
+  endDate     DateTime
+  autoRenew   Boolean  @default(true)
+  paymentId   String?  // Payment gateway transaction ID
+  user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Float
+  currency    String   @default("SAR")
+  status      String   @default("pending") // pending, completed, failed, refunded
+  paymentMethod String // credit_card, paypal, etc.
+  transactionId String @unique
+  description String
+  subscriptionId String?
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
