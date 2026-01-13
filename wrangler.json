@@ -1,0 +1,22 @@
+{
+    "name": "saha-platform",
+    "compatibility_date": "2024-01-01",
+    "pages_build_output_dir": "client/out",
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "saha-platform-db",
+            "database_id": "your-database-id-here",
+            "migrations_dir": "pages/d1/migrations"
+        }
+    ],
+    "vars": {
+        "NODE_ENV": "production",
+        "JWT_SECRET": "your_super_secret_saha_key_2025"
+    },
+    "pages_build_config": {
+        "build_command": "npm run build",
+        "destination_dir": "client/out",
+        "root_dir": "."
+    }
+}
