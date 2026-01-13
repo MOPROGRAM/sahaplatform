@@ -25,5 +25,45 @@ export const apiService = {
         });
         if (!response.ok) throw new Error('API Error');
         return response.json();
+    },
+
+    // Countries and Cities
+    async getCountries() {
+        return this.get('/countries');
+    },
+
+    async getCountry(id: string) {
+        return this.get(`/countries/${id}`);
+    },
+
+    // Ads
+    async getAds(filters: Record<string, any> = {}) {
+        return this.get('/ads', filters);
+    },
+
+    async getAd(id: string) {
+        return this.get(`/ads/${id}`);
+    },
+
+    async createAd(adData: any) {
+        return this.post('/ads', adData);
+    },
+
+    // Auth
+    async register(userData: { email: string; password: string; name: string }) {
+        return this.post('/auth/register', userData);
+    },
+
+    async login(credentials: { email: string; password: string }) {
+        return this.post('/auth/login', credentials);
+    },
+
+    // Conversations
+    async getConversations() {
+        return this.get('/conversations');
+    },
+
+    async sendMessage(conversationId: string, message: string) {
+        return this.post(`/conversations/${conversationId}/messages`, { content: message });
     }
 };
