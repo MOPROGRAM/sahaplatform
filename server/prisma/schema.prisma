@@ -45,7 +45,10 @@ model User {
   verified      Boolean        @default(false)
   phone         String?
   phoneVerified Boolean        @default(false)
-  location      String?
+  countryId     String?
+  cityId        String?
+  country       Country?       @relation(fields: [countryId], references: [id])
+  city          City?          @relation(fields: [cityId], references: [id])
   accounts      Account[]
   sessions      Session[]
   ads           Ad[]
@@ -68,16 +71,27 @@ model VerificationToken {
 model Ad {
   id          String   @id @default(cuid())
   title       String
+  titleAr     String?
+  titleEn     String?
   description String
+  descriptionAr String?
+  descriptionEn String?
   price       Float?
-  currency    String   @default("SAR")
+  currencyId  String   @default("sar") // Changed to reference Currency
+  currency    Currency @relation(fields: [currencyId], references: [id])
   category    String
-  location    String
-  images      String   @default("[]") // Changed from String[]
+  cityId      String?
+  city        City?    @relation(fields: [cityId], references: [id])
+  latitude    Float?
+  longitude   Float?
+  images      String   @default("[]") // JSON array of image URLs
   video       String?
   isBoosted   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  views       Int      @default(0)
   authorId    String
   author      User     @relation(fields: [authorId], references: [id])
+  conversations Conversation[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -101,7 +115,7 @@ model Message {
 
 model Conversation {
   id          String    @id @default(cuid())
-  participants String[] // Array of user IDs for simplicity
+  participants String   // JSON array of user IDs for simplicity
   lastMessage String?
   lastMessageTime DateTime @default(now())
   adId        String?   // If conversation is about specific ad
@@ -117,24 +131,78 @@ model Subscription {
   planName    String   // Basic, Premium, Gold
   planType    String   // Ads boost, Featured listing, etc.
   price       Float
-  currency    String   @default("SAR")
+  currencyId  String   @default("sar") // Changed to reference Currency
+  currency    Currency @relation(fields: [currencyId], references: [id])
   status      String   @default("active") // active, expired, cancelled
   startDate   DateTime @default(now())
   endDate     DateTime
   autoRenew   Boolean  @default(true)
   paymentId   String?  // Payment gateway transaction ID
   user        User     @relation(fields: [userId], references: [id])
+  payments    Payment[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Country {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  nameAr      String   @unique
+  nameEn      String   @unique
+  code        String   @unique // ISO country code (2 letters)
+  phoneCode   String   // International phone code
+  currencyId  String
+  currency    Currency @relation(fields: [currencyId], references: [id])
+  flag        String?  // Flag emoji or URL
+  isActive    Boolean  @default(true)
+  cities      City[]
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  nameAr    String
+  nameEn    String
+  countryId String
+  country   Country  @relation(fields: [countryId], references: [id])
+  latitude  Float?
+  longitude Float?
+  isActive  Boolean  @default(true)
+  ads       Ad[]
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, countryId])
+}
+
+model Currency {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  nameAr      String    @unique
+  nameEn      String    @unique
+  code        String    @unique // ISO currency code (3 letters)
+  symbol      String    // Currency symbol
+  countries   Country[]
+  ads         Ad[]
+  subscriptions Subscription[]
+  payments    Payment[]
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Payment {
   id          String   @id @default(cuid())
   userId      String
   amount      Float
-  currency    String   @default("SAR")
+  currencyId  String
+  currency    Currency @relation(fields: [currencyId], references: [id])
   status      String   @default("pending") // pending, completed, failed, refunded
-  paymentMethod String // credit_card, paypal, etc.
+  paymentMethod String // credit_card, paypal, stripe, apple_pay, google_pay
   transactionId String @unique
   description String
   subscriptionId String?
