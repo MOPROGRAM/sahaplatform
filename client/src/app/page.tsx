@@ -151,28 +151,28 @@ export default function HomePage() {
                 </header>
 
                 {/* Portal Layout */}
-                <div className="grid grid-cols-12 gap-2 h-full overflow-hidden pb-1">
+                <div className="grid grid-cols-12 gap-4 h-full overflow-hidden pb-4">
                     {/* Right Sidebar - Categories */}
-                    <aside className="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-2 space-y-2 h-full overflow-y-auto pr-1">
-                        <div className="glass rounded-xl overflow-hidden shadow-lg">
-                            <div className="gradient-secondary p-2 text-white text-[10px] font-extrabold text-center uppercase tracking-[0.1em] leading-none">
-                                بوابة الأقسام
+                    <aside className="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-2 space-y-4 h-full overflow-y-auto">
+                        <div className="glass rounded-xl overflow-hidden">
+                            <div className="bg-secondary p-3 text-white text-sm font-bold text-center">
+                                {t('categories')}
                             </div>
                             <div className="flex flex-col">
                                 {categories.map((cat, idx) => (
                                     <Link
                                         key={idx}
                                         href={`/ads?category=${cat.key}`}
-                                        className="px-3 py-2.5 border-b border-white/30 last:border-0 hover:bg-primary/10 cursor-pointer flex justify-between items-center group transition-all duration-300"
+                                        className="px-4 py-3 border-b border-gray-200 last:border-0 hover:bg-primary/10 cursor-pointer flex justify-between items-center group transition-all duration-300"
                                     >
-                                        <span className="text-[12px] font-[700] text-secondary/90 group-hover:text-primary flex items-center gap-2">
-                                            <svg className="w-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <span className="text-sm font-semibold text-secondary/90 group-hover:text-primary flex items-center gap-3">
+                                            <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconComponent(cat.icon)} />
                                             </svg>
                                             {cat.name}
                                         </span>
-                                        <span className="text-xs text-gray-500 font-medium">({cat.count})</span>
-                                        <ChevronLeft className="w-3.5 text-gray-400 group-hover:text-primary transition-all group-hover:translate-x-1" />
+                                        <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded-full">({cat.count})</span>
+                                        <ChevronLeft className="w-4 h-4 text-gray-400 group-hover:text-primary transition-all group-hover:translate-x-1" />
                                     </Link>
                                 ))}
                             </div>
@@ -196,21 +196,21 @@ export default function HomePage() {
                     </aside>
 
                     {/* Main Feed */}
-                    <section className="col-span-12 sm:col-span-6 md:col-span-7 lg:col-span-8 flex flex-col gap-3 h-full overflow-y-auto scrollbar-hide px-1">
-                        <div className="flex items-center gap-2 px-1 leading-none shrink-0 py-1">
-                            <Sparkles className="w-4 text-primary animate-pulse" />
-                            <h2 className="text-sm font-[900] text-secondary border-r-3 border-primary pr-3 italic">
+                    <section className="col-span-12 sm:col-span-6 md:col-span-7 lg:col-span-8 flex flex-col gap-4 h-full overflow-y-auto px-2">
+                        <div className="flex items-center gap-3 px-2 leading-none shrink-0 py-2">
+                            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                            <h2 className="text-lg font-bold text-secondary border-r-4 border-primary pr-4">
                                 {t('latestOffers')}
                             </h2>
                         </div>
 
                         {loading ? (
-                            <div className="flex items-center justify-center py-12">
-                                <div className="loading-spinner w-8 h-8 rounded-full"></div>
-                                <span className="mr-3 text-gray-600 font-medium">جارٍ تحميل الإعلانات...</span>
+                            <div className="flex items-center justify-center py-16">
+                                <div className="spinner"></div>
+                                <span className="mr-4 text-gray-600 font-medium">{t('loading')}</span>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 pb-16">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 pb-20">
                                 {categories.map((category, idx) => {
                                     const mockAds = [
                                         { title: `${category.name} عاجل جداً`, price: "للتفاوض" },
@@ -222,28 +222,28 @@ export default function HomePage() {
                                     const currentAd = mockAds[currentAdIndices[idx]];
 
                                     return (
-                                        <div key={idx} className="bg-white/40 backdrop-blur-md border border-white rounded-xl overflow-hidden shadow-xl shadow-black/[0.01] card-hover flex flex-col group/card hover:border-primary/30 transition-colors h-[240px]">
-                                            <div className="bg-white/60 p-1.5 text-secondary text-[11px] font-[900] border-b border-white flex items-center justify-between shrink-0">
-                                                <span className="flex items-center gap-1.5">
-                                                    <svg className="w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div key={idx} className="card flex flex-col group h-[280px]">
+                                            <div className="bg-gray-50 p-3 border-b border-gray-200 flex items-center justify-between shrink-0">
+                                                <span className="flex items-center gap-2">
+                                                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconComponent(category.icon)} />
                                                     </svg>
-                                                    {category.name}
+                                                    <span className="font-semibold text-secondary text-sm">{category.name}</span>
                                                 </span>
                                             </div>
 
-                                            <div className="divide-y divide-gray-50/50 overflow-hidden flex-1">
+                                            <div className="divide-y divide-gray-100 overflow-hidden flex-1">
                                                 {[0, 1, 2].map((i) => (
-                                                    <div key={i} className="py-2 px-2 border-b border-white/60 last:border-0 hover:bg-white/60 cursor-pointer flex flex-col gap-0.5 leading-tight group transition-all">
-                                                        <h4 className="text-[10px] font-bold text-secondary/90 line-clamp-1 group-hover:text-primary transition-colors">
-                                                            {category.name} جديد #{i + 1}
+                                                    <div key={i} className="py-3 px-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer flex flex-col gap-1 leading-tight group transition-all">
+                                                        <h4 className="text-xs font-semibold text-secondary/90 line-clamp-1 group-hover:text-primary transition-colors">
+                                                            {category.name} {t('newAd')} #{i + 1}
                                                         </h4>
-                                                        <div className="flex justify-between items-center text-[8px] text-gray-400 font-medium select-none">
+                                                        <div className="flex justify-between items-center text-xs text-gray-500 font-medium">
                                                             <span className="flex items-center gap-1">
-                                                                <Clock className="w-2.5" />
-                                                                10د
+                                                                <Clock className="w-3 h-3" />
+                                                                10 {language === 'ar' ? 'ساعة' : 'hours'}
                                                             </span>
-                                                            <span className="text-primary font-black bg-primary/5 px-1 rounded">1,200 ر.س</span>
+                                                            <span className="text-primary font-bold bg-primary/10 px-2 py-1 rounded text-xs">1,200 {language === 'ar' ? 'ر.س' : 'SAR'}</span>
                                                         </div>
                                                     </div>
                                                 ))}

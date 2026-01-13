@@ -10,6 +10,7 @@ export const translations = {
         dashboard: 'لوحة التحكم',
         logout: 'تسجيل الخروج',
         latestOffers: 'أحدث العروض الحصرية',
+        categories: 'بوابة الأقسام',
 
         // Categories
         jobs: 'وظائف',
@@ -47,6 +48,7 @@ export const translations = {
         noResults: 'لا توجد نتائج',
         error: 'حدث خطأ',
         success: 'تم بنجاح',
+        newAd: 'جديد',
 
         // Placeholders
         searchPlaceholder: 'ابحث عن وظائف، عقارات، سيارات...',
@@ -70,6 +72,7 @@ export const translations = {
         dashboard: 'Dashboard',
         logout: 'Logout',
         latestOffers: 'Latest Exclusive Offers',
+        categories: 'Categories Portal',
 
         // Categories
         jobs: 'Jobs',
@@ -107,6 +110,7 @@ export const translations = {
         noResults: 'No results found',
         error: 'An error occurred',
         success: 'Success',
+        newAd: 'New',
 
         // Placeholders
         searchPlaceholder: 'Search for jobs, real estate, cars...',
