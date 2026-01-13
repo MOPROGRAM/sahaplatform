@@ -31,7 +31,7 @@ Thumbs.db
 
 # Database
 database/*.db
-prisma/dev.db
+server/prisma/dev.db
 
 # Logs
 logs

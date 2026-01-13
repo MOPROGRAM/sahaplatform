@@ -34,6 +34,12 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy server source code
 COPY server/ .
 
+# Generate Prisma client
+RUN npx prisma generate
+
+# Run database migrations
+RUN npx prisma migrate deploy
+
 # Copy built frontend from the builder stage
 COPY --from=frontend-builder /app/client/out ./public
 
