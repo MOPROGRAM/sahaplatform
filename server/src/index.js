@@ -29,10 +29,12 @@ app.get('/', (req, res) => {
 // Import Modules
 const authRoutes = require('./modules/auth/auth.controller');
 const adRoutes = require('./modules/ads/ad.controller');
+const conversationRoutes = require('./modules/conversations/conversation.controller');
 const authMiddleware = require('./middleware/auth');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
+app.use('/api/conversations', conversationRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket) => {
