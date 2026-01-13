@@ -37,11 +37,19 @@ COPY server/ .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Run database migrations
-RUN npx prisma migrate deploy
-
 # Copy built frontend from the builder stage
 COPY --from=frontend-builder /app/client/out ./public
+
+# Create entrypoint script
+RUN echo '#!/bin/sh\n\
+    echo "🚀 Starting Saha Platform..."\n\
+    echo "📊 Running database migrations..."\n\
+    npx prisma migrate deploy --schema=./prisma/schema.prisma\n\
+    echo "🌱 Seeding database..."\n\
+    npx prisma db seed\n\
+    echo "✅ Database ready!"\n\
+    echo "🌐 Starting application..."\n\
+    exec "$@"' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S saha -u 1001
@@ -58,5 +66,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
 # Start the application
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "src/index.js"]
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["dumb-init", "--", "node", "src/index.js"]
