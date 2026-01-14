@@ -16,6 +16,19 @@
 - **🔐 Authentication:** JWT-based user system with secure registration/login
 - **🗄️ Database:** PostgreSQL with Prisma ORM for data persistence (production-ready)
 
+## ☁️ تشغيل سحابي فوري (بدون تحميل)
+
+يمكنك تشغيل المنصة كاملة (الموقع + السيرفر + قاعدة البيانات) بضغطة زر واحدة باستخدام إحدى الخدمات التالية:
+
+### 1. GitHub Codespaces (موصى به)
+إذا كان لديك حساب GitHub، اضغط على زر **Code** الأخضر في الأعلى، ثم اختر **Codespaces** واضغط **Create codespace on main**.
+سيقوم تلقائياً بتثبيت كل شيء وتشغيل الموقع لك في المتصفح.
+
+### 2. Gitpod
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/your-username/saha-platform)
+
+## 🛠️ Tech Stack
+
 ## 🛠️ Tech Stack
 
 ### Frontend

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon } from 'lucide-react';
 import { apiService } from '@/lib/api';
 
@@ -22,12 +23,9 @@ interface Ad {
     createdAt: string;
 }
 
-interface AdsPageProps {
-    searchParams: { category?: string };
-}
-
-export default function AdsPage({ searchParams }: AdsPageProps) {
-    const category = searchParams.category;
+function AdsContent() {
+    const searchParams = useSearchParams();
+    const category = searchParams.get('category');
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
@@ -237,7 +235,8 @@ export default function AdsPage({ searchParams }: AdsPageProps) {
                                             <button
                                                 className="p-1 hover:bg-gray-100 rounded transition-colors"
                                                 title="Share this ad"
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.preventDefault();
                                                     if (navigator.share) {
                                                         navigator.share({
                                                             title: ad.title,
@@ -272,5 +271,13 @@ export default function AdsPage({ searchParams }: AdsPageProps) {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function AdsPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <AdsContent />
+        </Suspense>
     );
 }

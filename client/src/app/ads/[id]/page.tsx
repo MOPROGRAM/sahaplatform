@@ -37,6 +37,10 @@ interface Ad {
     createdAt: string;
 }
 
+export async function generateStaticParams() {
+    return [];
+}
+
 export default function AdDetailsPage() {
     const { language, t } = useLanguage();
     const params = useParams();

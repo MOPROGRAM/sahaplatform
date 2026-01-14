@@ -1,0 +1,19 @@
+{
+    "name": "Saha Platform Monorepo",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "prisma.prisma"
+            ]
+        }
+    },
+    "forwardPorts": [
+        3000,
+        5000
+    ],
+    "postCreateCommand": "npm run install:all && cd server && npx prisma generate && npx prisma migrate dev --name init && npx prisma db seed",
+    "remoteUser": "node"
+}
