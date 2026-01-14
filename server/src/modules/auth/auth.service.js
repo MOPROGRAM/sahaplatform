@@ -31,7 +31,16 @@ const login = async (email, password) => {
         if (!isValid) throw new Error('Invalid credentials');
 
         const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-        return token;
+        return {
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                verified: user.verified
+            }
+        };
     } catch (error) {
         if (error.message.includes('does not exist')) {
             throw new Error('قاعدة البيانات غير مهيكلة بعد. يرجى تشغيل /api/setup-database أولاً');

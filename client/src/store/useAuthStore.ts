@@ -19,14 +19,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.login(email, password);
-
             authService.setToken(response.token);
-
-            // Decode user info from token (simplified)
-            const user = { id: 'temp', email, name: 'User', role: 'USER' };
-
             set({
-                user,
+                user: response.user,
                 session: response.token
             });
         } finally {
@@ -37,18 +32,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.register(email, password, name);
-
-            // After registration, automatically log in
             const loginResponse = await authService.login(email, password);
             authService.setToken(loginResponse.token);
-
             set({
-                user: {
-                    id: response.user.id,
-                    email: response.user.email,
-                    name: response.user.name,
-                    role: response.user.role || 'USER'
-                },
+                user: loginResponse.user,
                 session: loginResponse.token
             });
         } finally {
@@ -64,8 +51,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
             const token = authService.getToken();
             if (token) {
-                // TODO: Validate token with backend
                 set({ session: token });
+                try {
+                    // Fetch real profile from backend
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/auth/me`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const user = await response.json();
+                        set({ user });
+                    } else {
+                        authService.removeToken();
+                        set({ user: null, session: null });
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch profile:", e);
+                }
             }
         } finally {
             set({ loading: false });

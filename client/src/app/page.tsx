@@ -208,14 +208,8 @@ export default function HomePage() {
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 pb-20">
                                 {categories.map((category, idx) => {
-                                    const mockAds = [
-                                        { title: `${category.name} عاجل جداً`, price: "للتفاوض" },
-                                        { title: `فرصة ${category.name} مميزة`, price: "500 ر.س" },
-                                        { title: `خدمات ${category.name} شاملة`, price: "120 ر.س" },
-                                        { title: `عرض ${category.name} حصري`, price: "2500 ر.س" },
-                                        { title: `منتج ${category.name} ممتاز`, price: "50,000 ر.س" }
-                                    ];
-                                    const currentAd = mockAds[currentAdIndices[idx]];
+                                    const categoryAds = ads.filter(a => a.category === category.key).slice(0, 3);
+                                    const featuredAd = ads.find(a => a.category === category.key && a.featured) || categoryAds[0];
 
                                     return (
                                         <div key={idx} className="card flex flex-col group h-[280px]">
@@ -229,52 +223,58 @@ export default function HomePage() {
                                             </div>
 
                                             <div className="divide-y divide-gray-100 overflow-hidden flex-1">
-                                                {[0, 1, 2].map((i) => (
-                                                    <div key={i} className="py-3 px-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer flex flex-col gap-1 leading-tight group transition-all">
+                                                {categoryAds.length > 0 ? categoryAds.map((ad, i) => (
+                                                    <Link
+                                                        key={ad.id}
+                                                        href={`/ads/view?id=${ad.id}`}
+                                                        className="py-3 px-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer flex flex-col gap-1 leading-tight group transition-all"
+                                                    >
                                                         <h4 className="text-xs font-semibold text-secondary/90 line-clamp-1 group-hover:text-primary transition-colors">
-                                                            {category.name} {t('newAd')} #{i + 1}
+                                                            {ad.title}
                                                         </h4>
                                                         <div className="flex justify-between items-center text-xs text-gray-500 font-medium">
                                                             <span className="flex items-center gap-1">
                                                                 <Clock className="w-3 h-3" />
-                                                                10 {language === 'ar' ? 'ساعة' : 'hours'}
+                                                                {new Date(ad.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                                                             </span>
-                                                            <span className="text-primary font-bold bg-primary/10 px-2 py-1 rounded text-xs">1,200 {language === 'ar' ? 'ر.س' : 'SAR'}</span>
+                                                            <span className="text-primary font-bold bg-primary/10 px-2 py-1 rounded text-xs">{ad.price} {language === 'ar' ? 'ر.س' : 'SAR'}</span>
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    </Link>
+                                                )) : (
+                                                    <div className="p-4 text-center text-gray-400 text-[10px] italic">لا يوجد إعلانات حالياً</div>
+                                                )}
                                             </div>
 
-                                            <div className="bg-gradient-to-br from-primary/5 to-transparent border-t border-b border-gray-100 group/spotlight relative h-[85px] overflow-hidden shrink-0">
-                                                <div className="absolute inset-0 p-2 flex gap-2 animate-card-switch group cursor-pointer hover:bg-white/40 transition-colors">
-                                                    <div className="w-[65px] h-full bg-white rounded-md shrink-0 flex items-center justify-center relative overflow-hidden border border-white shadow-sm">
-                                                        <ImageIcon className="w-4 text-gray-300" />
-                                                        <div className="absolute top-0 right-0 bg-primary/90 text-white text-[7px] font-black px-1 py-0 rounded-bl-md shadow-sm">مميز</div>
-                                                    </div>
-                                                    <div className="flex-1 flex flex-col justify-between py-0.5">
-                                                        <div className="flex flex-col gap-0.5">
-                                                            <h4 className="text-[10px] font-[900] text-secondary line-clamp-2 leading-[1.2] group-hover/spotlight:text-primary transition-colors">
-                                                                {currentAd.title}
-                                                            </h4>
-                                                            <div className="flex items-center gap-2 text-[8px] text-gray-400 font-medium select-none">
-                                                                <span className="flex items-center gap-0.5">
-                                                                    <MapPin className="w-2.5 text-gray-300" />
-                                                                    الرياض
-                                                                </span>
+                                            {featuredAd && (
+                                                <div className="bg-gradient-to-br from-primary/5 to-transparent border-t border-b border-gray-100 group/spotlight relative h-[85px] overflow-hidden shrink-0">
+                                                    <Link href={`/ads/view?id=${featuredAd.id}`} className="absolute inset-0 p-2 flex gap-2 group cursor-pointer hover:bg-white/40 transition-colors">
+                                                        <div className="w-[65px] h-full bg-white rounded-md shrink-0 flex items-center justify-center relative overflow-hidden border border-white shadow-sm">
+                                                            <ImageIcon className="w-4 text-gray-300" />
+                                                            {featuredAd.featured && <div className="absolute top-0 right-0 bg-primary/90 text-white text-[7px] font-black px-1 py-0 rounded-bl-md shadow-sm">مميز</div>}
+                                                        </div>
+                                                        <div className="flex-1 flex flex-col justify-between py-0.5">
+                                                            <div className="flex flex-col gap-0.5">
+                                                                <h4 className="text-[10px] font-[900] text-secondary line-clamp-2 leading-[1.2] group-hover/spotlight:text-primary transition-colors">
+                                                                    {featuredAd.title}
+                                                                </h4>
+                                                                <div className="flex items-center gap-2 text-[8px] text-gray-400 font-medium select-none">
+                                                                    <span className="flex items-center gap-0.5">
+                                                                        <MapPin className="w-2.5 text-gray-300" />
+                                                                        {featuredAd.location}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex justify-between items-end">
+                                                                <span className="text-[10px] font-black text-primary">{featuredAd.price}</span>
+                                                                <span className="text-[8px] font-bold bg-white border border-gray-100 px-1.5 py-0 rounded shadow-sm">التفاصيل</span>
                                                             </div>
                                                         </div>
-                                                        <div className="flex justify-between items-end">
-                                                            <span className="text-[10px] font-black text-primary">{currentAd.price}</span>
-                                                            <Link href={`/ads/view?id=${idx + 1}`} className="text-[8px] font-bold bg-white border border-gray-100 px-1.5 py-0 rounded shadow-sm hover:border-primary/50 hover:text-primary transition-colors cursor-pointer">
-                                                                التفاصيل
-                                                            </Link>
-                                                        </div>
-                                                    </div>
+                                                    </Link>
                                                 </div>
-                                            </div>
+                                            )}
 
                                             <div className="py-1 bg-white/30 text-center border-t border-white/50 shrink-0">
-                                                <Link href={`/ads?category=${category.name}`} className="text-[8px] font-extrabold text-gray-400 hover:text-primary uppercase tracking-widest transition-all">
+                                                <Link href={`/ads?category=${category.key}`} className="text-[8px] font-extrabold text-gray-400 hover:text-primary uppercase tracking-widest transition-all">
                                                     عرض الكل
                                                 </Link>
                                             </div>

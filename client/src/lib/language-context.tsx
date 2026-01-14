@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Language, getCurrentLanguage, setLanguage as setLangUtil, getTranslation, TranslationKey } from './i18n';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface LanguageContextType {
     language: Language;
@@ -13,9 +14,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [language, setLanguageState] = useState<Language>('ar');
+    const { initialize } = useAuthStore();
 
     useEffect(() => {
         setLanguageState(getCurrentLanguage());
+        initialize();
     }, []);
 
     const setLanguage = (lang: Language) => {

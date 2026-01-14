@@ -2,13 +2,13 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const getAllAds = async (filters) => {
-    const { category, cityId, minPrice, maxPrice, searchQuery } = filters;
+    const { category, cityId, minPrice, maxPrice, searchQuery, authorId } = filters;
 
     try {
         return await prisma.ad.findMany({
             where: {
                 AND: [
-                    { isActive: true }, // Only show active ads
+                    authorId ? { authorId } : { isActive: true }, // If searching my ads, show all. Otherwise only active.
                     category ? { category } : {},
                     cityId ? { cityId } : {},
                     searchQuery ? {
@@ -39,23 +39,24 @@ const getAllAds = async (filters) => {
             orderBy: { createdAt: 'desc' }
         });
     } catch (error) {
-        // If tables don't exist yet, return empty array
-        console.log('Database not initialized yet, returning empty ads');
+        console.log('Database error:', error.message);
         return [];
     }
 };
 
 const createAd = async (adData, userId) => {
     try {
+        // Remove authorId from adData if it exists to avoid duplication with userId param
+        const { authorId, ...data } = adData;
         return await prisma.ad.create({
             data: {
-                ...adData,
+                ...data,
                 authorId: userId
             }
         });
     } catch (error) {
-        console.error('Database not initialized yet:', error.message);
-        throw new Error('قاعدة البيانات غير مهيكلة بعد. يرجى تشغيل /api/setup-database أولاً');
+        console.error('Database error:', error.message);
+        throw new Error('فشل في إنشاء الإعلان. تأكد من أن قاعدة البيانات جاهزة.');
     }
 };
 
