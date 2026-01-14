@@ -1,6 +1,10 @@
 // Simple internationalization system
 export const translations = {
     ar: {
+        // Brand
+        siteName: 'ساحة',
+        siteBrand: 'ساحة للمزادات والعقارات',
+
         // Navigation
         home: 'الرئيسية',
         ads: 'الإعلانات',
@@ -29,9 +33,13 @@ export const translations = {
         addToFavorites: 'أضف للمفضلة',
         share: 'مشاركة',
         details: 'التفاصيل',
-        contact: 'اتصل',
+        contact: 'اتصل من هنا',
         save: 'حفظ',
         cancel: 'إلغاء',
+        choosePlan: 'اختر الباقة',
+        startToday: 'ابدأ اليوم وشاهد الفرق',
+        joinThousands: 'انضم لآلاف التجار الناجحين الذين زادوا مبيعاتهم مع ساحة',
+        postYourFirst: 'أضف إعلانك الأول',
 
         // Forms
         email: 'البريد الإلكتروني',
@@ -62,8 +70,13 @@ export const translations = {
         inactive: 'غير نشط',
         verified: 'موثوق',
         featured: 'مميز',
+        trustedMerchant: 'تاجر موثوق',
     },
     en: {
+        // Brand
+        siteName: 'Saha',
+        siteBrand: 'Saha Auctions & Real Estate',
+
         // Navigation
         home: 'Home',
         ads: 'Ads',
@@ -92,9 +105,13 @@ export const translations = {
         addToFavorites: 'Add to Favorites',
         share: 'Share',
         details: 'Details',
-        contact: 'Contact',
+        contact: 'Contact Seller',
         save: 'Save',
         cancel: 'Cancel',
+        choosePlan: 'Choose Plan',
+        startToday: 'Start Today and See the Difference',
+        joinThousands: 'Join thousands of successful merchants who increased their sales with Saha',
+        postYourFirst: 'Post Your First Ad',
 
         // Forms
         email: 'Email',
@@ -125,6 +142,7 @@ export const translations = {
         inactive: 'Inactive',
         verified: 'Verified',
         featured: 'Featured',
+        trustedMerchant: 'Trusted Merchant',
     }
 };
 
