@@ -8,7 +8,8 @@ WORKDIR /app/client
 COPY client/package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production=false
+# Install dependencies
+RUN npm install
 
 # Copy source code
 COPY client/ .
@@ -19,8 +20,8 @@ RUN npm run build
 # Stage 2: Setup the production environment
 FROM node:18-alpine AS production
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init and sqlite dependencies
+RUN apk add --no-cache dumb-init sqlite
 
 # Create app directory
 WORKDIR /app
@@ -29,33 +30,37 @@ WORKDIR /app
 COPY server/package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --production && npm cache clean --force
 
 # Copy server source code
 COPY server/ .
 
+# Ensure prisma directory exists and copy it specifically if needed (though COPY server/ . covers it)
 # Generate Prisma client
 RUN npx prisma generate
 
 # Copy built frontend from the builder stage
 COPY --from=frontend-builder /app/client/out ./public
 
-# Create entrypoint script
-RUN echo '#!/bin/sh\n\
-    echo "🚀 Starting Saha Platform..."\n\
-    echo "📊 Running database migrations..."\n\
-    npx prisma migrate deploy --schema=./prisma/schema.prisma\n\
-    echo "🌱 Seeding database..."\n\
-    npx prisma db seed\n\
-    echo "✅ Database ready!"\n\
-    echo "🌐 Starting application..."\n\
-    exec "$@"' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+# Create entrypoint script with proper multi-line handling
+COPY --chmod=755 <<EOF /app/entrypoint.sh
+#!/bin/sh
+echo "🚀 Starting Saha Platform..."
+echo "📊 Running database migrations... (if schema changes)"
+# Using push instead of migrate deploy for SQLite ensures dev.db is created/updated
+npx prisma db push
+echo "🌱 Seeding database..."
+npx prisma db seed
+echo "✅ Database ready!"
+echo "🌐 Starting application..."
+exec "\$@"
+EOF
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S saha -u 1001
 
-# Change ownership
-RUN chown -R saha:nodejs /app
+# Change ownership of the app directory to allow writing to the database
+RUN chown -R saha:nodejs /app && chmod 777 /app
 USER saha
 
 # Expose port
