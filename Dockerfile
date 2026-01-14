@@ -66,15 +66,9 @@ echo "🚀 Starting Saha Platform..."
 mkdir -p /app/prisma
 
 echo "📊 Running database setup..."
-if [ ! -f "/app/prisma/dev.db" ]; then
-    echo "Creating new database..."
-    npx prisma db push --accept-data-loss
-    echo "🌱 Seeding database..."
-    npx prisma db seed
-else
-    echo "Database exists, applying migrations..."
-    npx prisma db push
-fi
+npx prisma db push --accept-data-loss
+echo "🌱 Syncing global data (Currencies/Countries)..."
+npx prisma db seed
 
 echo "✅ Database ready!"
 echo "🌐 Starting application..."

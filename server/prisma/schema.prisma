@@ -81,6 +81,7 @@ model Ad {
   currencyId  String   @default("sar")
   currency    Currency @relation(fields: [currencyId], references: [id])
   category    String
+  location    String?
   cityId      String?
   city        City?    @relation(fields: [cityId], references: [id])
   latitude    Float?
