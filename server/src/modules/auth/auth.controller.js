@@ -40,4 +40,29 @@ router.get('/me', authMiddleware, async (req, res) => {
     }
 });
 
+router.post('/make-admin', async (req, res) => {
+    try {
+        const { email, secret } = req.body;
+        // Simple protection for the admin creation endpoint
+        if (secret !== 'SAHA_ADMIN_SECRET_2026') {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const { PrismaClient } = require('@prisma/client');
+        const prisma = new PrismaClient();
+
+        const user = await prisma.user.update({
+            where: { email },
+            data: { role: 'ADMIN' }
+        });
+
+        res.json({
+            message: 'User promoted to ADMIN successfully',
+            user: { id: user.id, email: user.email, role: user.role }
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 module.exports = router;

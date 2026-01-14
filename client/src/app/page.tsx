@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Search, MapPin, Heart, MessageSquare, PlusCircle, Sparkles, Zap, ChevronLeft, Clock, Image as ImageIcon, Globe, Grid, TrendingUp } from 'lucide-react';
 import { apiService } from '@/lib/api';
 import { useLanguage } from '@/lib/language-context';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface Ad {
     id: string;
@@ -18,6 +19,7 @@ interface Ad {
 
 export default function HomePage() {
     const { language, setLanguage, t } = useLanguage();
+    const { user } = useAuthStore();
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -68,10 +70,22 @@ export default function HomePage() {
                     </button>
                     <Link href="/help" className="hover:text-white">{t('help')}</Link>
                     <Link href="/advertise" className="text-primary font-bold">{t('advertiseWithUs')}</Link>
+                    {user?.role === 'ADMIN' && (
+                        <Link href="/admin" className="text-red-500 font-bold border-r border-white/10 pr-4 ml-4 uppercase tracking-widest animate-pulse">
+                            System Control
+                        </Link>
+                    )}
                 </div>
                 <div className="flex gap-4">
                     <span className="opacity-60 italic">{language === 'ar' ? 'الجو: صافي' : 'Sunny 24°C'}</span>
-                    <Link href="/login" className="font-bold hover:text-white">{t('login')}</Link>
+                    {user ? (
+                        <Link href="/dashboard" className="font-bold hover:text-white flex items-center gap-1">
+                            <div className="w-4 h-4 bg-primary/20 rounded-full flex items-center justify-center text-[8px] border border-primary/30 uppercase">{user.name?.substring(0, 1)}</div>
+                            {user.name}
+                        </Link>
+                    ) : (
+                        <Link href="/login" className="font-bold hover:text-white">{t('login')}</Link>
+                    )}
                 </div>
             </div>
 
