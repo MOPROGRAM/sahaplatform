@@ -1,4 +1,3 @@
-import { apiService } from "@/lib/api";
 import AdDetailsContent from "./AdDetailsContent";
 
 // This function is required for static export to work with dynamic routes.
