@@ -66,10 +66,16 @@ export default function HomePage() {
             <Header />
 
             {/* Ticker - Micro Density */}
-            <div className="bg-yellow-50 border-b border-yellow-100 py-0.5 overflow-hidden text-[9px] font-bold text-yellow-800">
-                <div className="animate-marquee flex gap-20">
-                    <span>🔥 {language === 'ar' ? 'عروض حصرية لمشتركي باقة "ساحة بيزنس" - خصم 50%' : 'Exclusive offers for Saha Business members - 50% OFF'}</span>
-                    <span>📈 {language === 'ar' ? 'أفضل وقت لنشر إعلانات السيارات: الآن!' : 'Best time to post Car ads: NOW!'}</span>
+            <div className="bg-navy text-white py-1.5 overflow-hidden text-[12px] font-black uppercase tracking-widest border-b border-white/10 shadow-lg">
+                <div className="animate-marquee flex gap-32">
+                    <span className="flex items-center gap-2">
+                        <span className="bg-primary text-white px-1.5 py-0.5 rounded-xs text-[10px] italic">HOT</span>
+                        {language === 'ar' ? 'عروض حصرية لمشتركي باقة "ساحة بيزنس" - خصم 50%' : 'Exclusive offers for Saha Business members - 50% OFF'}
+                    </span>
+                    <span className="flex items-center gap-2">
+                        <span className="bg-emerald text-white px-1.5 py-0.5 rounded-xs text-[10px] italic">TRENDING</span>
+                        {language === 'ar' ? 'أفضل وقت لنشر إعلانات السيارات: الآن!' : 'Best time to post Car ads: NOW!'}
+                    </span>
                 </div>
             </div>
 

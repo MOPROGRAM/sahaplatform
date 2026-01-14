@@ -94,32 +94,42 @@ export default function PostAdPage() {
                         <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex flex-col animate-in fade-in slide-in-from-right-4">
                             <div className="p-6 space-y-5">
                                 {error && (
-                                    <div className="bg-red-50 text-red-600 p-3 text-[10px] font-black border-r-4 border-red-500 rounded-sm uppercase tracking-tighter italic">
-                                        Error Code: {error}
+                                    <div className="bg-red-50 text-red-600 p-4 text-[13px] font-black border-r-4 border-red-500 rounded-sm uppercase tracking-tighter italic flex items-center gap-3">
+                                        <Info className="shrink-0" size={18} />
+                                        <div>
+                                            <span className="block text-[11px] opacity-70">SYSTEM ERROR CODE: 401_AUTH_FAILURE</span>
+                                            {error}
+                                        </div>
                                     </div>
                                 )}
 
-                                <div className="space-y-4">
-                                    <div className="flex flex-col gap-1.5">
-                                        <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">{language === 'ar' ? 'عنوان الإعلان الإحترافي *' : 'Professional Ad Title *'}</label>
+                                <div className="space-y-6">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[12px] font-black text-secondary uppercase tracking-[0.15em] pl-1 flex items-center gap-2">
+                                            <div className="w-1 h-3 bg-primary rounded-full"></div>
+                                            {language === 'ar' ? 'عنوان الإعلان الإحترافي *' : 'Professional Ad Title *'}
+                                        </label>
                                         <input
                                             name="title"
                                             value={formData.title}
                                             onChange={handleInputChange}
-                                            className="bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tighter"
+                                            className="bg-gray-50 border border-gray-200 p-4 text-[14px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tighter"
                                             placeholder={language === 'ar' ? 'مثال: شقة استثمارية في حي النرجس...' : 'e.g. Investment Apartment in District 5...'}
                                             required
                                         />
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="flex flex-col gap-1.5">
-                                            <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">{t('category')} *</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[12px] font-black text-secondary uppercase tracking-[0.15em] pl-1 flex items-center gap-2">
+                                                <div className="w-1 h-3 bg-navy rounded-full"></div>
+                                                {t('category')} *
+                                            </label>
                                             <select
                                                 name="category"
                                                 value={formData.category}
                                                 onChange={handleInputChange}
-                                                className="bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner uppercase tracking-tighter"
+                                                className="bg-gray-50 border border-gray-200 p-4 text-[13px] font-black rounded-sm outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner uppercase tracking-tighter"
                                                 required
                                             >
                                                 <option value="">{language === 'ar' ? 'اختر تصنيف الوحدة' : 'SELECT UNIT CATEGORY'}</option>
@@ -128,58 +138,68 @@ export default function PostAdPage() {
                                                 <option value="cars">Automotive / سيارات</option>
                                                 <option value="goods">Retail / سلع</option>
                                                 <option value="services">Services / خدمات</option>
+                                                <option value="other">Other / أخرى</option>
                                             </select>
                                         </div>
-                                        <div className="flex flex-col gap-1.5">
-                                            <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">ASKING PRICE (SAR) *</label>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[12px] font-black text-secondary uppercase tracking-[0.15em] pl-1 flex items-center gap-2">
+                                                <div className="w-1 h-3 bg-emerald rounded-full"></div>
+                                                ASKING PRICE (SAR) *
+                                            </label>
                                             <input
                                                 name="price"
                                                 type="number"
                                                 value={formData.price}
                                                 onChange={handleInputChange}
-                                                className="bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner italic"
+                                                className="bg-gray-50 border border-gray-200 p-4 text-[14px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner italic"
                                                 placeholder="0.00"
                                                 required
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-1.5">
-                                        <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">Deployment Location *</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[12px] font-black text-secondary uppercase tracking-[0.15em] pl-1 flex items-center gap-2">
+                                            <div className="w-1 h-3 bg-amber rounded-full"></div>
+                                            Deployment Location *
+                                        </label>
                                         <div className="relative">
                                             <input
                                                 name="location"
                                                 value={formData.location}
                                                 onChange={handleInputChange}
-                                                className="w-full bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tighter"
+                                                className="w-full bg-gray-50 border border-gray-200 p-4 text-[14px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tighter"
                                                 placeholder={language === 'ar' ? 'الرياض، مكة، دبي...' : 'Riyadh, Dubai...'}
                                                 required
                                             />
-                                            <MapPin size={14} className="absolute right-3 top-3.5 text-primary opacity-40" />
+                                            <MapPin size={18} className="absolute right-4 top-4 text-primary opacity-40" />
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-1.5">
-                                        <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">detailed Briefing / description</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[12px] font-black text-secondary uppercase tracking-[0.15em] pl-1 flex items-center gap-2">
+                                            <div className="w-1 h-3 bg-secondary rounded-full"></div>
+                                            detailed Briefing / description
+                                        </label>
                                         <textarea
                                             name="description"
                                             value={formData.description}
                                             onChange={handleInputChange}
                                             rows={6}
-                                            className="bg-gray-50 border border-gray-100 p-4 text-[11px] font-bold rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner resize-none leading-relaxed"
+                                            className="bg-gray-50 border border-gray-200 p-5 text-[14px] font-medium rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner resize-none leading-relaxed"
                                             placeholder={language === 'ar' ? 'اكتب وصفاً تقنياً دقيقاً...' : 'Write a technical and accurate description...'}
                                         ></textarea>
                                     </div>
                                 </div>
 
-                                <div className="pt-4">
+                                <div className="pt-6 border-t border-gray-100">
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-sm text-[13px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center gap-3 active:scale-95 group"
+                                        className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-sm text-[15px] font-black uppercase tracking-[0.25em] shadow-2xl shadow-primary/40 transition-all flex items-center justify-center gap-4 active:scale-95 group mb-4 border-b-4 border-primary-dark"
                                     >
-                                        {loading ? <Loader2 className="animate-spin" size={18} /> : <PlusCircle size={18} className="group-hover:rotate-90 transition-transform" />}
-                                        {loading ? 'DEPLOYING TO HUB...' : 'DEPLOY LISTING NOW'}
+                                        {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} className="group-hover:rotate-90 transition-transform" />}
+                                        {loading ? 'INITIATING DEPLOYMENT...' : 'DEPLOY LISTING TO MATRIX'}
                                     </button>
                                     <div className="mt-4 flex items-center justify-center gap-2">
                                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>

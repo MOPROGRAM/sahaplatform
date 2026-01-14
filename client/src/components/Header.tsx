@@ -40,15 +40,16 @@ export default function Header() {
         <header className={`bg-white border-b border-gray-200 shadow-sm sticky top-0 z-[100] transition-all ${isScrolled ? 'py-1' : 'py-2'}`}>
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
                 {/* Brand - Sharp High Density */}
-                <Link href="/" className="flex items-center gap-2 group shrink-0">
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5 shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
-                        <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
+                <Link href="/" className="flex items-center gap-3 group shrink-0">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center p-2 shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">
+                        {/* Placeholder for User's Logo - can be replaced with <img src="/logo.png" /> */}
+                        <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="12" strokeLinecap="round">
                             <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
                         </svg>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-lg font-black tracking-tighter text-secondary leading-none">{t('siteName')}</span>
-                        <span className="text-[7px] font-black uppercase tracking-widest text-primary opacity-80 mt-0.5">Premier Hub v2.1</span>
+                        <span className="text-2xl font-black tracking-tighter text-secondary leading-none">{t('siteName')}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary opacity-90 mt-1">Premier Hub v2.1</span>
                     </div>
                 </Link>
 
@@ -58,10 +59,10 @@ export default function Header() {
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
-                            className="flex-1 px-3 py-1.5 text-[11px] outline-none font-bold bg-transparent"
+                            className="flex-1 px-4 py-2.5 text-[14px] outline-none font-bold bg-transparent placeholder:opacity-50"
                         />
-                        <button className="px-3 text-gray-400 group-focus-within:text-primary transition-colors">
-                            <Search size={14} />
+                        <button className="px-4 text-gray-400 group-focus-within:text-primary transition-colors hover:scale-110 active:scale-95">
+                            <Search size={18} />
                         </button>
                     </div>
                 </div>
@@ -89,28 +90,28 @@ export default function Header() {
                     </div>
 
                     {user ? (
-                        <div className="flex items-center gap-3">
-                            <Link href="/dashboard" className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded-xs transition-all group">
-                                <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 uppercase">
+                        <div className="flex items-center gap-4">
+                            <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-md transition-all group border border-transparent hover:border-gray-100">
+                                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-[12px] font-black text-primary border border-primary/20 uppercase shadow-inner">
                                     {user.name?.substring(0, 1)}
                                 </div>
                                 <div className="hidden sm:flex flex-col">
-                                    <span className="text-[10px] font-black text-secondary leading-none uppercase">{user.name}</span>
-                                    <span className="text-[7px] font-black text-primary tracking-widest uppercase mt-0.5">{user.role === 'ADMIN' ? 'Chief Admin' : 'Merchant'}</span>
+                                    <span className="text-[12px] font-black text-secondary leading-none uppercase tracking-tight">{user.name}</span>
+                                    <span className="text-[9px] font-black text-primary tracking-widest uppercase mt-1 opacity-80">{user.role === 'ADMIN' ? 'Chief Admin' : 'Merchant'}</span>
                                 </div>
                             </Link>
                             {user.role === 'ADMIN' && (
-                                <Link href="/admin" className="p-1.5 bg-red-500 text-white rounded-xs hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 active:scale-90">
-                                    <ShieldCheck size={14} />
+                                <Link href="/admin" className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 active:scale-90 flex items-center justify-center">
+                                    <ShieldCheck size={16} />
                                 </Link>
                             )}
                         </div>
                     ) : (
-                        <Link href="/login" className="text-[10px] font-black text-gray-400 hover:text-primary border border-gray-200 px-3 py-1.5 rounded-sm uppercase tracking-widest">{t('login')}</Link>
+                        <Link href="/login" className="text-[12px] font-black text-secondary hover:text-primary border border-gray-200 px-5 py-2 rounded-md uppercase tracking-widest transition-all hover:border-primary shadow-sm">{t('login')}</Link>
                     )}
 
-                    <Link href="/post-ad" className="bg-primary text-white px-4 py-1.5 rounded-sm text-[11px] font-black flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0 shrink-0 uppercase tracking-widest">
-                        <PlusCircle size={14} />
+                    <Link href="/post-ad" className="bg-primary text-white px-6 py-2.5 rounded-md text-[13px] font-black flex items-center gap-2 hover:bg-primary-hover shadow-xl shadow-primary/30 transition-all hover:-translate-y-0.5 active:translate-y-0 shrink-0 uppercase tracking-widest border-b-4 border-primary-dark">
+                        <PlusCircle size={18} />
                         {t('postAd')}
                     </Link>
                 </div>

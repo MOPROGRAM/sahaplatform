@@ -19,20 +19,20 @@
 }
 
 body {
-  font-size: 13px;
-  /* Smaller base font for Chinese density style */
-  line-height: 1.4;
+  font-size: 15px;
+  /* Increased for better readability */
+  line-height: 1.5;
   background: #f4f6f9;
-  color: #333;
+  color: #1c1e21;
   -webkit-font-smoothing: antialiased;
 }
 
 [dir="rtl"] body {
-  font-family: var(--font-cairo), 'Tajawal', sans-serif;
+  font-family: var(--font-cairo), var(--font-tajawal), 'Cairo', sans-serif;
 }
 
 [dir="ltr"] body {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
 }
 
 /* Force Icon Sizes - Fix for the "Large Icons" issue */
@@ -126,26 +126,26 @@ svg {
 
 /* Typography Overrides for Density */
 h1 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 900;
 }
 
 h2 {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 800;
 }
 
 h3 {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
 }
 
 .text-xs {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .text-sm {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* Grid fixes */

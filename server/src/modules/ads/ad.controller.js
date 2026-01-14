@@ -38,8 +38,8 @@ router.get('/:id', async (req, res) => {
 // Post a new ad (protected)
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const adData = { ...req.body, authorId: req.user.id };
-        const ad = await adService.createAd(adData);
+        const adData = req.body;
+        const ad = await adService.createAd(adData, req.user.id);
         res.status(201).json(ad);
     } catch (error) {
         res.status(400).json({ error: error.message });
