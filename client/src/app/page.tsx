@@ -119,14 +119,30 @@ export default function HomePage() {
             </div>
 
             <main className="w-full h-full flex flex-col overflow-hidden px-2 pb-2">
-                {/* Header with Search */}
                 <header className="flex justify-between items-center glass p-2 px-4 rounded-xl mb-2 shadow-xl shadow-black/[0.02] shrink-0 gap-8">
                     <div className="flex items-center gap-8">
-                        <div className="flex items-baseline gap-1.5 group cursor-pointer">
-                            <Link href="/" className="text-3xl font-[900] text-primary tracking-tighter italic transition-all group-hover:scale-[1.02]">
-                                ساحة
-                            </Link>
-                        </div>
+                        <Link href="/" className="flex items-center gap-3 group">
+                            {/* Circular Logo with User's Custom Mark */}
+                            <div className="relative flex items-center justify-center">
+                                <div className="w-11 h-11 bg-gradient-to-br from-primary to-primary-hover rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transform transition-transform group-hover:scale-110 duration-500">
+                                    <svg viewBox="0 0 100 40" className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                                        {/* Stylized Path representing the user's uploaded mark */}
+                                        <path d="M 15 15 L 15 10 L 85 10 M 85 10 L 85 25 L 15 25 M 15 25 L 15 30 L 50 30" className="opacity-0" />
+                                        <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
+                                    </svg>
+                                </div>
+                                <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm group-hover:blur-md transition-all"></div>
+                            </div>
+
+                            <div className="flex flex-col leading-none">
+                                <span className="text-2xl font-black text-secondary tracking-tighter group-hover:text-primary transition-colors uppercase">
+                                    {t('siteName')}
+                                </span>
+                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">
+                                    {language === 'ar' ? 'منصة الفرص' : 'Official Portal'}
+                                </span>
+                            </div>
+                        </Link>
                     </div>
 
                     <div className="flex-1 max-w-2xl relative group">
