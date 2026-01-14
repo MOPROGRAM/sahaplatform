@@ -1,7 +1,12 @@
+const getApiUrl = (endpoint: string) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '/api';
+    return `${baseUrl}${endpoint}`;
+};
+
 // استخدام API الخاص بالباكيند الموجود على Render مع PostgreSQL
 export const authService = {
     async login(email: string, password: string) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        const response = await fetch(getApiUrl('/auth/login'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -16,7 +21,7 @@ export const authService = {
     },
 
     async register(email: string, password: string, name: string) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        const response = await fetch(getApiUrl('/auth/register'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, name }),

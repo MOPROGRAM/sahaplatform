@@ -1,4 +1,14 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    if (typeof window !== 'undefined') {
+        const host = window.location.origin;
+        // If we are on render but env is missing, try to use current origin + /api
+        return `${host}/api`;
+    }
+    return 'http://localhost:5000/api';
+};
+
+const API_URL = getBaseUrl();
 
 const getAuthHeaders = (): Record<string, string> => {
     const token = localStorage.getItem('token');
