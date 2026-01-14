@@ -20,20 +20,28 @@ const getAuthHeaders = (): Record<string, string> => {
 export const apiService = {
     async get(endpoint: string, params: Record<string, any> = {}) {
         const query = new URLSearchParams(params).toString();
-        const response = await fetch(`${API_URL}${endpoint}${query ? `?${query}` : ''}`, {
+        const url = `${API_URL}${endpoint}${query ? `?${query}` : ''}`;
+        const response = await fetch(url, {
             headers: getAuthHeaders(),
         });
-        if (!response.ok) throw new Error('API Error');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Error: ${response.status}`);
+        }
         return response.json();
     },
 
     async post(endpoint: string, data: any) {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const url = `${API_URL}${endpoint}`;
+        const response = await fetch(url, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(data),
         });
-        if (!response.ok) throw new Error('API Error');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Error: ${response.status}`);
+        }
         return response.json();
     },
 

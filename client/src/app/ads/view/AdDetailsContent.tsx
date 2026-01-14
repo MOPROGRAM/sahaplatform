@@ -27,7 +27,6 @@ interface Ad {
     title: string;
     description: string;
     price: number;
-    currency: string;
     category: string;
     location: string;
     latitude?: number;
@@ -40,6 +39,10 @@ interface Ad {
         name: string;
         verified: boolean;
         phone?: string;
+    };
+    currency?: {
+        code: string;
+        symbol: string;
     };
     createdAt: string;
 }
@@ -140,8 +143,10 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 </div>
                                 <div className="text-right flex flex-col items-end">
                                     <div className="flex items-baseline gap-1 text-primary">
-                                        <span className="text-3xl font-black italic tracking-tighter">{new Intl.NumberFormat('ar-SA').format(ad.price)}</span>
-                                        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">SAR</span>
+                                        <span className="text-3xl font-black italic tracking-tighter">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                                            {ad.currency?.code || 'SAR'}
+                                        </span>
                                     </div>
                                     <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">Listed {new Date(ad.createdAt).toLocaleDateString()}</span>
                                 </div>

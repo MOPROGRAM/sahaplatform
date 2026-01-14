@@ -12,11 +12,15 @@ import Footer from '@/components/Footer';
 interface Ad {
     id: string;
     title: string;
-    price: string;
+    price: number;
     location: string;
     category: string;
     createdAt: string;
     featured?: boolean;
+    currency?: {
+        code: string;
+        symbol: string;
+    };
 }
 
 export default function HomePage() {
@@ -131,7 +135,8 @@ export default function HomePage() {
                                     <div className="flex flex-col gap-1.5 flex-1">
                                         <h4 className="text-[13px] font-black line-clamp-2 leading-tight group-hover:text-primary transition-colors h-[32px] text-black uppercase tracking-tight">{ad.title}</h4>
                                         <div className="text-[16px] font-[1000] text-primary italic tracking-tighter">
-                                            {ad.price.toLocaleString()} <span className="text-[10px] opacity-60 font-bold uppercase tracking-widest not-italic">SAR</span>
+                                            {Number(ad.price).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                            <span className="text-[10px] opacity-60 font-bold uppercase tracking-widest not-italic"> {ad.currency?.code || 'SAR'}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 border-t border-gray-50 pt-2 mt-auto">
                                             <span className="flex items-center gap-1"><MapPin size={10} className="text-primary" /> {ad.location}</span>

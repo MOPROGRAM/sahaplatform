@@ -10,7 +10,7 @@ import Header from "@/components/Header";
 import Footer from '@/components/Footer';
 
 export default function PostAdPage() {
-    const { language, t } = useLanguage();
+    const { language, t, currency } = useLanguage();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -41,6 +41,7 @@ export default function PostAdPage() {
             const response = await apiService.post('/ads', {
                 ...formData,
                 price: Number(formData.price),
+                currencyId: currency, // Use context currency
                 images: "[]",
                 latitude: 24.7136,
                 longitude: 46.6753
@@ -51,7 +52,8 @@ export default function PostAdPage() {
             }
         } catch (err: any) {
             console.error("Failed to post ad:", err);
-            setError(language === 'ar' ? "حدث خطأ أثناء نشر الإعلان. يرجى التأكد من تسجيل الدخول." : "Error posting ad. Please ensure you are logged in.");
+            // Show more specific error from API if available
+            setError(err.message || (language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad."));
         } finally {
             setLoading(false);
         }

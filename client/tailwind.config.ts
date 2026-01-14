@@ -11,43 +11,42 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#ff6700',
-          hover: '#e55c00',
-          dark: '#cc5200',
+          DEFAULT: 'var(--primary)',
+          hover: 'var(--primary-hover)',
+          dark: 'var(--primary-dark)',
         },
+        'gray-bg': 'var(--gray-bg)',
+        'card-bg': 'var(--card-bg)',
+        'text-main': 'var(--text-main)',
+        'text-muted': 'var(--text-muted)',
+        'border-color': 'var(--border-color)',
         secondary: {
-          DEFAULT: '#111111',
-          light: '#444444',
+          DEFAULT: '#1c1e21',
+          light: '#2d3142',
         },
         navy: {
-          DEFAULT: '#020617',
-          light: '#0f172a',
+          DEFAULT: '#0f172a',
+          light: '#1e293b',
         },
         emerald: {
-          DEFAULT: '#047857',
+          DEFAULT: '#059669',
           light: '#10b981',
         },
         amber: {
-          DEFAULT: '#b45309',
+          DEFAULT: '#d97706',
           light: '#f59e0b',
-        },
-        surface: {
-          light: '#ffffff',
-          dark: '#020617',
-        },
-        border: {
-          light: '#e2e8f0',
-          dark: '#1e293b',
         }
       },
       fontSize: {
-        'micro': '12px',
-        'xs': '14px',
-        'sm': '16px',
-        'base': '18px',
-        'lg': '20px',
-        'xl': '24px',
-        '2xl': '30px',
+        'micro': '10px',
+        'xs': '12px',
+        'sm': '13px',
+        'base': '14px',
+        'lg': '16px',
+        'xl': '18px',
+        '2xl': '24px',
+        '3xl': '30px',
+        '4xl': '36px',
       },
       fontFamily: {
         sans: ['Inter', 'Cairo', 'Tajawal', 'sans-serif'],

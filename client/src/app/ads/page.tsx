@@ -14,7 +14,10 @@ interface Ad {
     title: string;
     description: string;
     price: number;
-    currency: string;
+    currency?: {
+        code: string;
+        symbol: string;
+    };
     category: string;
     location: string;
     images: string;
@@ -27,7 +30,7 @@ interface Ad {
 }
 
 function AdsContent() {
-    const { language, t } = useLanguage();
+    const { language, t, currency } = useLanguage();
     const searchParams = useSearchParams();
     const categoryQuery = searchParams.get('category');
 
@@ -62,21 +65,21 @@ function AdsContent() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f0f2f5]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-[#f0f2f5] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            {/* Filter Bar - Professional High Density */}
+            {/* Filter Bar */}
             <div className="bg-white border-b border-gray-200 py-2 px-4 sticky top-[53px] z-40 shadow-sm">
                 <div className="max-w-7xl mx-auto flex items-center gap-4">
                     <div className="flex items-center gap-2 text-[10px] font-black text-secondary bg-gray-100 px-3 py-1.5 rounded-xs border border-gray-200 uppercase tracking-widest italic">
                         <Filter size={14} className="text-primary" />
-                        <span>Matrix Filters</span>
+                        <span>Filter Matrix</span>
                     </div>
                     <div className="flex-1 flex items-center gap-2">
                         <input
                             type="text"
                             placeholder={language === 'ar' ? 'البحث عن مدينة...' : 'Search Location...'}
-                            className="bg-gray-50 border border-gray-200 px-3 py-1.5 text-[10px] font-bold rounded-xs focus:border-primary focus:bg-white outline-none w-40 transition-all"
+                            className="bg-gray-50 border border-gray-200 px-3 py-1.5 text-[10px] font-bold rounded-xs focus:border-primary focus:bg-white outline-none w-40 transition-all font-cairo"
                             value={locationFilter}
                             onChange={(e) => setLocationFilter(e.target.value)}
                         />
@@ -102,14 +105,14 @@ function AdsContent() {
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto w-full p-3 font-cairo">
+            <main className="max-w-7xl mx-auto w-full p-3 flex-1">
                 {/* Result Info */}
                 <div className="flex items-center justify-between mb-4 px-1">
                     <div className="flex items-center gap-3">
                         <div className="w-1 h-4 bg-primary rounded-full"></div>
                         <h1 className="text-[14px] font-black uppercase text-secondary tracking-tight">
                             {categoryQuery ? `${categoryQuery}` : 'Global Marketplace'}
-                            <span className="text-[10px] font-black text-gray-400 mr-3 border-r border-gray-200 pr-3 uppercase italic">{ads.length} listings identified</span>
+                            <span className="text-[10px] font-black text-gray-400 mr-3 border-r border-gray-200 pr-3 uppercase italic mx-2">{ads.length} listings identified</span>
                         </h1>
                     </div>
                 </div>
@@ -118,7 +121,7 @@ function AdsContent() {
                     <div className="flex items-center justify-center p-20 opacity-20">
                         <Loader2 className="animate-spin" size={48} />
                     </div>
-                ) : (
+                ) : ads.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                         {ads.map((ad) => (
                             <Link
@@ -132,16 +135,17 @@ function AdsContent() {
                                         <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-2 py-0.5 rounded-bl-sm shadow-md uppercase tracking-widest">Boosted</div>
                                     )}
                                 </div>
-                                <div className="flex flex-col gap-1.5 flex-1">
+                                <div className="flex flex-col gap-1.5 flex-1 p-1">
                                     <h3 className="text-[11px] font-black line-clamp-2 leading-[1.3] group-hover:text-primary transition-colors text-secondary h-[28px] uppercase tracking-tighter">
                                         {ad.title}
                                     </h3>
-                                    <div className="flex flex-col mt-auto pt-2 border-t border-gray-50">
+                                    <div className="mt-auto">
                                         <div className="text-[14px] font-black text-primary italic tracking-tighter flex items-center gap-1 leading-none">
-                                            {new Intl.NumberFormat('ar-SA').format(ad.price)} <span className="text-[8px] not-italic opacity-40 uppercase tracking-widest">SAR</span>
+                                            {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}
+                                            <span className="text-[8px] not-italic opacity-40 uppercase tracking-widest">{ad.currency?.code || 'SAR'}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 text-[9px] font-black text-gray-400 mt-2 uppercase tracking-tighter">
-                                            <MapPin size={10} className="text-primary opacity-50" />
+                                        <div className="flex items-center gap-1 text-[9px] font-black text-gray-400 mt-2 uppercase tracking-tighter truncate">
+                                            <MapPin size={10} className="text-primary opacity-50 shrink-0" />
                                             <span className="truncate">{ad.location}</span>
                                         </div>
                                     </div>
@@ -149,6 +153,8 @@ function AdsContent() {
                             </Link>
                         ))}
                     </div>
+                ) : (
+                    <div className="text-center p-20 text-gray-300 font-black uppercase text-sm italic tracking-widest">No matching listings in the matrix</div>
                 )}
             </main>
             <Footer />

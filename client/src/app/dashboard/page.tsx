@@ -26,9 +26,21 @@ import { useLanguage } from "@/lib/language-context";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+interface Ad {
+    id: string;
+    title: string;
+    price: number;
+    category: string;
+    isActive: boolean;
+    views: number;
+    currency?: {
+        code: string;
+    };
+}
+
 export default function DashboardPage() {
+    const { language, t, currency } = useLanguage();
     const { user, logout } = useAuthStore();
-    const { language, t } = useLanguage();
     const router = useRouter();
     const [ads, setAds] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -165,7 +177,7 @@ export default function DashboardPage() {
                                                         <div className="min-w-0">
                                                             <span className="font-black text-secondary block truncate group-hover:text-primary transition-colors uppercase tracking-tight">{ad.title}</span>
                                                             <div className="flex items-center gap-2 mt-0.5">
-                                                                <span className="text-primary font-black italic">{new Intl.NumberFormat('ar-SA').format(ad.price)} SAR</span>
+                                                                <span className="text-primary font-black italic">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}</span>
                                                                 <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
                                                                 <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">{ad.category}</span>
                                                             </div>
