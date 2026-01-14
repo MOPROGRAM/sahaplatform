@@ -26,6 +26,18 @@ export const translations = {
         services: 'خدمات',
         other: 'أخرى',
 
+        // Regional
+        country: 'الدولة',
+        currency: 'العملة',
+        sar: 'ريال سعودي',
+        ae: 'الإمارات',
+        sa: 'السعودية',
+        kw: 'الكويت',
+        qa: 'قطر',
+        bh: 'البحرين',
+        om: 'عمان',
+        eg: 'مصر',
+
         // Actions
         search: 'ابحث',
         filter: 'فلتر',
@@ -90,6 +102,19 @@ export const translations = {
         trustedMerchant: 'تاجر موثوق',
         merchantLabel: 'تاجر / معلن',
         adminLabel: 'مدير النظام',
+
+        // Auth Pages
+        loginTitle: 'تسجيل الدخول للنظام',
+        registerTitle: 'إنشاء حساب جديد',
+        placeholderEmail: 'أدخل البريد الإلكتروني...',
+        placeholderPassword: 'أدخل كلمة المرور...',
+        placeholderName: 'الاسم الكامل باللغة العربية...',
+        btnSubmitLogin: 'دخول آمن',
+        btnSubmitRegister: 'بدء الرحلة الآن',
+        backToHome: 'العودة للرئيسية',
+        alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
+        noAccount: 'ليس لديك حساب؟',
+        processing: 'جارٍ المعالجة...',
     },
     en: {
         // Brand
@@ -116,6 +141,18 @@ export const translations = {
         goods: 'Goods',
         services: 'Services',
         other: 'Other',
+
+        // Regional
+        country: 'Country',
+        currency: 'Currency',
+        sar: 'SAR (Saudi Riyal)',
+        ae: 'UAE',
+        sa: 'Saudi Arabia',
+        kw: 'Kuwait',
+        qa: 'Qatar',
+        bh: 'Bahrain',
+        om: 'Oman',
+        eg: 'Egypt',
 
         // Actions
         search: 'Search',
@@ -181,6 +218,19 @@ export const translations = {
         trustedMerchant: 'Trusted Merchant',
         merchantLabel: 'Merchant / Seller',
         adminLabel: 'System Admin',
+
+        // Auth Pages
+        loginTitle: 'System Login',
+        registerTitle: 'Create New Account',
+        placeholderEmail: 'Enter email address...',
+        placeholderPassword: 'Enter your password...',
+        placeholderName: 'Full Name...',
+        btnSubmitLogin: 'Secure Login',
+        btnSubmitRegister: 'Start Journey Now',
+        backToHome: 'Back to Home',
+        alreadyHaveAccount: 'Already have an account?',
+        noAccount: 'Don\'t have an account?',
+        processing: 'Processing...',
     }
 };
 

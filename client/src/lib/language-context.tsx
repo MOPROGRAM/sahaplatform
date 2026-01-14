@@ -8,16 +8,27 @@ interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
     t: (key: TranslationKey) => string;
+    theme: 'light' | 'dark';
+    toggleTheme: () => void;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [language, setLanguageState] = useState<Language>('ar');
+    const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const { initialize } = useAuthStore();
 
     useEffect(() => {
-        setLanguageState(getCurrentLanguage());
+        // Init Language
+        const savedLang = getCurrentLanguage();
+        setLanguageState(savedLang);
+
+        // Init Theme
+        const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+        setTheme(savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
         initialize();
     }, []);
 
@@ -26,11 +37,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         setLangUtil(lang);
     };
 
+    const toggleTheme = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.documentElement.setAttribute('data-theme', newTheme);
+    };
+
     const t = (key: TranslationKey) => getTranslation(key, language);
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
-            <div dir={language === 'ar' ? 'rtl' : 'ltr'} lang={language}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, theme, toggleTheme }}>
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} lang={language} className="min-h-screen">
                 {children}
             </div>
         </LanguageContext.Provider>
