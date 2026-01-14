@@ -11,9 +11,14 @@ const getBaseUrl = () => {
 const API_URL = getBaseUrl();
 
 const getAuthHeaders = (): Record<string, string> => {
-    const token = localStorage.getItem('token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('🔐 Token found and added to request');
+    } else {
+        console.warn('⚠️ No authentication token found in localStorage');
+    }
     return headers;
 };
 

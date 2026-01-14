@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiService } from "@/lib/api";
 import { useLanguage } from "@/lib/language-context";
+import { useAuthStore } from "@/store/useAuthStore";
 import Header from "@/components/Header";
 import Footer from '@/components/Footer';
 
 export default function PostAdPage() {
     const { language, t, currency } = useLanguage();
+    const { user, loading: authLoading } = useAuthStore();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -21,6 +23,13 @@ export default function PostAdPage() {
         location: "",
         description: "",
     });
+
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push('/login');
+        }
+    }, [user, authLoading, router]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -58,6 +67,20 @@ export default function PostAdPage() {
             setLoading(false);
         }
     };
+
+    // Show loading while checking auth
+    if (authLoading) {
+        return (
+            <div className="bg-[#f8fafc] min-h-screen flex items-center justify-center">
+                <Loader2 className="animate-spin text-primary" size={40} />
+            </div>
+        );
+    }
+
+    // Don't render if not authenticated (will redirect)
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
