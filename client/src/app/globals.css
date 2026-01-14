@@ -138,9 +138,31 @@ textarea:focus {
   box-shadow: 0 0 0 4px rgba(255, 103, 0, 0.1);
 }
 
-/* Professional Buttons */
-.btn-primary {
-  @apply bg-primary hover:bg-primary-hover text-white font-black uppercase tracking-widest transition-all active:scale-95 px-6 py-3 rounded-md shadow-lg shadow-primary/20;
+/* Professional 3D Buttons - The "Saha" Signature Style */
+.btn-saha-primary {
+  @apply bg-primary text-white font-[1000] uppercase tracking-[0.2em] transition-all active:translate-y-[2px] active:border-b-0 px-6 py-3 rounded-md shadow-xl shadow-primary/30 border-b-[6px] border-primary-dark flex items-center justify-center gap-3 hover:-translate-y-[2px] hover:shadow-primary/40;
+}
+
+.btn-saha-secondary {
+  @apply bg-black text-white font-[1000] uppercase tracking-[0.15em] transition-all active:translate-y-[2px] active:border-b-0 px-6 py-3 rounded-md shadow-xl shadow-black/20 border-b-[6px] border-gray-800 flex items-center justify-center gap-3 hover:-translate-y-[2px] hover:shadow-black/30;
+}
+
+.btn-saha-outline {
+  @apply bg-white text-black font-[1000] uppercase tracking-[0.15em] transition-all active:translate-y-[2px] active:border-b-0 px-6 py-3 rounded-md border-2 border-black border-b-[6px] flex items-center justify-center gap-3 hover:-translate-y-[2px] hover:bg-gray-50;
+}
+
+/* Base Utility for Card Shadows */
+.saha-card {
+  @apply bg-white border border-gray-200 rounded-md shadow-premium transition-all hover:shadow-2xl hover:border-primary/30;
+}
+
+/* Focus States */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(255, 103, 0, 0.15);
 }
 
 /* Responsive Utilities */

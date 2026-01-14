@@ -95,7 +95,7 @@ export default function HomePage() {
                         <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 rounded-full -mr-12 -mt-12 blur-2xl group-hover:scale-150 transition-transform"></div>
                         <h4 className="text-[12px] font-black mb-1 italic text-primary uppercase tracking-tighter relative z-10">{t('siteName')} PRO</h4>
                         <p className="text-[10px] font-bold leading-relaxed mb-3 opacity-90 relative z-10">{t('joinThousands')}</p>
-                        <button className="w-full bg-primary hover:bg-primary-hover py-2 text-[10px] font-black rounded transition-all uppercase tracking-widest relative z-10 shadow-lg shadow-primary/20">{t('startToday')}</button>
+                        <button className="btn-saha-primary !px-4 !py-2 !text-[9px] !border-b-[4px] relative z-10">{t('startToday')}</button>
                     </div>
                 </aside>
 
@@ -134,7 +134,9 @@ export default function HomePage() {
                                         </div>
                                         <div className="flex justify-between items-center text-[11px] font-bold text-gray-500 border-t border-gray-100 pt-3 mt-auto">
                                             <span className="flex items-center gap-1.5"><MapPin size={12} className="text-primary" /> {ad.location}</span>
-                                            <span className="flex items-center gap-1.5"><Clock size={12} /> {new Date(ad.createdAt).toLocaleDateString()}</span>
+                                            <button className="btn-saha-primary !px-2.5 !py-1 !text-[10px] !border-b-[3px] !shadow-sm !rounded-sm">
+                                                {t('details')}
+                                            </button>
                                         </div>
                                     </div>
                                 </Link>
@@ -169,10 +171,10 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 p-5 rounded-md text-center relative overflow-hidden flex flex-col justify-center items-center group shadow-sm">
-                        <h4 className="text-[14px] font-[1000] text-black relative z-10 leading-none uppercase tracking-tighter">{t('siteBrand')}</h4>
-                        <p className="text-[10px] text-gray-400 mt-2 relative z-10 leading-tight font-bold uppercase tracking-widest opacity-80">{t('taglineFooter')}</p>
-                        <button className="w-full bg-black text-white text-[11px] font-black px-4 py-2.5 rounded-md mt-4 relative z-10 hover:bg-primary transition-all shadow-xl shadow-black/10 uppercase tracking-widest active:scale-95">{t('register')}</button>
+                    <div className="bg-white border border-gray-200 p-5 rounded-md text-center relative overflow-hidden flex flex-col justify-center items-center group shadow-premium hover:shadow-2xl transition-all">
+                        <h4 className="text-[15px] font-[1000] text-black relative z-10 leading-none uppercase tracking-tighter">{t('siteBrand')}</h4>
+                        <p className="text-[11px] text-gray-500 mt-2 relative z-10 leading-tight font-bold uppercase tracking-widest opacity-80">{t('taglineFooter')}</p>
+                        <button className="btn-saha-secondary !w-full !px-4 !py-2.5 !text-[11px] !border-b-[4px] mt-4 relative z-10">{t('register')}</button>
                     </div>
                 </aside>
             </main>

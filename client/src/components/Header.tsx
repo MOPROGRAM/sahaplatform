@@ -90,21 +90,21 @@ export default function Header() {
                     {user ? (
                         <div className="flex items-center gap-4">
                             <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-md transition-all group border border-transparent hover:border-gray-200">
-                                <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-[14px] font-[900] text-primary border-2 border-primary/20 uppercase shadow-inner">
+                                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-[15px] font-[1000] text-primary border-2 border-primary/20 uppercase shadow-inner">
                                     {user.name?.substring(0, 1)}
                                 </div>
                                 <div className="hidden sm:flex flex-col">
-                                    <span className="text-[13px] font-[900] text-black leading-none uppercase tracking-tight">{user.name}</span>
-                                    <span className="text-[10px] font-bold text-gray-500 tracking-wide mt-1.5">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
+                                    <span className="text-[14px] font-[1000] text-black leading-none uppercase tracking-tight">{user.name}</span>
+                                    <span className="text-[11px] font-bold text-gray-400 tracking-wide mt-1.5">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
                                 </div>
                             </Link>
                         </div>
                     ) : (
-                        <Link href="/login" className="text-[13px] font-black text-black hover:text-primary border border-gray-300 px-5 py-2 rounded-md uppercase tracking-widest transition-all hover:border-primary shadow-sm bg-white">{t('login')}</Link>
+                        <Link href="/login" className="btn-saha-outline !px-5 !py-2 !text-[12px] !border-b-[4px]">{t('login')}</Link>
                     )}
 
-                    <Link href="/post-ad" className="bg-primary text-white px-6 py-2.5 rounded-md text-[14px] font-black flex items-center gap-2 hover:bg-primary-hover shadow-xl shadow-primary/40 transition-all hover:-translate-y-0.5 active:translate-y-0 shrink-0 uppercase tracking-widest border-b-4 border-primary-dark">
-                        <PlusCircle size={20} />
+                    <Link href="/post-ad" className="btn-saha-primary !px-6 !py-2.5 !text-[13px] !border-b-[4px]">
+                        <PlusCircle size={18} />
                         {t('postAd')}
                     </Link>
                 </div>

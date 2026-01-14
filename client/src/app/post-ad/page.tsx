@@ -196,7 +196,7 @@ export default function PostAdPage() {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-primary hover:bg-primary-hover text-white py-6 rounded-md text-[18px] font-black uppercase tracking-[0.3em] shadow-2xl shadow-primary/40 transition-all flex items-center justify-center gap-4 active:scale-95 group mb-6 border-b-8 border-primary-dark"
+                                        className="btn-saha-primary !w-full !py-6 !text-[18px] mb-6"
                                     >
                                         {loading ? <Loader2 className="animate-spin" size={24} /> : <PlusCircle size={24} className="group-hover:rotate-90 transition-transform" />}
                                         {loading ? t('loading') : t('deployListing')}
