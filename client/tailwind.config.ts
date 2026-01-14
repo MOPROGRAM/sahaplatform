@@ -11,42 +11,43 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#ff6700', // Typical Chinese marketplace orange
-          dark: '#e55c00',
+          DEFAULT: '#ff6700',
+          hover: '#e55c00',
+          dark: '#cc5200',
         },
         secondary: {
-          DEFAULT: '#222222',
-          light: '#666666',
+          DEFAULT: '#111111',
+          light: '#444444',
         },
         navy: {
-          DEFAULT: '#0f172a',
-          light: '#1e293b',
+          DEFAULT: '#020617',
+          light: '#0f172a',
         },
         emerald: {
-          DEFAULT: '#059669',
+          DEFAULT: '#047857',
           light: '#10b981',
         },
         amber: {
-          DEFAULT: '#d97706',
+          DEFAULT: '#b45309',
           light: '#f59e0b',
         },
         surface: {
           light: '#ffffff',
-          dark: '#0f111a',
+          dark: '#020617',
         },
         border: {
-          light: '#e5e7eb',
-          dark: '#1f2937',
+          light: '#e2e8f0',
+          dark: '#1e293b',
         }
       },
       fontSize: {
         'micro': '12px',
-        'xs': '13px',
-        'sm': '15px',
-        'base': '17px',
-        'lg': '19px',
-        'xl': '22px',
-        '2xl': '26px',
+        'xs': '14px',
+        'sm': '16px',
+        'base': '18px',
+        'lg': '20px',
+        'xl': '24px',
+        '2xl': '30px',
       },
       fontFamily: {
         sans: ['Inter', 'Cairo', 'Tajawal', 'sans-serif'],

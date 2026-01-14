@@ -4,82 +4,88 @@
 
 :root {
   --primary: #ff6700;
-  --primary-hover: #e65c00;
-  --secondary: #1c1e21;
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-900: #111827;
+  --primary-hover: #e55c00;
+  --primary-dark: #cc5200;
+  --navy: #0f172a;
+  --emerald: #059669;
+  --amber: #d97706;
+  --black: #000000;
+  --white: #ffffff;
+  --gray-bg: #f8fafc;
 }
 
-/* Base Compression */
 * {
   box-sizing: border-box;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+html,
 body {
-  font-size: 15px;
-  /* Increased for better readability */
-  line-height: 1.5;
-  background: #f4f6f9;
-  color: #1c1e21;
-  -webkit-font-smoothing: antialiased;
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: var(--gray-bg);
+  color: var(--black);
+  text-rendering: optimizeLegibility;
+}
+
+/* Fluid Typography & Higher Contrast */
+body {
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 [dir="rtl"] body {
-  font-family: var(--font-cairo), var(--font-tajawal), 'Cairo', sans-serif;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
 [dir="ltr"] body {
-  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Force Icon Sizes - Fix for the "Large Icons" issue */
-svg {
-  width: 1em;
-  height: 1em;
-  display: inline-block;
-  vertical-align: middle;
-  flex-shrink: 0;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--black);
+  letter-spacing: -0.02em;
 }
 
-/* Information Density Utilities */
-.dense-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 8px;
-}
-
-/* Glassmorphism Refined */
-.glass {
+/* High Contrast Borders & Surfaces */
+.glass-panel {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Compact Components */
-.card {
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  /* Sharper corners for pro look */
-  transition: all 0.2s;
+.shadow-premium {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
 }
 
-.card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+/* Custom Scrollbar - Sharp & Clean */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.btn-compact {
-  padding: 4px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 2px;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Modern Ticker */
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations */
 @keyframes marquee {
   0% {
     transform: translateX(100%);
@@ -90,67 +96,56 @@ svg {
   }
 }
 
-.animate-marquee {
-  display: inline-block;
-  white-space: nowrap;
-  animation: marquee 40s linear infinite;
-}
-
 [dir="rtl"] .animate-marquee {
   animation: marquee-rtl 40s linear infinite;
 }
 
-@keyframes marquee-rtl {
+[dir="ltr"] .animate-marquee {
+  animation: marquee-ltr 40s linear infinite;
+}
+
+@keyframes marquee-ltr {
   0% {
-    transform: translateX(-100%);
+    transform: translateX(0);
   }
 
   100% {
-    transform: translateX(100%);
+    transform: translateX(-50%);
   }
 }
 
-/* Scrollbar Integration */
-::-webkit-scrollbar {
-  width: 4px;
+@keyframes marquee-rtl {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(50%);
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 10px;
+.animate-marquee {
+  display: flex;
+  width: max-content;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+/* Focus States */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(255, 103, 0, 0.1);
 }
 
-/* Typography Overrides for Density */
-h1 {
-  font-size: 24px;
-  font-weight: 900;
+/* Professional Buttons */
+.btn-primary {
+  @apply bg-primary hover:bg-primary-hover text-white font-black uppercase tracking-widest transition-all active:scale-95 px-6 py-3 rounded-md shadow-lg shadow-primary/20;
 }
 
-h2 {
-  font-size: 20px;
-  font-weight: 800;
-}
-
-h3 {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.text-xs {
-  font-size: 11px;
-}
-
-.text-sm {
-  font-size: 13px;
-}
-
-/* Grid fixes */
-.portal-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 8px;
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .max-w-7xl {
+    padding: 0 1rem;
+  }
 }

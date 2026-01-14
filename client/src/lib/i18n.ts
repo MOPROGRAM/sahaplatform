@@ -4,11 +4,12 @@ export const translations = {
         // Brand
         siteName: 'ساحة',
         siteBrand: 'ساحة للمزادات والعقارات',
+        taglineFooter: 'بوابة الخليج العقارية والمهنية',
 
         // Navigation
         home: 'الرئيسية',
         ads: 'الإعلانات',
-        postAd: 'أضف إعلان',
+        postAd: 'أضف إعلانك',
         login: 'دخول',
         register: 'إنشاء حساب',
         dashboard: 'لوحة التحكم',
@@ -33,37 +34,53 @@ export const translations = {
         addToFavorites: 'أضف للمفضلة',
         share: 'مشاركة',
         details: 'التفاصيل',
-        contact: 'اتصل من هنا',
+        contact: 'اتصل الآن',
         save: 'حفظ',
         cancel: 'إلغاء',
         choosePlan: 'اختر الباقة',
         startToday: 'ابدأ اليوم وشاهد الفرق',
         joinThousands: 'انضم لآلاف التجار الناجحين الذين زادوا مبيعاتهم مع ساحة',
         postYourFirst: 'أضف إعلانك الأول',
+        viewAll: 'عرض الكل',
 
-        // Forms
+        // Forms & Labels
         email: 'البريد الإلكتروني',
         password: 'كلمة المرور',
         name: 'الاسم',
         phone: 'الهاتف',
         location: 'الموقع',
-        title: 'العنوان',
-        description: 'الوصف',
+        title: 'عنوان الإعلان',
+        description: 'وصف الإعلان',
         price: 'السعر',
         category: 'التصنيف',
+        professionalTitle: 'عنوان الإعلان الإحترافي',
+        askingPrice: 'السعر المطلوب (ريال)',
+        deploymentLocation: 'موقع التسليم / المدينة',
+        detailedBriefing: 'تفاصيل الإعلان / الوصف الدقيق',
+        deployListing: 'نشر الإعلان الآن',
+        secureProtocol: 'اتصال آمن وموثوق لبياناتك',
+        marketRules: 'قواعد السوق',
+        marketRulesDesc: 'كن دقيقاً في السعر والتصنيف لجذب المشترين الجادين فوراً.',
 
-        // Messages
+        // Messages & Ticker
         loading: 'جارٍ التحميل...',
         noResults: 'لا توجد نتائج',
         error: 'حدث خطأ',
         success: 'تم بنجاح',
         newAd: 'جديد',
+        hotOffer: 'عرض ساخن',
+        trending: 'رائج الآن',
+        tickerMessage1: 'عروض حصرية لمشتركي باقة "ساحة بيزنس" - خصم 50%',
+        tickerMessage2: 'أفضل وقت لنشر إعلانات السيارات: الآن!',
+        footerNotice: 'جميع الحقوق محفوظة لمنصة ساحة 2026',
 
         // Placeholders
         searchPlaceholder: 'ابحث عن وظائف، عقارات، سيارات...',
-        locationPlaceholder: 'ابحث عن الموقع...',
+        locationPlaceholder: 'الرياض، جدة، دبي...',
         priceFrom: 'السعر من',
         priceTo: 'إلى',
+        adTitlePlaceholder: 'مثال: شقة استثمارية في حي النرجس...',
+        descriptionPlaceholder: 'اكتب وصفاً تقنياً دقيقاً وشاملاً...',
 
         // Status
         active: 'نشط',
@@ -71,16 +88,19 @@ export const translations = {
         verified: 'موثوق',
         featured: 'مميز',
         trustedMerchant: 'تاجر موثوق',
+        merchantLabel: 'تاجر / معلن',
+        adminLabel: 'مدير النظام',
     },
     en: {
         // Brand
         siteName: 'Saha',
         siteBrand: 'Saha Auctions & Real Estate',
+        taglineFooter: 'GCC Real Estate & Career Portal',
 
         // Navigation
         home: 'Home',
         ads: 'Ads',
-        postAd: 'Post Ad',
+        postAd: 'Post Your Ad',
         login: 'Login',
         register: 'Register',
         dashboard: 'Dashboard',
@@ -105,37 +125,53 @@ export const translations = {
         addToFavorites: 'Add to Favorites',
         share: 'Share',
         details: 'Details',
-        contact: 'Contact Seller',
+        contact: 'Contact Now',
         save: 'Save',
         cancel: 'Cancel',
         choosePlan: 'Choose Plan',
         startToday: 'Start Today and See the Difference',
         joinThousands: 'Join thousands of successful merchants who increased their sales with Saha',
         postYourFirst: 'Post Your First Ad',
+        viewAll: 'View All',
 
-        // Forms
+        // Forms & Labels
         email: 'Email',
         password: 'Password',
         name: 'Name',
         phone: 'Phone',
         location: 'Location',
-        title: 'Title',
+        title: 'Ad Title',
         description: 'Description',
         price: 'Price',
         category: 'Category',
+        professionalTitle: 'Professional Ad Title',
+        askingPrice: 'Asking Price (SAR)',
+        deploymentLocation: 'Deployment Location / City',
+        detailedBriefing: 'Detailed Briefing / Description',
+        deployListing: 'Post Ad Now',
+        secureProtocol: 'Secure and Encrypted Data Connection',
+        marketRules: 'Market Rules',
+        marketRulesDesc: 'Be precise with price and category to attract high-quality buyers instantly.',
 
-        // Messages
+        // Messages & Ticker
         loading: 'Loading...',
         noResults: 'No results found',
         error: 'An error occurred',
         success: 'Success',
         newAd: 'New',
+        hotOffer: 'HOT OFFER',
+        trending: 'TRENDING',
+        tickerMessage1: 'Exclusive offers for Saha Business members - 50% OFF',
+        tickerMessage2: 'Best time to post Car ads: NOW!',
+        footerNotice: 'All rights reserved to Saha Platform 2026',
 
         // Placeholders
         searchPlaceholder: 'Search for jobs, real estate, cars...',
-        locationPlaceholder: 'Search location...',
+        locationPlaceholder: 'Riyadh, Jeddah, Dubai...',
         priceFrom: 'Price from',
         priceTo: 'to',
+        adTitlePlaceholder: 'e.g. Investment Apartment in District 5...',
+        descriptionPlaceholder: 'Write a technical and comprehensive description...',
 
         // Status
         active: 'Active',
@@ -143,6 +179,8 @@ export const translations = {
         verified: 'Verified',
         featured: 'Featured',
         trustedMerchant: 'Trusted Merchant',
+        merchantLabel: 'Merchant / Seller',
+        adminLabel: 'System Admin',
     }
 };
 
