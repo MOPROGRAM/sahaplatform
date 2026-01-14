@@ -138,22 +138,31 @@ textarea:focus {
   box-shadow: 0 0 0 4px rgba(255, 103, 0, 0.1);
 }
 
-/* Professional 3D Buttons - The "Saha" Signature Style */
+/* Clean 3D Buttons - High Density Style (Matching User Image) */
+.btn-saha {
+  @apply transition-all active:translate-y-[2px] active:border-b-[1px] rounded-md border-2 font-[1000] uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer select-none;
+}
+
 .btn-saha-primary {
-  @apply bg-primary text-white font-[1000] uppercase tracking-[0.2em] transition-all active:translate-y-[2px] active:border-b-0 px-6 py-3 rounded-md shadow-xl shadow-primary/30 border-b-[6px] border-primary-dark flex items-center justify-center gap-3 hover:-translate-y-[2px] hover:shadow-primary/40;
+  @apply btn-saha bg-primary text-white border-black border-b-[4px] px-3 py-1.5 text-[12px] shadow-lg shadow-primary/10 hover:-translate-y-[1px] hover:shadow-primary/20;
 }
 
 .btn-saha-secondary {
-  @apply bg-black text-white font-[1000] uppercase tracking-[0.15em] transition-all active:translate-y-[2px] active:border-b-0 px-6 py-3 rounded-md shadow-xl shadow-black/20 border-b-[6px] border-gray-800 flex items-center justify-center gap-3 hover:-translate-y-[2px] hover:shadow-black/30;
+  @apply btn-saha bg-black text-white border-black border-b-[4px] px-3 py-1.5 text-[12px] shadow-lg shadow-black/10 hover:-translate-y-[1px] hover:shadow-black/20;
 }
 
 .btn-saha-outline {
-  @apply bg-white text-black font-[1000] uppercase tracking-[0.15em] transition-all active:translate-y-[2px] active:border-b-0 px-6 py-3 rounded-md border-2 border-black border-b-[6px] flex items-center justify-center gap-3 hover:-translate-y-[2px] hover:bg-gray-50;
+  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-[12px] hover:-translate-y-[1px] hover:bg-gray-50;
 }
 
-/* Base Utility for Card Shadows */
+/* Attract Style - Orange Border for Highlights (User request) */
+.btn-saha-attract {
+  @apply btn-saha bg-white text-black border-primary border-b-[4px] px-3 py-1.5 text-[12px] hover:-translate-y-[1px] hover:bg-orange-50 font-[1000] tracking-widest;
+}
+
+/* Compact Card Utility */
 .saha-card {
-  @apply bg-white border border-gray-200 rounded-md shadow-premium transition-all hover:shadow-2xl hover:border-primary/30;
+  @apply bg-white border border-gray-200 rounded-md shadow-premium transition-all hover:shadow-xl hover:border-primary/20 p-3;
 }
 
 /* Focus States */
@@ -162,7 +171,7 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px rgba(255, 103, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 103, 0, 0.1);
 }
 
 /* Responsive Utilities */

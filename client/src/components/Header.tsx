@@ -40,15 +40,9 @@ export default function Header() {
         <header className={`bg-white border-b border-gray-200 shadow-sm sticky top-0 z-[100] transition-all ${isScrolled ? 'py-1' : 'py-2'}`}>
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
                 {/* Brand - Sharp High Density */}
-                <Link href="/" className="flex items-center gap-4 group shrink-0">
-                    <div className="w-11 h-11 bg-primary rounded-full flex items-center justify-center p-2.5 shadow-xl shadow-primary/40 group-hover:scale-105 transition-transform">
-                        <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round">
-                            <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
-                        </svg>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-3xl font-[1000] tracking-tighter text-black leading-none uppercase">{t('siteName')}</span>
-                    </div>
+                <Link href="/" className="flex flex-col group shrink-0">
+                    <span className="text-3xl font-[1000] tracking-tighter text-black leading-none uppercase -mb-0.5">{t('siteName')}</span>
+                    <div className="h-1.5 w-full bg-primary mt-1.5 shadow-sm shadow-primary/20 group-hover:scale-x-105 transition-transform origin-left"></div>
                 </Link>
 
                 {/* Micro Search Bar */}
@@ -66,45 +60,31 @@ export default function Header() {
                 </div>
 
                 {/* Action Grid - Ultra Density */}
-                <div className="flex items-center gap-4">
-                    <div className="hidden lg:flex items-center gap-4 border-r border-gray-100 pr-4 mr-1">
-                        <button onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')} className="flex items-center gap-2 text-[12px] font-black text-black hover:text-primary transition-all px-3 py-1.5 uppercase tracking-widest border border-gray-200 rounded-md bg-white hover:border-primary">
-                            <Globe size={16} /> {language === 'ar' ? 'English' : 'العربية'}
+                <div className="flex items-center gap-3">
+                    <div className="hidden lg:flex items-center gap-3 border-r border-gray-100 pr-3 mr-1">
+                        <button onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')} className="btn-saha-outline !px-3 !py-1 !text-[11px] !border-b-[3px]">
+                            <Globe size={14} /> {language === 'ar' ? 'English' : 'العربية'}
                         </button>
-
-                        {user && (
-                            <>
-                                <Link href="/messages" className="relative group p-1">
-                                    <MessageSquare size={16} className="text-gray-400 group-hover:text-primary transition-colors" />
-                                    {unreadCount > 0 && (
-                                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-bounce"></span>
-                                    )}
-                                </Link>
-                                <Link href="/notifications" className="group p-1">
-                                    <Bell size={16} className="text-gray-400 group-hover:text-primary transition-colors" />
-                                </Link>
-                            </>
-                        )}
                     </div>
 
                     {user ? (
-                        <div className="flex items-center gap-4">
-                            <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-md transition-all group border border-transparent hover:border-gray-200">
-                                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-[15px] font-[1000] text-primary border-2 border-primary/20 uppercase shadow-inner">
+                        <div className="flex items-center gap-3">
+                            <Link href="/dashboard" className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded-md transition-all group border border-transparent hover:border-gray-200">
+                                <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-[15px] font-[1000] text-primary border-2 border-primary/20 uppercase">
                                     {user.name?.substring(0, 1)}
                                 </div>
-                                <div className="hidden sm:flex flex-col">
-                                    <span className="text-[14px] font-[1000] text-black leading-none uppercase tracking-tight">{user.name}</span>
-                                    <span className="text-[11px] font-bold text-gray-400 tracking-wide mt-1.5">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
+                                <div className="hidden sm:flex flex-col leading-none">
+                                    <span className="text-[13px] font-[1000] text-black uppercase tracking-tight">{user.name}</span>
+                                    <span className="text-[10px] font-bold text-gray-400 mt-1">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
                                 </div>
                             </Link>
                         </div>
                     ) : (
-                        <Link href="/login" className="btn-saha-outline !px-5 !py-2 !text-[12px] !border-b-[4px]">{t('login')}</Link>
+                        <Link href="/login" className="btn-saha-attract !px-4 !py-1.5 !text-[11px] !border-b-[3px]">{t('login')}</Link>
                     )}
 
-                    <Link href="/post-ad" className="btn-saha-primary !px-6 !py-2.5 !text-[13px] !border-b-[4px]">
-                        <PlusCircle size={18} />
+                    <Link href="/post-ad" className="btn-saha-primary !px-5 !py-1.5 !text-[12px] !border-b-[3px]">
+                        <PlusCircle size={16} />
                         {t('postAd')}
                     </Link>
                 </div>
