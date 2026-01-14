@@ -183,7 +183,7 @@ function AdsContent() {
                         {ads.map((ad) => (
                             <Link
                                 key={ad.id}
-                                href={`/ads/${ad.id}`}
+                                href={`/ads/view?id=${ad.id}`}
                                 className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-primary/20 transition-all duration-300 group"
                             >
                                 {/* Image */}
