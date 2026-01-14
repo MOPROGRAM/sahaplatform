@@ -216,7 +216,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         <div className="flex flex-col gap-2">
                             <button
                                 onClick={handleStartChat}
-                                className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95 uppercase tracking-widest"
+                                className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 uppercase tracking-widest"
                             >
                                 <MessageCircle size={16} />
                                 {language === 'ar' ? 'بدء محادثة فورية' : 'START REAL-TIME CHAT'}

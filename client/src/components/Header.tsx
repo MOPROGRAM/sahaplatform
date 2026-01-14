@@ -59,7 +59,7 @@ export default function Header() {
                 {/* Brand - Sharp High Density */}
                 <Link href="/" className="flex flex-col group shrink-0">
                     <span className="text-3xl font-[1000] tracking-tighter text-text-main leading-none uppercase -mb-0.5">{t('siteName')}</span>
-                    <div className="h-1.5 w-full bg-primary mt-1.5 shadow-sm shadow-primary/20 group-hover:scale-x-105 transition-transform origin-left"></div>
+                    <div className="h-1.5 w-full bg-primary mt-1.5 shadow-md group-hover:scale-x-105 transition-transform origin-left"></div>
                 </Link>
 
                 {/* Region & Currency Selector */}

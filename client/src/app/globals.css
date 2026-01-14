@@ -163,27 +163,27 @@ textarea:focus {
 }
 
 .btn-saha-primary {
-  @apply btn-saha bg-primary text-white border-black border-b-[4px] px-3 py-1.5 text-[12px] shadow-lg shadow-primary/10 hover:-translate-y-[1px] hover:shadow-primary/20;
+  @apply btn-saha bg-primary text-white border-black border-b-[4px] px-3 py-1.5 text-xs shadow-lg hover:-translate-y-[1px];
 }
 
 .btn-saha-secondary {
-  @apply btn-saha bg-black text-white border-black border-b-[4px] px-3 py-1.5 text-[12px] shadow-lg shadow-black/10 hover:-translate-y-[1px] hover:shadow-black/20;
+  @apply btn-saha bg-black text-white border-black border-b-[4px] px-3 py-1.5 text-xs shadow-lg hover:-translate-y-[1px];
 }
 
 .btn-saha-outline {
-  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-[12px] hover:-translate-y-[1px] hover:bg-gray-50;
+  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px] hover:bg-gray-50;
 }
 
 /* Attract Style - Orange Border for Highlights (User request) */
 .btn-saha-attract {
-  @apply btn-saha bg-white text-black border-primary border-b-[4px] px-3 py-1.5 text-[12px] hover:-translate-y-[1px] hover:bg-orange-50 font-[1000] tracking-widest;
+  @apply btn-saha bg-white text-black border-primary border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px] hover:bg-orange-50 font-[1000] tracking-widest;
 }
 
 /* Compact Card Utility */
 .saha-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply rounded-md shadow-premium transition-all hover:shadow-xl hover:border-primary/20 p-3;
+  @apply rounded-md shadow-sm transition-all hover:shadow-xl p-3;
 }
 
 /* Focus States */

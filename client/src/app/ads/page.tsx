@@ -100,7 +100,7 @@ function AdsContent() {
                                 onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
                             />
                         </div>
-                        <button onClick={fetchAds} className="bg-primary text-white px-4 py-1.5 text-[10px] font-black rounded-xs hover:bg-primary-hover transition-all uppercase tracking-widest shadow-md shadow-primary/20 active:scale-95">SYNC RESULTS</button>
+                        <button onClick={fetchAds} className="bg-primary text-white px-4 py-1.5 text-[10px] font-black rounded-xs hover:bg-primary-hover transition-all uppercase tracking-widest shadow-lg active:scale-95">SYNC RESULTS</button>
                     </div>
                 </div>
             </div>

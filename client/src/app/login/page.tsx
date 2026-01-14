@@ -41,7 +41,7 @@ export default function LoginPage() {
                 <div className="flex flex-col items-center mb-8">
                     <Link href="/" className="flex flex-col group items-center">
                         <span className="text-4xl font-[1000] tracking-tighter text-black leading-none uppercase -mb-0.5">{t('siteName')}</span>
-                        <div className="h-1.5 w-16 bg-primary mt-2 shadow-sm shadow-primary/20 group-hover:w-24 transition-all"></div>
+                        <div className="h-1.5 w-16 bg-primary mt-2 shadow-md group-hover:w-24 transition-all"></div>
                     </Link>
                 </div>
 

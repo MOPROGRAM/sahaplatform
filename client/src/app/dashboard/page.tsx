@@ -92,7 +92,7 @@ export default function DashboardPage() {
                     <div className="bg-white border border-gray-200 p-5 rounded-sm shadow-sm relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform"></div>
                         <div className="relative z-10 text-center">
-                            <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg shadow-primary/10">
+                            <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
                                 <span className="text-lg font-black text-primary italic">{user.name?.substring(0, 2).toUpperCase()}</span>
                             </div>
                             <h4 className="text-[12px] font-black text-secondary uppercase tracking-tight truncate">{user.name}</h4>

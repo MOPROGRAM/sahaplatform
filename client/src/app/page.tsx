@@ -129,7 +129,7 @@ export default function HomePage() {
                                     <div className="aspect-[4/3] bg-gray-50 rounded-sm relative overflow-hidden flex items-center justify-center border border-gray-100 group-hover:bg-primary/5 transition-colors">
                                         <ImageIcon className="text-gray-200 group-hover:text-primary/20 transition-all" size={24} />
                                         {ad.featured && (
-                                            <div className="absolute top-1.5 right-1.5 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-lg shadow-primary/20 uppercase italic">{t('featured')}</div>
+                                            <div className="absolute top-1.5 right-1.5 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-lg uppercase italic">{t('featured')}</div>
                                         )}
                                     </div>
                                     <div className="flex flex-col gap-1.5 flex-1">

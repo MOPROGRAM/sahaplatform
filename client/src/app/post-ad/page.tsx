@@ -67,7 +67,7 @@ export default function PostAdPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Left Info Column */}
                     <div className="md:col-span-1 space-y-4">
-                        <div className="bg-primary p-5 rounded-md text-white shadow-xl shadow-primary/10 relative overflow-hidden group">
+                        <div className="bg-primary p-5 rounded-md text-white shadow-xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform"></div>
                             <h2 className="text-xl font-[1000] italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
                             <p className="text-[10px] font-bold opacity-90 mt-2 leading-tight relative z-10">{t('joinThousands')}</p>
