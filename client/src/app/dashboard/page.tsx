@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { apiService } from "@/lib/api";
 import { useLanguage } from "@/lib/language-context";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default function DashboardPage() {
     const { user, logout } = useAuthStore();
@@ -213,6 +214,7 @@ export default function DashboardPage() {
                     </div>
                 </main>
             </div>
+            <Footer />
         </div>
     );
 }

@@ -7,6 +7,7 @@ import { apiService } from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import ChatWindow from "@/components/ChatWindow";
 
 export default function MessagesPage() {
@@ -131,6 +132,7 @@ export default function MessagesPage() {
                     )}
                 </section>
             </main>
+            <Footer />
         </div>
     );
 }

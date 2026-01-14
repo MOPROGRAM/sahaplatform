@@ -7,6 +7,7 @@ import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as Ima
 import { apiService } from '@/lib/api';
 import { useLanguage } from '@/lib/language-context';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 interface Ad {
     id: string;
@@ -150,6 +151,7 @@ function AdsContent() {
                     </div>
                 )}
             </main>
+            <Footer />
         </div>
     );
 }
