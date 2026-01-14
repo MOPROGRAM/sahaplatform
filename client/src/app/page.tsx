@@ -265,7 +265,7 @@ export default function HomePage() {
                                                         </div>
                                                         <div className="flex justify-between items-end">
                                                             <span className="text-[10px] font-black text-primary">{currentAd.price}</span>
-                                                            <Link href={`/ads/${idx + 1}`} className="text-[8px] font-bold bg-white border border-gray-100 px-1.5 py-0 rounded shadow-sm hover:border-primary/50 hover:text-primary transition-colors cursor-pointer">
+                                                            <Link href={`/ads/view?id=${idx + 1}`} className="text-[8px] font-bold bg-white border border-gray-100 px-1.5 py-0 rounded shadow-sm hover:border-primary/50 hover:text-primary transition-colors cursor-pointer">
                                                                 التفاصيل
                                                             </Link>
                                                         </div>
