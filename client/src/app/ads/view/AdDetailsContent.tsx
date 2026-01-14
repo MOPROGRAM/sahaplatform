@@ -12,7 +12,9 @@ import {
     MessageCircle,
     Phone,
     Info,
-    Loader2
+    Loader2,
+    PlusCircle,
+    Search
 } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
 import { useState, useEffect } from "react";
@@ -66,142 +68,162 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-[#f2f4f7] dark:bg-slate-950">
-                <Loader2 className="animate-spin text-primary" size={48} />
+            <div className="flex items-center justify-center min-h-screen bg-[#f0f2f5]">
+                <div className="w-8 h-8 border-3 border-primary border-t-transparent animate-spin rounded-full"></div>
             </div>
         );
     }
 
     if (!ad) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-[#f2f4f7] dark:bg-slate-950 gap-4">
-                <h2 className="text-xl font-bold">الإعلان غير موجود أو تم حذفه</h2>
-                <Link href="/" className="text-primary hover:underline">العودة للرئيسية</Link>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-[#f0f2f5] gap-4">
+                <h2 className="text-[13px] font-black italic">SAHA: AD NOT FOUND</h2>
+                <Link href="/" className="text-primary text-[11px] font-bold hover:underline">BACK HOME</Link>
             </div>
         );
     }
 
     return (
-        <div className="bg-[#f2f4f7] dark:bg-slate-950 min-h-screen pb-12" dir="rtl">
-            {/* Breadcrumbs (Dense) */}
-            <div className="max-w-[1240px] mx-auto px-4 py-3 text-[11px] text-gray-500 flex items-center gap-2">
-                <Link href="/" className="hover:text-primary transition-colors">الرئيسية</Link> <ChevronLeft size={10} />
-                <span>{ad.category === 'realEstate' ? 'عقارات' : ad.category === 'cars' ? 'سيارات' : 'أصناف أخرى'}</span> <ChevronLeft size={10} />
-                <span className="text-secondary dark:text-gray-300 font-bold truncate max-w-[200px]">{ad.title}</span>
+        <div className="bg-[#f0f2f5] min-h-screen" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            {/* Unified Micro Header */}
+            <header className="bg-white border-b border-gray-200 py-2 px-4 shadow-sm z-50 sticky top-0">
+                <div className="max-w-7xl mx-auto flex items-center gap-6">
+                    <Link href="/" className="flex items-center gap-2 group shrink-0">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5 shadow-md">
+                            <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
+                                <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
+                            </svg>
+                        </div>
+                        <span className="text-lg font-black tracking-tighter text-secondary">{t('siteName')}</span>
+                    </Link>
+
+                    <div className="flex-1 max-w-xl flex border-2 border-primary rounded-sm overflow-hidden bg-white">
+                        <input
+                            type="text"
+                            placeholder={t('searchPlaceholder')}
+                            className="flex-1 px-3 py-1.5 text-xs outline-none font-bold"
+                        />
+                        <button className="bg-primary px-4 text-white hover:bg-primary-hover transition-colors">
+                            <Search size={14} />
+                        </button>
+                    </div>
+
+                    <Link href="/post-ad" className="bg-secondary text-white px-4 py-1.5 rounded-sm text-[11px] font-black flex items-center gap-2 hover:bg-black transition-all shrink-0">
+                        <PlusCircle size={14} />
+                        {t('postAd')}
+                    </Link>
+                </div>
+            </header>
+
+            {/* Breadcrumbs - Ultra Compact */}
+            <div className="max-w-7xl mx-auto px-2 py-1.5 text-[10px] text-gray-400 flex items-center gap-1">
+                <Link href="/" className="hover:text-primary">{t('home')}</Link>
+                <ChevronLeft size={10} className="opacity-30" />
+                <span className="truncate max-w-[150px] font-bold text-gray-600">{ad.title}</span>
             </div>
 
-            <main className="max-w-[1240px] mx-auto grid grid-cols-12 gap-6 px-4">
-
-                {/* Left: Main Content */}
-                <div className="col-span-12 lg:col-span-8 flex flex-col gap-4">
-                    {/* Gallery Section */}
-                    <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-sm overflow-hidden">
-                        <div className="aspect-video bg-gray-100 dark:bg-slate-800 relative flex items-center justify-center overflow-hidden">
+            <main className="max-w-7xl mx-auto grid grid-cols-12 gap-2 p-2 pt-0">
+                {/* Main Content Area (8/12) */}
+                <div className="col-span-12 lg:col-span-9 flex flex-col gap-2">
+                    {/* Media Card */}
+                    <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
+                        <div className="aspect-[21/9] bg-gray-900 relative flex items-center justify-center">
                             {JSON.parse(ad.images || "[]").length > 0 ? (
-                                <img src={JSON.parse(ad.images || "[]")[0]} alt={ad.title} className="w-full h-full object-cover" />
+                                <img src={JSON.parse(ad.images || "[]")[0]} alt={ad.title} className="w-full h-full object-cover opacity-90" />
                             ) : (
-                                <span className="text-gray-300 text-lg font-bold italic opacity-20 text-[80px] select-none">الـساحـة</span>
+                                <span className="text-gray-800 text-4xl font-black italic opacity-50 select-none">SAHA HUB</span>
                             )}
-                            <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-sm text-xs font-bold">1 / {JSON.parse(ad.images || "[]").length || 1}</div>
+                            <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded-xs text-[9px] font-bold">1 / {JSON.parse(ad.images || "[]").length || 1}</div>
                         </div>
                     </div>
 
-                    {/* Core Info */}
-                    <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 p-6 rounded-sm">
-                        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
-                            <div className="flex flex-col gap-1">
-                                <h1 className="text-2xl font-black">{ad.title}</h1>
-                                <div className="flex items-center gap-4 text-xs text-gray-400">
-                                    <span className="flex items-center gap-1"><MapPin size={14} /> {ad.location || 'الموقع غير محدد'}</span>
-                                    <span className="flex items-center gap-1"><Calendar size={14} /> {new Date(ad.createdAt).toLocaleDateString('ar-SA')}</span>
-                                    <span className="flex items-center gap-1"><Eye size={14} /> {ad.views} مشاهدة</span>
+                    {/* Content Details */}
+                    <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm">
+                        <div className="flex flex-col gap-2">
+                            <div className="flex justify-between items-start">
+                                <h1 className="text-lg font-black text-secondary leading-tight">{ad.title}</h1>
+                                <div className="text-right">
+                                    <span className="text-xl font-black text-primary block">{new Intl.NumberFormat('ar-SA').format(ad.price)}</span>
+                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{language === 'ar' ? 'ريال سعودي' : 'SAR'}</span>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-end shrink-0">
-                                <span className="text-3xl font-black text-primary">{ad.price?.toLocaleString()}</span>
-                                <span className="text-sm font-bold text-gray-400">ريال سعودي</span>
+
+                            <div className="flex items-center gap-4 text-[10px] font-bold text-gray-500 border-y border-gray-50 py-2 mt-2">
+                                <span className="flex items-center gap-1"><MapPin size={12} className="text-primary" /> {ad.location}</span>
+                                <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(ad.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</span>
+                                <span className="flex items-center gap-1"><Eye size={12} /> {ad.views} {language === 'ar' ? 'مشاهدة' : 'Views'}</span>
                             </div>
-                        </div>
 
-                        <div className="flex gap-2 mb-8">
-                            <button className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-4 py-2 text-xs font-bold rounded-sm hover:bg-gray-50 transition-colors"><Share2 size={16} /> مشاركة</button>
-                            <button className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-4 py-2 text-xs font-bold rounded-sm hover:text-red-500 transition-colors"><Heart size={16} /> حفظ في المفضلة</button>
-                        </div>
-
-                        {/* Description */}
-                        <div className="prose dark:prose-invert max-w-none">
-                            <h3 className="text-lg font-bold mb-3 border-r-4 border-primary pr-3">الوصف</h3>
-                            <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400 whitespace-pre-line">
-                                {ad.description}
-                            </p>
+                            <div className="py-4">
+                                <h3 className="text-[12px] font-black uppercase text-secondary mb-2 border-r-3 border-primary pr-2 leading-none">{language === 'ar' ? 'وصف الإعلان' : 'Description'}</h3>
+                                <p className="text-[11px] leading-relaxed text-gray-600 font-medium whitespace-pre-line">
+                                    {ad.description}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right: Seller Info & Interaction */}
-                <div className="col-span-12 lg:col-span-4 flex flex-col gap-4">
-                    {/* Seller Card */}
-                    <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-sm shadow-sm overflow-hidden">
-                        <div className="p-6">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-4 border-gray-50 overflow-hidden shrink-0">
-                                    <span className="text-xl font-black text-primary">{ad.author.name?.substring(0, 2).toUpperCase()}</span>
+                {/* Interaction Sidebar (3/12) */}
+                <aside className="col-span-12 lg:col-span-3 flex flex-col gap-2">
+                    <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden">
+                        <div className="p-4">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shrink-0 font-black text-primary text-xs italic">
+                                    {ad.author.name?.substring(0, 2).toUpperCase()}
                                 </div>
-                                <div>
-                                    <h3 className="font-bold text-base flex items-center gap-1 text-right">
+                                <div className="min-w-0">
+                                    <h3 className="font-bold text-[11px] flex items-center gap-1 truncate text-secondary">
                                         {ad.author.name}
-                                        {ad.author.verified && <ShieldCheck size={16} className="text-blue-500" />}
+                                        {ad.author.verified && <ShieldCheck size={12} className="text-blue-500" />}
                                     </h3>
-                                    <p className="text-xs text-green-500 font-bold text-right">معلن نشط</p>
+                                    <span className="text-[9px] font-black text-green-500 uppercase tracking-tighter">Verified Seller</span>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-1.5">
                                 <button
                                     onClick={() => setShowChat(true)}
-                                    className="w-full bg-primary hover:bg-primary-dark text-white py-4 rounded-sm font-black flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                                    className="w-full bg-primary hover:bg-primary-hover text-white py-2 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 transition-all"
                                 >
-                                    <MessageCircle size={20} />
-                                    دردشة مع البائع
+                                    <MessageCircle size={14} />
+                                    {language === 'ar' ? 'بدء دردشة' : 'START CHAT'}
                                 </button>
                                 <button
                                     onClick={() => setShowPhone(!showPhone)}
-                                    className="w-full bg-secondary dark:bg-slate-800 text-white py-4 rounded-sm font-black flex items-center justify-center gap-3 hover:bg-black transition-all"
+                                    className="w-full bg-secondary text-white py-2 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all"
                                 >
-                                    <Phone size={20} />
-                                    {showPhone ? (ad.author.phone || 'لا يوجد رقم') : 'إظهار رقم الجوال'}
+                                    <Phone size={14} />
+                                    {showPhone ? (ad.author.phone || 'N/A') : (language === 'ar' ? 'إظهار الجوال' : 'SHOW PHONE')}
                                 </button>
                             </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-slate-800/50 p-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                            <Link href="/dashboard" className="text-xs font-bold text-gray-500 hover:text-primary">مشاهدة جميع إعلانات المعلن</Link>
-                            <ChevronLeft size={14} className="text-gray-300" />
-                        </div>
+                        <Link href="/" className="bg-gray-50 p-2 border-t border-gray-100 flex items-center justify-between text-[10px] font-bold text-gray-400 hover:text-primary transition-colors">
+                            <span>عرض جميع إعلانات المعلن</span>
+                            <ChevronLeft size={12} />
+                        </Link>
                     </div>
 
-                    {/* Safety Tips Overlay */}
-                    <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-800 p-4 rounded-sm flex gap-3">
-                        <Info className="text-orange-500 shrink-0" size={20} />
-                        <div className="flex flex-col gap-1">
-                            <span className="text-xs font-bold text-orange-700 dark:text-orange-400">نصيحة أمان</span>
-                            <p className="text-[11px] text-orange-600 dark:text-orange-400/70 leading-relaxed">
-                                لا تقم بتحويل أي مبلغ مقدم لحجز العقار. ننصح بمعاينة العقار شخصياً قبل إتمام أي معاملة مالية.
+                    <div className="bg-orange-50 border border-orange-100 p-3 rounded-sm flex gap-2">
+                        <Info className="text-orange-500 shrink-0" size={16} />
+                        <div className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-black text-orange-700 uppercase">{language === 'ar' ? 'توصية أمان' : 'Safety Tip'}</span>
+                            <p className="text-[9px] text-orange-600 leading-tight font-bold">
+                                {language === 'ar' ? 'معاينة الغرض شخصياً هي أفضل ضامن لك.' : 'Personal inspection is your best safeguard.'}
                             </p>
                         </div>
                     </div>
 
-                    {/* Chat Window Popup Integration */}
                     {showChat && (
-                        <div className="fixed bottom-4 left-4 w-96 z-50">
-                            <div className="flex justify-between items-center bg-primary text-white p-2 rounded-t-sm">
-                                <span className="text-xs font-bold">دردشة سريعة</span>
-                                <button onClick={() => setShowChat(false)} className="text-xl">×</button>
+                        <div className="fixed bottom-4 left-4 w-80 z-50 shadow-2xl border border-gray-200">
+                            <div className="flex justify-between items-center bg-secondary text-white p-2 rounded-t-sm">
+                                <span className="text-[10px] font-black uppercase italic tracking-widest">Saha Messenger</span>
+                                <button onClick={() => setShowChat(false)} className="text-xl leading-none">×</button>
                             </div>
                             <ChatWindow />
                         </div>
                     )}
-                </div>
-
+                </aside>
             </main>
         </div>
     );
