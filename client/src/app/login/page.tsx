@@ -22,11 +22,12 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const normalizedEmail = email.trim().toLowerCase();
         try {
             if (isLogin) {
-                await login(email, password);
+                await login(normalizedEmail, password);
             } else {
-                await register(email, password, name);
+                await register(normalizedEmail, password, name);
             }
             router.push('/');
         } catch (error: any) {
