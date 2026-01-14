@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiService } from "@/lib/api";
 import { useLanguage } from "@/lib/language-context";
+import Header from "@/components/Header";
 
 export default function PostAdPage() {
     const { language, t } = useLanguage();
@@ -40,6 +41,8 @@ export default function PostAdPage() {
                 ...formData,
                 price: Number(formData.price),
                 images: "[]",
+                latitude: 24.7136, // Default for now
+                longitude: 46.6753
             });
 
             if (response && response.id) {
@@ -55,141 +58,136 @@ export default function PostAdPage() {
 
     return (
         <div className="bg-[#f0f2f5] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {/* Unified Micro Header */}
-            <header className="bg-white border-b border-gray-200 py-2 px-4 shadow-sm z-50 sticky top-0">
-                <div className="max-w-7xl mx-auto flex items-center gap-6">
-                    <Link href="/" className="flex items-center gap-2 group shrink-0">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5 shadow-md">
-                            <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
-                                <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
-                            </svg>
-                        </div>
-                        <span className="text-lg font-black tracking-tighter text-secondary">{t('siteName')}</span>
-                    </Link>
+            <Header />
 
-                    <div className="flex-1 max-w-xl flex border border-gray-200 rounded-sm overflow-hidden bg-gray-50">
-                        <input type="text" placeholder={t('searchPlaceholder')} className="flex-1 px-3 py-1 text-[10px] outline-none font-bold bg-transparent" />
-                        <button className="px-2 text-gray-400"><Search size={12} /></button>
-                    </div>
-
-                    <Link href="/dashboard" className="text-[10px] font-black text-secondary hover:text-primary transition-colors">
-                        {t('dashboard')}
-                    </Link>
-                </div>
-            </header>
-
-            <main className="max-w-3xl mx-auto w-full p-4 flex-1">
-                <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex flex-col">
-                    <div className="bg-gray-50 border-b border-gray-100 p-3 flex items-center justify-between">
-                        <h2 className="text-[12px] font-black uppercase tracking-widest flex items-center gap-2">
-                            <PlusCircle size={14} className="text-primary" />
-                            {language === 'ar' ? 'نشر إعلان جديد' : 'CREATE NEW LISTING'}
-                        </h2>
-                    </div>
-
-                    <div className="p-6 space-y-4">
-                        {error && (
-                            <div className="bg-red-50 text-red-600 p-2 text-[10px] font-black border-r-4 border-red-500 rounded-sm">
-                                {error}
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{language === 'ar' ? 'عنوان الإعلان *' : 'Ad Title *'}</label>
-                                <input
-                                    name="title"
-                                    value={formData.title}
-                                    onChange={handleInputChange}
-                                    className="bg-gray-50 border border-gray-100 p-2 text-[11px] font-bold rounded-sm outline-none focus:border-primary transition-all"
-                                    placeholder={language === 'ar' ? 'مثال: شقة للبيع...' : 'e.g. Apartment for sale...'}
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{language === 'ar' ? 'التصنيف *' : 'Category *'}</label>
-                                <select
-                                    name="category"
-                                    value={formData.category}
-                                    onChange={handleInputChange}
-                                    className="bg-gray-50 border border-gray-100 p-2 text-[11px] font-bold rounded-sm outline-none focus:border-primary cursor-pointer"
-                                    required
-                                >
-                                    <option value="">{language === 'ar' ? 'اختر النوع' : 'Select Type'}</option>
-                                    <option value="realEstate">عقارات</option>
-                                    <option value="jobs">وظائف</option>
-                                    <option value="cars">سيارات</option>
-                                    <option value="goods">سلع</option>
-                                    <option value="services">خدمات</option>
-                                    <option value="other">أخرى</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{language === 'ar' ? 'السعر *' : 'Price *'}</label>
-                                <input
-                                    name="price"
-                                    type="number"
-                                    value={formData.price}
-                                    onChange={handleInputChange}
-                                    className="bg-gray-50 border border-gray-100 p-2 text-[11px] font-bold rounded-sm outline-none focus:border-primary"
-                                    placeholder="0"
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{language === 'ar' ? 'الموقع *' : 'Location *'}</label>
-                                <div className="relative">
-                                    <input
-                                        name="location"
-                                        value={formData.location}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-gray-50 border border-gray-100 p-2 text-[11px] font-bold rounded-sm outline-none focus:border-primary"
-                                        placeholder={language === 'ar' ? 'الرياض، مكة...' : 'Riyadh, Jeddah...'}
-                                        required
-                                    />
-                                    <MapPin size={12} className="absolute right-2 top-2.5 text-gray-300" />
+            <main className="max-w-4xl mx-auto w-full p-4 flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Left Info Column */}
+                    <div className="md:col-span-1 space-y-4">
+                        <div className="bg-primary p-6 rounded-sm text-white shadow-xl shadow-primary/20 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform"></div>
+                            <h2 className="text-lg font-black italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
+                            <p className="text-[10px] font-bold opacity-80 mt-2 leading-relaxed relative z-10">Start your professional selling journey on GCC's fastest growing marketplace.</p>
+                            <div className="mt-6 flex flex-col gap-3 relative z-10">
+                                <div className="flex items-center gap-3 bg-white/10 p-2 rounded-xs border border-white/10">
+                                    <CheckCircle2 size={16} />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Global Exposure</span>
+                                </div>
+                                <div className="flex items-center gap-3 bg-white/10 p-2 rounded-xs border border-white/10">
+                                    <Tag size={16} />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Instant Liquidity</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{language === 'ar' ? 'التفاصيل' : 'Description'}</label>
-                            <textarea
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                rows={4}
-                                className="bg-gray-50 border border-gray-100 p-3 text-[11px] font-bold rounded-sm outline-none focus:border-primary resize-none"
-                                placeholder={language === 'ar' ? 'اكتب وصفاً مفصلاً...' : 'Write a detailed description...'}
-                            ></textarea>
-                        </div>
-
-                        <div className="pt-4 flex flex-col gap-3">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-sm text-[12px] font-black uppercase tracking-widest shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2"
-                            >
-                                {loading ? <Loader2 className="animate-spin" size={16} /> : <PlusCircle size={16} />}
-                                {loading ? (language === 'ar' ? 'جاري النشر...' : 'POSTING...') : (language === 'ar' ? 'نشر الإعلان الآن' : 'PUBLISH LISTING')}
-                            </button>
-                            <p className="text-[9px] text-gray-400 text-center font-bold">
-                                BY PUBLISHING, YOU AGREE TO OUR TERMS OF SERVICE AND PRIVACY POLICY.
-                            </p>
+                        <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm flex gap-3">
+                            <Info size={18} className="text-secondary shrink-0" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase text-secondary tracking-widest leading-none">Market Rules</span>
+                                <p className="text-[9px] text-gray-500 font-bold mt-1.5 leading-[1.3] italic">Be precise with price and category to attract high-quality buyers instantly.</p>
+                            </div>
                         </div>
                     </div>
-                </form>
 
-                <div className="mt-4 bg-blue-50 border border-blue-100 p-3 rounded-sm flex gap-3">
-                    <Info size={16} className="text-blue-500 shrink-0" />
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-blue-800 uppercase italic">Saha Pro Tip:</span>
-                        <p className="text-[9px] text-blue-600 font-bold leading-tight mt-0.5">
-                            Ads with clear titles and detailed descriptions get 3x more views and faster deals.
-                        </p>
+                    {/* Form Column */}
+                    <div className="md:col-span-2">
+                        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex flex-col animate-in fade-in slide-in-from-right-4">
+                            <div className="p-6 space-y-5">
+                                {error && (
+                                    <div className="bg-red-50 text-red-600 p-3 text-[10px] font-black border-r-4 border-red-500 rounded-sm uppercase tracking-tighter italic">
+                                        Error Code: {error}
+                                    </div>
+                                )}
+
+                                <div className="space-y-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">{language === 'ar' ? 'عنوان الإعلان الإحترافي *' : 'Professional Ad Title *'}</label>
+                                        <input
+                                            name="title"
+                                            value={formData.title}
+                                            onChange={handleInputChange}
+                                            className="bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tighter"
+                                            placeholder={language === 'ar' ? 'مثال: شقة استثمارية في حي النرجس...' : 'e.g. Investment Apartment in District 5...'}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">{t('category')} *</label>
+                                            <select
+                                                name="category"
+                                                value={formData.category}
+                                                onChange={handleInputChange}
+                                                className="bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner uppercase tracking-tighter"
+                                                required
+                                            >
+                                                <option value="">{language === 'ar' ? 'اختر تصنيف الوحدة' : 'SELECT UNIT CATEGORY'}</option>
+                                                <option value="realEstate">Real Estate / عقارات</option>
+                                                <option value="jobs">Jobs / وظائف</option>
+                                                <option value="cars">Automotive / سيارات</option>
+                                                <option value="goods">Retail / سلع</option>
+                                                <option value="services">Services / خدمات</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">ASKING PRICE (SAR) *</label>
+                                            <input
+                                                name="price"
+                                                type="number"
+                                                value={formData.price}
+                                                onChange={handleInputChange}
+                                                className="bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner italic"
+                                                placeholder="0.00"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">Deployment Location *</label>
+                                        <div className="relative">
+                                            <input
+                                                name="location"
+                                                value={formData.location}
+                                                onChange={handleInputChange}
+                                                className="w-full bg-gray-50 border border-gray-100 p-3 text-[11px] font-black rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tighter"
+                                                placeholder={language === 'ar' ? 'الرياض، مكة، دبي...' : 'Riyadh, Dubai...'}
+                                                required
+                                            />
+                                            <MapPin size={14} className="absolute right-3 top-3.5 text-primary opacity-40" />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-[10px] font-black text-secondary uppercase tracking-widest pl-1">detailed Briefing / description</label>
+                                        <textarea
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleInputChange}
+                                            rows={6}
+                                            className="bg-gray-50 border border-gray-100 p-4 text-[11px] font-bold rounded-sm outline-none focus:border-primary focus:bg-white transition-all shadow-inner resize-none leading-relaxed"
+                                            placeholder={language === 'ar' ? 'اكتب وصفاً تقنياً دقيقاً...' : 'Write a technical and accurate description...'}
+                                        ></textarea>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4">
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-sm text-[13px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center gap-3 active:scale-95 group"
+                                    >
+                                        {loading ? <Loader2 className="animate-spin" size={18} /> : <PlusCircle size={18} className="group-hover:rotate-90 transition-transform" />}
+                                        {loading ? 'DEPLOYING TO HUB...' : 'DEPLOY LISTING NOW'}
+                                    </button>
+                                    <div className="mt-4 flex items-center justify-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Saha Secure Transmission Protocol Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </main>

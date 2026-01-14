@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Heart, MessageSquare, PlusCircle, Sparkles, Zap, ChevronLeft, Clock, Image as ImageIcon, Globe, Grid, TrendingUp } from 'lucide-react';
+import { Search, MapPin, Heart, MessageSquare, PlusCircle, Sparkles, Zap, ChevronLeft, Clock, Image as ImageIcon, Globe, Grid, TrendingUp, Loader2 } from 'lucide-react';
 import { apiService } from '@/lib/api';
 import { useLanguage } from '@/lib/language-context';
 import { useAuthStore } from '@/store/useAuthStore';
+import Header from '@/components/Header';
 
 interface Ad {
     id: string;
@@ -62,67 +63,7 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen bg-[#f0f2f5] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {/* Ultra Dense Top Nav */}
-            <div className="bg-[#1c1e21] text-[10px] py-1 px-4 flex justify-between items-center text-gray-300">
-                <div className="flex gap-4">
-                    <button onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')} className="hover:text-white transition-colors">
-                        {language === 'ar' ? 'English' : 'العربية'}
-                    </button>
-                    <Link href="/help" className="hover:text-white">{t('help')}</Link>
-                    <Link href="/advertise" className="text-primary font-bold">{t('advertiseWithUs')}</Link>
-                    {user?.role === 'ADMIN' && (
-                        <Link href="/admin" className="text-red-500 font-bold border-r border-white/10 pr-4 ml-4 uppercase tracking-widest animate-pulse">
-                            System Control
-                        </Link>
-                    )}
-                </div>
-                <div className="flex gap-4">
-                    <span className="opacity-60 italic">{language === 'ar' ? 'الجو: صافي' : 'Sunny 24°C'}</span>
-                    {user ? (
-                        <Link href="/dashboard" className="font-bold hover:text-white flex items-center gap-1">
-                            <div className="w-4 h-4 bg-primary/20 rounded-full flex items-center justify-center text-[8px] border border-primary/30 uppercase">{user.name?.substring(0, 1)}</div>
-                            {user.name}
-                        </Link>
-                    ) : (
-                        <Link href="/login" className="font-bold hover:text-white">{t('login')}</Link>
-                    )}
-                </div>
-            </div>
-
-            {/* Compressed Header */}
-            <header className="bg-white border-b border-gray-200 py-2 px-4 shadow-sm z-40 sticky top-0">
-                <div className="max-w-7xl mx-auto flex items-center gap-6">
-                    {/* Logo Section */}
-                    <Link href="/" className="flex items-center gap-2 group shrink-0">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5 shadow-md">
-                            <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
-                                <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
-                            </svg>
-                        </div>
-                        <span className="text-lg font-black tracking-tighter text-secondary">{t('siteName')}</span>
-                    </Link>
-
-                    {/* Compact Search */}
-                    <div className="flex-1 max-w-xl relative">
-                        <div className="flex border-2 border-primary rounded-sm overflow-hidden bg-white">
-                            <input
-                                type="text"
-                                placeholder={t('searchPlaceholder')}
-                                className="flex-1 px-3 py-1.5 text-xs outline-none font-bold"
-                            />
-                            <button className="bg-primary px-4 text-white hover:bg-primary-hover transition-colors">
-                                <Search size={14} />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* User Action */}
-                    <Link href="/post-ad" className="bg-secondary text-white px-4 py-1.5 rounded-sm text-[11px] font-black flex items-center gap-2 hover:bg-black transition-all shrink-0">
-                        <PlusCircle size={14} />
-                        {t('postAd')}
-                    </Link>
-                </div>
-            </header>
+            <Header />
 
             {/* Ticker - Micro Density */}
             <div className="bg-yellow-50 border-b border-yellow-100 py-0.5 overflow-hidden text-[9px] font-bold text-yellow-800">
@@ -167,7 +108,7 @@ export default function HomePage() {
 
                 {/* Central Feed - Maximum Content Density */}
                 <section className="col-span-8 flex flex-col gap-2">
-                    <div className="flex items-center justify-between px-2 py-1 bg-white border border-gray-200 rounded-sm">
+                    <div className="flex items-center justify-between px-2 py-1 bg-white border border-gray-200 rounded-sm shadow-sm">
                         <div className="flex items-center gap-2">
                             <TrendingUp className="text-primary" size={14} />
                             <h2 className="text-[13px] font-black uppercase tracking-tight">{t('latestOffers')}</h2>
@@ -180,29 +121,29 @@ export default function HomePage() {
                     </div>
 
                     {loading ? (
-                        <div className="bg-white h-64 flex items-center justify-center border border-gray-200">
-                            <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin rounded-full"></div>
+                        <div className="bg-white h-64 flex items-center justify-center border border-gray-200 rounded-sm">
+                            <Loader2 className="animate-spin text-primary" size={24} />
                         </div>
                     ) : (
                         <div className="grid grid-cols-3 gap-2">
                             {ads.map((ad, idx) => (
-                                <Link href={`/ads/view?id=${ad.id}`} key={idx} className="bg-white border border-gray-100 p-2 rounded-sm hover:border-primary transition-all group flex flex-col gap-1.5 h-full">
+                                <Link href={`/ads/view?id=${ad.id}`} key={idx} className="bg-white border border-gray-100 p-2 rounded-sm hover:border-primary transition-all group flex flex-col gap-1.5 h-full shadow-sm hover:shadow-md">
                                     <div className="aspect-[4/3] bg-gray-50 rounded-xs relative overflow-hidden flex items-center justify-center border border-gray-100">
                                         <ImageIcon className="text-gray-200" size={24} />
                                         {ad.featured && (
-                                            <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-sm">مميز</div>
+                                            <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-sm shadow-sm">مميز</div>
                                         )}
                                     </div>
                                     <div className="flex flex-col gap-0.5">
                                         <div className="flex justify-between items-start gap-2">
                                             <h4 className="text-[11px] font-black line-clamp-2 leading-none group-hover:text-primary transition-colors h-[22px]">{ad.title}</h4>
                                         </div>
-                                        <div className="text-[11px] font-black text-primary mt-1">
-                                            {ad.price} <span className="text-[8px] opacity-60">{language === 'ar' ? 'ر.س' : 'SAR'}</span>
+                                        <div className="text-[11px] font-black text-primary mt-1 italic tracking-tighter">
+                                            {ad.price} <span className="text-[8px] opacity-60 font-bold uppercase tracking-widest">SAR</span>
                                         </div>
                                         <div className="flex justify-between items-center text-[9px] font-bold text-gray-400 border-t border-gray-50 pt-1 mt-1">
-                                            <span className="flex items-center gap-1"><MapPin size={8} /> {ad.location}</span>
-                                            <span>{new Date(ad.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</span>
+                                            <span className="flex items-center gap-1"><MapPin size={8} className="text-primary" /> {ad.location}</span>
+                                            <span className="flex items-center gap-1"><Clock size={8} /> {new Date(ad.createdAt).toLocaleDateString()}</span>
                                         </div>
                                     </div>
                                 </Link>
@@ -216,28 +157,28 @@ export default function HomePage() {
                     <div className="bg-white border border-gray-200 p-2 rounded-sm shadow-sm">
                         <div className="flex items-center gap-2 mb-2 text-secondary">
                             <Zap size={14} className="text-primary fill-primary" />
-                            <h3 className="text-[11px] font-black uppercase">فرص ساخنة</h3>
+                            <h3 className="text-[11px] font-black uppercase italic tracking-tighter">Hot Deals</h3>
                         </div>
                         <div className="space-y-2">
                             {[1, 2, 3, 4].map(i => (
                                 <div key={i} className="flex gap-2 items-center group cursor-pointer border-b border-gray-50 last:border-0 pb-1.5 transition-all">
-                                    <div className="w-8 h-8 rounded-xs bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-                                        <ImageIcon className="text-gray-200" size={12} />
+                                    <div className="w-8 h-8 rounded-xs bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0 group-hover:bg-primary/5 group-hover:border-primary/20">
+                                        <ImageIcon className="text-gray-200 group-hover:text-primary" size={12} />
                                     </div>
                                     <div className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-bold truncate group-hover:text-primary line-clamp-1">{language === 'ar' ? 'شقة استثمارية' : 'Investment Dept'}</span>
-                                        <span className="text-[10px] font-black text-primary leading-none">125k <span className="text-[8px] opacity-40">SAR</span></span>
+                                        <span className="text-[10px] font-black truncate group-hover:text-primary line-clamp-1 uppercase tracking-tighter">Investment Dept</span>
+                                        <span className="text-[10px] font-black text-primary leading-none italic">125k <span className="text-[8px] opacity-40 uppercase tracking-widest">SAR</span></span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="bg-gray-900 p-3 rounded-sm text-center relative overflow-hidden h-32 flex flex-col justify-center items-center">
-                        <div className="bg-white/5 w-16 h-16 absolute -top-4 -left-4 rounded-full blur-xl"></div>
-                        <h4 className="text-xs font-black text-white relative z-10">{t('siteBrand')}</h4>
-                        <p className="text-[8px] text-gray-400 mt-1 relative z-10 leading-tight">انضم لأكبر تجمع للتجار في الخليج.</p>
-                        <button className="bg-primary text-white text-[9px] font-black px-4 py-1.5 rounded-sm mt-3 relative z-10 hover:bg-primary-hover transition-all">{t('register')}</button>
+                    <div className="bg-gray-900 p-3 rounded-sm text-center relative overflow-hidden h-32 flex flex-col justify-center items-center group">
+                        <div className="bg-primary/20 w-32 h-32 absolute -top-16 -left-16 rounded-full blur-3xl group-hover:scale-150 transition-transform"></div>
+                        <h4 className="text-xs font-black text-white relative z-10 leading-none">{t('siteBrand')}</h4>
+                        <p className="text-[8px] text-gray-400 mt-2 relative z-10 leading-tight font-bold uppercase tracking-widest opacity-60">GCC Largest Trade Hub</p>
+                        <button className="bg-primary text-white text-[9px] font-black px-4 py-1.5 rounded-sm mt-3 relative z-10 hover:bg-primary-hover transition-all shadow-lg shadow-primary/30 uppercase tracking-widest active:scale-95">{t('register')}</button>
                     </div>
                 </aside>
             </main>
@@ -246,16 +187,15 @@ export default function HomePage() {
             <footer className="mt-auto bg-white border-t border-gray-200 py-3 px-4">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4 text-[10px] font-bold text-gray-400">
-                        <span>© 2026 {t('siteName')}</span>
-                        <Link href="/" className="hover:text-secondary whitespace-nowrap">عن المنصة</Link>
-                        <Link href="/" className="hover:text-secondary whitespace-nowrap">الشروط</Link>
-                        <Link href="/" className="hover:text-secondary whitespace-nowrap">الخصوصية</Link>
+                        <span className="font-black italic text-secondary tracking-tighter">SAHA SYNC © 2026</span>
+                        <Link href="/" className="hover:text-secondary whitespace-nowrap uppercase tracking-widest text-[8px]">Terms</Link>
+                        <Link href="/" className="hover:text-secondary whitespace-nowrap uppercase tracking-widest text-[8px]">Privacy</Link>
+                        <Link href="/" className="hover:text-secondary whitespace-nowrap uppercase tracking-widest text-[8px]">Legal</Link>
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-sm px-2 py-1">
-                            <span className="text-[9px] font-black uppercase text-gray-500 tracking-tighter">Platform Health:</span>
-                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                            <span className="text-[9px] font-black text-green-600 uppercase">Excellent</span>
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.5)]"></div>
+                            <span className="text-[8px] font-black text-green-600 uppercase tracking-widest">Network Secure</span>
                         </div>
                     </div>
                 </div>

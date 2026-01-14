@@ -3,9 +3,10 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon, PlusCircle } from 'lucide-react';
+import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon, PlusCircle, Loader2 } from 'lucide-react';
 import { apiService } from '@/lib/api';
 import { useLanguage } from '@/lib/language-context';
+import Header from '@/components/Header';
 
 interface Ad {
     id: string;
@@ -61,117 +62,86 @@ function AdsContent() {
 
     return (
         <div className="min-h-screen bg-[#f0f2f5]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {/* Unified Micro Header */}
-            <header className="bg-white border-b border-gray-200 py-2 px-4 shadow-sm sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto flex items-center gap-6">
-                    <Link href="/" className="flex items-center gap-2 group shrink-0">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5 shadow-md">
-                            <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
-                                <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
-                            </svg>
-                        </div>
-                        <span className="text-lg font-black tracking-tighter text-secondary">{t('siteName')}</span>
-                    </Link>
+            <Header />
 
-                    <div className="flex-1 max-w-xl flex border-2 border-primary rounded-sm overflow-hidden bg-white">
+            {/* Filter Bar - Professional High Density */}
+            <div className="bg-white border-b border-gray-200 py-2 px-4 sticky top-[53px] z-40 shadow-sm">
+                <div className="max-w-7xl mx-auto flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-[10px] font-black text-secondary bg-gray-100 px-3 py-1.5 rounded-xs border border-gray-200 uppercase tracking-widest italic">
+                        <Filter size={14} className="text-primary" />
+                        <span>Matrix Filters</span>
+                    </div>
+                    <div className="flex-1 flex items-center gap-2">
                         <input
                             type="text"
-                            placeholder={t('searchPlaceholder')}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && fetchAds()}
-                            className="flex-1 px-3 py-1.5 text-xs outline-none font-bold"
+                            placeholder={language === 'ar' ? 'البحث عن مدينة...' : 'Search Location...'}
+                            className="bg-gray-50 border border-gray-200 px-3 py-1.5 text-[10px] font-bold rounded-xs focus:border-primary focus:bg-white outline-none w-40 transition-all"
+                            value={locationFilter}
+                            onChange={(e) => setLocationFilter(e.target.value)}
                         />
-                        <button onClick={fetchAds} className="bg-primary px-4 text-white hover:bg-primary-hover transition-colors">
-                            <Search size={14} />
-                        </button>
+                        <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xs px-2 py-1">
+                            <input
+                                type="number"
+                                placeholder="MIN"
+                                className="bg-transparent text-[10px] font-black outline-none w-14 text-center placeholder:text-gray-300"
+                                value={priceRange.min}
+                                onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                            />
+                            <span className="text-[10px] opacity-20 font-black">/</span>
+                            <input
+                                type="number"
+                                placeholder="MAX"
+                                className="bg-transparent text-[10px] font-black outline-none w-14 text-center placeholder:text-gray-300"
+                                value={priceRange.max}
+                                onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                            />
+                        </div>
+                        <button onClick={fetchAds} className="bg-primary text-white px-4 py-1.5 text-[10px] font-black rounded-xs hover:bg-primary-hover transition-all uppercase tracking-widest shadow-md shadow-primary/20 active:scale-95">SYNC RESULTS</button>
                     </div>
-
-                    <Link href="/post-ad" className="bg-secondary text-white px-4 py-1.5 rounded-sm text-[11px] font-black flex items-center gap-2 hover:bg-black transition-all shrink-0">
-                        <PlusCircle size={14} />
-                        {t('postAd')}
-                    </Link>
-                </div>
-            </header>
-
-            {/* Filter Bar - Ultra Compact */}
-            <div className="bg-white border-b border-gray-200 py-1.5 px-4 sticky top-[53px] z-40">
-                <div className="max-w-7xl mx-auto flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 text-[10px] font-black text-gray-500 bg-gray-50 px-2 py-1 rounded-sm border border-gray-200">
-                        <Filter size={12} />
-                        <span>تصفية:</span>
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="المدينة"
-                        className="bg-gray-50 border border-gray-200 px-2 py-1 text-[10px] rounded-sm focus:border-primary outline-none w-24"
-                        value={locationFilter}
-                        onChange={(e) => setLocationFilter(e.target.value)}
-                    />
-                    <div className="flex items-center gap-1">
-                        <input
-                            type="number"
-                            placeholder="الأقل"
-                            className="bg-gray-50 border border-gray-200 px-2 py-1 text-[10px] rounded-sm focus:border-primary outline-none w-16"
-                            value={priceRange.min}
-                            onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                        />
-                        <span className="text-[10px] opacity-30">-</span>
-                        <input
-                            type="number"
-                            placeholder="الأعلى"
-                            className="bg-gray-50 border border-gray-200 px-2 py-1 text-[10px] rounded-sm focus:border-primary outline-none w-16"
-                            value={priceRange.max}
-                            onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                        />
-                    </div>
-                    <button onClick={fetchAds} className="bg-primary/10 text-primary px-3 py-1 text-[10px] font-black rounded-sm hover:bg-primary hover:text-white transition-all">تطبيق</button>
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto w-full p-2">
+            <main className="max-w-7xl mx-auto w-full p-3 font-cairo">
                 {/* Result Info */}
-                <div className="flex items-center justify-between mb-3 px-1">
-                    <h1 className="text-[13px] font-black uppercase text-secondary">
-                        {categoryQuery ? `${categoryQuery}` : 'جميع الإعلانات'}
-                        <span className="text-[10px] font-bold text-gray-400 mr-2 border-r pr-2">({ads.length} نتيجة)</span>
-                    </h1>
+                <div className="flex items-center justify-between mb-4 px-1">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1 h-4 bg-primary rounded-full"></div>
+                        <h1 className="text-[14px] font-black uppercase text-secondary tracking-tight">
+                            {categoryQuery ? `${categoryQuery}` : 'Global Marketplace'}
+                            <span className="text-[10px] font-black text-gray-400 mr-3 border-r border-gray-200 pr-3 uppercase italic">{ads.length} listings identified</span>
+                        </h1>
+                    </div>
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-                        {[...Array(12)].map((_, i) => (
-                            <div key={i} className="bg-white border border-gray-100 rounded-sm p-2 animate-pulse">
-                                <div className="aspect-[4/3] bg-gray-50 mb-2"></div>
-                                <div className="h-3 bg-gray-50 w-3/4 mb-1"></div>
-                                <div className="h-3 bg-gray-50 w-1/2"></div>
-                            </div>
-                        ))}
+                    <div className="flex items-center justify-center p-20 opacity-20">
+                        <Loader2 className="animate-spin" size={48} />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                         {ads.map((ad) => (
                             <Link
                                 key={ad.id}
                                 href={`/ads/view?id=${ad.id}`}
-                                className="bg-white border border-gray-100 p-2 rounded-sm hover:border-primary transition-all group flex flex-col gap-1.5 h-full shadow-sm"
+                                className="bg-white border border-gray-100 p-2 rounded-sm hover:border-primary transition-all group flex flex-col gap-2 h-full shadow-sm hover:shadow-xl hover:-translate-y-1"
                             >
                                 <div className="aspect-[4/3] bg-gray-50 rounded-xs relative overflow-hidden flex items-center justify-center border border-gray-100 shrink-0">
-                                    <ImageIcon className="text-gray-200" size={24} />
+                                    <ImageIcon className="text-gray-200 group-hover:scale-110 transition-transform" size={24} />
                                     {ad.isBoosted && (
-                                        <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-sm">مميز</div>
+                                        <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-2 py-0.5 rounded-bl-sm shadow-md uppercase tracking-widest">Boosted</div>
                                     )}
                                 </div>
-                                <div className="flex flex-col gap-1 flex-1">
-                                    <h3 className="text-[11px] font-black line-clamp-2 leading-[1.2] group-hover:text-primary transition-colors h-[26px]">
+                                <div className="flex flex-col gap-1.5 flex-1">
+                                    <h3 className="text-[11px] font-black line-clamp-2 leading-[1.3] group-hover:text-primary transition-colors text-secondary h-[28px] uppercase tracking-tighter">
                                         {ad.title}
                                     </h3>
-                                    <div className="flex flex-col mt-auto">
-                                        <div className="text-[12px] font-black text-primary">
-                                            {new Intl.NumberFormat('ar-SA').format(ad.price)} <span className="text-[8px] opacity-60">ر.س</span>
+                                    <div className="flex flex-col mt-auto pt-2 border-t border-gray-50">
+                                        <div className="text-[14px] font-black text-primary italic tracking-tighter flex items-center gap-1 leading-none">
+                                            {new Intl.NumberFormat('ar-SA').format(ad.price)} <span className="text-[8px] not-italic opacity-40 uppercase tracking-widest">SAR</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-[9px] font-bold text-gray-400 border-t border-gray-50 pt-1 mt-1">
-                                            <span className="flex items-center gap-1 truncate"><MapPin size={8} /> {ad.location}</span>
+                                        <div className="flex items-center gap-1 text-[9px] font-black text-gray-400 mt-2 uppercase tracking-tighter">
+                                            <MapPin size={10} className="text-primary opacity-50" />
+                                            <span className="truncate">{ad.location}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -186,7 +156,7 @@ function AdsContent() {
 
 export default function AdsPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-xs text-primary italic">LOADING SAHA...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-xs text-primary italic uppercase tracking-[0.3em]">Syncing Feed Matrix...</div>}>
             <AdsContent />
         </Suspense>
     );

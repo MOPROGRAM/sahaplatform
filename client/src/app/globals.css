@@ -19,7 +19,8 @@
 }
 
 body {
-  font-size: 13px; /* Smaller base font for Chinese density style */
+  font-size: 13px;
+  /* Smaller base font for Chinese density style */
   line-height: 1.4;
   background: #f4f6f9;
   color: #333;
@@ -27,11 +28,11 @@ body {
 }
 
 [dir="rtl"] body {
-  font-family: 'Cairo', 'Tajawal', sans-serif;
+  font-family: var(--font-cairo), 'Tajawal', sans-serif;
 }
 
 [dir="ltr"] body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 /* Force Icon Sizes - Fix for the "Large Icons" issue */
@@ -61,13 +62,14 @@ svg {
 .card {
   background: white;
   border: 1px solid #eee;
-  border-radius: 4px; /* Sharper corners for pro look */
+  border-radius: 4px;
+  /* Sharper corners for pro look */
   transition: all 0.2s;
 }
 
 .card:hover {
   border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .btn-compact {
@@ -79,8 +81,13 @@ svg {
 
 /* Modern Ticker */
 @keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .animate-marquee {
@@ -94,28 +101,52 @@ svg {
 }
 
 @keyframes marquee-rtl {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Scrollbar Integration */
 ::-webkit-scrollbar {
   width: 4px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #ddd;
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
 
 /* Typography Overrides for Density */
-h1 { font-size: 20px; font-weight: 900; }
-h2 { font-size: 16px; font-weight: 800; }
-h3 { font-size: 14px; font-weight: 700; }
-.text-xs { font-size: 10px; }
-.text-sm { font-size: 12px; }
+h1 {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+h3 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.text-xs {
+  font-size: 10px;
+}
+
+.text-sm {
+  font-size: 12px;
+}
 
 /* Grid fixes */
 .portal-grid {

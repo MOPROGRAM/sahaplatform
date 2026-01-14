@@ -16,12 +16,14 @@ import {
     ChevronRight,
     Loader2,
     PlusCircle,
-    Search
+    Search,
+    ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiService } from "@/lib/api";
 import { useLanguage } from "@/lib/language-context";
+import Header from "@/components/Header";
 
 export default function DashboardPage() {
     const { user, logout } = useAuthStore();
@@ -30,10 +32,10 @@ export default function DashboardPage() {
     const [ads, setAds] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState([
-        { label: "المشاهدات", value: "0", icon: <Eye size={12} />, color: "text-blue-500" },
-        { label: "الرسائل", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
-        { label: "الإعلانات", value: "0", icon: <Package size={12} />, color: "text-orange-500" },
-        { label: "المتابعين", value: "0", icon: <TrendingUp size={12} />, color: "text-purple-500" },
+        { label: "Views", value: "0", icon: <Eye size={12} />, color: "text-blue-500" },
+        { label: "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
+        { label: "Listings", value: "0", icon: <Package size={12} />, color: "text-orange-500" },
+        { label: "Growth", value: "0%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
     ]);
 
     useEffect(() => {
@@ -53,10 +55,10 @@ export default function DashboardPage() {
             const activeAds = myAds.filter((ad: any) => ad.isActive).length;
 
             setStats([
-                { label: "المشاهدات", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
-                { label: "الرسائل", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
-                { label: "الإعلانات", value: activeAds.toString(), icon: <Package size={12} />, color: "text-orange-500" },
-                { label: "المتابعين", value: "0", icon: <TrendingUp size={12} />, color: "text-purple-500" },
+                { label: language === 'ar' ? "المشاهدات" : "Views", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
+                { label: language === 'ar' ? "الرسائل" : "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
+                { label: language === 'ar' ? "الإعلانات" : "Listings", value: activeAds.toString(), icon: <Package size={12} />, color: "text-orange-500" },
+                { label: language === 'ar' ? "النمو" : "Growth", value: "+12%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
             ]);
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
@@ -65,146 +67,149 @@ export default function DashboardPage() {
         }
     };
 
-    const handleLogout = () => {
-        logout();
-        router.push('/');
-    };
-
     if (!user) return null;
 
     return (
         <div className="bg-[#f0f2f5] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {/* Unified Micro Header */}
-            <header className="bg-white border-b border-gray-200 py-2 px-4 shadow-sm z-50 sticky top-0">
-                <div className="max-w-7xl mx-auto flex items-center gap-6">
-                    <Link href="/" className="flex items-center gap-2 group shrink-0">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5 shadow-md">
-                            <svg viewBox="0 0 100 40" className="w-full h-full text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
-                                <path d="M 10 15 L 10 10 L 90 10 L 90 20 M 10 20 L 10 30 L 90 30 L 90 25" />
-                            </svg>
+            <Header />
+
+            <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
+                {/* Left Mini Sidebar - Professional Tech Style */}
+                <aside className="w-full md:w-56 space-y-3 shrink-0">
+                    <div className="bg-white border border-gray-200 p-5 rounded-sm shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform"></div>
+                        <div className="relative z-10 text-center">
+                            <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg shadow-primary/10">
+                                <span className="text-lg font-black text-primary italic">{user.name?.substring(0, 2).toUpperCase()}</span>
+                            </div>
+                            <h4 className="text-[12px] font-black text-secondary uppercase tracking-tight truncate">{user.name}</h4>
+                            <div className="flex items-center justify-center gap-1 mt-1 text-primary">
+                                <ShieldCheck size={12} className="fill-primary/10" />
+                                <span className="text-[8px] font-black uppercase tracking-widest">{user.role} MERCHANT</span>
+                            </div>
                         </div>
-                        <span className="text-lg font-black tracking-tighter text-secondary">{t('siteName')}</span>
-                    </Link>
-
-                    <nav className="hidden lg:flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-gray-400">
-                        <Link href="/dashboard" className="text-primary border-b-2 border-primary pb-0.5">Overview</Link>
-                        <Link href="/ads/my" className="hover:text-secondary">My Ads</Link>
-                        <Link href="/messages" className="hover:text-secondary">Messages</Link>
-                    </nav>
-
-                    <div className="flex-1 max-w-sm ml-auto flex border border-gray-200 rounded-sm overflow-hidden bg-gray-50">
-                        <input type="text" placeholder="Search dashboard..." className="flex-1 px-3 py-1 text-[10px] outline-none font-bold bg-transparent" />
-                        <button className="px-2 text-gray-400"><Search size={12} /></button>
                     </div>
 
-                    <button onClick={handleLogout} className="text-[10px] font-black text-red-500 flex items-center gap-1 hover:opacity-70">
-                        <LogOut size={12} />
-                        {t('logout')}
-                    </button>
-                </div>
-            </header>
-
-            <div className="max-w-7xl mx-auto w-full flex-1 flex gap-4 p-4">
-                {/* Left Mini Sidebar */}
-                <aside className="w-48 space-y-2 shrink-0 hidden md:block">
-                    <div className="bg-white border border-gray-200 p-4 text-center rounded-sm">
-                        <div className="w-12 h-12 bg-primary/10 rounded-full mx-auto mb-2 flex items-center justify-center border border-primary/20">
-                            <span className="text-sm font-black text-primary">{user.name?.substring(0, 2).toUpperCase()}</span>
-                        </div>
-                        <h4 className="text-[11px] font-black text-secondary">{user.name}</h4>
-                        <span className="text-[8px] font-black text-primary bg-primary/10 px-1.5 py-0.5 rounded-full mt-1 inline-block uppercase tracking-tighter">Verified Merchant</span>
-                    </div>
-
-                    <nav className="bg-white border border-gray-200 rounded-sm">
+                    <nav className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
                         {[
-                            { label: "Overview", icon: <LayoutDashboard size={14} />, active: true },
-                            { label: "My Listings", icon: <Package size={14} /> },
-                            { label: "Messages", icon: <MessageSquare size={14} /> },
-                            { label: "Favorites", icon: <Heart size={14} /> },
-                            { label: "Settings", icon: <Settings size={14} /> },
+                            { label: "Overview", icon: <LayoutDashboard size={14} />, active: true, path: "/dashboard" },
+                            { label: "My Listings", icon: <Package size={14} />, path: "/ads/my" },
+                            { label: "Messages", icon: <MessageSquare size={14} />, path: "/messages" },
+                            { label: "Settings", icon: <Settings size={14} />, path: "/settings" },
                         ].map((item, i) => (
-                            <button key={i} className={`w-full flex items-center gap-3 px-3 py-2 text-[10px] font-bold border-b border-gray-50 last:border-0 ${item.active ? 'text-primary bg-primary/5 border-r-2 border-r-primary' : 'text-gray-500 hover:bg-gray-50'}`}>
+                            <Link key={i} href={item.path || "#"} className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-gray-50 last:border-0 transition-all ${item.active ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary' : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'}`}>
                                 {item.icon}
                                 <span>{item.label}</span>
-                            </button>
+                            </Link>
                         ))}
                     </nav>
+
+                    <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50/50 hover:bg-red-50 transition-all border border-red-100/50 rounded-sm">
+                        <LogOut size={14} />
+                        <span>Sign Out System</span>
+                    </button>
                 </aside>
 
                 {/* Main Content Area */}
                 <main className="flex-1 flex flex-col gap-4">
-                    {/* Compact Stats Row */}
-                    <div className="grid grid-cols-4 gap-2">
+                    {/* Compact Stats Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         {stats.map((stat, i) => (
-                            <div key={i} className="bg-white border border-gray-200 p-3 rounded-sm flex flex-col gap-1 shadow-sm">
-                                <span className={`w-6 h-6 flex items-center justify-center rounded-sm bg-gray-50 ${stat.color}`}>{stat.icon}</span>
-                                <div className="flex flex-col mt-1">
-                                    <span className="text-base font-black leading-none">{stat.value}</span>
-                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</span>
+                            <div key={i} className="bg-white border border-gray-200 p-4 rounded-sm flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                                <div className={`absolute bottom-0 right-0 w-12 h-12 ${stat.color} opacity-[0.03] -mr-4 -mb-4 group-hover:scale-150 transition-transform`}>{stat.icon}</div>
+                                <span className={`w-8 h-8 flex items-center justify-center rounded-xs bg-gray-50 ${stat.color} p-1 border border-black/5 shadow-inner`}>
+                                    {stat.icon}
+                                </span>
+                                <div className="flex flex-col">
+                                    <span className="text-2xl font-black italic tracking-tighter text-secondary leading-none">{stat.value}</span>
+                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1 opacity-60">{stat.label} Matrix</span>
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    {/* Listings Table - High Density */}
-                    <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col min-h-[400px]">
-                        <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="text-[10px] font-black uppercase tracking-widest text-secondary">Recent Listings</h3>
-                            <Link href="/post-ad" className="text-primary text-[9px] font-black flex items-center gap-1 hover:underline">
-                                <PlusCircle size={10} /> {t('postAd')}
+                    {/* Listings Table - High Density Professional */}
+                    <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+                        <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Package size={14} className="text-primary" />
+                                <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-secondary">Operational Fleet / Listings</h3>
+                            </div>
+                            <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                                <PlusCircle size={12} /> ADD UNIT
                             </Link>
                         </div>
 
-                        {loading ? (
-                            <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-primary opacity-20" /></div>
-                        ) : ads.length > 0 ? (
-                            <table className="w-full text-[10px]">
-                                <thead className="bg-gray-50 text-gray-400 font-black uppercase text-[8px]">
-                                    <tr>
-                                        <th className="px-4 py-2 text-left">Listing Name</th>
-                                        <th className="px-4 py-2 text-center">Status</th>
-                                        <th className="px-4 py-2 text-center">Views</th>
-                                        <th className="px-4 py-2 text-right">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {ads.map(ad => (
-                                        <tr key={ad.id} className="hover:bg-primary/5 transition-colors cursor-pointer group">
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 bg-gray-50 border border-gray-100 rounded-xs flex items-center justify-center shrink-0">
-                                                        <Package size={14} className="text-gray-200" />
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <span className="font-black text-secondary block truncate group-hover:text-primary">{ad.title}</span>
-                                                        <span className="text-primary font-bold">{new Intl.NumberFormat('ar-SA').format(ad.price)} SAR</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase ${ad.isActive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                                                    {ad.isActive ? 'Active' : 'Ended'}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center font-bold text-gray-400">
-                                                {ad.views || 0}
-                                            </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-gray-400 font-bold">{new Date(ad.createdAt).toLocaleDateString()}</span>
-                                                    <Link href={`/ads/view?id=${ad.id}`} className="text-primary hover:underline flex items-center gap-1">Open <ExternalLink size={8} /></Link>
-                                                </div>
-                                            </td>
+                        <div className="overflow-x-auto">
+                            {loading ? (
+                                <div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin text-primary opacity-20" /></div>
+                            ) : ads.length > 0 ? (
+                                <table className="w-full text-[10px] border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-100/50 text-gray-400 font-black uppercase text-[8px] tracking-widest border-b border-gray-200">
+                                            <th className="px-6 py-3 text-left">Unit Identification / Details</th>
+                                            <th className="px-6 py-3 text-center">Status Matrix</th>
+                                            <th className="px-6 py-3 text-center">Engagement</th>
+                                            <th className="px-6 py-3 text-right">Actions</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        ) : (
-                            <div className="flex-1 flex flex-col items-center justify-center text-gray-300 gap-2">
-                                <Package size={40} className="opacity-10" />
-                                <span className="text-[10px] font-black uppercase italic tracking-widest">No Active Listings Found</span>
-                            </div>
-                        )}
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {ads.map(ad => (
+                                            <tr key={ad.id} className="hover:bg-primary/[0.02] transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-9 h-9 bg-gray-50 border border-gray-100 rounded-xs flex items-center justify-center shrink-0 shadow-inner group-hover:border-primary/20 transition-colors">
+                                                            <Package size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <span className="font-black text-secondary block truncate group-hover:text-primary transition-colors uppercase tracking-tight">{ad.title}</span>
+                                                            <div className="flex items-center gap-2 mt-0.5">
+                                                                <span className="text-primary font-black italic">{new Intl.NumberFormat('ar-SA').format(ad.price)} SAR</span>
+                                                                <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
+                                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">{ad.category}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                            {ad.isActive ? 'Operation: Active' : 'Operation: Pause'}
+                                                        </span>
+                                                        <span className="text-[7px] font-black text-gray-300 uppercase italic">Code: {ad.id?.substring(0, 8)}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex flex-col items-center">
+                                                        <span className="text-[13px] font-black text-secondary leading-none">{ad.views || 0}</span>
+                                                        <span className="text-[7px] font-black text-gray-400 uppercase tracking-tighter mt-1 italic">Total Imprints</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex flex-col items-end gap-1.5">
+                                                        <Link href={`/ads/view?id=${ad.id}`} className="px-3 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
+                                                        <div className="flex items-center gap-1 text-[8px] font-black text-gray-300 uppercase tracking-tighter">
+                                                            <Clock size={8} /> {new Date(ad.createdAt).toLocaleDateString()}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 p-16">
+                                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shadow-inner">
+                                        <Package size={32} className="opacity-10" />
+                                    </div>
+                                    <div className="text-center">
+                                        <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-300">No Mission Data Found</h4>
+                                        <p className="text-[9px] font-bold text-gray-300 uppercase italic mt-1 font-cairo">ابدأ رحلتك بنشر إعلانك الأول الآن</p>
+                                    </div>
+                                    <Link href="/post-ad" className="mt-4 bg-primary text-white text-[9px] font-black px-6 py-2 rounded-xs shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all uppercase tracking-widest">Post Ad Now</Link>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </main>
             </div>
