@@ -50,6 +50,19 @@ export const apiService = {
         return response.json();
     },
 
+    async delete(endpoint: string) {
+        const url = `${API_URL}${endpoint}`;
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Error: ${response.status}`);
+        }
+        return response.json();
+    },
+
     // Countries and Cities
     async getCountries() {
         return this.get('/countries');
