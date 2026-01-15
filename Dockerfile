@@ -29,11 +29,12 @@ RUN npm run build
 # Stage 2: Setup the production environment
 FROM node:18-slim AS production
 
-# Install runtime dependencies (sqlite3, openssl for Prisma)
+# Install runtime dependencies (openssl for Prisma, postgresql-client for DB operations)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    sqlite3 \
     openssl \
     ca-certificates \
+    postgresql-client \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
@@ -48,7 +49,7 @@ RUN npm install --production && npm cache clean --force
 # Copy server source code
 COPY server/ .
 
-# Set Env for Prisma
+# Set default Env for Prisma (can be overridden by environment variables)
 ENV DATABASE_URL="file:/app/prisma/dev.db"
 
 # Generate Prisma client for linux (debian)
@@ -62,13 +63,22 @@ COPY --chmod=755 <<EOF /app/entrypoint.sh
 #!/bin/sh
 echo "🚀 Starting Saha Platform..."
 
-# Ensure database directory exists
-mkdir -p /app/prisma
-
-echo "📊 Running database setup..."
-npx prisma db push --accept-data-loss
-echo "🌱 Syncing global data (Currencies/Countries)..."
-npx prisma db seed
+# Check if using PostgreSQL (Supabase) or SQLite
+if echo "\$DATABASE_URL" | grep -q "postgresql://"; then
+  echo "📊 Using PostgreSQL (Supabase) database..."
+  echo "🔄 Running database migrations..."
+  npx prisma db push --accept-data-loss
+  echo "🌱 Seeding database with initial data..."
+  npx prisma db seed
+else
+  echo "📊 Using SQLite database..."
+  # Ensure database directory exists for SQLite
+  mkdir -p /app/prisma
+  echo "🔄 Setting up database..."
+  npx prisma db push --accept-data-loss
+  echo "🌱 Seeding database with initial data..."
+  npx prisma db seed
+fi
 
 echo "✅ Database ready!"
 echo "🌐 Starting application..."

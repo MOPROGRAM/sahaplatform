@@ -1,0 +1,48 @@
+# Docker Compose for Local Development with Supabase
+# This file is optional - use it if you want to test PostgreSQL locally
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database (simulates Supabase locally)
+  postgres:
+    image: postgres:15-alpine
+    container_name: saha-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: saha_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: saha-server
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/saha_platform
+      JWT_SECRET: saha_platform_secret_key_secure_2025
+      NODE_ENV: development
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  postgres_data:
+    driver: local

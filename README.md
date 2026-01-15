@@ -42,10 +42,11 @@
 ### Backend
 - **Runtime:** Node.js (Express)
 - **ORM:** Prisma
-- **Database:** SQLite (production-ready)
+- **Database:** PostgreSQL (Supabase) / SQLite (local dev)
 - **Authentication:** JWT + bcrypt
 - **Security:** Helmet, CORS, middleware
 - **Real-time:** Socket.io (ready for chat)
+
 
 ## 📂 Project Structure
 
@@ -103,6 +104,7 @@ saha-platform/
 - Node.js 18+ (download from [nodejs.org](https://nodejs.org/))
 - npm (comes with Node.js)
 - Git
+- **Optional:** Supabase account for persistent database ([supabase.com](https://supabase.com))
 
 ### Installation
 
@@ -117,7 +119,7 @@ saha-platform/
    cd server
    npm install
    npx prisma generate
-   npx prisma migrate dev --name init
+   npx prisma db push
    npx prisma db seed
    npm run dev
    ```
@@ -131,6 +133,38 @@ saha-platform/
    npm run dev
    ```
    The client will start on http://localhost:3000
+
+### 🗄️ Database Setup
+
+#### للتطوير المحلي (SQLite):
+البنية الافتراضية تستخدم SQLite - لا حاجة لإعداد إضافي!
+
+#### للإنتاج مع Supabase (موصى به):
+للحصول على قاعدة بيانات دائمة لا تُحذف عند إعادة التشغيل:
+
+1. **راجع دليل الإعداد الكامل:** [`SUPABASE_SETUP.md`](SUPABASE_SETUP.md)
+2. **أنشئ حساب مجاني** على [supabase.com](https://supabase.com)
+3. **احصل على رابط الاتصال** من لوحة التحكم
+4. **حدّث متغير البيئة:**
+   ```bash
+   # في ملف server/.env
+   DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@db.xxx.supabase.co:5432/postgres"
+   ```
+5. **شغّل سكريبت الترحيل:**
+   ```bash
+   # Windows
+   .\migrate-to-supabase.ps1
+   
+   # Linux/Mac
+   ./migrate-to-supabase.sh
+   ```
+
+**المزايا:**
+- ✅ البيانات لا تُحذف عند إعادة التشغيل
+- ✅ مجاني حتى 500MB
+- ✅ يعمل مع Docker والبنية الحالية
+- ✅ قابل للنقل لأي منصة استضافة
+
 
 ## 📚 API Documentation
 
