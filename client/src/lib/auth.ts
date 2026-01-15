@@ -20,11 +20,11 @@ export const authService = {
         return response.json();
     },
 
-    async register(email: string, password: string, name: string) {
+    async register(email: string, password: string, name: string, userType: string = 'SEEKER') {
         const response = await fetch(getApiUrl('/auth/register'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, name }),
+            body: JSON.stringify({ email, password, name, userType }),
         });
 
         if (!response.ok) {

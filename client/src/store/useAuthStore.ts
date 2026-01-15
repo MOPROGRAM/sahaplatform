@@ -6,7 +6,7 @@ interface AuthState {
     session: any;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string, name: string) => Promise<void>;
+    register: (email: string, password: string, name: string, userType?: string) => Promise<void>;
     logout: () => Promise<void>;
     initialize: () => Promise<void>;
 }
@@ -28,10 +28,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ loading: false });
         }
     },
-    register: async (email, password, name) => {
+    register: async (email, password, name, userType = 'SEEKER') => {
         set({ loading: true });
         try {
-            const response = await authService.register(email, password, name);
+            const response = await authService.register(email, password, name, userType);
             const loginResponse = await authService.login(email, password);
             authService.setToken(loginResponse.token);
             set({
