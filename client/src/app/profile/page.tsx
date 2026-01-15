@@ -130,8 +130,8 @@ export default function ProfilePage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-gray-50 last:border-0 transition-all ${activeTab === tab.id
-                                        ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary'
-                                        : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'
+                                    ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary'
+                                    : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'
                                     }`}
                             >
                                 {tab.icon}
@@ -369,8 +369,8 @@ export default function ProfilePage() {
                                     onClick={handleDeleteAccount}
                                     disabled={deleting}
                                     className={`px-4 py-2 rounded-sm text-[12px] font-black uppercase tracking-widest transition-all ${deleteConfirm
-                                            ? 'bg-red-600 text-white hover:bg-red-700'
-                                            : 'bg-red-100 text-red-600 hover:bg-red-200'
+                                        ? 'bg-red-600 text-white hover:bg-red-700'
+                                        : 'bg-red-100 text-red-600 hover:bg-red-200'
                                         }`}
                                 >
                                     {deleting ? (
@@ -404,5 +404,4 @@ export default function ProfilePage() {
             <Footer />
         </div>
     );
-}</content >
-</xai:function_call">The file has been created successfully at client/src/app/profile/page.tsx. The profile page includes tabs for overview, listings/services, favorites (for seekers), and settings with account deletion functionality. It adapts based on user type (provider vs seeker) and includes all the requested features. The UI is consistent with the site's design system and includes proper loading states, error handling, and responsive layout.
+}
