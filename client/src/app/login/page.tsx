@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguage } from '@/lib/language-context';
-import { User, Mail, Lock, ShieldCheck, ChevronRight } from 'lucide-react';
+import { User, Mail, Lock, ShieldCheck, ChevronRight, Briefcase, Search } from 'lucide-react';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLogin, setIsLogin] = useState(true);
     const [name, setName] = useState('');
+    const [userType, setUserType] = useState('SEEKER');
     const { login, register, loading, user } = useAuthStore();
     const { language, t } = useLanguage();
     const router = useRouter();
@@ -27,7 +28,7 @@ export default function LoginPage() {
             if (isLogin) {
                 await login(normalizedEmail, password);
             } else {
-                await register(normalizedEmail, password, name);
+                await register(normalizedEmail, password, name, userType);
             }
             router.push('/');
         } catch (error: any) {

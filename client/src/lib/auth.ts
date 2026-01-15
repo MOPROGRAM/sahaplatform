@@ -56,5 +56,6 @@ export type AuthUser = {
     email: string;
     name?: string;
     role?: string;
+    userType?: string;
     verified?: boolean;
 };

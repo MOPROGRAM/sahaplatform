@@ -8,8 +8,8 @@ const authMiddleware = require('../../middleware/auth');
 
 router.post('/register', async (req, res) => {
     try {
-        const { email, password, name } = req.body;
-        const user = await authService.register(email, password, name);
+        const { email, password, name, userType } = req.body;
+        const user = await authService.register(email, password, name, userType);
         res.status(201).json({ message: 'User registered successfully', user });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -32,9 +32,39 @@ router.get('/me', authMiddleware, async (req, res) => {
         const prisma = new PrismaClient();
         const user = await prisma.user.findUnique({
             where: { id: req.user.id },
-            select: { id: true, email: true, name: true, role: true, verified: true }
+            select: { id: true, email: true, name: true, role: true, userType: true, verified: true }
         });
         res.json(user);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.delete('/me', authMiddleware, async (req, res) => {
+    try {
+        const { PrismaClient } = require('@prisma/client');
+        const prisma = new PrismaClient();
+
+        // Delete all related data first
+        await prisma.account.deleteMany({ where: { userId: req.user.id } });
+        await prisma.session.deleteMany({ where: { userId: req.user.id } });
+        await prisma.message.deleteMany({
+            where: {
+                OR: [
+                    { senderId: req.user.id },
+                    { receiverId: req.user.id }
+                ]
+            }
+        });
+        await prisma.conversation.deleteMany({ where: { participants: { some: { id: req.user.id } } } });
+        await prisma.payment.deleteMany({ where: { userId: req.user.id } });
+        await prisma.subscription.deleteMany({ where: { userId: req.user.id } });
+        await prisma.ad.deleteMany({ where: { authorId: req.user.id } });
+
+        // Finally delete the user
+        await prisma.user.delete({ where: { id: req.user.id } });
+
+        res.json({ message: 'Account deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

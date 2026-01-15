@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = new PrismaClient();
 
-const register = async (email, password, name) => {
+const register = async (email, password, name, userType = 'SEEKER') => {
     try {
         const normalizedEmail = email.trim().toLowerCase();
         const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
@@ -11,8 +11,8 @@ const register = async (email, password, name) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await prisma.user.create({
-            data: { email: normalizedEmail, password: hashedPassword, name },
-            select: { id: true, email: true, name: true, role: true }
+            data: { email: normalizedEmail, password: hashedPassword, name, userType },
+            select: { id: true, email: true, name: true, role: true, userType: true }
         });
         return user;
     } catch (error) {
@@ -47,6 +47,7 @@ const login = async (email, password) => {
                 email: user.email,
                 name: user.name,
                 role: user.role,
+                userType: user.userType,
                 verified: user.verified
             }
         };
