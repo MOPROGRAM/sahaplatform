@@ -8,10 +8,14 @@ require('dotenv').config();
 
 // Fix DATABASE_URL to start with protocol if missing
 if (process.env.DATABASE_URL) {
+    console.log('DATABASE_URL before fix:', process.env.DATABASE_URL);
     process.env.DATABASE_URL = process.env.DATABASE_URL.trim();
     if (!process.env.DATABASE_URL.startsWith('file') && !process.env.DATABASE_URL.includes('://')) {
         process.env.DATABASE_URL = 'postgresql://' + process.env.DATABASE_URL;
     }
+    console.log('DATABASE_URL after fix:', process.env.DATABASE_URL);
+} else {
+    console.log('DATABASE_URL is not set');
 }
 
 const app = express();
