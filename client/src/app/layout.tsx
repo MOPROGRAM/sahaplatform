@@ -36,8 +36,6 @@ export default function RootLayout({
     return (
         <html className={`${inter.variable} ${cairo.variable} ${tajawal.variable}`}>
             <head>
-                <script src="https://cdn.tailwindcss.com"></script>
-                <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
                 <style dangerouslySetInnerHTML={{
                     __html: `
                         :root {

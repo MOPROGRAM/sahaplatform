@@ -125,12 +125,14 @@ const authRoutes = require('./modules/auth/auth.controller');
 const adRoutes = require('./modules/ads/ad.controller');
 const conversationRoutes = require('./modules/conversations/conversation.controller');
 const countryRoutes = require('./modules/countries/country.controller');
+const subscriptionRoutes = require('./modules/subscriptions/subscription.controller');
 const authMiddleware = require('./middleware/auth');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/countries', countryRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket) => {

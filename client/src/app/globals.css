@@ -2,236 +2,90 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===========================================
-   DESIGN SYSTEM - SAHA PLATFORM
-   =========================================== */
-
 :root {
-  /* Primary Brand Colors */
   --primary: #ff6700;
-  --primary-hover: #e65c00;
-  --primary-light: rgba(255, 103, 0, 0.1);
-  --primary-dark: #cc5500;
-
-  /* Secondary Colors */
-  --secondary: #1c1e21;
-  --secondary-light: rgba(28, 30, 33, 0.1);
-  --secondary-dark: #141517;
-
-  /* Neutral Colors */
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
-
-  /* Status Colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
-
-  /* Spacing Scale */
-  --spacing-xs: 0.25rem;
-  /* 4px */
-  --spacing-sm: 0.5rem;
-  /* 8px */
-  --spacing-md: 0.75rem;
-  /* 12px */
-  --spacing-lg: 1rem;
-  /* 16px */
-  --spacing-xl: 1.25rem;
-  /* 20px */
-  --spacing-2xl: 1.5rem;
-  /* 24px */
-  --spacing-3xl: 2rem;
-  /* 32px */
-  --spacing-4xl: 2.5rem;
-  /* 40px */
-  --spacing-5xl: 3rem;
-  /* 48px */
-
-  /* Typography Scale */
-  --font-size-xs: 0.75rem;
-  /* 12px */
-  --font-size-sm: 0.875rem;
-  /* 14px */
-  --font-size-base: 1rem;
-  /* 16px */
-  --font-size-lg: 1.125rem;
-  /* 18px */
-  --font-size-xl: 1.25rem;
-  /* 20px */
-  --font-size-2xl: 1.5rem;
-  /* 24px */
-  --font-size-3xl: 1.875rem;
-  /* 30px */
-  --font-size-4xl: 2.25rem;
-  /* 36px */
-  --font-size-5xl: 3rem;
-  /* 48px */
-
-  /* Border Radius */
-  --radius-sm: 0.25rem;
-  /* 4px */
-  --radius-md: 0.375rem;
-  /* 6px */
-  --radius-lg: 0.5rem;
-  /* 8px */
-  --radius-xl: 0.75rem;
-  /* 12px */
-  --radius-2xl: 1rem;
-  /* 16px */
-  --radius-full: 9999px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --primary-hover: #e55c00;
+  --primary-dark: #cc5200;
+  --navy: #0f172a;
+  --emerald: #059669;
+  --amber: #d97706;
+  --black: #000000;
+  --white: #ffffff;
+  --gray-bg: #f4f7fa;
+  --card-bg: #ffffff;
+  --text-main: #1c1e21;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
 }
 
-/* ===========================================
-   TYPOGRAPHY SYSTEM
-   =========================================== */
+[data-theme="dark"] {
+  --gray-bg: #0f111a;
+  --card-bg: #1a1d29;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #2d3142;
+  --black: #ffffff;
+  --white: #12141d;
+}
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: var(--font-size-base);
-  line-height: 1.6;
-  color: var(--gray-900);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Arabic Typography */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: var(--gray-bg);
+  color: var(--text-main);
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Fluid Typography & Higher Contrast */
+body {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
 [dir="rtl"] body {
-  font-family: 'Cairo', 'Tajawal', 'Noto Sans Arabic', Arial, sans-serif;
-  direction: rtl;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
-/* English Typography */
 [dir="ltr"] body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  direction: ltr;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Heading Hierarchy */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--gray-900);
-  margin: 0;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
-h1 {
-  font-size: var(--font-size-4xl);
+/* High Contrast Borders & Surfaces */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-  font-size: var(--font-size-3xl);
+.shadow-premium {
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
 }
 
-h3 {
-  font-size: var(--font-size-2xl);
+[data-theme="dark"] .shadow-premium {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
-h4 {
-  font-size: var(--font-size-xl);
-}
-
-h5 {
-  font-size: var(--font-size-lg);
-}
-
-h6 {
-  font-size: var(--font-size-base);
-}
-
-/* Text Utilities */
-.text-primary {
-  color: var(--primary);
-}
-
-.text-secondary {
-  color: var(--secondary);
-}
-
-.text-success {
-  color: var(--success);
-}
-
-.text-warning {
-  color: var(--warning);
-}
-
-.text-error {
-  color: var(--error);
-}
-
-.text-info {
-  color: var(--info);
-}
-
-.font-bold {
-  font-weight: 700;
-}
-
-.font-semibold {
-  font-weight: 600;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-.font-normal {
-  font-weight: 400;
-}
-
-.font-light {
-  font-weight: 300;
-}
-
-/* Premium Aesthetic Backgrounds */
-.glass-morphism {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-[data-theme='dark'] .glass-morphism {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mesh-bg {
-  background-color: #f8fafc;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(255, 103, 0, 0.03) 0, transparent 50%),
-    radial-gradient(at 50% 0%, rgba(28, 30, 33, 0.02) 0, transparent 50%);
-}
-
-[data-theme='dark'] .mesh-bg {
-  background-color: #020617;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(255, 103, 0, 0.05) 0, transparent 50%),
-    radial-gradient(at 50% 0%, rgba(15, 23, 42, 0.1) 0, transparent 50%);
-}
-
-/* Scrollbar styling for a compact look */
+/* Custom Scrollbar - Sharp & Clean */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -242,14 +96,15 @@ h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #cbd5e1;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: #94a3b8;
 }
 
+/* Animations */
 @keyframes marquee {
   0% {
     transform: translateX(100%);
@@ -260,192 +115,89 @@ h6 {
   }
 }
 
-.animate-marquee {
-  display: inline-block;
-  white-space: nowrap;
-  animation: marquee 30s linear infinite;
+[dir="rtl"] .animate-marquee {
+  animation: marquee-rtl 40s linear infinite;
 }
 
-[dir="rtl"] .animate-marquee {
-  animation: marquee-rtl 30s linear infinite;
+[dir="ltr"] .animate-marquee {
+  animation: marquee-ltr 40s linear infinite;
+}
+
+@keyframes marquee-ltr {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes marquee-rtl {
   0% {
-    transform: translateX(-100%);
+    transform: translateX(0);
   }
 
   100% {
-    transform: translateX(100%);
+    transform: translateX(50%);
   }
 }
 
-@keyframes marquee-slow {
-  0% {
-    transform: translateX(100%);
-  }
-
-  100% {
-    transform: translateX(-100%);
-  }
+.animate-marquee {
+  display: flex;
+  width: max-content;
 }
 
-@keyframes marquee-rtl-slow {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-marquee-slow {
-  display: inline-block;
-  white-space: nowrap;
-  animation: marquee-slow 60s linear infinite;
-}
-
-[dir="rtl"] .animate-marquee-slow {
-  animation: marquee-rtl-slow 60s linear infinite;
-}
-
-@keyframes fadeInOut {
-
-  0%,
-  100% {
-    opacity: 0;
-  }
-
-  10%,
-  90% {
-    opacity: 1;
-  }
-}
-
-.animate-fade-slow {
-  animation: fadeInOut 8s ease-in-out infinite;
-}
-
-/* Utility for high density grids */
-.dense-grid {
-  display: grid;
-  gap: 1px;
-  background-color: #e5e7eb;
-  /* Grid line color */
-}
-
-[data-theme='dark'] .dense-grid {
-  background-color: #1f2937;
-}
-
-.dense-grid>* {
-  background-color: white;
-}
-
-[data-theme='dark'] .dense-grid>* {
-  background-color: #0f111a;
-}
-
-/* ===========================================
-   SAHA DESIGN SYSTEM COMPONENTS
-   =========================================== */
-
-/* Buttons */
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--radius-lg);
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-md);
-}
-
-.btn-primary:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
-}
-
-.btn-secondary {
-  background: white;
-  color: var(--secondary);
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--radius-lg);
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-  border: 2px solid var(--gray-200);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-/* Input Fields */
-.input-field {
-  width: 100%;
-  padding: var(--spacing-md);
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-sm);
-  transition: all 0.2s ease;
-  background: white;
-}
-
-.input-field:focus {
+/* Focus States */
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(255, 103, 0, 0.1);
 }
 
-/* Cards */
-.card {
-  background: white;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--gray-200);
-  overflow: hidden;
-  transition: all 0.2s ease;
+/* Clean 3D Buttons - High Density Style (Matching User Image) */
+.btn-saha {
+  @apply transition-all active:translate-y-[2px] active:border-b-[1px] rounded-md border-2 font-[1000] uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer select-none;
 }
 
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+.btn-saha-primary {
+  @apply btn-saha bg-primary text-white border-black border-b-[4px] px-3 py-1.5 text-xs shadow-lg hover:-translate-y-[1px];
 }
 
-/* Loading Spinner */
-.spinner {
-  border: 3px solid var(--gray-200);
-  border-top: 3px solid var(--primary);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
+.btn-saha-secondary {
+  @apply btn-saha bg-black text-white border-black border-b-[4px] px-3 py-1.5 text-xs shadow-lg hover:-translate-y-[1px];
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.btn-saha-outline {
+  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px] hover:bg-gray-50;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--gray-100);
-  border-radius: var(--radius-full);
+/* Attract Style - Orange Border for Highlights (User request) */
+.btn-saha-attract {
+  @apply btn-saha bg-white text-black border-primary border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px] hover:bg-orange-50 font-[1000] tracking-widest;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--gray-400);
-  border-radius: var(--radius-full);
+/* Compact Card Utility */
+.saha-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply rounded-md shadow-sm transition-all hover:shadow-xl p-3;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--gray-500);
+/* Focus States */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(255, 103, 0, 0.1);
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .max-w-7xl {
+    padding: 0 1rem;
+  }
 }

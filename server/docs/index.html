@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saha Platform API Documentation</title>
+    <style>
+        :root {
+            --primary: #ff6700;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        h1 { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        h2 { margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        .endpoint {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .method {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        .GET { background: #dbeafe; color: #1e40af; }
+        .POST { background: #dcfce7; color: #166534; }
+        .PUT { background: #fef9c3; color: #854d0e; }
+        .DELETE { background: #fee2e2; color: #991b1b; }
+        
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        .auth-badge {
+            background: #fbbf24;
+            color: #78350f;
+            font-size: 0.8em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Saha Platform API v1</h1>
+        <p>Documentation for the Saha Marketplace Platform REST API.</p>
+        <p><strong>Base URL:</strong> <code style="background: #e2e8f0; padding: 2px 5px; border-radius: 4px;">/api</code></p>
+
+        <h2>Authentication</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method POST">POST</span>
+                <strong>/auth/register</strong>
+            </div>
+            <p>Register a new user.</p>
+            <pre>
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "John Doe"
+}</pre>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method POST">POST</span>
+                <strong>/auth/login</strong>
+            </div>
+            <p>Login to receive an access token.</p>
+            <pre>
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+/* Response */
+{
+  "token": "eyJhbGciOiJIUzI1NiIsIn..."
+}</pre>
+        </div>
+
+        <h2>Ads</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method GET">GET</span>
+                <strong>/ads</strong>
+            </div>
+            <p>Get a list of ads. Supports query params for filtering (category, city, etc).</p>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method GET">GET</span>
+                <strong>/ads/:id</strong>
+            </div>
+            <p>Get details of a specific ad.</p>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method POST">POST</span>
+                <strong>/ads</strong>
+                <span class="auth-badge">Auth Required</span>
+            </div>
+            <p>Create a new ad.</p>
+            <pre>
+{
+  "title": "iPhone 15 Pro",
+  "description": "Like new condition",
+  "price": 3500,
+  "category": "electronics",
+  "cityId": "riyadh"
+}</pre>
+        </div>
+
+        <h2>Utility</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method GET">GET</span>
+                <strong>/countries</strong>
+            </div>
+            <p>Get list of supported countries.</p>
+        </div>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method GET">GET</span>
+                <strong>/health</strong>
+            </div>
+            <p>Service health check.</p>
+        </div>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method POST">POST</span>
+                <strong>/setup-database</strong>
+            </div>
+            <p>Initialize or reset the database schema and seed data.</p>
+        </div>
+    </div>
+</body>
+</html>

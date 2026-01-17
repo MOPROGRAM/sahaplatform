@@ -1,8 +1,8 @@
-# 🚀 Saha (ساحة) - A Vast Space of Opportunities
+# 🚀 Saha (ساحة) - A Vast Space of Opportunities [Deploy Triggered]
 
 **Saha** is a high-performance, professional marketplace platform for jobs, real estate, and general classifieds. A vast space of opportunities connecting buyers and sellers across the Middle East with cutting-edge technology and seamless user experience.
 
-![Saha Preview](./live-preview.html)
+![Saha Preview](./docs/screenshots/preview.png)
 
 ## ✨ Key Features
 
@@ -15,6 +15,19 @@
 - **📱 Responsive Design:** Compact, app-like experience on mobile with a bottom navigation bar.
 - **🔐 Authentication:** JWT-based user system with secure registration/login
 - **🗄️ Database:** PostgreSQL with Prisma ORM for data persistence (production-ready)
+
+## ☁️ تشغيل سحابي فوري (بدون تحميل)
+
+يمكنك تشغيل المنصة كاملة (الموقع + السيرفر + قاعدة البيانات) بضغطة زر واحدة باستخدام إحدى الخدمات التالية:
+
+### 1. GitHub Codespaces (موصى به)
+إذا كان لديك حساب GitHub، اضغط على زر **Code** الأخضر في الأعلى، ثم اختر **Codespaces** واضغط **Create codespace on main**.
+سيقوم تلقائياً بتثبيت كل شيء وتشغيل الموقع لك في المتصفح.
+
+### 2. Gitpod
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/your-username/saha-platform)
+
+## 🛠️ Tech Stack
 
 ## 🛠️ Tech Stack
 
@@ -29,10 +42,11 @@
 ### Backend
 - **Runtime:** Node.js (Express)
 - **ORM:** Prisma
-- **Database:** SQLite (production-ready)
+- **Database:** PostgreSQL (Render) / SQLite (local dev)
 - **Authentication:** JWT + bcrypt
 - **Security:** Helmet, CORS, middleware
 - **Real-time:** Socket.io (ready for chat)
+
 
 ## 📂 Project Structure
 
@@ -90,6 +104,7 @@ saha-platform/
 - Node.js 18+ (download from [nodejs.org](https://nodejs.org/))
 - npm (comes with Node.js)
 - Git
+- **Optional:** Render account for deployment ([render.com](https://render.com))
 
 ### Installation
 
@@ -104,7 +119,7 @@ saha-platform/
    cd server
    npm install
    npx prisma generate
-   npx prisma migrate dev --name init
+   npx prisma db push
    npx prisma db seed
    npm run dev
    ```
@@ -118,6 +133,28 @@ saha-platform/
    npm run dev
    ```
    The client will start on http://localhost:3000
+
+### 🗄️ Database Setup
+
+#### للتطوير المحلي (SQLite):
+البنية الافتراضية تستخدم SQLite - لا حاجة لإعداد إضافي!
+
+#### للإنتاج مع Render (موصى به):
+للحصول على قاعدة بيانات دائمة لا تُحذف عند إعادة التشغيل:
+
+1. **راجع دليل النشر على Render** أدناه
+2. **أنشئ قاعدة بيانات PostgreSQL** على Render
+3. **حدّث متغير البيئة:**
+   ```bash
+   # في متغيرات البيئة على Render
+   DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@db.xxx.render.com:5432/saha_db"
+   ```
+
+**المزايا:**
+- ✅ البيانات لا تُحذف عند إعادة التشغيل
+- ✅ يعمل مع Docker والبنية الحالية
+- ✅ قابل للنقل لأي منصة استضافة
+
 
 ## 📚 API Documentation
 
@@ -263,61 +300,7 @@ Dynamic category display with:
 
 ## 🚀 Deployment & GitHub Setup
 
-### 📦 الطريقة الموصى بها: نشر كامل على Koyeb (أسهل وأسرع)
 
-#### لماذا Koyeb؟
-- **نشر بنقرة واحدة** من GitHub
-- **قاعدة بيانات PostgreSQL** مدمجة
-- **توسع تلقائي** وموازنة تحميل
-- **HTTPS مجاني** وشهادات SSL
-- **Auto-scaling** حسب الاستخدام
-- **مراقبة شاملة** وlogs
-
-#### خطوات النشر على Koyeb:
-
-1. **رفع الكود إلى GitHub:**
-   ```bash
-   git add .
-   git commit -m "إعداد النشر: Saha Platform جاهز للإنتاج"
-   git push origin main
-   ```
-
-2. **إنشاء حساب Koyeb:**
-   - اذهب إلى [koyeb.com](https://www.koyeb.com)
-   - سجل حساب جديد أو ادخل بحساب موجود
-
-3. **ربط GitHub:**
-   - اربط حساب GitHub الخاص بك
-   - اختر repository `saha-platform`
-
-4. **إعداد التطبيق:**
-   - **Service Type:** Docker
-   - **Dockerfile path:** `./Dockerfile`
-   - **Working directory:** `.`
-   - **Port:** `5000`
-   - **Public:** ✅ نعم
-
-5. **إضافة قاعدة البيانات:**
-   - في Koyeb Dashboard: Services → Add Database
-   - اختر PostgreSQL
-   - انسخ connection string
-
-6. **متغيرات البيئة:**
-   ```
-   NODE_ENV=production
-   JWT_SECRET=your_super_secret_saha_key_2025
-   DATABASE_URL=postgresql://user:password@host:port/database
-   ```
-
-7. **النشر:**
-   - اضغط "Deploy"
-   - انتظر 5-10 دقائق حتى يكتمل البناء
-   - احصل على رابط التطبيق العام
-
-#### 📋 دليل مفصل للنشر:
-راجع [`KOYEB_DEPLOYMENT.md`](KOYEB_DEPLOYMENT.md) للحصول على دليل شامل خطوة بخطوة.
-
----
 
 ### 🛠️ بدائل النشر الأخرى (للمطورين المتقدمين)
 

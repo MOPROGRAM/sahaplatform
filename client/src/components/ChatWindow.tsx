@@ -1,87 +1,199 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin } from "lucide-react";
+import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin, Paperclip, FileText, ImageIcon, Loader2, X } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { apiService } from "@/lib/api";
+import { io } from "socket.io-client";
+import { useLanguage } from "@/lib/language-context";
 
 interface Message {
     id: string;
     senderId: string;
     content: string;
-    timestamp: string;
+    messageType: 'text' | 'image' | 'file' | 'location';
+    fileUrl?: string;
+    fileName?: string;
+    createdAt: string;
+    sender: {
+        name: string;
+        image?: string;
+    };
 }
 
-export default function ChatWindow() {
+interface ChatWindowProps {
+    conversationId: string;
+    onClose?: () => void;
+}
+
+export default function ChatWindow({ conversationId, onClose }: ChatWindowProps) {
     const { user } = useAuthStore();
-    const [messages, setMessages] = useState<Message[]>([
-        { id: '1', senderId: 'seller', content: 'أهلاً بك، نعم الشقة لاتزال متوفرة.', timestamp: '10:00 AM' },
-        { id: '2', senderId: 'user', content: 'ممتاز، هل السعر قابل للتفاوض؟', timestamp: '10:05 AM' },
-    ]);
+    const { language, t } = useLanguage();
+    const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    const [participants, setParticipants] = useState<any[]>([]);
+    const [adInfo, setAdInfo] = useState<any>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const socketRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (conversationId) {
+            fetchChatData();
+            setupSocket();
+        }
+        return () => {
+            if (socketRef.current) socketRef.current.disconnect();
+        };
+    }, [conversationId]);
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const handleSend = () => {
-        if (!input.trim()) return;
-        const newMessage: Message = {
-            id: Date.now().toString(),
-            senderId: 'user',
-            content: input,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        setMessages([...messages, newMessage]);
-        setInput("");
+    const setupSocket = () => {
+        const socketUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        socketRef.current = io(socketUrl);
+
+        socketRef.current.on('receive_message', (message: Message) => {
+            if (message.id && !messages.find(m => m.id === message.id)) {
+                setMessages(prev => [...prev, message]);
+            }
+        });
     };
 
+    const fetchChatData = async () => {
+        setLoading(true);
+        try {
+            const data = await apiService.get(`/conversations/${conversationId}`);
+            setMessages(data.messages || []);
+            setParticipants(data.participants || []);
+            setAdInfo(data.ad);
+        } catch (error) {
+            console.error("Failed to fetch chat:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSend = async (type: 'text' | 'image' | 'file' | 'location' = 'text', content?: string, fileData?: any) => {
+        const messageContent = content || input;
+        if (!messageContent.trim() && type === 'text') return;
+
+        setSending(true);
+        try {
+            const payload = {
+                content: messageContent,
+                messageType: type,
+                ...fileData
+            };
+            const newMessage = await apiService.post(`/conversations/${conversationId}/messages`, payload);
+
+            // Broadcast via socket
+            socketRef.current.emit('send_message', newMessage);
+
+            setMessages(prev => [...prev, newMessage]);
+            if (type === 'text') setInput("");
+        } catch (error) {
+            console.error("Failed to send message:", error);
+        } finally {
+            setSending(false);
+        }
+    };
+
+    const shareLocation = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const { latitude, longitude } = position.coords;
+                const mapUrl = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=16/${latitude}/${longitude}`;
+                handleSend('location', mapUrl);
+            });
+        }
+    };
+
+    const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
+
+    if (loading) return (
+        <div className="flex flex-col h-[500px] bg-white border border-gray-200 rounded-sm items-center justify-center">
+            <Loader2 className="animate-spin text-primary" size={32} />
+            <span className="text-[10px] font-black uppercase tracking-widest mt-4 opacity-40">Connecting to Saha Link...</span>
+        </div>
+    );
+
     return (
-        <div className="flex flex-col h-[600px] bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-sm shadow-xl overflow-hidden">
-            {/* Chat Header */}
-            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50">
+        <div className="flex flex-col h-[600px] bg-white border border-gray-200 rounded-sm shadow-2xl overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            {/* Header - High Density */}
+            <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/80 backdrop-blur-md">
                 <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">
-                            مح
-                        </div>
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                    <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black border border-primary/20 text-xs shadow-sm">
+                        {otherMember.name?.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-sm font-bold flex items-center gap-1">
-                            محمد العلي
-                            <ShieldCheck size={14} className="text-blue-500" />
+                        <span className="text-[12px] font-black flex items-center gap-1 text-secondary uppercase tracking-tight">
+                            {otherMember.name}
+                            <ShieldCheck size={14} className="text-blue-500 fill-blue-500/10" />
                         </span>
-                        <span className="text-[10px] text-gray-400">متصل الآن - تاجر عقارات</span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Active - Verified {otherMember.role}</span>
+                        </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4 text-gray-400">
-                    <button className="hover:text-primary"><Phone size={18} /></button>
-                    <button className="hover:text-primary"><MoreVertical size={18} /></button>
+                <div className="flex items-center gap-3">
+                    {adInfo && (
+                        <div className="hidden md:flex items-center gap-2 px-2 py-1 bg-white border border-gray-100 rounded-xs">
+                            <div className="w-6 h-6 bg-gray-50 rounded-xs flex items-center justify-center"><ImageIcon size={12} className="text-gray-300" /></div>
+                            <span className="text-[9px] font-black text-secondary truncate max-w-[100px] uppercase italic">{adInfo.title}</span>
+                        </div>
+                    )}
+                    <button onClick={onClose} className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all rounded-xs"><X size={16} /></button>
                 </div>
             </div>
 
-            {/* Security Tip Overlay */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-2 text-center border-b border-blue-100 dark:border-blue-800">
-                <p className="text-[10px] text-blue-600 dark:text-blue-400">
-                    نصيحة: تجنب التعامل المالي خارج المنصة لضمان حقك. لا تشارك رموز التحقق أبداً.
-                </p>
+            {/* Safety Bar */}
+            <div className="bg-orange-50/50 py-1.5 px-3 border-b border-orange-100/50 flex items-center gap-2">
+                <div className="text-orange-600"><ShieldCheck size={12} /></div>
+                <p className="text-[9px] font-black text-orange-800 uppercase italic tracking-tight">Security Alert: Always keep transactions within Saha platform.</p>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed opacity-95">
-                {messages.map((msg) => (
-                    <div
-                        key={msg.id}
-                        className={`flex ${msg.senderId === 'user' ? 'justify-start' : 'justify-end'}`}
-                    >
-                        <div className={`max-w-[80%] p-3 rounded-sm text-sm shadow-sm ${msg.senderId === 'user'
+            {/* Messages Area - High Density */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar">
+                {messages.map((msg, idx) => (
+                    <div key={msg.id || idx} className={`flex flex-col ${msg.senderId === user?.id ? 'items-end' : 'items-start'}`}>
+                        <div className={`max-w-[75%] px-3 py-2 rounded-sm shadow-sm transition-all hover:shadow-md ${msg.senderId === user?.id
                             ? 'bg-primary text-white rounded-br-none'
-                            : 'bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-bl-none'
-                            }`}>
-                            <p>{msg.content}</p>
-                            <span className={`text-[9px] mt-1 block ${msg.senderId === 'user' ? 'text-white/70' : 'text-gray-400'}`}>
-                                {msg.timestamp}
+                            : 'bg-white border border-gray-100 text-secondary rounded-bl-none'}`}>
+
+                            {msg.messageType === 'text' && <p className="text-[11px] font-bold leading-relaxed">{msg.content}</p>}
+
+                            {msg.messageType === 'location' && (
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-[10px] font-black border-b border-black/5 pb-1 mb-1">
+                                        <MapPin size={12} /> SHARED LOCATION
+                                    </div>
+                                    <iframe
+                                        width="200"
+                                        height="150"
+                                        className="rounded-xs border-0"
+                                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) + 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) + 0.01}&layer=mapnik&marker=${msg.content.split('mlat=')[1].split('&')[0]}%2C${msg.content.split('mlon=')[1].split('#')[0]}`}
+                                    ></iframe>
+                                    <a href={msg.content} target="_blank" className="text-[9px] underline block mt-1 opacity-70">VIEW ON FULL MAP</a>
+                                </div>
+                            )}
+
+                            {msg.messageType === 'file' && (
+                                <div className="flex items-center gap-3 bg-black/5 p-2 rounded-xs">
+                                    <FileText size={20} className="text-primary" />
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="text-[10px] font-black truncate">{msg.fileName || 'Attached File'}</span>
+                                        <a href={msg.fileUrl} target="_blank" className="text-[9px] font-black text-primary hover:underline">DOWNLOAD NOW</a>
+                                    </div>
+                                </div>
+                            )}
+
+                            <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-gray-400'}`}>
+                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                         </div>
                     </div>
@@ -89,38 +201,37 @@ export default function ChatWindow() {
                 <div ref={scrollRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-900">
-                <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                        <button className="text-gray-400 hover:text-primary p-2 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-paperclip"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
-                        </button>
-                        <input
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder="اكتب رسالتك لـ محمد..."
-                            className="flex-1 bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 rounded-sm text-sm focus:ring-1 ring-primary transition-all"
-                        />
-                        <button
-                            onClick={handleSend}
-                            className="bg-primary text-white p-3 rounded-sm hover:bg-primary-dark transition-all active:scale-95 shadow-lg shadow-primary/20"
-                        >
-                            <Send size={20} className="transform rotate-180" />
-                        </button>
-                    </div>
-                    {/* Job Tools */}
-                    <div className="flex gap-2">
-                        <button className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-600 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all">
-                            <Briefcase size={12} />
-                            إرفاق السيرة الذاتية (CV)
-                        </button>
-                        <button className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-600 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-all">
-                            <MapPin size={12} />
-                            مشاركة الموقع الحالي
-                        </button>
-                    </div>
+            {/* Input Tools - Compressed */}
+            <div className="p-2 bg-gray-50 border-t border-gray-100 flex gap-2 overflow-x-auto no-scrollbar">
+                <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
+                    <MapPin size={12} /> SHARE LOCATION
+                </button>
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                    <Paperclip size={12} /> ATTACH DOCUMENT
+                    <input type="file" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleSend('file', `Attached: ${file.name}`, { fileName: file.name, fileUrl: '#' });
+                    }} />
+                </label>
+            </div>
+
+            {/* Input Main */}
+            <div className="p-3 bg-white">
+                <div className="flex gap-2">
+                    <input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                        placeholder={language === 'ar' ? `اكتب رسالة لـ ${otherMember.name}...` : `Message ${otherMember.name}...`}
+                        className="flex-1 bg-gray-50 border border-gray-100 outline-none px-4 py-2.5 rounded-sm text-[11px] font-bold focus:border-primary transition-all placeholder:font-black placeholder:uppercase placeholder:text-[9px] placeholder:tracking-widest"
+                    />
+                    <button
+                        onClick={() => handleSend()}
+                        disabled={sending || !input.trim()}
+                        className="bg-primary text-white p-2.5 rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-all shadow-lg shadow-primary/20 active:scale-90"
+                    >
+                        {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
+                    </button>
                 </div>
             </div>
         </div>

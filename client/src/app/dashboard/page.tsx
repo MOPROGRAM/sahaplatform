@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/store/useAuthStore";
+import { useState, useEffect } from "react";
 import {
     LayoutDashboard,
     Package,
@@ -12,151 +13,220 @@ import {
     TrendingUp,
     Clock,
     ExternalLink,
-    ChevronRight
+    ChevronRight,
+    Loader2,
+    PlusCircle,
+    Search,
+    ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { apiService } from "@/lib/api";
+import { useLanguage } from "@/lib/language-context";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+interface Ad {
+    id: string;
+    title: string;
+    price: number;
+    category: string;
+    isActive: boolean;
+    views: number;
+    currency?: {
+        code: string;
+    };
+}
 
 export default function DashboardPage() {
-    const { user } = useAuthStore();
+    const { language, t, currency } = useLanguage();
+    const { user, logout } = useAuthStore();
+    const router = useRouter();
+    const [ads, setAds] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState([
+        { label: "Views", value: "0", icon: <Eye size={12} />, color: "text-blue-500" },
+        { label: "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
+        { label: "Listings", value: "0", icon: <Package size={12} />, color: "text-orange-500" },
+        { label: "Growth", value: "0%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
+    ]);
 
-    const stats = [
-        { label: "إجمالي المشاهدات", value: "2.4k", icon: <Eye size={16} />, color: "text-blue-500" },
-        { label: "الرسائل النشطة", value: "14", icon: <MessageSquare size={16} />, color: "text-green-500" },
-        { label: "الإعلانات النشطة", value: "6", icon: <Package size={16} />, color: "text-orange-500" },
-        { label: "المتابعين", value: "128", icon: <TrendingUp size={16} />, color: "text-purple-500" },
-    ];
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+        fetchDashboardData();
+    }, [user, router]);
 
-    const myAds = [
-        { id: 1, title: "شقة للبيع - حي الملقا", price: "1.2M", date: "منذ 3 أيام", status: "Active", views: 450 },
-        { id: 2, title: "تويوتا لاندكروزر 2023", price: "320k", date: "منذ 5 أيام", status: "Active", views: 1200 },
-        { id: 3, title: "مطلوب مصمم جرافيك", price: "8k", date: "منذ أسبوع", status: "Expired", views: 150 },
-    ];
+    const fetchDashboardData = async () => {
+        try {
+            const myAds = await apiService.get('/ads/my');
+            setAds(myAds);
+
+            const totalViews = myAds.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
+            const activeAds = myAds.filter((ad: any) => ad.isActive).length;
+
+            setStats([
+                { label: language === 'ar' ? "المشاهدات" : "Views", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
+                { label: language === 'ar' ? "الرسائل" : "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
+                { label: language === 'ar' ? "الإعلانات" : "Listings", value: activeAds.toString(), icon: <Package size={12} />, color: "text-orange-500" },
+                { label: language === 'ar' ? "النمو" : "Growth", value: "+12%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
+            ]);
+        } catch (error) {
+            console.error("Failed to fetch dashboard data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!user) return null;
 
     return (
-        <div className="bg-[#f2f4f7] dark:bg-slate-950 min-h-screen flex">
-            {/* Sidebar Navigation */}
-            <aside className="w-64 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-gray-800 py-8 px-4 flex flex-col hidden md:flex">
-                <div className="flex flex-col items-center mb-10">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full mb-3 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
-                        <span className="text-2xl font-black text-gray-300">AM</span>
-                    </div>
-                    <h3 className="font-bold text-sm">{user?.name}</h3>
-                    <span className="text-[11px] text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full mt-1">تاجر موثوق</span>
-                </div>
+        <div className="bg-[#f0f2f5] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <Header />
 
-                <nav className="flex flex-col gap-1 flex-1">
-                    {[
-                        { label: "الرئيسية", icon: <LayoutDashboard size={18} />, active: true },
-                        { label: "إعلاناتي", icon: <Package size={18} /> },
-                        { label: "الدردشة", icon: <MessageSquare size={18} />, count: 5 },
-                        { label: "المفضلة", icon: <Heart size={18} /> },
-                        { label: "الإعدادات", icon: <Settings size={18} /> },
-                    ].map((item, i) => (
-                        <button
-                            key={i}
-                            className={`flex items-center justify-between px-4 py-3 rounded-sm transition-all ${item.active ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-slate-800'}`}
-                        >
-                            <div className="flex items-center gap-3">
-                                {item.icon}
-                                <span className="text-sm font-medium">{item.label}</span>
+            <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
+                {/* Left Mini Sidebar - Professional Tech Style */}
+                <aside className="w-full md:w-56 space-y-3 shrink-0">
+                    <div className="bg-white border border-gray-200 p-5 rounded-sm shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform"></div>
+                        <div className="relative z-10 text-center">
+                            <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
+                                <span className="text-lg font-black text-primary italic">{user.name?.substring(0, 2).toUpperCase()}</span>
                             </div>
-                            {item.count && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{item.count}</span>}
-                        </button>
-                    ))}
-                </nav>
-
-                <button className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-sm transition-all mt-auto border-t border-gray-50 dark:border-gray-800">
-                    <LogOut size={18} />
-                    <span className="text-sm font-medium">تسجيل الخروج</span>
-                </button>
-            </aside>
-
-            {/* Main Content */}
-            <main className="flex-1 p-4 md:p-10 overflow-y-auto">
-                <div className="max-w-[1000px] mx-auto">
-                    <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-xl font-black">مرحباً بعودتك، {user?.name.split(' ')[0]} 👋</h2>
-                        <Link href="/post-ad" className="bg-primary text-white px-6 py-2 rounded-sm text-sm font-bold shadow-lg shadow-primary/20">أضف إعلان جديد</Link>
+                            <h4 className="text-[12px] font-black text-secondary uppercase tracking-tight truncate">{user.name}</h4>
+                            <div className="flex items-center justify-center gap-1 mt-1 text-primary">
+                                <ShieldCheck size={12} className="fill-primary/10" />
+                                <span className="text-[8px] font-black uppercase tracking-widest">{user.role} MERCHANT</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                    <nav className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
+                        {[
+                            { label: "Overview", icon: <LayoutDashboard size={14} />, active: true, path: "/dashboard" },
+                            { label: "My Listings", icon: <Package size={14} />, path: "/ads/my" },
+                            { label: "Messages", icon: <MessageSquare size={14} />, path: "/messages" },
+                            { label: "Settings", icon: <Settings size={14} />, path: "/settings" },
+                        ].map((item, i) => (
+                            <Link key={i} href={item.path || "#"} className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-gray-50 last:border-0 transition-all ${item.active ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary' : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'}`}>
+                                {item.icon}
+                                <span>{item.label}</span>
+                            </Link>
+                        ))}
+                    </nav>
+
+                    <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50/50 hover:bg-red-50 transition-all border border-red-100/50 rounded-sm">
+                        <LogOut size={14} />
+                        <span>Sign Out System</span>
+                    </button>
+                </aside>
+
+                {/* Main Content Area */}
+                <main className="flex-1 flex flex-col gap-4">
+                    {/* Compact Stats Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         {stats.map((stat, i) => (
-                            <div key={i} className="bg-white dark:bg-slate-900 p-4 rounded-sm border border-gray-100 dark:border-gray-800 shadow-sm">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className={`p-2 bg-gray-50 dark:bg-slate-800 rounded-sm ${stat.color}`}>{stat.icon}</span>
-                                    <span className="text-[11px] text-green-500 font-bold">+12%</span>
-                                </div>
+                            <div key={i} className="bg-white border border-gray-200 p-4 rounded-sm flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                                <div className={`absolute bottom-0 right-0 w-12 h-12 ${stat.color} opacity-[0.03] -mr-4 -mb-4 group-hover:scale-150 transition-transform`}>{stat.icon}</div>
+                                <span className={`w-8 h-8 flex items-center justify-center rounded-xs bg-gray-50 ${stat.color} p-1 border border-black/5 shadow-inner`}>
+                                    {stat.icon}
+                                </span>
                                 <div className="flex flex-col">
-                                    <span className="text-2xl font-black">{stat.value}</span>
-                                    <span className="text-[11px] text-gray-400 font-bold uppercase">{stat.label}</span>
+                                    <span className="text-2xl font-black italic tracking-tighter text-secondary leading-none">{stat.value}</span>
+                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1 opacity-60">{stat.label} Matrix</span>
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    {/* Recent Ads Table */}
-                    <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 rounded-sm shadow-sm overflow-hidden">
-                        <div className="p-5 border-b border-gray-50 dark:border-gray-800 flex justify-between items-center">
-                            <h3 className="font-bold text-sm uppercase text-gray-400">آخر الإعلانات المنشورة</h3>
-                            <button className="text-xs text-primary font-bold flex items-center gap-1">عرض الكل <ChevronRight size={14} /></button>
+                    {/* Listings Table - High Density Professional */}
+                    <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+                        <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Package size={14} className="text-primary" />
+                                <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-secondary">Operational Fleet / Listings</h3>
+                            </div>
+                            <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                                <PlusCircle size={12} /> ADD UNIT
+                            </Link>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-right text-sm">
-                                <thead className="bg-gray-50 dark:bg-slate-800 text-[11px] font-bold text-gray-400 uppercase">
-                                    <tr>
-                                        <th className="px-5 py-3">الإعلان</th>
-                                        <th className="px-5 py-3 text-center">الحالة</th>
-                                        <th className="px-5 py-3 text-center">المشاهدات</th>
-                                        <th className="px-5 py-3 text-left">التاريخ</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                                    {myAds.map(ad => (
-                                        <tr key={ad.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-gray-100 dark:bg-slate-800 rounded-sm shrink-0"></div>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-bold group-hover:text-primary transition-colors">{ad.title}</span>
-                                                        <span className="text-xs text-primary font-bold">{ad.price}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-4 text-center">
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${ad.status === 'Active' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                                                    {ad.status === 'Active' ? 'نشط' : 'منتهي'}
-                                                </span>
-                                            </td>
-                                            <td className="px-5 py-4 text-center">
-                                                <div className="flex items-center justify-center gap-1 text-gray-400">
-                                                    <Eye size={12} />
-                                                    <span className="text-xs font-bold">{ad.views}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-4 text-left">
-                                                <div className="flex flex-col text-[11px] text-gray-400">
-                                                    <span className="flex items-center gap-1 justify-end"><Clock size={10} /> {ad.date}</span>
-                                                    <button className="text-primary hover:underline mt-1 flex items-center gap-1 justify-end">رابط الإعلان <ExternalLink size={10} /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
 
-                    {/* Account Upgrade Banner */}
-                    <div className="mt-8 bg-gradient-to-r from-secondary to-slate-800 p-6 rounded-sm text-white flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex flex-col gap-1">
-                            <h4 className="text-lg font-black italic">SAHA PRO</h4>
-                            <p className="text-sm opacity-70">احصل على وصول حصري لقاعدة بيانات المتقدمين للوظائف وإحصائيات العقارات المتقدمة.</p>
+                        <div className="overflow-x-auto">
+                            {loading ? (
+                                <div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin text-primary opacity-20" /></div>
+                            ) : ads.length > 0 ? (
+                                <table className="w-full text-[10px] border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-100/50 text-gray-400 font-black uppercase text-[8px] tracking-widest border-b border-gray-200">
+                                            <th className="px-6 py-3 text-left">Unit Identification / Details</th>
+                                            <th className="px-6 py-3 text-center">Status Matrix</th>
+                                            <th className="px-6 py-3 text-center">Engagement</th>
+                                            <th className="px-6 py-3 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {ads.map(ad => (
+                                            <tr key={ad.id} className="hover:bg-primary/[0.02] transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-9 h-9 bg-gray-50 border border-gray-100 rounded-xs flex items-center justify-center shrink-0 shadow-inner group-hover:border-primary/20 transition-colors">
+                                                            <Package size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <span className="font-black text-secondary block truncate group-hover:text-primary transition-colors uppercase tracking-tight">{ad.title}</span>
+                                                            <div className="flex items-center gap-2 mt-0.5">
+                                                                <span className="text-primary font-black italic">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}</span>
+                                                                <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
+                                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">{ad.category}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                            {ad.isActive ? 'Operation: Active' : 'Operation: Pause'}
+                                                        </span>
+                                                        <span className="text-[7px] font-black text-gray-300 uppercase italic">Code: {ad.id?.substring(0, 8)}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex flex-col items-center">
+                                                        <span className="text-[13px] font-black text-secondary leading-none">{ad.views || 0}</span>
+                                                        <span className="text-[7px] font-black text-gray-400 uppercase tracking-tighter mt-1 italic">Total Imprints</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex flex-col items-end gap-1.5">
+                                                        <Link href={`/ads/view?id=${ad.id}`} className="px-3 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
+                                                        <div className="flex items-center gap-1 text-[8px] font-black text-gray-300 uppercase tracking-tighter">
+                                                            <Clock size={8} /> {new Date(ad.createdAt).toLocaleDateString()}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 p-16">
+                                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shadow-inner">
+                                        <Package size={32} className="opacity-10" />
+                                    </div>
+                                    <div className="text-center">
+                                        <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-300">No Mission Data Found</h4>
+                                        <p className="text-[9px] font-bold text-gray-300 uppercase italic mt-1 font-cairo">ابدأ رحلتك بنشر إعلانك الأول الآن</p>
+                                    </div>
+                                    <Link href="/post-ad" className="mt-4 bg-primary text-white text-[9px] font-black px-6 py-2 rounded-xs shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all uppercase tracking-widest">Post Ad Now</Link>
+                                </div>
+                            )}
                         </div>
-                        <button className="bg-white text-secondary px-8 py-3 rounded-sm font-bold text-sm hover:bg-primary hover:text-white transition-all whitespace-nowrap">الترقية الآن</button>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
+            <Footer />
         </div>
     );
 }

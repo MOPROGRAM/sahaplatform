@@ -1,16 +1,23 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon, PlusCircle, Loader2 } from 'lucide-react';
 import { apiService } from '@/lib/api';
+import { useLanguage } from '@/lib/language-context';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 interface Ad {
     id: string;
     title: string;
     description: string;
     price: number;
-    currency: string;
+    currency?: {
+        code: string;
+        symbol: string;
+    };
     category: string;
     location: string;
     images: string;
@@ -22,12 +29,10 @@ interface Ad {
     createdAt: string;
 }
 
-interface AdsPageProps {
-    searchParams: { category?: string };
-}
-
-export default function AdsPage({ searchParams }: AdsPageProps) {
-    const category = searchParams.category;
+function AdsContent() {
+    const { language, t, currency } = useLanguage();
+    const searchParams = useSearchParams();
+    const categoryQuery = searchParams.get('category');
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,13 +42,13 @@ export default function AdsPage({ searchParams }: AdsPageProps) {
 
     useEffect(() => {
         fetchAds();
-    }, [category]);
+    }, [categoryQuery]);
 
     const fetchAds = async () => {
         setLoading(true);
         try {
             const params: any = {};
-            if (category) params.category = category;
+            if (categoryQuery) params.category = categoryQuery;
             if (searchQuery) params.searchQuery = searchQuery;
             if (locationFilter) params.location = locationFilter;
             if (priceRange.min) params.minPrice = priceRange.min;
@@ -53,224 +58,114 @@ export default function AdsPage({ searchParams }: AdsPageProps) {
             setAds(data);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
-            // Show empty state when no data available
             setAds([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSearch = () => {
-        fetchAds();
-    };
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('ar-SA').format(price);
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-
-        if (diffInHours < 24) {
-            return `منذ ${diffInHours} ساعة`;
-        } else {
-            return `منذ ${Math.floor(diffInHours / 24)} يوم`;
-        }
-    };
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9]" dir="rtl">
-            {/* Header */}
-            <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between gap-4">
-                        <Link href="/" className="flex items-center gap-2 text-primary hover:text-primary-hover transition-colors">
-                            <ChevronLeft className="w-5 h-5" />
-                            <span className="font-bold text-lg">ساحة</span>
-                        </Link>
+        <div className="min-h-screen bg-[#f0f2f5] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <Header />
 
-                        <div className="flex-1 max-w-2xl">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="ابحث في الإعلانات..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                />
-                                <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                                <Filter className="w-5 h-5 text-gray-600" />
-                            </button>
-                        </div>
+            {/* Filter Bar */}
+            <div className="bg-white border-b border-gray-200 py-2 px-4 sticky top-[53px] z-40 shadow-sm">
+                <div className="max-w-7xl mx-auto flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-[10px] font-black text-secondary bg-gray-100 px-3 py-1.5 rounded-xs border border-gray-200 uppercase tracking-widest italic">
+                        <Filter size={14} className="text-primary" />
+                        <span>Filter Matrix</span>
                     </div>
-
-                    {/* Filters */}
-                    <div className="flex items-center gap-4 mt-4 text-sm">
-                        <span className="text-gray-600">فلترة:</span>
+                    <div className="flex-1 flex items-center gap-2">
                         <input
                             type="text"
-                            placeholder="الموقع"
+                            placeholder={language === 'ar' ? 'البحث عن مدينة...' : 'Search Location...'}
+                            className="bg-gray-50 border border-gray-200 px-3 py-1.5 text-[10px] font-bold rounded-xs focus:border-primary focus:bg-white outline-none w-40 transition-all font-cairo"
                             value={locationFilter}
                             onChange={(e) => setLocationFilter(e.target.value)}
-                            className="px-3 py-1 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-primary focus:border-primary"
                         />
-                        <input
-                            type="number"
-                            placeholder="السعر من"
-                            value={priceRange.min}
-                            onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                            className="px-3 py-1 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-primary focus:border-primary w-24"
-                        />
-                        <input
-                            type="number"
-                            placeholder="إلى"
-                            value={priceRange.max}
-                            onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                            className="px-3 py-1 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-primary focus:border-primary w-24"
-                        />
-                        <button
-                            onClick={handleSearch}
-                            className="px-4 py-1 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors text-sm font-medium"
-                        >
-                            تطبيق
-                        </button>
+                        <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xs px-2 py-1">
+                            <input
+                                type="number"
+                                placeholder="MIN"
+                                className="bg-transparent text-[10px] font-black outline-none w-14 text-center placeholder:text-gray-300"
+                                value={priceRange.min}
+                                onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                            />
+                            <span className="text-[10px] opacity-20 font-black">/</span>
+                            <input
+                                type="number"
+                                placeholder="MAX"
+                                className="bg-transparent text-[10px] font-black outline-none w-14 text-center placeholder:text-gray-300"
+                                value={priceRange.max}
+                                onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                            />
+                        </div>
+                        <button onClick={fetchAds} className="bg-primary text-white px-4 py-1.5 text-[10px] font-black rounded-xs hover:bg-primary-hover transition-all uppercase tracking-widest shadow-lg active:scale-95">SYNC RESULTS</button>
                     </div>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 py-6">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            {category ? `${category}` : 'جميع الإعلانات'}
+            <main className="max-w-7xl mx-auto w-full p-3 flex-1">
+                {/* Result Info */}
+                <div className="flex items-center justify-between mb-4 px-1">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1 h-4 bg-primary rounded-full"></div>
+                        <h1 className="text-[14px] font-black uppercase text-secondary tracking-tight">
+                            {categoryQuery ? `${categoryQuery}` : 'Global Marketplace'}
+                            <span className="text-[10px] font-black text-gray-400 mr-3 border-r border-gray-200 pr-3 uppercase italic mx-2">{ads.length} listings identified</span>
                         </h1>
-                        <p className="text-gray-600 mt-1">
-                            {loading ? 'جارٍ التحميل...' : `${ads.length} إعلان متاح`}
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <span>ترتيب:</span>
-                        <select className="border border-gray-200 rounded px-3 py-1">
-                            <option>الأحدث أولاً</option>
-                            <option>السعر: من الأقل للأعلى</option>
-                            <option>السعر: من الأعلى للأقل</option>
-                        </select>
                     </div>
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {[...Array(8)].map((_, i) => (
-                            <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-                                <div className="h-48 bg-gray-200"></div>
-                                <div className="p-4 space-y-3">
-                                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                                    <div className="h-6 bg-gray-200 rounded w-1/4"></div>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="flex items-center justify-center p-20 opacity-20">
+                        <Loader2 className="animate-spin" size={48} />
                     </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                ) : ads.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                         {ads.map((ad) => (
                             <Link
                                 key={ad.id}
-                                href={`/ads/${ad.id}`}
-                                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-primary/20 transition-all duration-300 group"
+                                href={`/ads/view?id=${ad.id}`}
+                                className="bg-white border border-gray-100 p-2 rounded-sm hover:border-primary transition-all group flex flex-col gap-2 h-full shadow-sm hover:shadow-xl hover:-translate-y-1"
                             >
-                                {/* Image */}
-                                <div className="relative h-48 bg-gray-100 flex items-center justify-center">
-                                    <ImageIcon className="w-12 h-12 text-gray-300" />
+                                <div className="aspect-[4/3] bg-gray-50 rounded-xs relative overflow-hidden flex items-center justify-center border border-gray-100 shrink-0">
+                                    <ImageIcon className="text-gray-200 group-hover:scale-110 transition-transform" size={24} />
                                     {ad.isBoosted && (
-                                        <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded text-xs font-bold">
-                                            مميز
-                                        </div>
+                                        <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-2 py-0.5 rounded-bl-sm shadow-md uppercase tracking-widest">Boosted</div>
                                     )}
                                 </div>
-
-                                {/* Content */}
-                                <div className="p-4">
-                                    <h3 className="font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                                <div className="flex flex-col gap-1.5 flex-1 p-1">
+                                    <h3 className="text-[11px] font-black line-clamp-2 leading-[1.3] group-hover:text-primary transition-colors text-secondary h-[28px] uppercase tracking-tighter">
                                         {ad.title}
                                     </h3>
-
-                                    <div className="flex items-center gap-1 text-gray-600 text-sm mb-2">
-                                        <MapPin className="w-4 h-4" />
-                                        <span>{ad.location}</span>
-                                    </div>
-
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-xl font-bold text-primary">
-                                            {formatPrice(ad.price)} ر.س
-                                        </span>
-                                        <div className="flex items-center gap-1 text-gray-500 text-xs">
-                                            <Clock className="w-3 h-3" />
-                                            <span>{formatDate(ad.createdAt)}</span>
+                                    <div className="mt-auto">
+                                        <div className="text-[14px] font-black text-primary italic tracking-tighter flex items-center gap-1 leading-none">
+                                            {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}
+                                            <span className="text-[8px] not-italic opacity-40 uppercase tracking-widest">{ad.currency?.code || 'SAR'}</span>
                                         </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-gray-600">بواسطة</span>
-                                            <span className="text-sm font-medium text-gray-900">{ad.author.name}</span>
-                                            {ad.author.verified && (
-                                                <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                                                    <span className="text-white text-xs">✓</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add to favorites">
-                                                <Heart className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors" />
-                                            </button>
-                                            <button
-                                                className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                                title="Share this ad"
-                                                onClick={() => {
-                                                    if (navigator.share) {
-                                                        navigator.share({
-                                                            title: ad.title,
-                                                            text: ad.description,
-                                                            url: window.location.href,
-                                                        });
-                                                    } else {
-                                                        // Fallback: copy to clipboard
-                                                        navigator.clipboard.writeText(window.location.href);
-                                                        alert('Link copied to clipboard!');
-                                                    }
-                                                }}
-                                            >
-                                                <Share2 className="w-4 h-4 text-gray-400 hover:text-blue-500 transition-colors" />
-                                            </button>
+                                        <div className="flex items-center gap-1 text-[9px] font-black text-gray-400 mt-2 uppercase tracking-tighter truncate">
+                                            <MapPin size={10} className="text-primary opacity-50 shrink-0" />
+                                            <span className="truncate">{ad.location}</span>
                                         </div>
                                     </div>
                                 </div>
                             </Link>
                         ))}
                     </div>
+                ) : (
+                    <div className="text-center p-20 text-gray-300 font-black uppercase text-sm italic tracking-widest">No matching listings in the matrix</div>
                 )}
-
-                {!loading && ads.length === 0 && (
-                    <div className="text-center py-12">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Search className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد إعلانات</h3>
-                        <p className="text-gray-600">لم نجد أي إعلانات تطابق معايير البحث الخاصة بك</p>
-                    </div>
-                )}
-            </div>
+            </main>
+            <Footer />
         </div>
+    );
+}
+
+export default function AdsPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-xs text-primary italic uppercase tracking-[0.3em]">Syncing Feed Matrix...</div>}>
+            <AdsContent />
+        </Suspense>
     );
 }

@@ -1,29 +1,65 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    if (typeof window !== 'undefined') {
+        const host = window.location.origin;
+        // If we are on render but env is missing, try to use current origin + /api
+        return `${host}/api`;
+    }
+    return 'http://localhost:5000/api';
+};
+
+const API_URL = getBaseUrl();
 
 const getAuthHeaders = (): Record<string, string> => {
-    const token = localStorage.getItem('token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('🔐 Token found and added to request');
+    } else {
+        console.warn('⚠️ No authentication token found in localStorage');
+    }
     return headers;
 };
 
 export const apiService = {
     async get(endpoint: string, params: Record<string, any> = {}) {
         const query = new URLSearchParams(params).toString();
-        const response = await fetch(`${API_URL}${endpoint}${query ? `?${query}` : ''}`, {
+        const url = `${API_URL}${endpoint}${query ? `?${query}` : ''}`;
+        const response = await fetch(url, {
             headers: getAuthHeaders(),
         });
-        if (!response.ok) throw new Error('API Error');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Error: ${response.status}`);
+        }
         return response.json();
     },
 
     async post(endpoint: string, data: any) {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const url = `${API_URL}${endpoint}`;
+        const response = await fetch(url, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(data),
         });
-        if (!response.ok) throw new Error('API Error');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Error: ${response.status}`);
+        }
+        return response.json();
+    },
+
+    async delete(endpoint: string) {
+        const url = `${API_URL}${endpoint}`;
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Error: ${response.status}`);
+        }
         return response.json();
     },
 

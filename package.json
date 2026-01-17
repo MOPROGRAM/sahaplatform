@@ -10,7 +10,7 @@
         "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
         "dev:client": "cd client && npm run dev",
         "dev:server": "cd server && npm run dev",
-        "install:all": "npm install && cd client && npm install",
+        "install:all": "npm install && cd client && npm install && cd ../server && npm install",
         "cf:dev": "wrangler pages dev client/out --local",
         "cf:deploy": "wrangler pages deploy client/out",
         "cf:db:create": "wrangler d1 create saha-platform-db",

@@ -1,147 +1,243 @@
 "use client";
 
-import { useState } from "react";
-import { Camera, MapPin, Tag, Info, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { apiService } from "@/lib/api";
+import { useLanguage } from "@/lib/language-context";
+import { useAuthStore } from "@/store/useAuthStore";
+import Header from "@/components/Header";
+import Footer from '@/components/Footer';
 
 export default function PostAdPage() {
-    const [step, setStep] = useState(1);
+    const { language, t, currency } = useLanguage();
+    const { user, loading: authLoading } = useAuthStore();
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [formData, setFormData] = useState({
+        title: "",
+        category: "",
+        price: "",
+        location: "",
+        description: "",
+    });
+
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push('/login');
+        }
+    }, [user, authLoading, router]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+
+        if (!formData.title || !formData.category || !formData.price || !formData.location) {
+            setError(language === 'ar' ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await apiService.post('/ads', {
+                ...formData,
+                price: Number(formData.price),
+                currencyId: currency, // Use context currency
+                images: "[]",
+                latitude: 24.7136,
+                longitude: 46.6753
+            });
+
+            if (response && response.id) {
+                router.push(`/ads/view?id=${response.id}`);
+            }
+        } catch (err: any) {
+            console.error("Failed to post ad:", err);
+            // Show more specific error from API if available
+            setError(err.message || (language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad."));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Show loading while checking auth
+    if (authLoading) {
+        return (
+            <div className="bg-[#f8fafc] min-h-screen flex items-center justify-center">
+                <Loader2 className="animate-spin text-primary" size={40} />
+            </div>
+        );
+    }
+
+    // Don't render if not authenticated (will redirect)
+    if (!user) {
+        return null;
+    }
 
     return (
-        <div className="bg-[#f2f4f7] dark:bg-slate-950 min-h-screen py-8 px-4">
-            <div className="max-w-[800px] mx-auto">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-6">
-                    <Link href="/" className="text-2xl font-black text-primary">SAHA</Link>
-                    <div className="flex gap-2">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className={`w-8 h-1 rounded-full ${step >= i ? 'bg-primary' : 'bg-gray-300'}`}></div>
-                        ))}
+        <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <Header />
+
+            <main className="max-w-5xl mx-auto w-full p-2 md:p-4 flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Left Info Column */}
+                    <div className="md:col-span-1 space-y-4">
+                        <div className="bg-primary p-5 rounded-md text-white shadow-xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform"></div>
+                            <h2 className="text-xl font-[1000] italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
+                            <p className="text-[10px] font-bold opacity-90 mt-2 leading-tight relative z-10">{t('joinThousands')}</p>
+
+                            <div className="mt-5 flex flex-col gap-2 relative z-10">
+                                <div className="flex items-center gap-3 bg-white/10 p-2 rounded-md border border-white/10">
+                                    <CheckCircle2 size={16} />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">{t('verified')}</span>
+                                </div>
+                                <div className="flex items-center gap-3 bg-white/10 p-2 rounded-md border border-white/10">
+                                    <Tag size={16} />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">{t('featured')}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 p-4 rounded-md shadow-sm flex gap-3">
+                            <i className="text-secondary shrink-0">
+                                <Info size={18} className="text-primary" />
+                            </i>
+                            <div className="flex flex-col">
+                                <span className="text-[11px] font-black uppercase text-black tracking-widest leading-none">{t('marketRules')}</span>
+                                <p className="text-[10px] text-gray-500 font-bold mt-2 leading-relaxed">{t('marketRulesDesc')}</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-sm shadow-sm p-6">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                        <Tag className="text-primary" />
-                        <span>ماذا تود أن تبيع أو تعرض اليوم؟</span>
-                    </h2>
-
-                    <div className="space-y-6">
-                        {/* Title & Category */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-gray-500">عنوان الإعلان</label>
-                                <input
-                                    className="bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 text-sm rounded-sm focus:ring-1 ring-primary"
-                                    placeholder="مثال: شقة للبيع في حي النرجس"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-gray-500">التصنيف الرئيسي</label>
-                                <select className="bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 text-sm rounded-sm focus:ring-1 ring-primary appearance-none">
-                                    <option>اختر التصنيف</option>
-                                    <option>عقارات</option>
-                                    <option>وظائف</option>
-                                    <option>سيارات</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Price & Location */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-gray-500">السعر (ريال سعودي)</label>
-                                <input
-                                    type="number"
-                                    className="bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 text-sm rounded-sm focus:ring-1 ring-primary"
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-gray-500">المدينة / الحي</label>
-                                <div className="relative">
-                                    <input
-                                        className="w-full bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 pr-10 text-sm rounded-sm focus:ring-1 ring-primary"
-                                        placeholder="ابحث عن الموقع..."
-                                    />
-                                    <MapPin size={16} className="absolute right-3 top-3.5 text-gray-400" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Description */}
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-gray-500">تفاصيل الإعلان</label>
-                            <textarea
-                                rows={5}
-                                className="bg-gray-50 dark:bg-slate-800 border-none outline-none p-3 text-sm rounded-sm focus:ring-1 ring-primary resize-none"
-                                placeholder="اكتب وصفاً تفصيلياً لجذب المشترين..."
-                            ></textarea>
-                        </div>
-
-                        {/* Image Upload Simulation */}
-                        <div>
-                            <label className="text-xs font-bold text-gray-500 mb-2 block">صور الإعلان (حتى 10 صور)</label>
-                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-                                <div className="aspect-square bg-gray-50 dark:bg-slate-800 border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center cursor-pointer hover:border-primary group transition-colors">
-                                    <Camera className="text-gray-400 group-hover:text-primary mb-1" size={24} />
-                                    <span className="text-[10px] text-gray-400">إضافة صورة</span>
-                                </div>
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="aspect-square bg-gray-100 dark:bg-slate-800 rounded-sm"></div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Premium Options */}
-                        <div className="border-t border-gray-100 dark:border-gray-800 pt-6">
-                            <h3 className="text-sm font-bold mb-4">خيارات الترويج</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="border border-primary/20 bg-primary/5 p-4 rounded-sm relative cursor-pointer group">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <span className="text-xs font-black text-primary">إعلان عاجل</span>
-                                            <p className="text-[11px] text-gray-500 mt-1">يظهر بتمييز أحمر لمدة 3 أيام</p>
-                                        </div>
-                                        <span className="text-sm font-bold text-primary">49 ريال</span>
+                    {/* Form Column */}
+                    <div className="md:col-span-2">
+                        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-md shadow-xl shadow-black/[0.01] overflow-hidden flex flex-col">
+                            <div className="p-5 space-y-5">
+                                {error && (
+                                    <div className="bg-red-50 text-red-600 p-3 text-[12px] font-black border-r-4 border-red-500 rounded-md uppercase tracking-tight flex items-center gap-3">
+                                        <Info size={16} />
+                                        {error}
                                     </div>
-                                    <CheckCircle2 size={16} className="absolute -top-2 -left-2 text-primary bg-white rounded-full" />
-                                </div>
-                                <div className="border border-gray-100 dark:border-gray-800 p-4 rounded-sm cursor-pointer hover:border-primary transition-colors">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <span className="text-xs font-bold">إعلان مثبت</span>
-                                            <p className="text-[11px] text-gray-400 mt-1">يظهر في أعلى قائمة البحث</p>
+                                )}
+
+                                <div className="space-y-5">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                            <div className="w-1 h-3 bg-primary rounded-full"></div>
+                                            {t('professionalTitle')} *
+                                        </label>
+                                        <input
+                                            name="title"
+                                            value={formData.title}
+                                            onChange={handleInputChange}
+                                            className="bg-gray-50 border border-gray-200 p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tight"
+                                            placeholder={t('adTitlePlaceholder')}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                                <div className="w-1 h-3 bg-navy rounded-full"></div>
+                                                {t('category')} *
+                                            </label>
+                                            <select
+                                                name="category"
+                                                value={formData.category}
+                                                onChange={handleInputChange}
+                                                className="bg-gray-50 border border-gray-200 p-3 text-[13px] font-black rounded-md outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner"
+                                                required
+                                            >
+                                                <option value="">{language === 'ar' ? '-- اختر القسم --' : '-- Choose Category --'}</option>
+                                                <option value="realEstate">{t('realEstate')}</option>
+                                                <option value="jobs">{t('jobs')}</option>
+                                                <option value="cars">{t('cars')}</option>
+                                                <option value="goods">{t('goods')}</option>
+                                                <option value="services">{t('services')}</option>
+                                                <option value="other">{t('other')}</option>
+                                            </select>
                                         </div>
-                                        <span className="text-sm font-bold">99 ريال</span>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                                <div className="w-1 h-3 bg-emerald rounded-full"></div>
+                                                {t('askingPrice')} *
+                                            </label>
+                                            <input
+                                                name="price"
+                                                type="number"
+                                                value={formData.price}
+                                                onChange={handleInputChange}
+                                                className="bg-gray-50 border border-gray-200 p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner italic"
+                                                placeholder="0.00"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                            <div className="w-1 h-3 bg-amber rounded-full"></div>
+                                            {t('deploymentLocation')} *
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                name="location"
+                                                value={formData.location}
+                                                onChange={handleInputChange}
+                                                className="w-full bg-gray-50 border border-gray-200 p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tight"
+                                                placeholder={t('locationPlaceholder')}
+                                                required
+                                            />
+                                            <MapPin size={18} className="absolute right-3 top-3 text-primary opacity-30" />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                            <div className="w-1 h-3 bg-black rounded-full"></div>
+                                            {t('detailedBriefing')}
+                                        </label>
+                                        <textarea
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleInputChange}
+                                            rows={5}
+                                            className="bg-gray-50 border border-gray-200 p-4 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner resize-none leading-relaxed"
+                                            placeholder={t('descriptionPlaceholder')}
+                                        ></textarea>
+                                    </div>
+                                </div>
+
+                                <div className="pt-5 border-t border-gray-100 flex flex-col items-center">
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="btn-saha-primary !w-full !py-4 !text-[16px] mb-4"
+                                    >
+                                        {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} className="group-hover:rotate-90 transition-transform" />}
+                                        {loading ? t('loading') : t('deployListing')}
+                                    </button>
+                                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{t('secureProtocol')}</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Terms & Submit */}
-                        <div className="flex flex-col gap-4 mt-8">
-                            <p className="text-[11px] text-gray-400 text-center">
-                                بالنقر على "نشر الإعلان"، فإنك توافق على <Link href="/" className="text-primary underline">شروط الاستخدام</Link> وسياسة المحتوى.
-                            </p>
-                            <button className="w-full bg-primary hover:bg-primary-dark text-white font-black py-4 rounded-sm shadow-xl shadow-primary/20 transition-all active:scale-[0.98]">
-                                نشر الإعلان الآن
-                            </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
-
-                {/* Tips Box */}
-                <div className="mt-8 bg-blue-50 dark:bg-slate-900/50 border border-blue-100 dark:border-slate-800 p-4 rounded-sm flex gap-3">
-                    <Info className="text-blue-500 shrink-0" size={20} />
-                    <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-blue-700 dark:text-blue-400">نصيحة "ساحة" للبيع السريع:</span>
-                        <p className="text-[11px] text-blue-600/80 dark:text-blue-400/60 leading-relaxed">
-                            الإعلانات التي تحتوي على أكثر من 5 صور واضحة ووصف مفصل تحصل على مشاهدات وتفاعل أكثر بنسبة 70%.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            </main>
+            <Footer />
         </div>
     );
 }

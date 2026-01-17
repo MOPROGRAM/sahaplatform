@@ -5,10 +5,15 @@ const getUserConversations = async (userId) => {
     return await prisma.conversation.findMany({
         where: {
             participants: {
-                has: userId
+                some: {
+                    id: userId
+                }
             }
         },
         include: {
+            participants: {
+                select: { id: true, name: true, image: true }
+            },
             ad: {
                 select: { title: true, images: true }
             },
@@ -27,20 +32,24 @@ const getUserConversations = async (userId) => {
 };
 
 const getConversationWithMessages = async (conversationId, userId) => {
-    // Check if user is participant
     const conversation = await prisma.conversation.findFirst({
         where: {
             id: conversationId,
             participants: {
-                has: userId
+                some: {
+                    id: userId
+                }
             }
         },
         include: {
             ad: true,
+            participants: {
+                select: { id: true, name: true, image: true, role: true }
+            },
             messages: {
                 include: {
                     sender: {
-                        select: { name: true, image: true }
+                        select: { id: true, name: true, image: true }
                     }
                 },
                 orderBy: { createdAt: 'asc' }
@@ -55,34 +64,57 @@ const getConversationWithMessages = async (conversationId, userId) => {
     return conversation;
 };
 
-const createConversation = async (participants, creatorId, adId = null) => {
+const createConversation = async (participantIds, creatorId, adId = null) => {
     // Ensure creator is in participants
-    if (!participants.includes(creatorId)) {
-        participants.push(creatorId);
+    if (!participantIds.includes(creatorId)) {
+        participantIds.push(creatorId);
     }
+
+    // Check if conversation already exists for these participants and ad
+    const existing = await prisma.conversation.findFirst({
+        where: {
+            adId,
+            AND: participantIds.map(id => ({
+                participants: { some: { id } }
+            }))
+        }
+    });
+
+    if (existing) return existing;
 
     return await prisma.conversation.create({
         data: {
-            participants,
-            adId
+            adId,
+            participants: {
+                connect: participantIds.map(id => ({ id }))
+            }
+        },
+        include: {
+            participants: true
         }
     });
 };
 
 const sendMessage = async (conversationId, senderId, content, messageType = 'text', fileUrl = null, fileName = null, fileSize = null) => {
-    // Check if sender is participant
     const conversation = await prisma.conversation.findFirst({
         where: {
             id: conversationId,
             participants: {
-                has: senderId
+                some: {
+                    id: senderId
+                }
             }
+        },
+        include: {
+            participants: true
         }
     });
 
     if (!conversation) {
         throw new Error('Conversation not found or access denied');
     }
+
+    const receiver = conversation.participants.find(p => p.id !== senderId);
 
     const message = await prisma.message.create({
         data: {
@@ -92,21 +124,20 @@ const sendMessage = async (conversationId, senderId, content, messageType = 'tex
             fileName,
             fileSize,
             senderId,
-            receiverId: conversation.participants.find(p => p !== senderId), // For now, assume 1-on-1
+            receiverId: receiver ? receiver.id : senderId,
             conversationId
         },
         include: {
             sender: {
-                select: { name: true, image: true }
+                select: { id: true, name: true, image: true }
             }
         }
     });
 
-    // Update conversation last message
     await prisma.conversation.update({
         where: { id: conversationId },
         data: {
-            lastMessage: content,
+            lastMessage: messageType === 'text' ? content : `Sent a ${messageType}`,
             lastMessageTime: new Date()
         }
     });
