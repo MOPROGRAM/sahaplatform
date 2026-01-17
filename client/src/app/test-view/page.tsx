@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { apiService } from "@/lib/api";
 
-export default function TestViewPage() {
+function TestViewContent() {
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
     const [ad, setAd] = useState<any>(null);
@@ -47,5 +47,13 @@ export default function TestViewPage() {
             )}
             {!ad && !loading && !error && <div>Ad not found</div>}
         </div>
+    );
+}
+
+export default function TestViewPage() {
+    return (
+        <Suspense fallback={<div className="p-10">Loading...</div>}>
+            <TestViewContent />
+        </Suspense>
     );
 }
