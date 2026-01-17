@@ -5,26 +5,32 @@ const getAllAds = async (filters) => {
     const { category, cityId, minPrice, maxPrice, searchQuery, authorId } = filters;
 
     try {
+        const where = {};
+        if (authorId) {
+            where.authorId = authorId;
+        } else {
+            where.isActive = true;
+        }
+        if (category) where.category = category;
+        if (cityId) where.cityId = cityId;
+        if (searchQuery && typeof searchQuery === 'string') {
+            where.OR = [
+                { title: { contains: searchQuery.toLowerCase() } },
+                { titleAr: { contains: searchQuery.toLowerCase() } },
+                { titleEn: { contains: searchQuery.toLowerCase() } },
+                { description: { contains: searchQuery.toLowerCase() } },
+                { descriptionAr: { contains: searchQuery.toLowerCase() } },
+                { descriptionEn: { contains: searchQuery.toLowerCase() } }
+            ];
+        }
+        if (minPrice || maxPrice) {
+            where.price = {};
+            if (minPrice) where.price.gte = parseFloat(minPrice);
+            if (maxPrice) where.price.lte = parseFloat(maxPrice);
+        }
+
         return await prisma.ad.findMany({
-            where: {
-                AND: [
-                    authorId ? { authorId } : { isActive: true }, // If searching my ads, show all. Otherwise only active.
-                    category ? { category } : {},
-                    cityId ? { cityId } : {},
-                    searchQuery ? {
-                        OR: [
-                            { title: { contains: searchQuery.toLowerCase() } },
-                            { titleAr: { contains: searchQuery.toLowerCase() } },
-                            { titleEn: { contains: searchQuery.toLowerCase() } },
-                            { description: { contains: searchQuery.toLowerCase() } },
-                            { descriptionAr: { contains: searchQuery.toLowerCase() } },
-                            { descriptionEn: { contains: searchQuery.toLowerCase() } }
-                        ]
-                    } : {},
-                    minPrice ? { price: { gte: parseFloat(minPrice) } } : {},
-                    maxPrice ? { price: { lte: parseFloat(maxPrice) } } : {},
-                ]
-            },
+            where,
             include: {
                 author: {
                     select: { id: true, name: true, verified: true, phone: true }
