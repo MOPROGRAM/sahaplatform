@@ -6,6 +6,11 @@ const morgan = require('morgan');
 const { Server } = require('socket.io');
 require('dotenv').config();
 
+// Fix DATABASE_URL to start with protocol if missing
+if (process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('postgresql://') && !process.env.DATABASE_URL.startsWith('postgres://')) {
+    process.env.DATABASE_URL = 'postgresql://' + process.env.DATABASE_URL;
+}
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {

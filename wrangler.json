@@ -6,7 +6,7 @@
         {
             "binding": "DB",
             "database_name": "saha-platform-db",
-            "database_id": "your-database-id-here",
+            "database_id": "",
             "migrations_dir": "pages/d1/migrations"
         }
     ],
