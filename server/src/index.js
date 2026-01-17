@@ -9,7 +9,7 @@ require('dotenv').config();
 // Fix DATABASE_URL to start with protocol if missing
 if (process.env.DATABASE_URL) {
     process.env.DATABASE_URL = process.env.DATABASE_URL.trim();
-    if (!process.env.DATABASE_URL.startsWith('postgres')) {
+    if (!process.env.DATABASE_URL.startsWith('file') && !process.env.DATABASE_URL.includes('://')) {
         process.env.DATABASE_URL = 'postgresql://' + process.env.DATABASE_URL;
     }
 }
