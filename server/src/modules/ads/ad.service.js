@@ -96,8 +96,43 @@ const getAdById = async (id) => {
     }
 };
 
+const updateAd = async (id, adData, userId) => {
+    try {
+        const ad = await prisma.ad.findUnique({ where: { id } });
+        if (!ad) throw new Error('Ad not found');
+        if (ad.authorId !== userId) throw new Error('Unauthorized');
+
+        return await prisma.ad.update({
+            where: { id },
+            data: adData
+        });
+    } catch (error) {
+        console.error('Database error:', error.message);
+        throw new Error('Failed to update ad');
+    }
+};
+
+const deleteAd = async (id, userId) => {
+    try {
+        const ad = await prisma.ad.findUnique({ where: { id } });
+        if (!ad) throw new Error('Ad not found');
+        if (ad.authorId !== userId) throw new Error('Unauthorized');
+
+        // Soft delete
+        return await prisma.ad.update({
+            where: { id },
+            data: { isActive: false }
+        });
+    } catch (error) {
+        console.error('Database error:', error.message);
+        throw new Error('Failed to delete ad');
+    }
+};
+
 module.exports = {
     getAllAds,
     createAd,
-    getAdById
+    getAdById,
+    updateAd,
+    deleteAd
 };

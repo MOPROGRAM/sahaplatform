@@ -46,4 +46,25 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 });
 
+// Update ad (protected)
+router.put('/:id', authMiddleware, async (req, res) => {
+    try {
+        const adData = req.body;
+        const ad = await adService.updateAd(req.params.id, adData, req.user.id);
+        res.json(ad);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Delete ad (protected)
+router.delete('/:id', authMiddleware, async (req, res) => {
+    try {
+        const ad = await adService.deleteAd(req.params.id, req.user.id);
+        res.json({ message: 'Ad deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 module.exports = router;

@@ -9,9 +9,9 @@ export default function BottomNav() {
 
     const navItems = [
         { label: "الرئيسية", icon: <Home size={22} />, path: "/" },
-        { label: "بحث", icon: <Search size={22} />, path: "/search" },
+        { label: "بحث", icon: <Search size={22} />, path: "/ads" },
         { label: "أضف", icon: <PlusSquare size={26} />, path: "/post-ad", center: true },
-        { label: "رسائلي", icon: <MessageSquare size={22} />, path: "/dashboard/chat" },
+        { label: "رسائلي", icon: <MessageSquare size={22} />, path: "/messages" },
         { label: "حسابي", icon: <UserCircle size={22} />, path: "/dashboard" },
     ];
 
@@ -24,8 +24,8 @@ export default function BottomNav() {
                     className={`flex flex-col items-center gap-1 ${item.center ? '-mt-10' : ''}`}
                 >
                     <div className={`p-2 rounded-full transition-all ${item.center
-                            ? 'bg-primary text-white shadow-lg shadow-primary/40 p-4 border-4 border-white dark:border-slate-900'
-                            : pathname === item.path ? 'text-primary' : 'text-gray-400'
+                        ? 'bg-primary text-white shadow-lg shadow-primary/40 p-4 border-4 border-white dark:border-slate-900'
+                        : pathname === item.path ? 'text-primary' : 'text-gray-400'
                         }`}>
                         {item.icon}
                     </div>
