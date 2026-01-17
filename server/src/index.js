@@ -3,6 +3,7 @@ const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
 const { Server } = require('socket.io');
 require('dotenv').config();
 
@@ -124,7 +125,7 @@ app.get('/api', (req, res) => {
 
 // Serve frontend for all non-API routes
 app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 // Import Modules
