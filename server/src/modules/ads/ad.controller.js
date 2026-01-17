@@ -5,6 +5,7 @@ const authMiddleware = require('../../middleware/auth');
 
 // Get all ads with filters
 router.get('/', async (req, res) => {
+    res.set('Cache-Control', 'no-cache');
     try {
         const filters = req.query;
         const ads = await adService.getAllAds(filters);
@@ -26,6 +27,7 @@ router.get('/my', authMiddleware, async (req, res) => {
 
 // Get ad by ID
 router.get('/:id', async (req, res) => {
+    res.set('Cache-Control', 'no-cache');
     try {
         const ad = await adService.getAdById(req.params.id);
         if (!ad) return res.status(404).json({ error: 'Ad not found' });
