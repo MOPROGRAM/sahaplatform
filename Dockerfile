@@ -4,10 +4,10 @@ FROM node:18-slim AS frontend-builder
 
 # Install build dependencies (needed for some node modules)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+  python3 \
+  make \
+  g++ \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/client
 
@@ -31,11 +31,11 @@ FROM node:18-slim AS production
 
 # Install runtime dependencies (openssl for Prisma, postgresql-client for DB operations)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl \
-    ca-certificates \
-    postgresql-client \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+  openssl \
+  ca-certificates \
+  postgresql-client \
+  curl \
+  && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /app
@@ -65,22 +65,22 @@ echo "🚀 Starting Saha Platform..."
 
 # Check if using PostgreSQL (Supabase) or SQLite
 if echo "\$DATABASE_URL" | grep -q "postgresql://"; then
-  echo "📊 Using PostgreSQL (Supabase) database..."
-  echo "🔄 Running database migrations..."
-  npx prisma db push --accept-data-loss
+  echo "📊 Using PostgreSQL database..."
+  echo "🔄 Pushing database schema..."
+  npx prisma db push --accept-data-loss || echo "DB push failed, continuing..."
   echo "🌱 Seeding database with initial data..."
-  npx prisma db seed
+  npx prisma db seed || echo "Seeding failed, continuing..."
 else
   echo "📊 Using SQLite database..."
   # Ensure database directory exists for SQLite
   mkdir -p /app/prisma
   echo "🔄 Setting up database..."
-  npx prisma db push --accept-data-loss
+  npx prisma db push --accept-data-loss || echo "DB push failed, continuing..."
   echo "🌱 Seeding database with initial data..."
-  npx prisma db seed
+  npx prisma db seed || echo "Seeding failed, continuing..."
 fi
 
-echo "✅ Database ready!"
+echo "✅ Database setup attempted!"
 echo "🌐 Starting application..."
 exec "\$@"
 EOF
@@ -94,7 +94,7 @@ EXPOSE 5000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+  CMD curl -f http://localhost:5000/health || exit 1
 
 # Start the application
 ENTRYPOINT ["/app/entrypoint.sh"]
