@@ -13,12 +13,12 @@ const getAllAds = async (filters) => {
                     cityId ? { cityId } : {},
                     searchQuery ? {
                         OR: [
-                            { title: { contains: searchQuery, mode: 'insensitive' } },
-                            { titleAr: { contains: searchQuery, mode: 'insensitive' } },
-                            { titleEn: { contains: searchQuery, mode: 'insensitive' } },
-                            { description: { contains: searchQuery, mode: 'insensitive' } },
-                            { descriptionAr: { contains: searchQuery, mode: 'insensitive' } },
-                            { descriptionEn: { contains: searchQuery, mode: 'insensitive' } }
+                            { title: { contains: searchQuery.toLowerCase() } },
+                            { titleAr: { contains: searchQuery.toLowerCase() } },
+                            { titleEn: { contains: searchQuery.toLowerCase() } },
+                            { description: { contains: searchQuery.toLowerCase() } },
+                            { descriptionAr: { contains: searchQuery.toLowerCase() } },
+                            { descriptionEn: { contains: searchQuery.toLowerCase() } }
                         ]
                     } : {},
                     minPrice ? { price: { gte: parseFloat(minPrice) } } : {},
