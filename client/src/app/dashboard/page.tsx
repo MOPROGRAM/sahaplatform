@@ -52,6 +52,7 @@ export default function DashboardPage() {
         { label: "Listings", value: "0", icon: <Package size={12} />, color: "text-orange-500" },
         { label: "Growth", value: "0%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
     ]);
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; adId: string | null; adTitle: string }>({ open: false, adId: null, adTitle: '' });
 
     const getRelativeTime = (date: string) => {
         const now = Date.now();
@@ -78,10 +79,11 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
         try {
             const myAds = await apiService.get('/ads/my');
-            setAds(myAds);
+            const activeAdsOnly = myAds.filter((ad: any) => ad.isActive);
+            setAds(activeAdsOnly);
 
-            const totalViews = myAds.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
-            const activeAds = myAds.filter((ad: any) => ad.isActive).length;
+            const totalViews = activeAdsOnly.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
+            const activeAds = activeAdsOnly.length;
 
             setStats([
                 { label: language === 'ar' ? "المشاهدات" : "Views", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
@@ -97,16 +99,23 @@ export default function DashboardPage() {
     };
 
     const deleteAd = async (adId: string) => {
-        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this ad?')) return;
-
         try {
             await apiService.delete('/ads/' + adId);
             // Refresh the list
             fetchDashboardData();
+            setDeleteModal({ open: false, adId: null, adTitle: '' });
         } catch (error) {
             console.error("Failed to delete ad:", error);
             alert(language === 'ar' ? 'فشل في حذف الإعلان' : 'Failed to delete ad');
         }
+    };
+
+    const openDeleteModal = (adId: string, adTitle: string) => {
+        setDeleteModal({ open: true, adId, adTitle });
+    };
+
+    const closeDeleteModal = () => {
+        setDeleteModal({ open: false, adId: null, adTitle: '' });
     };
 
     if (!user) return null;
@@ -234,7 +243,7 @@ export default function DashboardPage() {
                                                             <Link href={`/ads/edit?id=${ad.id}`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
                                                                 <Edit size={10} />
                                                             </Link>
-                                                            <button onClick={() => deleteAd(ad.id)} className="px-2 py-1 bg-red-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm">
+                                                            <button onClick={() => openDeleteModal(ad.id, ad.title)} className="px-2 py-1 bg-red-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm">
                                                                 <Trash2 size={10} />
                                                             </button>
                                                         </div>
@@ -264,6 +273,45 @@ export default function DashboardPage() {
                 </main>
             </div>
             <Footer />
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.open && (
+                <>
+                    <div className="fixed inset-0 bg-black/50 z-[50] flex items-center justify-center p-4">
+                        <div className="bg-white border-2 border-gray-200 rounded-md shadow-2xl max-w-md w-full p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                    <Trash2 size={20} className="text-red-500" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-black text-secondary uppercase tracking-tight">{language === 'ar' ? 'تأكيد الحذف' : 'Confirm Delete'}</h3>
+                                    <p className="text-sm text-gray-600">{language === 'ar' ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this ad?'}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-3 rounded-md mb-6">
+                                <p className="text-sm font-bold text-secondary">{deleteModal.adTitle}</p>
+                                <p className="text-xs text-gray-500 mt-1">{language === 'ar' ? 'لا يمكن التراجع عن هذا الإجراء' : 'This action cannot be undone'}</p>
+                            </div>
+
+                            <div className="flex gap-3 justify-end">
+                                <button
+                                    onClick={closeDeleteModal}
+                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all"
+                                >
+                                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                </button>
+                                <button
+                                    onClick={() => deleteAd(deleteModal.adId!)}
+                                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all"
+                                >
+                                    {language === 'ar' ? 'حذف' : 'Delete'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
