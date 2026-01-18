@@ -22,6 +22,7 @@ export default function PostAdPage() {
         price: "",
         location: "",
         description: "",
+        isBoosted: false,
     });
     const [images, setImages] = useState<File[]>([]);
     const [video, setVideo] = useState<File | null>(null);
@@ -34,8 +35,8 @@ export default function PostAdPage() {
     }, [user, authLoading, router]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target as any;
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -42,7 +42,7 @@ const getAllAds = async (filters) => {
                 },
                 currency: true
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: [{ isBoosted: 'desc' }, { createdAt: 'desc' }]
         });
     } catch (error) {
         console.log('Database error:', error.message);
