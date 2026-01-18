@@ -33,6 +33,7 @@
     "license": "MIT",
     "devDependencies": {
         "concurrently": "^8.2.2",
+        "next": "14.3.0",
         "wrangler": "^3.19.0"
     },
     "engines": {
