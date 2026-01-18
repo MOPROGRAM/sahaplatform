@@ -54,6 +54,8 @@ const createAd = async (adData, userId) => {
     try {
         // Remove authorId from adData if it exists to avoid duplication with userId param
         const { authorId, ...data } = adData;
+        // Normalize currencyId to lowercase
+        if (data.currencyId) data.currencyId = data.currencyId.toLowerCase();
         return await prisma.ad.create({
             data: {
                 ...data,
