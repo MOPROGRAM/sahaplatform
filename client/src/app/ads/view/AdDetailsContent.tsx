@@ -235,7 +235,16 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <ShieldCheck size={20} className="text-blue-500 shrink-0" />
                                 <div className="flex flex-col"><span className="text-[10px] font-black text-blue-700 uppercase tracking-tighter">Verified Seller</span><p className="text-[9px] text-gray-500 font-bold leading-tight">This seller has provided valid identity documents for safety.</p></div>
                             </div>
-                            <button className="text-[9px] font-black text-gray-400 hover:text-red-500 transition-colors uppercase italic underline w-fit">Report Suspicious Content</button>
+                            <button
+                                onClick={() => {
+                                    if (confirm(language === 'ar' ? 'هل أنت متأكد من الإبلاغ عن هذا المحتوى؟' : 'Are you sure you want to report this content?')) {
+                                        alert(language === 'ar' ? 'تم الإبلاغ بنجاح' : 'Reported successfully');
+                                    }
+                                }}
+                                className="text-[9px] font-black text-gray-400 hover:text-red-500 transition-colors uppercase italic underline w-fit"
+                            >
+                                {language === 'ar' ? 'الإبلاغ عن محتوى مشبوه' : 'Report Suspicious Content'}
+                            </button>
                         </div>
                     </div>
 

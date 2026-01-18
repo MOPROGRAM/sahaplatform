@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, MapPin, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { apiService } from "@/lib/api";
@@ -10,9 +11,11 @@ import { apiService } from "@/lib/api";
 export default function Header() {
     const { user, logout } = useAuthStore();
     const { language, setLanguage, t, theme, toggleTheme, country, setCountry, currency, setCurrency } = useLanguage();
+    const router = useRouter();
     const [unreadCount, setUnreadCount] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);
     const [showRegion, setShowRegion] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const currencyMap: Record<string, string> = {
         sa: 'sar',
@@ -111,8 +114,14 @@ export default function Header() {
                             type="text"
                             placeholder={t('searchPlaceholder')}
                             className="flex-1 px-4 py-2.5 text-[14px] outline-none font-bold bg-transparent text-text-main placeholder:text-gray-400"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/ads?search=${encodeURIComponent(searchQuery)}`); }}
                         />
-                        <button className="px-4 text-text-muted group-focus-within:text-primary transition-colors">
+                        <button
+                            className="px-4 text-text-muted group-focus-within:text-primary transition-colors"
+                            onClick={() => router.push(`/ads?search=${encodeURIComponent(searchQuery)}`)}
+                        >
                             <Search size={18} />
                         </button>
                     </div>
