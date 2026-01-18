@@ -79,6 +79,12 @@ export const translations = {
         secureProtocol: 'اتصال آمن وموثوق لبياناتك',
         marketRules: 'قواعد السوق',
         marketRulesDesc: 'كن دقيقاً في السعر والتصنيف لجذب المشترين الجادين فوراً.',
+        photos: 'الصور',
+        optional: 'اختياري',
+        imagesSelected: 'صورة محددة',
+        clickToAddPhotos: 'انقر لإضافة الصور',
+        max5Images: 'الحد الأقصى 5 صور',
+        each: 'لكل',
 
         // Messages & Ticker
         loading: 'جارٍ التحميل...',
@@ -224,6 +230,12 @@ export const translations = {
         secureProtocol: 'Secure and Encrypted Data Connection',
         marketRules: 'Market Rules',
         marketRulesDesc: 'Be precise with price and category to attract high-quality buyers instantly.',
+        photos: 'Photos',
+        optional: 'Optional',
+        imagesSelected: 'image selected',
+        clickToAddPhotos: 'Click to add photos',
+        max5Images: 'Max 5 images',
+        each: 'each',
 
         // Messages & Ticker
         loading: 'Loading...',
