@@ -1,0 +1,7 @@
+name = "saha-client"
+compatibility_date = "2024-01-01"
+
+[[pages_build_config]]
+build_command = "npm run build"
+destination_dir = ".next"
+source_dir = "."

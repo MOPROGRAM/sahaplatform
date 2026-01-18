@@ -1,18 +1,20 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-    output: 'export',
-    distDir: 'out',
-    trailingSlash: true,
-    images: {
-        unoptimized: true,
-    },
-    webpack: (config) => {
-        config.resolve.alias = {
-            ...config.resolve.alias,
-            '@': require('path').resolve(__dirname, 'src'),
-        };
-        return config;
-    },
-};
+module.exports = async () => {
+    if (process.env.NODE_ENV === 'development') {
+        const { setupDevPlatform } = require('@cloudflare/next-on-pages/next-dev');
+        await setupDevPlatform();
+    }
 
-module.exports = nextConfig;
+    return {
+        images: {
+            unoptimized: true,
+        },
+        webpack: (config) => {
+            config.resolve.alias = {
+                ...config.resolve.alias,
+                '@': require('path').resolve(__dirname, 'src'),
+            };
+            return config;
+        },
+    };
+};
