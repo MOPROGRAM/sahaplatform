@@ -23,6 +23,8 @@ export default function PostAdPage() {
         location: "",
         description: "",
     });
+    const [images, setImages] = useState<File[]>([]);
+    const [video, setVideo] = useState<File | null>(null);
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -36,12 +38,41 @@ export default function PostAdPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        // Validate file types and sizes
+        const validFiles = files.filter(file =>
+            file.type.startsWith('image/') &&
+            file.size <= 5 * 1024 * 1024 // 5MB max
+        );
+        if (validFiles.length !== files.length) {
+            setError(language === 'ar' ? "بعض الصور غير صالحة (يجب أن تكون صور وأقل من 5MB)" : "Some images are invalid (must be images under 5MB)");
+            return;
+        }
+        setImages(validFiles);
+    };
+
+    const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && file.type.startsWith('video/') && file.size <= 50 * 1024 * 1024) { // 50MB max
+            setVideo(file);
+        } else if (file) {
+            setError(language === 'ar' ? "الفيديو غير صالح (يجب أن يكون فيديو وأقل من 50MB)" : "Invalid video (must be video under 50MB)");
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
         if (!formData.title || !formData.category || !formData.price || !formData.location) {
             setError(language === 'ar' ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
+            return;
+        }
+
+        // Validate images for certain categories
+        if (['realEstate', 'cars'].includes(formData.category) && images.length === 0) {
+            setError(language === 'ar' ? "يجب إرفاق صور لهذا النوع من الإعلانات" : "Images are required for this type of advertisement");
             return;
         }
 

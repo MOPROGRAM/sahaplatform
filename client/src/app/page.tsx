@@ -125,7 +125,7 @@ export default function HomePage() {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {ads.length > 0 ? ads.map((ad, idx) => (
-                                <Link href={`/ads/view?id=${ad.id}`} key={idx} className="bg-white border border-gray-100 p-2 rounded-md hover:border-primary/50 transition-all group flex flex-col gap-2 h-full shadow-sm hover:shadow-md">
+                                <Link href={`/ads/view?id=${ad.id}`} key={idx} className="bg-white border-2 border-gray-200 p-2 rounded-md hover:border-primary transition-all group flex flex-col gap-2 h-full shadow-sm hover:shadow-md">
                                     <div className="aspect-[4/3] bg-gray-50 rounded-sm relative overflow-hidden flex items-center justify-center border border-gray-100 group-hover:bg-primary/5 transition-colors">
                                         <ImageIcon className="text-gray-200 group-hover:text-primary/20 transition-all" size={24} />
                                         {ad.featured && (
