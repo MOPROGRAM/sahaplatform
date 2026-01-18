@@ -143,10 +143,10 @@ export default function DashboardPage() {
 
                     <nav className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
                         {[
-                            { label: "Overview", icon: <LayoutDashboard size={14} />, active: true, path: "/dashboard" },
-                            { label: "My Listings", icon: <Package size={14} />, path: "/ads/my" },
-                            { label: "Messages", icon: <MessageSquare size={14} />, path: "/messages" },
-                            { label: "Settings", icon: <Settings size={14} />, path: "/settings" },
+                            { label: t('overview'), icon: <LayoutDashboard size={14} />, active: true, path: "/dashboard" },
+                            { label: t('myListings'), icon: <Package size={14} />, path: "/ads/my" },
+                            { label: t('messages'), icon: <MessageSquare size={14} />, path: "/messages" },
+                            { label: t('settings'), icon: <Settings size={14} />, path: "/settings" },
                         ].map((item, i) => (
                             <Link key={i} href={item.path || "#"} className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-gray-50 last:border-0 transition-all ${item.active ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary' : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'}`}>
                                 {item.icon}

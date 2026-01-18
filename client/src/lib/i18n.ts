@@ -109,6 +109,28 @@ export const translations = {
         merchantLabel: 'تاجر / معلن',
         adminLabel: 'مدير النظام',
 
+        // Dashboard
+        overview: 'نظرة عامة',
+        myListings: 'إعلاناتي',
+        messages: 'الرسائل',
+        settings: 'الإعدادات',
+        operationalFleet: 'الأسطول التشغيلي / الإعلانات',
+        unitIdentification: 'تحديد الوحدة / التفاصيل',
+        statusMatrix: 'مصفوفة الحالة',
+        engagement: 'المشاركة',
+        actions: 'الإجراءات',
+        code: 'الرمز',
+        totalImprints: 'إجمالي الطباعات',
+        matrix: 'المصفوفة',
+        noMissionData: 'لا توجد بيانات مهمة',
+        startYourJourney: 'ابدأ رحلتك بنشر إعلانك الأول الآن',
+
+        // Modals
+        confirmDelete: 'تأكيد الحذف',
+        deleteWarning: 'هل أنت متأكد من حذف هذا الإعلان؟',
+        thisActionCannotBeUndone: 'لا يمكن التراجع عن هذا الإجراء',
+        delete: 'حذف',
+
         // Auth Pages
         loginTitle: 'تسجيل الدخول للنظام',
         registerTitle: 'إنشاء حساب جديد',
@@ -230,6 +252,28 @@ export const translations = {
         trustedMerchant: 'Trusted Merchant',
         merchantLabel: 'Merchant / Seller',
         adminLabel: 'System Admin',
+
+        // Dashboard
+        overview: 'Overview',
+        myListings: 'My Listings',
+        messages: 'Messages',
+        settings: 'Settings',
+        operationalFleet: 'Operational Fleet / Listings',
+        unitIdentification: 'Unit Identification / Details',
+        statusMatrix: 'Status Matrix',
+        engagement: 'Engagement',
+        actions: 'Actions',
+        code: 'Code',
+        totalImprints: 'Total Imprints',
+        matrix: 'Matrix',
+        noMissionData: 'No Mission Data Found',
+        startYourJourney: 'Start your journey by posting your first ad now',
+
+        // Modals
+        confirmDelete: 'Confirm Delete',
+        deleteWarning: 'Are you sure you want to delete this ad?',
+        thisActionCannotBeUndone: 'This action cannot be undone',
+        delete: 'Delete',
 
         // Auth Pages
         loginTitle: 'System Login',
