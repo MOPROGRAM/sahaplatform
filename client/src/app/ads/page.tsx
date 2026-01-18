@@ -33,16 +33,18 @@ function AdsContent() {
     const { language, t, currency } = useLanguage();
     const searchParams = useSearchParams();
     const categoryQuery = searchParams.get('category');
+    const searchQueryParam = searchParams.get('search');
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
     const [locationFilter, setLocationFilter] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
 
     useEffect(() => {
+        setSearchQuery(searchQueryParam || '');
         fetchAds();
-    }, [categoryQuery]);
+    }, [categoryQuery, searchQueryParam]);
 
     const fetchAds = async () => {
         setLoading(true);

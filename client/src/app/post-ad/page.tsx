@@ -22,6 +22,8 @@ export default function PostAdPage() {
         price: "",
         location: "",
         description: "",
+        phone: "",
+        email: "",
         isBoosted: false,
     });
     const [images, setImages] = useState<File[]>([]);
@@ -190,7 +192,7 @@ export default function PostAdPage() {
                                                 className="bg-gray-50 border border-gray-200 p-3 text-[13px] font-black rounded-md outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner"
                                                 required
                                             >
-                                                <option value="">{language === 'ar' ? '-- اختر القسم --' : '-- Choose Category --'}</option>
+                                                <option value="">{t('chooseCategory')}</option>
                                                 <option value="realEstate">{t('realEstate')}</option>
                                                 <option value="jobs">{t('jobs')}</option>
                                                 <option value="cars">{t('cars')}</option>

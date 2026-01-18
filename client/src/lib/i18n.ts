@@ -99,6 +99,7 @@ export const translations = {
         priceTo: 'إلى',
         adTitlePlaceholder: 'مثال: شقة استثمارية في حي النرجس...',
         descriptionPlaceholder: 'اكتب وصفاً تقنياً دقيقاً وشاملاً...',
+        chooseCategory: '-- اختر القسم --',
 
         // Status
         active: 'نشط',
@@ -243,6 +244,7 @@ export const translations = {
         priceTo: 'to',
         adTitlePlaceholder: 'e.g. Investment Apartment in District 5...',
         descriptionPlaceholder: 'Write a technical and comprehensive description...',
+        chooseCategory: '-- Choose Category --',
 
         // Status
         active: 'Active',
