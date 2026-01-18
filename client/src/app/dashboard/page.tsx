@@ -17,7 +17,9 @@ import {
     Loader2,
     PlusCircle,
     Search,
-    ShieldCheck
+    ShieldCheck,
+    Edit,
+    Trash2
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -77,6 +79,19 @@ export default function DashboardPage() {
             console.error("Failed to fetch dashboard data:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const deleteAd = async (adId: string) => {
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this ad?')) return;
+
+        try {
+            await apiService.delete('/ads/' + adId);
+            // Refresh the list
+            fetchDashboardData();
+        } catch (error) {
+            console.error("Failed to delete ad:", error);
+            alert(language === 'ar' ? 'فشل في حذف الإعلان' : 'Failed to delete ad');
         }
     };
 
@@ -200,9 +215,17 @@ export default function DashboardPage() {
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex flex-col items-end gap-1.5">
-                                                        <Link href={`/ads/view?id=${ad.id}`} className="px-3 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
+                                                        <div className="flex items-center gap-1">
+                                                            <Link href={`/ads/view?id=${ad.id}`} className="px-2 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
+                                                            <Link href={`/ads/edit?id=${ad.id}`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
+                                                                <Edit size={10} />
+                                                            </Link>
+                                                            <button onClick={() => deleteAd(ad.id)} className="px-2 py-1 bg-red-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm">
+                                                                <Trash2 size={10} />
+                                                            </button>
+                                                        </div>
                                                         <div className="flex items-center gap-1 text-[8px] font-black text-gray-300 uppercase tracking-tighter">
-                                                            <Clock size={8} /> {new Date(ad.createdAt).toLocaleDateString()}
+                                                            <Clock size={8} /> {Math.floor((Date.now() - new Date(ad.createdAt).getTime()) / (1000 * 60 * 60))}h ago
                                                         </div>
                                                     </div>
                                                 </td>

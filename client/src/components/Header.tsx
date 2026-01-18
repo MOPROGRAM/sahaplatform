@@ -152,9 +152,6 @@ export default function Header() {
                         <PlusCircle size={16} />
                         {t('postAd')}
                     </Link>
-                    <Link href="/test-post" className="btn-saha-outline !px-3 !py-1 !text-[10px] !border-b-[2px] ml-2">
-                        Test Post
-                    </Link>
                 </div>
             </div>
         </header>
