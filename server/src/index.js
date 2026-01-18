@@ -123,11 +123,6 @@ app.get('/api', (req, res) => {
     res.json({ message: "Welcome to Saha Platform API (ساحة)" });
 });
 
-// Serve frontend for all non-API routes
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
-});
-
 // Import Modules
 const authRoutes = require('./modules/auth/auth.controller');
 const adRoutes = require('./modules/ads/ad.controller');
@@ -141,6 +136,11 @@ app.use('/api/ads', adRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+
+// Serve frontend for all non-API routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
 
 // Socket.io Logic
 io.on('connection', (socket) => {
