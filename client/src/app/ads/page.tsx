@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon, PlusCircle, Loader2 } from 'lucide-react';
-import { apiService } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -21,12 +21,12 @@ interface Ad {
     category: string;
     location: string;
     images: string;
-    isBoosted: boolean;
+    is_boosted: boolean;
     author: {
         name: string;
         verified: boolean;
     };
-    createdAt: string;
+    created_at: string;
 }
 
 function AdsContent() {
@@ -49,15 +49,41 @@ function AdsContent() {
     const fetchAds = async () => {
         setLoading(true);
         try {
-            const params: any = {};
-            if (categoryQuery) params.category = categoryQuery;
-            if (searchQuery) params.searchQuery = searchQuery;
-            if (locationFilter) params.location = locationFilter;
-            if (priceRange.min) params.minPrice = priceRange.min;
-            if (priceRange.max) params.maxPrice = priceRange.max;
+            let query = supabase
+                .from('ads')
+                .select(`
+                    *,
+                    author:user_id (
+                        name,
+                        verified
+                    ),
+                    currency:currency_id (
+                        code,
+                        symbol
+                    )
+                `)
+                .order('created_at', { ascending: false })
+                .limit(20);
 
-            const data = await apiService.get('/ads', params);
-            setAds(data);
+            if (categoryQuery) {
+                query = query.eq('category', categoryQuery);
+            }
+            if (searchQuery) {
+                query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+            }
+            if (locationFilter) {
+                query = query.ilike('location', `%${locationFilter}%`);
+            }
+            if (priceRange.min) {
+                query = query.gte('price', Number(priceRange.min));
+            }
+            if (priceRange.max) {
+                query = query.lte('price', Number(priceRange.max));
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+            setAds(data || []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
@@ -133,7 +159,7 @@ function AdsContent() {
                             >
                                 <div className="aspect-[4/3] bg-gray-50 rounded-xs relative overflow-hidden flex items-center justify-center border border-gray-100 shrink-0">
                                     <ImageIcon className="text-gray-200 group-hover:scale-110 transition-transform" size={24} />
-                                    {ad.isBoosted && (
+                                    {ad.is_boosted && (
                                         <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-2 py-0.5 rounded-bl-sm shadow-md uppercase tracking-widest">Boosted</div>
                                     )}
                                 </div>
