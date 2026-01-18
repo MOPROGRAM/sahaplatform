@@ -66,8 +66,8 @@ echo "🚀 Starting Saha Platform..."
 # Check if using PostgreSQL (Supabase) or SQLite
 if echo "\$DATABASE_URL" | grep -q "postgresql://"; then
   echo "📊 Using PostgreSQL database..."
-  echo "🔄 Pushing database schema..."
-  npx prisma db push --accept-data-loss || echo "DB push failed, continuing..."
+  echo "🔄 Applying database migrations..."
+  npx prisma migrate deploy || echo "Migration failed, continuing..."
   echo "🌱 Seeding database with initial data..."
   npx prisma db seed || echo "Seeding failed, continuing..."
 else
