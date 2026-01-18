@@ -1,53 +1,72 @@
-const getApiUrl = (endpoint: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '/api';
-    return `${baseUrl}${endpoint}`;
-};
+import { supabase } from './supabase';
 
-// استخدام API الخاص بالباكيند الموجود على Render مع PostgreSQL
+// استخدام Supabase Auth
 export const authService = {
     async login(email: string, password: string) {
-        const response = await fetch(getApiUrl('/auth/login'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Login failed');
+        if (error) {
+            throw new Error(error.message || 'Login failed');
         }
 
-        return response.json();
+        return {
+            token: data.session?.access_token,
+            user: {
+                id: data.user?.id,
+                email: data.user?.email,
+                name: data.user?.user_metadata?.name,
+                role: data.user?.role,
+                userType: data.user?.user_metadata?.userType,
+                verified: data.user?.email_confirmed_at ? true : false,
+            },
+        };
     },
 
     async register(email: string, password: string, name: string, userType: string = 'SEEKER') {
-        const response = await fetch(getApiUrl('/auth/register'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, name, userType }),
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    name,
+                    userType,
+                },
+            },
         });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Registration failed');
+        if (error) {
+            throw new Error(error.message || 'Registration failed');
         }
 
-        return response.json();
+        return {
+            token: data.session?.access_token,
+            user: {
+                id: data.user?.id,
+                email: data.user?.email,
+                name: data.user?.user_metadata?.name,
+                role: data.user?.role,
+                userType: data.user?.user_metadata?.userType,
+                verified: data.user?.email_confirmed_at ? true : false,
+            },
+        };
     },
 
     getToken(): string | null {
         if (typeof window === 'undefined') return null;
-        return localStorage.getItem('token');
+        return localStorage.getItem('supabase.auth.token');
     },
 
     setToken(token: string) {
         if (typeof window === 'undefined') return;
-        localStorage.setItem('token', token);
+        localStorage.setItem('supabase.auth.token', token);
     },
 
     removeToken() {
         if (typeof window === 'undefined') return;
-        localStorage.removeItem('token');
+        localStorage.removeItem('supabase.auth.token');
     }
 };
 

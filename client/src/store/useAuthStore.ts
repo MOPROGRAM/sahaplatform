@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { AuthUser, authService } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 interface AuthState {
     user: AuthUser | null;
@@ -19,7 +20,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.login(email, password);
-            authService.setToken(response.token);
             set({
                 user: response.user,
                 session: response.token
@@ -32,42 +32,38 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.register(email, password, name, userType);
-            const loginResponse = await authService.login(email, password);
-            authService.setToken(loginResponse.token);
             set({
-                user: loginResponse.user,
-                session: loginResponse.token
+                user: response.user,
+                session: response.token
             });
         } finally {
             set({ loading: false });
         }
     },
     logout: async () => {
+        await supabase.auth.signOut();
         authService.removeToken();
         set({ user: null, session: null });
     },
     initialize: async () => {
         set({ loading: true });
         try {
-            const token = authService.getToken();
-            if (token) {
-                set({ session: token });
-                try {
-                    // Fetch real profile from backend
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/auth/me`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const user = await response.json();
-                        set({ user });
-                    } else {
-                        authService.removeToken();
-                        set({ user: null, session: null });
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch profile:", e);
-                }
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                set({
+                    user: {
+                        id: session.user.id,
+                        email: session.user.email,
+                        name: session.user.user_metadata?.name,
+                        role: session.user.role,
+                        userType: session.user.user_metadata?.userType,
+                        verified: session.user.email_confirmed_at ? true : false,
+                    },
+                    session: session.access_token
+                });
             }
+        } catch (e) {
+            console.error("Failed to initialize auth:", e);
         } finally {
             set({ loading: false });
         }
