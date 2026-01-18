@@ -21,6 +21,8 @@ export default function PostAdPage() {
         category: "",
         price: "",
         location: "",
+        address: "",
+        paymentMethod: "",
         description: "",
         phone: "",
         email: "",
@@ -104,8 +106,10 @@ export default function PostAdPage() {
                     price: Number(formData.price),
                     category: formData.category,
                     location: formData.location,
-                    images_urls: imageUrls,
-                    user_id: user?.id, // Assuming user is authenticated
+                    address: formData.address,
+                    paymentMethod: formData.paymentMethod,
+                    images: JSON.stringify(imageUrls),
+                    authorId: user?.id, // Assuming user is authenticated
                 })
                 .select()
                 .single();

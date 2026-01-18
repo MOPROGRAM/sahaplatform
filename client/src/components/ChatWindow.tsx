@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin, Paperclip, FileText, ImageIcon, Loader2, X } from "lucide-react";
+import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Mic } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { apiService } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
 
@@ -11,7 +12,7 @@ interface Message {
     id: string;
     senderId: string;
     content: string;
-    messageType: 'text' | 'image' | 'file' | 'location';
+    messageType: 'text' | 'image' | 'file' | 'voice' | 'location';
     fileUrl?: string;
     fileName?: string;
     createdAt: string;
@@ -35,8 +36,11 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [sending, setSending] = useState(false);
     const [participants, setParticipants] = useState<any[]>([]);
     const [adInfo, setAdInfo] = useState<any>(null);
+    const [isRecording, setIsRecording] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<any>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
 
     useEffect(() => {
         if (conversationId) {
@@ -77,7 +81,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
-    const handleSend = async (type: 'text' | 'image' | 'file' | 'location' = 'text', content?: string, fileData?: any) => {
+    const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' = 'text', content?: string, fileData?: any) => {
         const messageContent = content || input;
         if (!messageContent.trim() && type === 'text') return;
 
@@ -109,6 +113,60 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 const mapUrl = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=16/${latitude}/${longitude}`;
                 handleSend('location', mapUrl);
             });
+        }
+    };
+
+    const handleFileUpload = async (file: File, type: 'file' | 'image') => {
+        const fileName = `${Date.now()}-${file.name}`;
+        const bucket = type === 'image' ? 'chat-images' : 'chat-files';
+        const { data, error } = await supabase.storage
+            .from(bucket)
+            .upload(fileName, file);
+
+        if (error) {
+            console.error('Error uploading file:', error);
+            return null;
+        }
+
+        const { data: urlData } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(fileName);
+
+        return { fileUrl: urlData.publicUrl, fileName: file.name, fileSize: file.size };
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunksRef.current.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+                const file = new File([audioBlob], 'voice-message.wav', { type: 'audio/wav' });
+                const uploadData = await handleFileUpload(file, 'file');
+                if (uploadData) {
+                    handleSend('voice', 'Voice message', uploadData);
+                }
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (error) {
+            console.error('Error starting recording:', error);
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+            setIsRecording(false);
         }
     };
 
