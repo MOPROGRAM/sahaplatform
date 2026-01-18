@@ -53,6 +53,20 @@ export default function DashboardPage() {
         { label: "Growth", value: "0%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
     ]);
 
+    const getRelativeTime = (date: string) => {
+        const now = Date.now();
+        const created = new Date(date).getTime();
+        const diff = now - created;
+
+        const minutes = Math.floor(diff / (1000 * 60));
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        if (minutes < 60) return `${minutes}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        return `${days}d ago`;
+    };
+
     useEffect(() => {
         if (!user) {
             router.push('/login');
@@ -225,7 +239,7 @@ export default function DashboardPage() {
                                                             </button>
                                                         </div>
                                                         <div className="flex items-center gap-1 text-[8px] font-black text-gray-300 uppercase tracking-tighter">
-                                                            <Clock size={8} /> {Math.floor((Date.now() - new Date(ad.createdAt).getTime()) / (1000 * 60 * 60))}h ago
+                                                            <Clock size={8} /> {getRelativeTime(ad.createdAt)}
                                                         </div>
                                                     </div>
                                                 </td>
