@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Search, MapPin, Heart, MessageSquare, PlusCircle, Sparkles, Zap, ChevronLeft, Clock, Image as ImageIcon, Globe, Grid, TrendingUp, Loader2, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';
-import { apiService } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
 import { useAuthStore } from '@/store/useAuthStore';
 import Header from '@/components/Header';
@@ -44,8 +44,18 @@ export default function HomePage() {
 
     const fetchAds = async () => {
         try {
-            const data = await apiService.get('/ads');
-            setAds(data);
+            const { data, error } = await supabase
+                .from('ads')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (error) {
+                console.error('Failed to fetch ads:', error);
+                setAds([]);
+            } else {
+                setAds(data || []);
+            }
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
