@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, MapPin, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { apiService } from "@/lib/api";
@@ -12,6 +12,7 @@ export default function Header() {
     const { user, logout } = useAuthStore();
     const { language, setLanguage, t, theme, toggleTheme, country, setCountry, currency, setCurrency } = useLanguage();
     const router = useRouter();
+    const pathname = usePathname();
     const [unreadCount, setUnreadCount] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);
     const [showRegion, setShowRegion] = useState(false);
@@ -126,6 +127,19 @@ export default function Header() {
                         </button>
                     </div>
                 </div>
+
+                {/* Navigation */}
+                <nav className="hidden md:flex items-center gap-6">
+                    <Link href="/" className={`text-[11px] font-black uppercase tracking-widest transition-colors ${pathname === '/' ? 'text-primary border-b-2 border-primary' : 'text-text-main hover:text-primary'}`}>
+                        {t('home')}
+                    </Link>
+                    <Link href="/ads" className={`text-[11px] font-black uppercase tracking-widest transition-colors ${pathname?.startsWith('/ads') ? 'text-primary border-b-2 border-primary' : 'text-text-main hover:text-primary'}`}>
+                        {t('ads')}
+                    </Link>
+                    <Link href="/advertise" className={`text-[11px] font-black uppercase tracking-widest transition-colors ${pathname === '/advertise' ? 'text-primary border-b-2 border-primary' : 'text-text-main hover:text-primary'}`}>
+                        Advertise
+                    </Link>
+                </nav>
 
                 {/* Action Grid - Ultra Density */}
                 <div className="flex items-center gap-3">

@@ -114,7 +114,8 @@ export default function AdDetailsContent({ id }: { id: string }) {
             </div>
 
             <main className="max-w-7xl mx-auto grid grid-cols-12 gap-3 p-2 pt-0">
-                <div className="col-span-12 lg:col-span-9 flex flex-col gap-3">
+                {/* Content */}
+                <div className="col-span-12 lg:col-span-9 order-2 lg:order-1 flex flex-col gap-3">
                     {/* Media Gallery */}
                     <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
                         <div className="aspect-[21/9] bg-gray-900 relative">
@@ -198,7 +199,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                 </div>
 
                 {/* Sidebar */}
-                <aside className="col-span-12 lg:col-span-3 flex flex-col gap-3">
+                <aside className="col-span-12 lg:col-span-3 order-1 flex flex-col gap-3">
                     <div className="bg-white border border-gray-200 rounded-sm shadow-sm p-4 sticky top-[80px]">
                         <div className="flex items-center gap-3 mb-6 bg-primary/5 p-3 rounded-xs border border-primary/10 transition-colors hover:bg-primary/10">
                             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
