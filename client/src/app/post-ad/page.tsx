@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { apiService } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import Header from "@/components/Header";
@@ -73,29 +73,51 @@ export default function PostAdPage() {
             return;
         }
 
-        // Validate images for certain categories
-        if (['realEstate', 'cars'].includes(formData.category) && images.length === 0) {
-            setError(language === 'ar' ? "يجب إرفاق صور لهذا النوع من الإعلانات" : "Images are required for this type of advertisement");
-            return;
-        }
+        // Images are optional for all categories
 
         setLoading(true);
         try {
-            const response = await apiService.post('/ads', {
-                ...formData,
-                price: Number(formData.price),
-                currencyId: currency, // Use context currency
-                images: "[]",
-                latitude: 24.7136,
-                longitude: 46.6753
-            });
+            // Upload images to Supabase Storage
+            const imageUrls: string[] = [];
+            for (const image of images) {
+                const fileName = `${Date.now()}-${image.name}`;
+                const { data, error } = await supabase.storage
+                    .from('ads-images')
+                    .upload(fileName, image);
 
-            if (response && response.id) {
-                router.push(`/ads/view?id=${response.id}`);
+                if (error) {
+                    console.error('Error uploading image:', error);
+                } else {
+                    const { data: urlData } = supabase.storage
+                        .from('ads-images')
+                        .getPublicUrl(fileName);
+                    imageUrls.push(urlData.publicUrl);
+                }
+            }
+
+            // Insert ad into database
+            const { data, error } = await supabase
+                .from('ads')
+                .insert({
+                    title: formData.title,
+                    description: formData.description,
+                    price: Number(formData.price),
+                    category: formData.category,
+                    location: formData.location,
+                    images_urls: imageUrls,
+                    user_id: user?.id, // Assuming user is authenticated
+                })
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Error posting ad:', error);
+                setError(language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad.");
+            } else if (data) {
+                router.push(`/ads/view?id=${data.id}`);
             }
         } catch (err: any) {
             console.error("Failed to post ad:", err);
-            // Show more specific error from API if available
             setError(err.message || (language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad."));
         } finally {
             setLoading(false);
@@ -249,6 +271,51 @@ export default function PostAdPage() {
                                             className="bg-gray-50 border border-gray-200 p-4 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner resize-none leading-relaxed"
                                             placeholder={t('descriptionPlaceholder')}
                                         ></textarea>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                            <Camera className="w-3 h-3" />
+                                            {t('photos')} ({t('optional')})
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                onChange={handleImageChange}
+                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            />
+                                            <div className="bg-gray-50 border-2 border-dashed border-gray-300 p-6 rounded-md text-center hover:border-primary transition-colors group">
+                                                <Camera className="mx-auto text-gray-400 group-hover:text-primary transition-colors mb-2" size={24} />
+                                                <p className="text-[12px] font-black text-gray-500 uppercase tracking-tight">
+                                                    {images.length > 0 ? `${images.length} ${t('imagesSelected')}` : t('clickToAddPhotos')}
+                                                </p>
+                                                <p className="text-[10px] text-gray-400 mt-1 font-bold">
+                                                    {t('max5Images')} • 5MB {t('each')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {images.length > 0 && (
+                                            <div className="grid grid-cols-4 gap-2 mt-2">
+                                                {images.map((image, index) => (
+                                                    <div key={index} className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
+                                                        <img
+                                                            src={URL.createObjectURL(image)}
+                                                            alt={`Preview ${index + 1}`}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setImages(images.filter((_, i) => i !== index))}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
