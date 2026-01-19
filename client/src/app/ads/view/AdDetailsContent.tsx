@@ -42,6 +42,7 @@ interface Ad {
 export default function AdDetailsContent({ id }: { id: string }) {
     const { language, t } = useLanguage();
     const { user } = useAuthStore();
+    const router = useRouter();
     const adId = id;
 
     const [ad, setAd] = useState<Ad | null>(null);
