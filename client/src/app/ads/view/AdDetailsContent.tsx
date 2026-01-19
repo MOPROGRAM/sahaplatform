@@ -233,7 +233,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 className="w-full bg-secondary text-white py-3 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
                             >
                                 <Phone size={16} />
-                                {showPhone ? (ad.author.phone || '05X XXX XXXX') : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
+                                {showPhone ? '05X XXX XXXX' : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
                             </button>
                         </div>
 
