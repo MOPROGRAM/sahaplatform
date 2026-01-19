@@ -10,14 +10,20 @@ const getBaseUrl = () => {
 
 const API_URL = getBaseUrl();
 
-const getAuthHeaders = (): Record<string, string> => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+const getAuthHeaders = async (): Promise<Record<string, string>> => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-        console.log('🔐 Token found and added to request');
-    } else {
-        console.warn('⚠️ No authentication token found in localStorage');
+    if (typeof window !== 'undefined') {
+        try {
+            const { data: { session } } = await import('@/lib/supabase').then(m => m.supabase.auth.getSession());
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+                console.log('🔐 Token found and added to request');
+            } else {
+                console.warn('⚠️ No authentication session found');
+            }
+        } catch (error) {
+            console.warn('⚠️ Error getting auth session:', error);
+        }
     }
     return headers;
 };
@@ -27,7 +33,7 @@ export const apiService = {
         const query = new URLSearchParams(params).toString();
         const url = `${API_URL}${endpoint}${query ? `?${query}` : ''}`;
         const response = await fetch(url, {
-            headers: getAuthHeaders(),
+            headers: await getAuthHeaders(),
         });
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
@@ -40,7 +46,7 @@ export const apiService = {
         const url = `${API_URL}${endpoint}`;
         const response = await fetch(url, {
             method: 'POST',
-            headers: getAuthHeaders(),
+            headers: await getAuthHeaders(),
             body: JSON.stringify(data),
         });
         if (!response.ok) {
@@ -54,7 +60,7 @@ export const apiService = {
         const url = `${API_URL}${endpoint}`;
         const response = await fetch(url, {
             method: 'DELETE',
-            headers: getAuthHeaders(),
+            headers: await getAuthHeaders(),
         });
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
