@@ -70,7 +70,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
     const handleStartChat = async () => {
         if (!user) {
-            alert(language === 'ar' ? 'يرجى تسجيل الدخول أولاً' : 'Please login first');
+            router.push('/login');
             return;
         }
         if (user.id === ad?.authorId) {
