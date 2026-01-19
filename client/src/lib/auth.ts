@@ -77,4 +77,5 @@ export type AuthUser = {
     role?: string;
     userType?: string;
     verified?: boolean;
+    image?: string;
 };
