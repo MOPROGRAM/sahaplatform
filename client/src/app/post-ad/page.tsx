@@ -103,9 +103,7 @@ export default function PostAdPage() {
                 description: formData.description,
                 price: Number(formData.price),
                 category: formData.category,
-                phone: formData.phone,
-                images: JSON.stringify(imageUrls),
-                authorId: user?.id,
+                user_id: user?.id,
             };
             console.log('Ad payload:', payload);
             const { data, error } = await supabase
