@@ -106,7 +106,6 @@ export default function PostAdPage() {
                     price: Number(formData.price),
                     category: formData.category,
                     phone: formData.phone,
-                    currency_id: 'sar',
                     authorId: user?.id,
                 })
                 .select()
