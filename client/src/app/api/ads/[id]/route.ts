@@ -12,12 +12,21 @@ export async function GET(request: Request, { params }: { params: { id: string }
         .single();
 
     if (error) {
-        return Response.json({ error: error.message }, { status: 500 });
+        return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 
     if (!data) {
-        return Response.json({ error: 'Ad not found' }, { status: 404 });
+        return new Response(JSON.stringify({ error: 'Ad not found' }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 
-    return Response.json(data);
+    return new Response(JSON.stringify(data), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
 }
