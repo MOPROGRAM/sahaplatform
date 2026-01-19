@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Cairo, Tajawal } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/language-context";
+import CategorySidebar from "@/components/CategorySidebar";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -101,7 +102,12 @@ export default function RootLayout({
             </head>
             <body>
                 <LanguageProvider>
-                    {children}
+                    <div className="flex min-h-screen">
+                        <CategorySidebar />
+                        <main className="flex-1 overflow-x-hidden">
+                            {children}
+                        </main>
+                    </div>
                 </LanguageProvider>
             </body>
         </html>

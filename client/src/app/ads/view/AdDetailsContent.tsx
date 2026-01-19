@@ -121,7 +121,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                 <div className="col-span-12 lg:col-span-9 order-2 lg:order-1 flex flex-col gap-3">
                     {/* Media Gallery */}
                     <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
-                        <div className="aspect-[21/9] bg-gray-900 relative">
+                        <div className="aspect-[16/9] bg-gray-900 relative">
                             {(() => {
                                 try {
                                     const images = JSON.parse(ad.images || "[]");
@@ -146,6 +146,27 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Share2 size={14} /></button>
                             </div>
                         </div>
+                        {(() => {
+                            try {
+                                const images = JSON.parse(ad.images || "[]");
+                                return images.length > 1 ? (
+                                    <div className="p-4 border-t border-gray-100">
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {images.slice(1, 5).map((img: string, idx: number) => (
+                                                <img
+                                                    key={idx}
+                                                    src={img}
+                                                    alt={`View ${idx + 2}`}
+                                                    className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+                            } catch (e) {
+                                return null;
+                            }
+                        })()}
                     </div>
 
                     {/* Content Section */}
