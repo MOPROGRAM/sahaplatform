@@ -46,7 +46,7 @@ export default function DashboardPage() {
     const router = useRouter();
     const [ads, setAds] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [branch, setBranch] = useState<string>('loading...');
+    const branch = 'feature/cloudflare-migration';
     const [stats, setStats] = useState([
         { label: "Views", value: "0", icon: <Eye size={12} />, color: "text-blue-500" },
         { label: "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
@@ -75,17 +75,7 @@ export default function DashboardPage() {
             return;
         }
         fetchDashboardData();
-        fetchBranch();
     }, [user, router]);
-
-    const fetchBranch = async () => {
-        try {
-            const response = await apiService.get('/branch');
-            setBranch(response.branch);
-        } catch (error) {
-            setBranch('unknown');
-        }
-    };
 
     const fetchDashboardData = async () => {
         try {
