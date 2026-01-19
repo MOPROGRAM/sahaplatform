@@ -14,18 +14,12 @@ interface Ad {
     title: string;
     description: string;
     price: number;
-    currency?: {
-        code: string;
-        symbol: string;
-    };
+    currency_id: string;
     category: string;
     location: string;
     images: string;
     is_boosted: boolean;
-    author: {
-        name: string;
-        verified: boolean;
-    };
+    user_id: string;
     created_at: string;
 }
 
@@ -51,17 +45,7 @@ function AdsContent() {
         try {
             let query = supabase
                 .from('ads')
-                .select(`
-                    *,
-                    author:user_id (
-                        name,
-                        verified
-                    ),
-                    currency:currency_id (
-                        code,
-                        symbol
-                    )
-                `)
+                .select('*')
                 .order('created_at', { ascending: false })
                 .limit(20);
 
