@@ -98,16 +98,19 @@ export default function PostAdPage() {
             }
 
             // Insert ad into database
+            const payload = {
+                title: formData.title,
+                description: formData.description,
+                price: Number(formData.price),
+                category: formData.category,
+                phone: formData.phone,
+                images: JSON.stringify(imageUrls),
+                authorId: user?.id,
+            };
+            console.log('Ad payload:', payload);
             const { data, error } = await supabase
                 .from('ads')
-                .insert({
-                    title: formData.title,
-                    description: formData.description,
-                    price: Number(formData.price),
-                    category: formData.category,
-                    phone: formData.phone,
-                    authorId: user?.id,
-                })
+                .insert(payload)
                 .select()
                 .single();
 
