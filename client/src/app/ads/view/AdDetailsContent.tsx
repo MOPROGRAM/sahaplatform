@@ -65,7 +65,9 @@ export default function AdDetailsContent({ id }: { id: string }) {
     const fetchAdDetails = async () => {
         setLoading(true);
         try {
+            console.log('Fetching ad details for id:', adId);
             const data = await apiService.get(`/ads/${adId}`);
+            console.log('Received ad data:', data);
             setAd(data);
         } catch (error) {
             console.error('Failed to fetch ad details:', error);
