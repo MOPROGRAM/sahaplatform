@@ -103,11 +103,16 @@ export default function PostAdPage() {
                 description: formData.description,
                 price: Number(formData.price),
                 category: formData.category,
+                location: formData.location,
+                address: formData.address,
+                phone: formData.phone,
+                email: formData.email,
+                images: JSON.stringify(imageUrls),
                 user_id: user?.id,
             };
             console.log('Ad payload:', payload);
             const { data, error } = await supabase
-                .from('ads')
+                .from('ad')
                 .insert(payload)
                 .select()
                 .single();
