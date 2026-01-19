@@ -38,7 +38,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [adInfo, setAdInfo] = useState<any>(null);
     const [isRecording, setIsRecording] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const socketRef = useRef<any>(null);
+    // const socketRef = useRef<any>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
 
@@ -48,6 +48,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             // setupSocket();
         }
         return () => {
+            // Socket cleanup disabled
             // if (socketRef.current) socketRef.current.disconnect();
         };
     }, [conversationId]);
@@ -56,16 +57,17 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const setupSocket = () => {
-        const socketUrl = process.env.NEXT_PUBLIC_API_URL || '';
-        socketRef.current = io(socketUrl);
+    // Socket functionality disabled for now
+    // const setupSocket = () => {
+    //     const socketUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    //     socketRef.current = io(socketUrl);
 
-        socketRef.current.on('receive_message', (message: Message) => {
-            if (message.id && !messages.find(m => m.id === message.id)) {
-                setMessages(prev => [...prev, message]);
-            }
-        });
-    };
+    //     socketRef.current.on('receive_message', (message: Message) => {
+    //         if (message.id && !messages.find(m => m.id === message.id)) {
+    //             setMessages(prev => [...prev, message]);
+    //         }
+    //     });
+    // };
 
     const fetchChatData = async () => {
         setLoading(true);
