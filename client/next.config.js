@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    trailingSlash: false,
+    output: 'export',
+    distDir: 'out',
+    trailingSlash: true,
     images: {
         unoptimized: true,
-    },
-    experimental: {
-        runtime: 'edge',
     },
     webpack: (config) => {
         config.resolve.alias = {
