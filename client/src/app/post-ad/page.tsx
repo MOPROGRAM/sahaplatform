@@ -105,11 +105,9 @@ export default function PostAdPage() {
                     description: formData.description,
                     price: Number(formData.price),
                     category: formData.category,
-                    location: formData.location,
-                    address: formData.address,
-                    paymentMethod: formData.paymentMethod,
-                    images: JSON.stringify(imageUrls),
-                    authorId: user?.id, // Assuming user is authenticated
+                    phone: formData.phone,
+                    currency_id: 'sar',
+                    authorId: user?.id,
                 })
                 .select()
                 .single();
