@@ -154,7 +154,7 @@ function AdsContent() {
                                     <div className="mt-auto">
                                         <div className="text-[14px] font-black text-primary italic tracking-tighter flex items-center gap-1 leading-none">
                                             {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}
-                                            <span className="text-[8px] not-italic opacity-40 uppercase tracking-widest">{ad.currency?.code || 'SAR'}</span>
+                                            <span className="text-[8px] not-italic opacity-40 uppercase tracking-widest">SAR</span>
                                         </div>
                                         <div className="flex items-center gap-1 text-[9px] font-black text-gray-400 mt-2 uppercase tracking-tighter truncate">
                                             <MapPin size={10} className="text-primary opacity-50 shrink-0" />
