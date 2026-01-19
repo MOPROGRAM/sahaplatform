@@ -46,6 +46,7 @@ export default function DashboardPage() {
     const router = useRouter();
     const [ads, setAds] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [branch, setBranch] = useState<string>('loading...');
     const [stats, setStats] = useState([
         { label: "Views", value: "0", icon: <Eye size={12} />, color: "text-blue-500" },
         { label: "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
@@ -74,7 +75,17 @@ export default function DashboardPage() {
             return;
         }
         fetchDashboardData();
+        fetchBranch();
     }, [user, router]);
+
+    const fetchBranch = async () => {
+        try {
+            const response = await apiService.get('/branch');
+            setBranch(response.branch);
+        } catch (error) {
+            setBranch('unknown');
+        }
+    };
 
     const fetchDashboardData = async () => {
         try {
@@ -138,6 +149,13 @@ export default function DashboardPage() {
                                 <ShieldCheck size={12} className="fill-primary/10" />
                                 <span className="text-[8px] font-black uppercase tracking-widest">{user.role} MERCHANT</span>
                             </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 p-3 rounded-sm shadow-sm">
+                        <div className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                            <span>Branch: {branch}</span>
                         </div>
                     </div>
 

@@ -18,6 +18,7 @@ import {
 import ChatWindow from "@/components/ChatWindow";
 import Header from "@/components/Header";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import { apiService } from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -37,6 +38,13 @@ interface Ad {
     authorId: string;
     currency_id?: string;
     createdAt: string;
+    author?: {
+        id: string;
+        name: string;
+        phone?: string;
+        email?: string;
+        verified: boolean;
+    };
 }
 
 export default function AdDetailsContent({ id }: { id: string }) {
@@ -234,7 +242,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 className="w-full bg-secondary text-white py-3 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
                             >
                                 <Phone size={16} />
-                                {showPhone ? '05X XXX XXXX' : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
+                                {showPhone ? (ad.author?.phone || 'Not provided') : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
                             </button>
                         </div>
 

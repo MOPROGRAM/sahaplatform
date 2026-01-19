@@ -5,7 +5,7 @@ import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, 
 import { useAuthStore } from "@/store/useAuthStore";
 import { apiService } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
 
 interface Message {
@@ -44,11 +44,11 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
     useEffect(() => {
         if (conversationId) {
-            // fetchChatData(); // Commented out to avoid 404
-            setupSocket();
+            fetchChatData();
+            // setupSocket();
         }
         return () => {
-            if (socketRef.current) socketRef.current.disconnect();
+            // if (socketRef.current) socketRef.current.disconnect();
         };
     }, [conversationId]);
 
@@ -92,21 +92,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 messageType: type,
                 ...fileData
             };
-            // const newMessage = await apiService.post(`/conversations/${conversationId}/messages`, payload); // Commented out to avoid 404
-
-            // Create local message
-            const newMessage = {
-                id: Date.now().toString(),
-                senderId: user?.id || '',
-                content: messageContent,
-                messageType: type,
-                createdAt: new Date().toISOString(),
-                sender: { name: user?.name || 'You', image: user?.image },
-                ...fileData
-            };
-
-            // Broadcast via socket
-            // socketRef.current.emit('send_message', newMessage); // Commented out
+            const newMessage = await apiService.post(`/conversations/${conversationId}/messages`, payload);
 
             setMessages(prev => [...prev, newMessage]);
             if (type === 'text') setInput("");
