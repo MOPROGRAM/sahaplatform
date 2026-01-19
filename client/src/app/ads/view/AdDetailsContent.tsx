@@ -34,16 +34,8 @@ interface Ad {
     images: string;
     views: number;
     isBoosted: boolean;
-    author: {
-        id: string;
-        name: string;
-        verified: boolean;
-        phone?: string;
-    };
-    currency?: {
-        code: string;
-        symbol: string;
-    };
+    authorId: string;
+    currency_id?: string;
     createdAt: string;
 }
 
@@ -81,7 +73,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
             alert(language === 'ar' ? 'يرجى تسجيل الدخول أولاً' : 'Please login first');
             return;
         }
-        if (user.id === ad?.author.id) {
+        if (user.id === ad?.authorId) {
             alert(language === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
             return;
         }
@@ -89,7 +81,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
         try {
             // Check or create conversation for this ad
             const conversation = await apiService.post('/conversations', {
-                participants: [ad?.author.id],
+                participants: [ad?.authorId],
                 adId: ad?.id
             });
             setConversationId(conversation.id);
@@ -121,13 +113,25 @@ export default function AdDetailsContent({ id }: { id: string }) {
                     {/* Media Gallery */}
                     <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
                         <div className="aspect-[21/9] bg-gray-900 relative">
-                            {JSON.parse(ad.images || "[]").length > 0 ? (
-                                <img src={JSON.parse(ad.images || "[]")[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                    <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
-                                </div>
-                            )}
+                            {(() => {
+                                try {
+                                    const images = JSON.parse(ad.images || "[]");
+                                    return images.length > 0 ? (
+                                        <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                        </div>
+                                    );
+                                } catch (e) {
+                                    console.error('Failed to parse ad images:', e);
+                                    return (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                        </div>
+                                    );
+                                }
+                            })()}
                             <div className="absolute bottom-3 right-3 flex gap-2">
                                 <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Maximize2 size={14} /></button>
                                 <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Share2 size={14} /></button>
@@ -148,7 +152,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                     <div className="flex items-baseline gap-1 text-primary">
                                         <span className="text-3xl font-black italic tracking-tighter">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}</span>
                                         <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                                            {ad.currency?.code || 'SAR'}
+                                            {ad.currency_id || 'SAR'}
                                         </span>
                                     </div>
                                     <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">Listed {new Date(ad.createdAt).toLocaleDateString()}</span>
@@ -205,12 +209,12 @@ export default function AdDetailsContent({ id }: { id: string }) {
                     <div className="bg-white border border-gray-200 rounded-sm shadow-sm p-4 sticky top-[80px]">
                         <div className="flex items-center gap-3 mb-6 bg-primary/5 p-3 rounded-xs border border-primary/10 transition-colors hover:bg-primary/10">
                             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
-                                <span className="font-black text-primary text-sm italic">{ad.author.name?.substring(0, 2).toUpperCase()}</span>
+                                <span className="font-black text-primary text-sm italic">SE</span>
                             </div>
                             <div className="flex flex-col min-w-0">
                                 <h4 className="text-[12px] font-black text-secondary truncate flex items-center gap-1">
-                                    {ad.author.name}
-                                    {ad.author.verified && <ShieldCheck size={14} className="text-blue-500 fill-blue-500/10" />}
+                                    Seller
+                                    <ShieldCheck size={14} className="text-blue-500 fill-blue-500/10" />
                                 </h4>
                                 <span className="text-[9px] font-black text-gray-400 uppercase italic tracking-tighter">Senior Merchant</span>
                             </div>
