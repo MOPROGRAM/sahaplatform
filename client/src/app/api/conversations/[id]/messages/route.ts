@@ -33,8 +33,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
         // Check if user is part of the conversation
         const { data: conversation, error: convError } = await supabaseAdmin
-            .from('Conversation')
-            .select('buyerId, sellerId')
+            .from('conversation')
+            .select('buyerid, sellerid')
             .eq('id', conversationId)
             .single();
 
@@ -45,7 +45,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
             });
         }
 
-        if (conversation.buyerId !== user.id && conversation.sellerId !== user.id) {
+        if (conversation.buyerid !== user.id && conversation.sellerid !== user.id) {
             return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                 status: 403,
                 headers: { 'Content-Type': 'application/json' }
@@ -54,19 +54,19 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
         // Fetch messages
         const { data: messages, error: msgError } = await supabaseAdmin
-            .from('Message')
+            .from('message')
             .select(`
                 id,
                 content,
-                messageType,
-                createdAt,
-                senderId,
-                User:senderId (
+                messagetype,
+                createdat,
+                senderid,
+                User:senderid (
                     name
                 )
             `)
-            .eq('conversationId', conversationId)
-            .order('createdAt', { ascending: true });
+            .eq('conversationid', conversationId)
+            .order('createdat', { ascending: true });
 
         if (msgError) {
             return new Response(JSON.stringify({ error: msgError.message }), {
@@ -126,8 +126,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
         // Check if user is part of the conversation
         const { data: conversation, error: convError } = await supabaseAdmin
-            .from('Conversation')
-            .select('buyerId, sellerId')
+            .from('conversation')
+            .select('buyerid, sellerid')
             .eq('id', conversationId)
             .single();
 
@@ -138,7 +138,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
             });
         }
 
-        if (conversation.buyerId !== userId && conversation.sellerId !== userId) {
+        if (conversation.buyerid !== userId && conversation.sellerid !== userId) {
             return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                 status: 403,
                 headers: { 'Content-Type': 'application/json' }
@@ -147,20 +147,20 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
         // Create message
         const { data: message, error } = await supabaseAdmin
-            .from('Message')
+            .from('message')
             .insert({
-                conversationId,
-                senderId: userId,
+                conversationid: conversationId,
+                senderid: userId,
                 content,
-                messageType,
+                messagetype: messageType,
             })
             .select(`
                 id,
                 content,
-                messageType,
-                createdAt,
-                senderId,
-                User:senderId (
+                messagetype,
+                createdat,
+                senderid,
+                User:senderid (
                     name
                 )
             `)
