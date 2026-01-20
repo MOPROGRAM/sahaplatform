@@ -39,6 +39,7 @@ export default function RootLayout({
     return (
         <html className={`${inter.variable} ${cairo.variable} ${tajawal.variable}`}>
             <head>
+                <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
                 <style dangerouslySetInnerHTML={{
                     __html: `
                         :root {
