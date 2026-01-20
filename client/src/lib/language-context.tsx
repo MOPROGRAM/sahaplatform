@@ -33,6 +33,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         // Init Theme
         const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
         setTheme(savedTheme);
+        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
         document.documentElement.setAttribute('data-theme', savedTheme);
 
         // Init Regional
@@ -63,6 +64,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         localStorage.setItem('theme', newTheme);
+        document.documentElement.classList.toggle('dark', newTheme === 'dark');
         document.documentElement.setAttribute('data-theme', newTheme);
     };
 

@@ -16,6 +16,7 @@ export default function Header() {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);
     const [showRegion, setShowRegion] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
     const currencyMap: Record<string, string> = {
@@ -58,7 +59,7 @@ export default function Header() {
     };
 
     return (
-        <header className={`bg-card-bg border-b border-border-color shadow-sm sticky top-0 z-[100] transition-all duration-300 ${isScrolled ? 'py-1' : 'py-2'}`}>
+        <header className={`bg-card border-color shadow-sm sticky top-0 z-[100] transition-all duration-300 ${isScrolled ? 'py-1' : 'py-2'}`}>
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
                 {/* Brand - Sharp High Density */}
                 <Link href="/" className="flex flex-col group shrink-0">
@@ -157,15 +158,59 @@ export default function Header() {
 
                     {user ? (
                         <div className="flex items-center gap-3">
-                            <Link href="/dashboard" className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded-md transition-all group border border-transparent hover:border-gray-200">
-                                <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-[15px] font-[1000] text-primary border-2 border-primary/20 uppercase shrink-0">
-                                    {user.name?.substring(0, 1)}
-                                </div>
-                                <div className="hidden sm:flex flex-col leading-none">
-                                    <span className="text-[12px] font-[1000] text-text-main uppercase tracking-tight">{user.name}</span>
-                                    <span className="text-[9px] font-bold text-text-muted mt-1">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
-                                </div>
-                            </Link>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded-md transition-all group border border-transparent hover:border-gray-200"
+                                >
+                                    <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-[15px] font-[1000] text-primary border-2 border-primary/20 uppercase shrink-0">
+                                        {user.name?.substring(0, 1)}
+                                    </div>
+                                    <div className="hidden sm:flex flex-col leading-none">
+                                        <span className="text-[12px] font-[1000] text-text-main uppercase tracking-tight">{user.name}</span>
+                                        <span className="text-[9px] font-bold text-text-muted mt-1">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
+                                    </div>
+                                    <ChevronDown size={12} className="text-gray-400 ml-1" />
+                                </button>
+
+                                {showUserMenu && (
+                                    <>
+                                        <div className="fixed inset-0 z-[105]" onClick={() => setShowUserMenu(false)}></div>
+                                        <div className="absolute top-full right-0 mt-2 w-48 bg-card-bg border-2 border-border-color shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-md py-2 z-[110] animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="space-y-1">
+                                                <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                    <LayoutDashboard size={14} />
+                                                    {t('dashboard')}
+                                                </Link>
+                                                <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                    <ShieldCheck size={14} />
+                                                    {t('myAds')}
+                                                </Link>
+                                                <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors relative" onClick={() => setShowUserMenu(false)}>
+                                                    <MessageSquare size={14} />
+                                                    {t('messages')}
+                                                    {unreadCount > 0 && (
+                                                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">{unreadCount}</span>
+                                                    )}
+                                                </Link>
+                                                <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                    <Bell size={14} />
+                                                    {t('notifications')}
+                                                </Link>
+                                                <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                    <User size={14} />
+                                                    {t('settings')}
+                                                </Link>
+                                                <div className="border-t border-border-color my-1"></div>
+                                                <button onClick={() => { logout(); setShowUserMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full text-left">
+                                                    <LogOut size={14} />
+                                                    {t('logout')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     ) : (
                         <Link href="/login" className="btn-saha-attract !px-4 !py-1.5 !text-[11px] !border-b-[3px]">{t('login')}</Link>

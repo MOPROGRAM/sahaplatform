@@ -59,6 +59,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
                 id,
                 content,
                 messagetype,
+                fileurl,
+                filename,
                 createdat,
                 senderid
             `)
@@ -105,7 +107,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const conversationId = params.id;
 
     try {
-        const { content, messageType = 'text' } = await request.json();
+        const { content, messageType = 'text', fileUrl, fileName, fileSize } = await request.json();
 
         if (!content) {
             return new Response(JSON.stringify({ error: 'Content is required' }), {
@@ -162,19 +164,28 @@ export async function POST(request: Request, { params }: { params: { id: string 
             });
         }
 
+        // Determine receiver
+        const receiverId = conversation.buyerid === userId ? conversation.sellerid : conversation.buyerid;
+
         // Create message
         const { data: message, error } = await supabaseAdmin
             .from('message')
             .insert({
                 conversationid: conversationId,
                 senderid: userId,
+                receiverid: receiverId,
                 content,
                 messagetype: messageType,
+                fileurl: fileUrl,
+                filename: fileName,
+                filesize: fileSize,
             })
             .select(`
                 id,
                 content,
                 messagetype,
+                fileurl,
+                filename,
                 createdat,
                 senderid
             `)
@@ -182,13 +193,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
         // Get sender name
         if (message && !error) {
-            const { data: user } = await supabaseAdmin
+            const { data: userData } = await supabaseAdmin
                 .from('users')
                 .select('name')
                 .eq('id', userId)
                 .single();
 
-            message.User = { name: user?.name || 'Unknown' };
+            (message as any).sender = { name: userData?.name || 'Unknown' };
         }
 
         if (error) {

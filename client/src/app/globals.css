@@ -947,6 +947,27 @@ textarea:focus {
   }
 }
 
+/* Theme Utility Classes */
+.bg-card {
+  background-color: var(--card-bg);
+}
+
+.bg-bg {
+  background-color: var(--gray-bg);
+}
+
+.text-main {
+  color: var(--text-main);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.border-color {
+  border-color: var(--border-color);
+}
+
 /* Responsive Utilities */
 @media (max-width: 768px) {
   .max-w-7xl {

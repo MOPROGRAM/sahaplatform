@@ -72,6 +72,8 @@ export async function GET(request: Request) {
                     id,
                     content,
                     messagetype,
+                    fileurl,
+                    filename,
                     createdat,
                     senderid
                 `)

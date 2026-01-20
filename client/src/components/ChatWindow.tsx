@@ -73,7 +73,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         setLoading(true);
         try {
             const data = await apiService.get(`/conversations/${conversationId}`);
-            setMessages(data.messages || []);
+            const processedMessages = (data.messages || []).map((msg: any) => ({
+                ...msg,
+                senderId: msg.senderid || msg.senderId,
+                messageType: msg.messagetype || msg.messageType,
+                createdAt: msg.createdat || msg.createdAt,
+                sender: msg.sender || { name: 'Unknown' }
+            }));
+            setMessages(processedMessages);
             setParticipants(data.participants || []);
             setAdInfo(data.ad);
         } catch (error) {

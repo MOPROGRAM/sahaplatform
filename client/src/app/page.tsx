@@ -87,28 +87,7 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {/* Search Section */}
-            <section className="bg-white border-b border-gray-200 py-6">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-6">
-                        <h1 className="text-3xl font-black text-gray-900 mb-2 uppercase tracking-tight">
-                            {t('siteName')}
-                        </h1>
-                        <p className="text-gray-600 font-medium">
-                            {language === 'ar' ? 'اكتشف أفضل العروض في المنطقة' : 'Discover the best deals in your area'}
-                        </p>
-                    </div>
-                    <div className="max-w-2xl mx-auto">
-                        <SearchBar
-                            placeholder={language === 'ar' ? 'ابحث عن أي شيء...' : 'Search for anything...'}
-                            onSearch={(query) => {
-                                window.location.href = `/ads?search=${encodeURIComponent(query)}`;
-                            }}
-                            className="shadow-lg"
-                        />
-                    </div>
-                </div>
-            </section>
+
 
             <main className="max-w-7xl mx-auto w-full p-2 grid grid-cols-12 gap-3">
                 {/* Left Sidebar */}
