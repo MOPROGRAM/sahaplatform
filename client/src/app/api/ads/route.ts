@@ -53,7 +53,7 @@ export async function GET(request: Request) {
                 latitude,
                 longitude
             `)
-            .eq('is_active', true); // Assuming there's an is_active column
+
 
         // Apply filters
         if (category) {
