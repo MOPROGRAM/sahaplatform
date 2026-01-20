@@ -78,7 +78,23 @@ export async function POST(request: Request) {
         }
 
         // Validate required fields exactly matching database schema
-        console.log('📋 Received formData:', JSON.stringify(formData, null, 2));
+        console.log('📋 RECEIVED PAYLOAD:', JSON.stringify(formData, null, 2));
+        console.log('📋 Payload keys:', Object.keys(formData));
+        console.log('📋 Payload types:', Object.fromEntries(
+            Object.entries(formData).map(([k, v]) => [k, typeof v])
+        ));
+
+        // Expected database schema for comparison
+        const expectedSchema = {
+            title: 'string (required)',
+            description: 'string | null',
+            price: 'number | null (required)',
+            category: 'string | null (required)',
+            location: 'string | null',
+            images_urls: 'string[] | null',
+            user_id: 'string (auto-added)'
+        };
+        console.log('🎯 EXPECTED DATABASE SCHEMA:', expectedSchema);
 
         const validationErrors = [];
 
@@ -117,7 +133,11 @@ export async function POST(request: Request) {
             });
         }
 
-        console.log('✅ User authenticated:', user.id);
+        console.log('👤 USER AUTHENTICATION DETAILS:');
+        console.log('👤 User ID:', user.id);
+        console.log('👤 User ID type:', typeof user.id);
+        console.log('👤 User ID length:', user.id?.length);
+        console.log('👤 User ID format check (UUID):', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id));
 
         // Optional: Verify user exists in users table (for foreign key safety)
         try {
@@ -126,6 +146,10 @@ export async function POST(request: Request) {
                 .select('id')
                 .eq('id', user.id)
                 .single();
+
+            console.log('👤 USER TABLE CHECK:');
+            console.log('👤 User exists in users table:', !!userCheck);
+            console.log('👤 User check error:', userCheckError?.message);
 
             if (userCheckError && !userCheckError.message.includes('No rows found')) {
                 console.warn('⚠️ Could not verify user in users table:', userCheckError.message);
@@ -173,9 +197,14 @@ export async function POST(request: Request) {
             }
         }
 
-        console.log('📝 Creating ad with data:', JSON.stringify(adData, null, 2));
-        console.log('👤 User ID:', user.id);
-        console.log('📋 Form data received:', JSON.stringify(formData, null, 2));
+        console.log('📝 FINAL DATA TO INSERT:', JSON.stringify(adData, null, 2));
+        console.log('📝 Data keys:', Object.keys(adData));
+        console.log('📝 Data types:', Object.fromEntries(
+            Object.entries(adData).map(([k, v]) => [k, Array.isArray(v) ? `array[${v.length}]` : typeof v])
+        ));
+        console.log('📝 Data values preview:', Object.fromEntries(
+            Object.entries(adData).map(([k, v]) => [k, Array.isArray(v) ? v.slice(0, 2) : String(v).slice(0, 50)])
+        ));
         console.log('🔗 Supabase URL:', supabaseUrl);
 
         // First, let's test if we can read from the table
@@ -217,6 +246,8 @@ export async function POST(request: Request) {
         // Insert ad into correct table
         console.log('💾 Attempting to insert into ads table...');
 
+        console.log('🔄 About to execute Supabase insert...');
+
         const { data: ad, error } = await supabaseAdmin
             .from('ads') // Correct table name (lowercase)
             .insert(adData)
@@ -224,7 +255,11 @@ export async function POST(request: Request) {
             .single();
 
         console.log('📊 Insert result - Data:', ad);
-        console.log('❌ Insert result - Error:', error);
+        console.log('❌ Insert result - Raw Error Object:', JSON.stringify(error, null, 2));
+        console.log('❌ Insert result - Error message:', error?.message);
+        console.log('❌ Insert result - Error code:', error?.code);
+        console.log('❌ Insert result - Error details:', error?.details);
+        console.log('❌ Insert result - Error hint:', error?.hint);
 
         if (error) {
             console.error('🛑 SUPABASE ERROR - Creating ad:', error);
