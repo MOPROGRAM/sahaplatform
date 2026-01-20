@@ -71,24 +71,41 @@ export async function GET(request: Request) {
                 .select(`
                     id,
                     content,
-                    messageType,
+                    messagetype,
                     createdat,
-                    senderid,
-                    User:senderid (
-                        name
-                    )
+                    senderid
                 `)
                 .eq('conversationid', conversationId)
                 .order('createdat', { ascending: true });
 
+            // Get sender names for messages
+            if (messages && messages.length > 0) {
+                const senderIds = [...new Set(messages.map(m => m.senderid))];
+                const { data: users } = await supabaseAdmin
+                    .from('users')
+                    .select('id, name')
+                    .in('id', senderIds);
+
+                const userMap = {};
+                if (users) {
+                    users.forEach(user => {
+                        userMap[user.id] = user.name;
+                    });
+                }
+
+                messages.forEach(message => {
+                    message.sender = { name: userMap[message.senderid] || 'Unknown' };
+                });
+            }
+
             // Get participants
             const participants = [];
             if (conversation.buyerid) {
-                const { data: buyer } = await supabaseAdmin.from('User').select('id, name, role').eq('id', conversation.buyerid).single();
+                const { data: buyer } = await supabaseAdmin.from('users').select('id, name, role').eq('id', conversation.buyerid).single();
                 if (buyer) participants.push(buyer);
             }
             if (conversation.sellerid) {
-                const { data: seller } = await supabaseAdmin.from('User').select('id, name, role').eq('id', conversation.sellerid).single();
+                const { data: seller } = await supabaseAdmin.from('users').select('id, name, role').eq('id', conversation.sellerid).single();
                 if (seller) participants.push(seller);
             }
 

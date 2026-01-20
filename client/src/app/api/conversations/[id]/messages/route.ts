@@ -60,13 +60,30 @@ export async function GET(request: Request, { params }: { params: { id: string }
                 content,
                 messagetype,
                 createdat,
-                senderid,
-                User:senderid (
-                    name
-                )
+                senderid
             `)
             .eq('conversationid', conversationId)
             .order('createdat', { ascending: true });
+
+        // Get sender names for messages
+        if (messages && messages.length > 0 && !msgError) {
+            const senderIds = Array.from(new Set(messages.map(m => m.senderid)));
+            const { data: users } = await supabaseAdmin
+                .from('users')
+                .select('id, name')
+                .in('id', senderIds);
+
+            const userMap = {};
+            if (users) {
+                users.forEach(user => {
+                    userMap[user.id] = user.name;
+                });
+            }
+
+            messages.forEach(message => {
+                message.User = { name: userMap[message.senderid] || 'Unknown' };
+            });
+        }
 
         if (msgError) {
             return new Response(JSON.stringify({ error: msgError.message }), {
@@ -159,12 +176,20 @@ export async function POST(request: Request, { params }: { params: { id: string 
                 content,
                 messagetype,
                 createdat,
-                senderid,
-                User:senderid (
-                    name
-                )
+                senderid
             `)
             .single();
+
+        // Get sender name
+        if (message && !error) {
+            const { data: user } = await supabaseAdmin
+                .from('users')
+                .select('name')
+                .eq('id', userId)
+                .single();
+
+            message.User = { name: user?.name || 'Unknown' };
+        }
 
         if (error) {
             return new Response(JSON.stringify({ error: error.message }), {
