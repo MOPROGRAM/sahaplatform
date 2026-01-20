@@ -96,10 +96,12 @@ export default function AdCard({
 
                 {/* Footer Info */}
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Clock size={12} />
-                        {formatRelativeTime(createdAt, language)}
-                    </div>
+                    {createdAt && (
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Clock size={12} />
+                            {formatRelativeTime(createdAt, language)}
+                        </div>
+                    )}
                     {category && (
                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                             {category}

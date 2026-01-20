@@ -2,6 +2,118 @@ export const runtime = 'edge';
 
 import { createClient } from '@supabase/supabase-js';
 
+export async function GET(request: Request) {
+    console.log('🚀 ADS API GET REQUEST RECEIVED');
+
+    try {
+        // Check environment variables
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !supabaseAnonKey) {
+            console.error('❌ MISSING SUPABASE ENVIRONMENT VARIABLES');
+            return new Response(JSON.stringify({
+                error: 'Server configuration error: Missing Supabase credentials'
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        // Create public client for read operations
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+        // Extract search params
+        const url = new URL(request.url);
+        const searchParams = url.searchParams;
+
+        const category = searchParams.get('category');
+        const location = searchParams.get('location');
+        const minPrice = searchParams.get('minPrice');
+        const maxPrice = searchParams.get('maxPrice');
+        const hasMedia = searchParams.get('hasMedia') === 'true';
+        const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
+        const sortBy = searchParams.get('sortBy') || 'created_at';
+        const sortOrder = searchParams.get('sortOrder') || 'desc';
+
+        // Build query
+        let query = supabase
+            .from('ads')
+            .select(`
+                id,
+                title,
+                description,
+                price,
+                category,
+                location,
+                images_urls,
+                created_at,
+                user_id,
+                views,
+                latitude,
+                longitude,
+                allow_no_media
+            `)
+            .eq('is_active', true); // Assuming there's an is_active column
+
+        // Apply filters
+        if (category) {
+            query = query.eq('category', category);
+        }
+
+        if (location) {
+            query = query.ilike('location', `%${location}%`);
+        }
+
+        if (minPrice) {
+            query = query.gte('price', parseFloat(minPrice));
+        }
+
+        if (maxPrice) {
+            query = query.lte('price', parseFloat(maxPrice));
+        }
+
+        if (hasMedia) {
+            query = query.or('images_urls.not.is.null,allow_no_media.eq.true');
+        }
+
+        // Sorting
+        if (sortBy === 'created_at') {
+            query = query.order('created_at', { ascending: sortOrder === 'asc' });
+        } else {
+            query = query.order('is_boosted', { ascending: false }).order('created_at', { ascending: false });
+        }
+
+        // Limit
+        query = query.limit(limit);
+
+        const { data: ads, error } = await query;
+
+        if (error) {
+            console.error('❌ Supabase query error:', error);
+            return new Response(JSON.stringify({
+                error: 'Failed to fetch ads',
+                details: error.message
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        // Return empty array if no results
+        return Response.json(ads || []);
+    } catch (err) {
+        console.error('💥 CRITICAL ERROR in ads GET API:', err);
+        return new Response(JSON.stringify({
+            error: 'Internal server error',
+            details: err.message
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+}
+
 export async function POST(request: Request) {
     console.log('🚀 ADS API POST REQUEST RECEIVED');
 

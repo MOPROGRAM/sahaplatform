@@ -37,7 +37,7 @@ interface Ad {
     allow_no_media?: boolean;
     views: number;
     user_id: string;
-    created_at: string;
+    created_at?: string | null;
     author: {
         id: string;
         name: string;
@@ -135,7 +135,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                             SAR
                                         </span>
                                     </div>
-                                    <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">{language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}</span>
+                                    {ad.created_at && <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">{language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}</span>}
                                 </div>
                             </div>
 
