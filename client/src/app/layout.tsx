@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Cairo, Tajawal } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/language-context";
 import CategorySidebar from "@/components/CategorySidebar";
@@ -102,14 +103,16 @@ export default function RootLayout({
                 }} />
             </head>
             <body>
-                <LanguageProvider>
-                    <div className="flex min-h-screen">
-                        <CategorySidebar />
-                        <main className="flex-1 overflow-x-hidden">
-                            {children}
-                        </main>
-                    </div>
-                </LanguageProvider>
+                <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+                    <LanguageProvider>
+                        <div className="flex min-h-screen">
+                            <CategorySidebar />
+                            <main className="flex-1 overflow-x-hidden">
+                                {children}
+                            </main>
+                        </div>
+                    </LanguageProvider>
+                </ThemeProvider>
             </body>
         </html>
     );
