@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import Header from "@/components/Header";
@@ -13,7 +12,7 @@ import MapSelector from '@/components/MapSelector';
 
 export default function PostAdPage() {
     const { language, t, currency } = useLanguage();
-    const { user, session, loading: authLoading } = useAuthStore();
+    const { user, token, loading: authLoading } = useAuthStore();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -99,7 +98,7 @@ export default function PostAdPage() {
 
         setLoading(true);
         try {
-            if (!session) {
+            if (!token) {
                 throw new Error(language === 'ar' ? "يرجى تسجيل الدخول أولاً" : "Please login first");
             }
 
@@ -112,7 +111,7 @@ export default function PostAdPage() {
                 const uploadResponse = await fetch('/api/upload', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${session}`,
+                        'Authorization': `Bearer ${token}`,
                     },
                     body: formDataUpload,
                 });
@@ -146,7 +145,7 @@ export default function PostAdPage() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session}`,
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(adPayload),
             });

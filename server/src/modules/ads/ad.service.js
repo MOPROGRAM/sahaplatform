@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const getAllAds = async (filters) => {
-    const { category, cityId, minPrice, maxPrice, searchQuery, authorId } = filters;
+    const { category, cityId, minPrice, maxPrice, search, location, type, priceRange, hasMedia, limit, sortBy, sortOrder, authorId } = filters;
 
     try {
         const where = {};
@@ -11,25 +11,87 @@ const getAllAds = async (filters) => {
         } else {
             where.isActive = true;
         }
+
+        // Category filter
         if (category) where.category = category;
+
+        // City filter
         if (cityId) where.cityId = cityId;
-        if (searchQuery && typeof searchQuery === 'string') {
+
+        // Search filter
+        if (search && typeof search === 'string') {
             where.OR = [
-                { title: { contains: searchQuery.toLowerCase() } },
-                { titleAr: { contains: searchQuery.toLowerCase() } },
-                { titleEn: { contains: searchQuery.toLowerCase() } },
-                { description: { contains: searchQuery.toLowerCase() } },
-                { descriptionAr: { contains: searchQuery.toLowerCase() } },
-                { descriptionEn: { contains: searchQuery.toLowerCase() } }
+                { title: { contains: search.toLowerCase() } },
+                { titleAr: { contains: search.toLowerCase() } },
+                { titleEn: { contains: search.toLowerCase() } },
+                { description: { contains: search.toLowerCase() } },
+                { descriptionAr: { contains: search.toLowerCase() } },
+                { descriptionEn: { contains: search.toLowerCase() } }
             ];
         }
+
+        // Location filter (search in location field)
+        if (location) {
+            const locations = Array.isArray(location) ? location : location.split(',');
+            where.OR = where.OR || [];
+            locations.forEach(loc => {
+                where.OR.push({ location: { contains: loc.trim() } });
+            });
+        }
+
+        // Type filter (search in title/description)
+        if (type) {
+            const types = Array.isArray(type) ? type : type.split(',');
+            where.OR = where.OR || [];
+            types.forEach(t => {
+                where.OR.push(
+                    { title: { contains: t.trim() } },
+                    { description: { contains: t.trim() } }
+                );
+            });
+        }
+
+        // Price range filter
+        if (priceRange) {
+            const ranges = Array.isArray(priceRange) ? priceRange : priceRange.split(',');
+            where.OR = where.OR || [];
+            ranges.forEach(range => {
+                const [min, max] = range.split('-').map(r => parseFloat(r));
+                const priceCondition = {};
+                if (!isNaN(min)) priceCondition.gte = min;
+                if (!isNaN(max) && max < Infinity) priceCondition.lte = max;
+                if (Object.keys(priceCondition).length > 0) {
+                    where.OR.push({ price: priceCondition });
+                }
+            });
+        }
+
+        // Legacy price filters
         if (minPrice || maxPrice) {
             where.price = {};
             if (minPrice) where.price.gte = parseFloat(minPrice);
             if (maxPrice) where.price.lte = parseFloat(maxPrice);
         }
 
-        return await prisma.ad.findMany({
+        // Media filter
+        if (hasMedia === true) {
+            where.OR = where.OR || [];
+            where.OR.push(
+                { images: { not: { equals: '[]' } } },
+                { latitude: { not: null } },
+                { allowNoMedia: true }
+            );
+        }
+
+        // Sorting
+        const orderBy = [];
+        if (sortBy === 'created_at') {
+            orderBy.push({ createdAt: sortOrder === 'asc' ? 'asc' : 'desc' });
+        } else {
+            orderBy.push({ isBoosted: 'desc' }, { createdAt: 'desc' });
+        }
+
+        const queryOptions = {
             where,
             include: {
                 author: {
@@ -42,8 +104,15 @@ const getAllAds = async (filters) => {
                 },
                 currency: true
             },
-            orderBy: [{ isBoosted: 'desc' }, { createdAt: 'desc' }]
-        });
+            orderBy
+        };
+
+        // Limit
+        if (limit) {
+            queryOptions.take = parseInt(limit);
+        }
+
+        return await prisma.ad.findMany(queryOptions);
     } catch (error) {
         console.log('Database error:', error.message);
         return [];
