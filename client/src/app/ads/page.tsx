@@ -14,13 +14,13 @@ interface Ad {
     title: string;
     description: string;
     price: number;
-    currency_id: string;
+    currencyId: string;
     category: string;
     location: string;
     images: string;
-    is_boosted: boolean;
-    user_id: string;
-    created_at: string;
+    isBoosted: boolean;
+    authorId: string;
+    createdAt: string;
 }
 
 function AdsContent() {
@@ -44,16 +44,16 @@ function AdsContent() {
         setLoading(true);
         try {
             let query = supabase
-                .from('ad')
+                .from('Ad')
                 .select('*')
-                .order('created_at', { ascending: false })
+                .order('createdAt', { ascending: false })
                 .limit(20);
 
             if (categoryQuery) {
                 query = query.eq('category', categoryQuery);
             }
             if (searchQuery) {
-                query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+                query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,titleAr.ilike.%${searchQuery}%,descriptionAr.ilike.%${searchQuery}%`);
             }
             if (locationFilter) {
                 query = query.ilike('location', `%${locationFilter}%`);
@@ -143,7 +143,7 @@ function AdsContent() {
                             >
                                 <div className="aspect-[4/3] bg-gray-50 rounded-xs relative overflow-hidden flex items-center justify-center border border-gray-100 shrink-0">
                                     <ImageIcon className="text-gray-200 group-hover:scale-110 transition-transform" size={24} />
-                                    {ad.is_boosted && (
+                                    {ad.isBoosted && (
                                         <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-2 py-0.5 rounded-bl-sm shadow-md uppercase tracking-widest">Boosted</div>
                                     )}
                                 </div>

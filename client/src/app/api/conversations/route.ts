@@ -130,8 +130,8 @@ export async function POST(request: Request) {
             .from('Conversation')
             .select('id')
             .eq('adId', adId)
-            .eq('buyerId', buyerId)
-            .eq('sellerId', sellerId)
+            .or(`buyerId.eq.${buyerId},sellerId.eq.${buyerId}`)
+            .or(`buyerId.eq.${sellerId},sellerId.eq.${sellerId}`)
             .single();
 
         if (existingConversation) {
