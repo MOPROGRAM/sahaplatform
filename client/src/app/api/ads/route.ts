@@ -4,6 +4,25 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: Request) {
     try {
+        // Check environment variables
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        console.log('Environment check:');
+        console.log('NEXT_PUBLIC_SUPABASE_URL exists:', !!supabaseUrl);
+        console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!supabaseServiceKey);
+
+        if (!supabaseUrl || !supabaseServiceKey) {
+            console.error('Missing Supabase environment variables');
+            return new Response(JSON.stringify({
+                error: 'Server configuration error',
+                details: 'Missing Supabase credentials'
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
         const formData = await request.json();
 
         // Get authenticated user
@@ -16,16 +35,26 @@ export async function POST(request: Request) {
         }
 
         // Create admin client for operations
-        const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
         // Verify JWT token using admin client
         const token = authHeader.replace('Bearer ', '');
+        console.log('Verifying JWT token...');
+
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+        console.log('Auth result:', {
+            hasUser: !!user,
+            userId: user?.id,
+            authError: authError?.message
+        });
+
         if (authError || !user) {
-            return new Response(JSON.stringify({ error: 'Authentication required' }), {
+            console.error('Authentication failed:', authError);
+            return new Response(JSON.stringify({
+                error: 'Authentication required',
+                details: authError?.message
+            }), {
                 status: 401,
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -59,51 +88,44 @@ export async function POST(request: Request) {
             });
         }
 
-        // Prepare minimal ad data with required fields only
-        const adData: any = {
+        // Prepare ad data according to database schema
+        const adData = {
             title: String(formData.title).trim(),
-            description: formData.description ? String(formData.description).trim() : '',
+            description: formData.description ? String(formData.description).trim() : null,
             price: Number(formData.price) || 0,
             category: String(formData.category),
-            authorId: user.id,
+            location: formData.location ? String(formData.location).trim() : null,
+            images_urls: formData.imageUrls && Array.isArray(formData.imageUrls) ? formData.imageUrls : null,
+            user_id: user.id, // Correct field name
         };
 
-        // Add optional fields if they exist
-        if (formData.location) adData.location = String(formData.location).trim();
-        if (formData.address) adData.address = String(formData.address).trim();
-        if (formData.imageUrls && Array.isArray(formData.imageUrls)) {
-            adData.images = JSON.stringify(formData.imageUrls);
-        } else {
-            adData.images = '[]';
-        }
-
         console.log('Creating ad with data:', adData);
+        console.log('User ID:', user.id);
+        console.log('Form data received:', formData);
 
-        // Insert ad
+        // Insert ad into correct table
         const { data: ad, error } = await supabaseAdmin
-            .from('Ad')
+            .from('ads') // Correct table name (lowercase)
             .insert(adData)
             .select()
             .single();
 
         if (error) {
-            console.error('Error creating ad:', error);
-            console.error('Error details:', JSON.stringify(error, null, 2));
+            console.error('🛑 SUPABASE ERROR - Creating ad:', error);
+            console.error('🛑 Error message:', error.message);
+            console.error('🛑 Error code:', error.code);
+            console.error('🛑 Error details:', error.details);
+            console.error('🛑 Error hint:', error.hint);
+            console.error('🛑 Ad data that caused error:', adData);
 
-            // Return more specific error message
-            let errorMessage = 'Failed to create ad';
-            if (error.message?.includes('foreign key')) {
-                errorMessage = 'Invalid data: foreign key constraint failed';
-            } else if (error.message?.includes('unique')) {
-                errorMessage = 'Data already exists';
-            } else if (error.message?.includes('null')) {
-                errorMessage = 'Required field is missing';
-            }
-
+            // Return detailed error for debugging
             return new Response(JSON.stringify({
-                error: errorMessage,
-                details: error.message,
-                code: error.code
+                error: 'Failed to create ad',
+                supabase_error: error.message,
+                code: error.code,
+                details: error.details,
+                hint: error.hint,
+                ad_data: adData
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
@@ -112,8 +134,16 @@ export async function POST(request: Request) {
 
         return Response.json(ad);
     } catch (err) {
-        console.error('Error in ads API:', err);
-        return new Response(JSON.stringify({ error: 'Internal server error' }), {
+        console.error('💥 CRITICAL ERROR in ads API:', err);
+        console.error('💥 Error stack:', err.stack);
+        console.error('💥 Error name:', err.name);
+        console.error('💥 Error message:', err.message);
+
+        return new Response(JSON.stringify({
+            error: 'Internal server error',
+            details: err.message,
+            type: err.name
+        }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
