@@ -119,56 +119,6 @@ export default function AdDetailsContent({ id }: { id: string }) {
             <main className="max-w-7xl mx-auto grid grid-cols-12 gap-3 p-2 pt-0">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-9 order-2 lg:order-1 flex flex-col gap-3">
-                    {/* Media Gallery */}
-                    <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
-                        <div className="aspect-[16/9] bg-gray-900 relative">
-                            {(() => {
-                                try {
-                                    const images = JSON.parse(ad.images || "[]");
-                                    return images.length > 0 ? (
-                                        <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
-                                        </div>
-                                    );
-                                } catch (e) {
-                                    console.error('Failed to parse ad images:', e);
-                                    return (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
-                                        </div>
-                                    );
-                                }
-                            })()}
-                            <div className="absolute bottom-3 right-3 flex gap-2">
-                                <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Maximize2 size={14} /></button>
-                                <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Share2 size={14} /></button>
-                            </div>
-                        </div>
-                        {(() => {
-                            try {
-                                const images = JSON.parse(ad.images || "[]");
-                                return images.length > 1 ? (
-                                    <div className="p-4 border-t border-gray-100">
-                                        <div className="grid grid-cols-4 gap-2">
-                                            {images.slice(1, 5).map((img: string, idx: number) => (
-                                                <img
-                                                    key={idx}
-                                                    src={img}
-                                                    alt={`View ${idx + 2}`}
-                                                    className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : null;
-                            } catch (e) {
-                                return null;
-                            }
-                        })()}
-                    </div>
-
                     {/* Content Section */}
                     <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
@@ -213,25 +163,77 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* Integrated Map - Free OpenStreetMap */}
-                    <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm overflow-hidden flex flex-col gap-3">
-                        <h3 className="text-[12px] font-black uppercase text-secondary flex items-center gap-2">
-                            <MapPin size={14} className="text-primary" />
-                            {language === 'ar' ? 'موقع العقار / السلعة' : 'PRECISE LOCATION'}
-                        </h3>
-                        <div className="h-64 rounded-xs border border-gray-100 overflow-hidden relative shadow-inner">
-                            <iframe
-                                width="100%"
-                                height="100%"
-                                frameBorder="0"
-                                scrolling="no"
-                                marginHeight={0}
-                                marginWidth={0}
-                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02}%2C${lat - 0.02}%2C${lon + 0.02}%2C${lat + 0.02}&layer=mapnik&marker=${lat}%2C${lon}`}
-                            ></iframe>
-                            <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 text-[8px] font-black border border-gray-200 uppercase tracking-tighter">Precision Map Data © OpenStreetMap</div>
+                    {/* Media Gallery - Moved to bottom */}
+                    <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
+                        <div className="max-h-96 bg-gray-900 relative">
+                            {(() => {
+                                try {
+                                    const images = JSON.parse(ad.images || "[]");
+                                    return images.length > 0 ? (
+                                        <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100 max-h-96" />
+                                    ) : (
+                                        <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                        </div>
+                                    );
+                                } catch (e) {
+                                    console.error('Failed to parse ad images:', e);
+                                    return (
+                                        <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                        </div>
+                                    );
+                                }
+                            })()}
+                            <div className="absolute bottom-3 right-3 flex gap-2">
+                                <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Maximize2 size={14} /></button>
+                                <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Share2 size={14} /></button>
+                            </div>
                         </div>
+                        {(() => {
+                            try {
+                                const images = JSON.parse(ad.images || "[]");
+                                return images.length > 1 ? (
+                                    <div className="p-4 border-t border-gray-100">
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {images.slice(1, 5).map((img: string, idx: number) => (
+                                                <img
+                                                    key={idx}
+                                                    src={img}
+                                                    alt={`View ${idx + 2}`}
+                                                    className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+                            } catch (e) {
+                                return null;
+                            }
+                        })()}
                     </div>
+
+                    {/* Integrated Map - Free OpenStreetMap - Moved to bottom */}
+                    {ad.location && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm overflow-hidden flex flex-col gap-3">
+                            <h3 className="text-[12px] font-black uppercase text-secondary flex items-center gap-2">
+                                <MapPin size={14} className="text-primary" />
+                                {language === 'ar' ? 'موقع العقار / السلعة' : 'PRECISE LOCATION'}
+                            </h3>
+                            <div className="h-48 rounded-xs border border-gray-100 overflow-hidden relative shadow-inner">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder="0"
+                                    scrolling="no"
+                                    marginHeight={0}
+                                    marginWidth={0}
+                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02}%2C${lat - 0.02}%2C${lon + 0.02}%2C${lat + 0.02}&layer=mapnik&marker=${lat}%2C${lon}`}
+                                ></iframe>
+                                <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 text-[8px] font-black border border-gray-200 uppercase tracking-tighter">Precision Map Data © OpenStreetMap</div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Sidebar */}
