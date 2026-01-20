@@ -1,6 +1,7 @@
 "use client";
 
 import { useFilterStore } from "@/store/useFilterStore";
+import { useRouter } from "next/navigation";
 import { ChevronDown, MapPin, Search } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -10,7 +11,27 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export default function AdvancedFilter() {
-    const { category, setCategory, tags, toggleTag } = useFilterStore();
+    const router = useRouter();
+    const { category, setCategory, tags, toggleTag, resetFilters } = useFilterStore();
+
+    const handleCategoryChange = (newCategory: string | null) => {
+        setCategory(newCategory);
+
+        // Update URL with category parameter
+        const params = new URLSearchParams(window.location.search);
+        if (newCategory) {
+            params.set('category', newCategory);
+        } else {
+            params.delete('category');
+        }
+        const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+        router.push(newUrl);
+    };
+
+    const handleTagToggle = (tag: string) => {
+        toggleTag(tag);
+        // Tags don't affect URL directly, they work through the store
+    };
 
     const mainCategories = [
         { id: 'jobs', label: 'وظائف', labelEn: 'Jobs' },
@@ -52,7 +73,7 @@ export default function AdvancedFilter() {
                 <div className="w-24 bg-gray-50 dark:bg-slate-800 p-2 text-gray-400 font-bold shrink-0">التصنيف</div>
                 <div className="flex flex-wrap gap-x-4 gap-y-2 p-2 px-4">
                     <button
-                        onClick={() => setCategory(null)}
+                        onClick={() => handleCategoryChange(null)}
                         className={cn("hover:text-primary whitespace-nowrap", !category && "text-primary font-bold")}
                     >
                         الكل
@@ -60,7 +81,7 @@ export default function AdvancedFilter() {
                     {mainCategories.map((cat) => (
                         <button
                             key={cat.id}
-                            onClick={() => setCategory(cat.id)}
+                            onClick={() => handleCategoryChange(cat.id)}
                             className={cn("hover:text-primary whitespace-nowrap", category === cat.id && "text-primary font-bold")}
                         >
                             {cat.label}
@@ -77,7 +98,7 @@ export default function AdvancedFilter() {
                         {row.items.map((item) => (
                             <button
                                 key={item}
-                                onClick={() => toggleTag(item)}
+                                onClick={() => handleTagToggle(item)}
                                 className={cn(
                                     "hover:text-primary whitespace-nowrap transition-colors",
                                     tags.includes(item) && "bg-primary/10 text-primary px-1 rounded-sm font-medium"
@@ -106,7 +127,7 @@ export default function AdvancedFilter() {
                         </span>
                     ))}
                     <button
-                        onClick={() => useFilterStore.getState().resetFilters()}
+                        onClick={() => resetFilters()}
                         className="text-[11px] text-gray-400 hover:text-red-500 underline underline-offset-2"
                     >
                         مسح الكل

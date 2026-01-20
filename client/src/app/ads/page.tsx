@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Filter, Loader2, MapPin, Image as ImageIcon } from 'lucide-react';
 import { apiService } from '@/lib/api';
 import { useLanguage } from '@/lib/language-context';
@@ -33,14 +33,24 @@ interface Ad {
 function AdsContent() {
     const { language, t, currency } = useLanguage();
     const searchParams = useSearchParams();
+    const router = useRouter();
     const searchQueryParam = searchParams.get('search');
-    const { category, tags } = useFilterStore();
+    const categoryParam = searchParams.get('category');
+    const { category, tags, setCategory, toggleTag, resetFilters } = useFilterStore();
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
     const [showAllAds, setShowAllAds] = useState(false); // Show ads without media
 
+    // Sync filters with URL on mount
+    useEffect(() => {
+        if (categoryParam && categoryParam !== category) {
+            setCategory(categoryParam);
+        }
+    }, [categoryParam, category, setCategory]);
+
+    // Update search query and fetch ads when dependencies change
     useEffect(() => {
         setSearchQuery(searchQueryParam || '');
         fetchAds();
