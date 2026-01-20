@@ -128,6 +128,8 @@ export default function PostAdPage() {
                 enableLocation: formData.enableLocation,
             };
 
+            console.log('Sending ad payload:', adPayload);
+
             const adResponse = await fetch('/api/ads', {
                 method: 'POST',
                 headers: {

@@ -2,10 +2,8 @@ export const runtime = 'edge';
 
 import { createClient } from '@supabase/supabase-js';
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
     try {
-        const formData = await request.json();
-
         // Get authenticated user
         const authHeader = request.headers.get('Authorization');
         if (!authHeader) {
@@ -31,55 +29,38 @@ export async function POST(request: Request) {
             });
         }
 
-        // Validate required fields
-        if (!formData.title || !formData.category || !formData.price) {
-            return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        // Validate user ID
-        if (!user.id) {
-            return new Response(JSON.stringify({ error: 'Invalid user authentication' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        // Prepare ad data
-        const adData = {
-            title: formData.title,
-            description: formData.description,
-            price: Number(formData.price),
-            currencyId: 'sar',
-            category: formData.category,
-            location: formData.enableLocation ? formData.location : null,
-            address: formData.address,
-            images: JSON.stringify(formData.imageUrls || []),
-            authorId: user.id,
-        };
-
-        console.log('Creating ad with data:', adData);
-
-        // Insert ad
-        const { data: ad, error } = await supabaseAdmin
+        // Get user's ads
+        const { data: ads, error } = await supabaseAdmin
             .from('Ad')
-            .insert(adData)
-            .select()
-            .single();
+            .select(`
+                id,
+                title,
+                description,
+                price,
+                currencyId,
+                category,
+                location,
+                address,
+                images,
+                isActive,
+                views,
+                createdAt,
+                updatedAt
+            `)
+            .eq('authorId', user.id)
+            .order('createdAt', { ascending: false });
 
         if (error) {
-            console.error('Error creating ad:', error);
+            console.error('Error fetching user ads:', error);
             return new Response(JSON.stringify({ error: error.message }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
             });
         }
 
-        return Response.json(ad);
+        return Response.json({ ads: ads || [] });
     } catch (err) {
-        console.error('Error in ads API:', err);
+        console.error('Error in ads/my API:', err);
         return new Response(JSON.stringify({ error: 'Internal server error' }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
