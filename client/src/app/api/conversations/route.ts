@@ -35,14 +35,14 @@ export async function GET(request: Request) {
 
             // Get specific conversation
             const { data: conversation, error } = await supabaseAdmin
-                .from('Conversation')
+                .from('conversation')
                 .select(`
                     id,
-                    adId,
-                    buyerId,
-                    sellerId,
-                    createdAt,
-                    Ad:adId (
+                    adid,
+                    buyerid,
+                    sellerid,
+                    createdat,
+                    Ad:adid (
                         id,
                         title
                     )
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
             }
 
             // Check if user is part of the conversation
-            if (conversation.buyerId !== user.id && conversation.sellerId !== user.id) {
+            if (conversation.buyerid !== user.id && conversation.sellerid !== user.id) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                     status: 403,
                     headers: { 'Content-Type': 'application/json' }
@@ -67,28 +67,28 @@ export async function GET(request: Request) {
 
             // Get messages
             const { data: messages } = await supabaseAdmin
-                .from('Message')
+                .from('message')
                 .select(`
                     id,
                     content,
                     messageType,
-                    createdAt,
-                    senderId,
-                    User:senderId (
+                    createdat,
+                    senderid,
+                    User:senderid (
                         name
                     )
                 `)
-                .eq('conversationId', conversationId)
-                .order('createdAt', { ascending: true });
+                .eq('conversationid', conversationId)
+                .order('createdat', { ascending: true });
 
             // Get participants
             const participants = [];
-            if (conversation.buyerId) {
-                const { data: buyer } = await supabaseAdmin.from('User').select('id, name, role').eq('id', conversation.buyerId).single();
+            if (conversation.buyerid) {
+                const { data: buyer } = await supabaseAdmin.from('User').select('id, name, role').eq('id', conversation.buyerid).single();
                 if (buyer) participants.push(buyer);
             }
-            if (conversation.sellerId) {
-                const { data: seller } = await supabaseAdmin.from('User').select('id, name, role').eq('id', conversation.sellerId).single();
+            if (conversation.sellerid) {
+                const { data: seller } = await supabaseAdmin.from('User').select('id, name, role').eq('id', conversation.sellerid).single();
                 if (seller) participants.push(seller);
             }
 
@@ -119,20 +119,20 @@ export async function GET(request: Request) {
             }
 
             const { data: conversations } = await supabaseAdmin
-                .from('Conversation')
+                .from('conversation')
                 .select(`
                     id,
-                    adId,
-                    buyerId,
-                    sellerId,
-                    createdAt,
-                    Ad:adId (
+                    adid,
+                    buyerid,
+                    sellerid,
+                    createdat,
+                    Ad:adid (
                         id,
                         title
                     )
                 `)
-                .or(`buyerId.eq.${user.id},sellerId.eq.${user.id}`)
-                .order('createdAt', { ascending: false });
+                .or(`buyerid.eq.${user.id},sellerid.eq.${user.id}`)
+                .order('createdat', { ascending: false });
 
             return Response.json({ conversations: conversations || [] });
         }
@@ -185,11 +185,11 @@ export async function POST(request: Request) {
 
         // Check if conversation already exists
         const { data: existingConversation } = await supabaseAdmin
-            .from('Conversation')
+            .from('conversation')
             .select('id')
-            .eq('adId', adId)
-            .or(`buyerId.eq.${buyerId},sellerId.eq.${buyerId}`)
-            .or(`buyerId.eq.${sellerId},sellerId.eq.${sellerId}`)
+            .eq('adid', adId)
+            .or(`buyerid.eq.${buyerId},sellerid.eq.${buyerId}`)
+            .or(`buyerid.eq.${sellerId},sellerid.eq.${sellerId}`)
             .single();
 
         if (existingConversation) {
@@ -198,11 +198,11 @@ export async function POST(request: Request) {
 
         // Create new conversation
         const { data: newConversation, error } = await supabaseAdmin
-            .from('Conversation')
+            .from('conversation')
             .insert({
-                adId,
-                buyerId,
-                sellerId,
+                adid: adId,
+                buyerid: buyerId,
+                sellerid: sellerId,
             })
             .select()
             .single();
