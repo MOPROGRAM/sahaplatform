@@ -32,8 +32,11 @@ export async function POST(request: Request) {
         }
 
         // Validate required fields
-        if (!formData.title || !formData.category || !formData.price) {
-            return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        if (!formData.title || !formData.category || formData.price === undefined) {
+            return new Response(JSON.stringify({
+                error: 'Missing required fields',
+                received: { title: !!formData.title, category: !!formData.category, price: formData.price }
+            }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
             });

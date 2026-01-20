@@ -58,7 +58,8 @@ export async function GET(request: Request) {
             });
         }
 
-        return Response.json({ ads: ads || [] });
+        // Always return an array
+        return Response.json({ ads: Array.isArray(ads) ? ads : [] });
     } catch (err) {
         console.error('Error in ads/my API:', err);
         return new Response(JSON.stringify({ error: 'Internal server error' }), {

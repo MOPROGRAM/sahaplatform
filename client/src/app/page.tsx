@@ -8,6 +8,9 @@ import { useLanguage } from '@/lib/language-context';
 import { useAuthStore } from '@/store/useAuthStore';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SearchBar from '@/components/SearchBar';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import AdCard from '@/components/AdCard';
 
 interface Ad {
     id: string;
@@ -16,6 +19,7 @@ interface Ad {
     location: string;
     category: string;
     createdAt: string;
+    images?: string[];
     featured?: boolean;
     currency?: {
         code: string;
@@ -54,7 +58,8 @@ export default function HomePage() {
                 console.error('Failed to fetch ads:', error);
                 setAds([]);
             } else {
-                setAds(data || []);
+                // Ensure data is always an array
+                setAds(Array.isArray(data) ? data : []);
             }
         } catch (error) {
             console.error('Failed to fetch ads:', error);
@@ -81,6 +86,29 @@ export default function HomePage() {
                     </span>
                 </div>
             </div>
+
+            {/* Search Section */}
+            <section className="bg-white border-b border-gray-200 py-6">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-6">
+                        <h1 className="text-3xl font-black text-gray-900 mb-2 uppercase tracking-tight">
+                            {t('siteName')}
+                        </h1>
+                        <p className="text-gray-600 font-medium">
+                            {language === 'ar' ? 'اكتشف أفضل العروض في المنطقة' : 'Discover the best deals in your area'}
+                        </p>
+                    </div>
+                    <div className="max-w-2xl mx-auto">
+                        <SearchBar
+                            placeholder={language === 'ar' ? 'ابحث عن أي شيء...' : 'Search for anything...'}
+                            onSearch={(query) => {
+                                window.location.href = `/ads?search=${encodeURIComponent(query)}`;
+                            }}
+                            className="shadow-lg"
+                        />
+                    </div>
+                </div>
+            </section>
 
             <main className="max-w-7xl mx-auto w-full p-2 grid grid-cols-12 gap-3">
                 {/* Left Sidebar */}
@@ -130,32 +158,22 @@ export default function HomePage() {
 
                     {loading ? (
                         <div className="bg-white h-48 flex items-center justify-center border border-gray-200 rounded-md shadow-sm">
-                            <Loader2 className="animate-spin text-primary" size={24} />
+                            <LoadingSpinner size={32} />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {ads.length > 0 ? ads.map((ad, idx) => (
-                                <Link href={`/ads/view?id=${ad.id}`} key={idx} className="bg-white border-2 border-gray-200 p-2 rounded-md hover:border-primary transition-all group flex flex-col gap-2 h-full shadow-sm hover:shadow-md">
-                                    <div className="aspect-[4/3] bg-gray-50 rounded-sm relative overflow-hidden flex items-center justify-center border border-gray-100 group-hover:bg-primary/5 transition-colors">
-                                        <ImageIcon className="text-gray-200 group-hover:text-primary/20 transition-all" size={24} />
-                                        {ad.featured && (
-                                            <div className="absolute top-1.5 right-1.5 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-lg uppercase italic">{t('featured')}</div>
-                                        )}
-                                    </div>
-                                    <div className="flex flex-col gap-1.5 flex-1">
-                                        <h4 className="text-[13px] font-black line-clamp-2 leading-tight group-hover:text-primary transition-colors h-[32px] text-black uppercase tracking-tight">{ad.title}</h4>
-                                        <div className="text-[16px] font-[1000] text-primary italic tracking-tighter">
-                                            {Number(ad.price).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                                            <span className="text-[10px] opacity-60 font-bold uppercase tracking-widest not-italic"> {ad.currency?.code || 'SAR'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 border-t border-gray-50 pt-2 mt-auto">
-                                            <span className="flex items-center gap-1"><MapPin size={10} className="text-primary" /> {ad.location}</span>
-                                            <button className="btn-saha-primary !px-2 !py-0.5 !text-[9px] !border-b-[2.5px] !shadow-sm !rounded-sm">
-                                                {t('details')}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Link>
+                                <AdCard
+                                    key={idx}
+                                    id={ad.id}
+                                    title={ad.title}
+                                    price={ad.price}
+                                    currency="ريال"
+                                    location={ad.location}
+                                    images={ad.images || []}
+                                    createdAt={ad.createdAt}
+                                    category={ad.category}
+                                />
                             )) : (
                                 <div className="col-span-full bg-white p-12 text-center border border-dashed border-gray-300 rounded-md">
                                     <div className="text-gray-300 font-bold uppercase tracking-widest text-[11px]">{t('noResults')}</div>

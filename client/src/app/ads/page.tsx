@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Search, Filter, MapPin, Clock, Heart, Share2, ChevronLeft, Image as ImageIcon, PlusCircle, Loader2 } from 'lucide-react';
+import { Filter, Loader2, MapPin, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AdCard from '@/components/AdCard';
+import SearchBar from '@/components/SearchBar';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Ad {
     id: string;
@@ -67,7 +69,8 @@ function AdsContent() {
 
             const { data, error } = await query;
             if (error) throw error;
-            setAds(data || []);
+            // Ensure data is always an array
+            setAds(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
@@ -130,39 +133,23 @@ function AdsContent() {
                 </div>
 
                 {loading ? (
-                    <div className="flex items-center justify-center p-20 opacity-20">
-                        <Loader2 className="animate-spin" size={48} />
+                    <div className="flex items-center justify-center p-20">
+                        <LoadingSpinner size={48} />
                     </div>
                 ) : ads.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {ads.map((ad) => (
-                            <Link
+                            <AdCard
                                 key={ad.id}
-                                href={`/ads/view?id=${ad.id}`}
-                                className="bg-white border border-gray-100 p-2 rounded-sm hover:border-primary transition-all group flex flex-col gap-2 h-full shadow-sm hover:shadow-xl hover:-translate-y-1"
-                            >
-                                <div className="aspect-[4/3] bg-gray-50 rounded-xs relative overflow-hidden flex items-center justify-center border border-gray-100 shrink-0">
-                                    <ImageIcon className="text-gray-200 group-hover:scale-110 transition-transform" size={24} />
-                                    {ad.isBoosted && (
-                                        <div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-2 py-0.5 rounded-bl-sm shadow-md uppercase tracking-widest">Boosted</div>
-                                    )}
-                                </div>
-                                <div className="flex flex-col gap-1.5 flex-1 p-1">
-                                    <h3 className="text-[11px] font-black line-clamp-2 leading-[1.3] group-hover:text-primary transition-colors text-secondary h-[28px] uppercase tracking-tighter">
-                                        {ad.title}
-                                    </h3>
-                                    <div className="mt-auto">
-                                        <div className="text-[14px] font-black text-primary italic tracking-tighter flex items-center gap-1 leading-none">
-                                            {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}
-                                            <span className="text-[8px] not-italic opacity-40 uppercase tracking-widest">SAR</span>
-                                        </div>
-                                        <div className="flex items-center gap-1 text-[9px] font-black text-gray-400 mt-2 uppercase tracking-tighter truncate">
-                                            <MapPin size={10} className="text-primary opacity-50 shrink-0" />
-                                            <span className="truncate">{ad.location}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
+                                id={ad.id}
+                                title={ad.title}
+                                price={ad.price}
+                                currency="ريال"
+                                location={ad.location}
+                                images={JSON.parse(ad.images || '[]')}
+                                createdAt={ad.createdAt}
+                                category={ad.category}
+                            />
                         ))}
                     </div>
                 ) : (
@@ -176,7 +163,11 @@ function AdsContent() {
 
 export default function AdsPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center font-black text-xs text-primary italic uppercase tracking-[0.3em]">Syncing Feed Matrix...</div>}>
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-bg flex items-center justify-center">
+                <LoadingSpinner size={48} />
+            </div>
+        }>
             <AdsContent />
         </Suspense>
     );

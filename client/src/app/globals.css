@@ -199,18 +199,19 @@ textarea:focus {
    CUSTOM UI COMPONENTS - SAHA PLATFORM
    =========================================== */
 
-/* ===== ENHANCED BUTTONS ===== */
+/* ===== ENHANCED BUTTONS (Subtle 3D Effect) ===== */
 .btn-saha-3d {
   position: relative;
-  font-size: 1.2em;
-  padding: 0.7em 1.4em;
+  font-size: 1.1em;
+  padding: 0.6em 1.2em;
   background-color: var(--primary);
   text-decoration: none;
   border: none;
-  border-radius: 0.5em;
+  border-radius: 0.4em;
   color: white;
-  box-shadow: 0.5em 0.5em 0.5em rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: 0.3em 0.3em 0.3em rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  font-weight: 600;
 }
 
 .btn-saha-3d::before {
@@ -220,10 +221,20 @@ textarea:focus {
   width: 0;
   top: 0;
   left: 0;
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy) 50%, var(--primary-hover) 50%, var(--primary) 60%);
-  border-radius: 0 0 0.5em 0;
-  box-shadow: 0.2em 0.2em 0.2em rgba(0, 0, 0, 0.3);
-  transition: 0.3s;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy) 30%, var(--primary-hover) 70%, var(--primary) 100%);
+  border-radius: 0 0 0.4em 0;
+  box-shadow: 0.15em 0.15em 0.15em rgba(0, 0, 0, 0.15);
+  transition: 0.2s ease;
+}
+
+.btn-saha-3d:hover::before {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.btn-saha-3d:active {
+  box-shadow: 0.15em 0.15em 0.2em rgba(0, 0, 0, 0.15);
+  transform: translate(0.05em, 0.05em);
 }
 
 .btn-saha-3d:hover::before {
@@ -236,144 +247,114 @@ textarea:focus {
   transform: translate(0.1em, 0.1em);
 }
 
-/* ===== ENHANCED AD CARDS ===== */
+/* ===== ENHANCED AD CARDS (Subtle Glass Effect) ===== */
 .ad-card-3d {
-  width: 190px;
-  height: 120px;
-  padding: 0.5rem;
-  background: rgba(255, 103, 0, 0.1);
-  border-radius: 8px;
-  backdrop-filter: blur(5px);
-  border-bottom: 3px solid rgba(255, 103, 0, 0.2);
-  border-left: 2px rgba(255, 103, 0, 0.3) outset;
-  box-shadow: -40px 50px 30px rgba(255, 103, 0, 0.15);
-  transform: skewX(10deg);
-  transition: .4s;
+  width: 100%;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(255, 103, 0, 0.08);
+  transition: all 0.3s ease;
   overflow: hidden;
   color: var(--text-main);
+  position: relative;
+}
+
+.ad-card-3d::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .ad-card-3d:hover {
-  height: 254px;
-  transform: skew(0deg);
-  box-shadow: -40px 50px 50px rgba(255, 103, 0, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 103, 0, 0.12);
 }
 
-.ad-card-3d .card-controls {
-  padding: 1rem;
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  align-self: flex-start;
+.ad-card-3d:hover::before {
+  opacity: 1;
 }
 
-.ad-card-3d .dot-red {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #ff605c;
-  box-shadow: -5px 5px 5px rgba(0, 0, 0, 0.280);
+.ad-card-3d .card-header {
+  margin-bottom: 1rem;
 }
 
-.ad-card-3d .dot-yellow {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #ffbd44;
-  box-shadow: -5px 5px 5px rgba(0, 0, 0, 0.280);
+.ad-card-3d .card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
 }
 
-.ad-card-3d .dot-green {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #00ca4e;
-  box-shadow: -5px 5px 5px rgba(0, 0, 0, 0.280);
-}
-
-.ad-card-3d h1 {
-  text-align: center;
-  margin: 1.3rem;
+.ad-card-3d .card-price {
+  font-size: 1.2rem;
+  font-weight: 700;
   color: var(--primary);
-  text-shadow: -10px 5px 10px rgba(0, 0, 0, 0.573);
+  margin-bottom: 0.5rem;
 }
 
-/* ===== ENHANCED SEARCH BAR ===== */
-.search-form {
-  --timing: 0.3s;
-  --width-of-input: 200px;
-  --height-of-input: 40px;
-  --border-height: 2px;
-  --input-bg: var(--card-bg);
-  --border-color: var(--primary);
-  --border-radius: 30px;
-  --after-border-radius: 1px;
-  position: relative;
-  width: var(--width-of-input);
-  height: var(--height-of-input);
+.ad-card-3d .card-location {
+  font-size: 0.9rem;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
-  padding-inline: 0.8em;
-  border-radius: var(--border-radius);
-  transition: border-radius 0.5s ease;
-  background: var(--input-bg, #fff);
-  border: 1px solid var(--border-color);
+  gap: 0.25rem;
 }
 
-.search-form:before {
-  content: "";
-  position: absolute;
-  background: var(--border-color);
-  transform: scaleX(0);
-  transform-origin: center;
-  width: 100%;
-  height: var(--border-height);
-  left: 0;
-  bottom: 0;
-  border-radius: 1px;
-  transition: transform var(--timing) ease;
+.ad-card-3d .card-location::before {
+  content: '📍';
+  font-size: 0.8rem;
 }
 
-.search-input {
-  font-size: 0.9rem;
-  background-color: transparent;
+/* ===== ENHANCED SEARCH BAR (Clean & Minimal) ===== */
+.search-form {
+  position: relative;
   width: 100%;
-  height: 100%;
-  padding-inline: 0.5em;
-  padding-block: 0.7em;
-  border: none;
-  color: var(--text-main);
+  max-width: 300px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding-inline: 1rem;
+  border-radius: 22px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .search-form:focus-within {
-  border-radius: var(--after-border-radius);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 103, 0, 0.1);
 }
 
-.search-input:focus {
+.search-input {
+  font-size: 0.95rem;
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  color: var(--text-main);
   outline: none;
 }
 
-.search-form:focus-within:before {
-  transform: scale(1);
-}
-
-.search-reset {
-  border: none;
-  background: none;
-  opacity: 0;
-  visibility: hidden;
+.search-input::placeholder {
   color: var(--text-muted);
-}
-
-.search-input:not(:placeholder-shown)~.search-reset {
-  opacity: 1;
-  visibility: visible;
 }
 
 .search-form svg {
-  width: 17px;
-  margin-top: 3px;
+  width: 18px;
+  height: 18px;
   color: var(--text-muted);
+  flex-shrink: 0;
+  margin-left: 0.5rem;
 }
 
 /* ===== ENHANCED LOADING SPINNER ===== */
