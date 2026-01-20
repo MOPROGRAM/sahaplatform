@@ -10,17 +10,33 @@ import { ar } from 'date-fns/locale';
  * @returns Formatted relative time string
  */
 export function formatRelativeTime(date: string | Date, language: 'ar' | 'en' = 'en'): string {
-    const targetDate = new Date(date);
+    if (!date) {
+        console.warn('formatRelativeTime: No date provided');
+        return language === 'ar' ? 'غير محدد' : 'Unknown';
+    }
 
-    if (language === 'ar') {
-        return formatDistanceToNow(targetDate, {
-            addSuffix: true,
-            locale: ar
-        });
-    } else {
-        return formatDistanceToNow(targetDate, {
-            addSuffix: true
-        });
+    try {
+        const targetDate = new Date(date);
+
+        // Check if the date is valid
+        if (isNaN(targetDate.getTime())) {
+            console.warn('formatRelativeTime: Invalid date value:', date);
+            return language === 'ar' ? 'تاريخ غير صحيح' : 'Invalid date';
+        }
+
+        if (language === 'ar') {
+            return formatDistanceToNow(targetDate, {
+                addSuffix: true,
+                locale: ar
+            });
+        } else {
+            return formatDistanceToNow(targetDate, {
+                addSuffix: true
+            });
+        }
+    } catch (error) {
+        console.error('formatRelativeTime: Error formatting date:', date, error);
+        return language === 'ar' ? 'خطأ في التاريخ' : 'Date error';
     }
 }
 
