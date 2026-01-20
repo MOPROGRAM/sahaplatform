@@ -52,7 +52,23 @@ export async function POST(request: Request) {
         }
 
         // Create admin client for operations
+        console.log('🔑 Creating Supabase admin client with service role...');
         const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+        // Test service role connection
+        try {
+            const { data: testConnection, error: connectionError } = await supabaseAdmin
+                .from('ads')
+                .select('count(*)', { count: 'exact', head: true });
+
+            console.log('🔑 Service role connection test:', {
+                success: !connectionError,
+                error: connectionError?.message,
+                can_access_ads_table: !connectionError
+            });
+        } catch (testErr) {
+            console.warn('🔑 Service role test failed:', testErr.message);
+        }
 
         // Verify JWT token using admin client
         const token = authHeader.replace('Bearer ', '');
@@ -262,11 +278,14 @@ export async function POST(request: Request) {
         console.log('❌ Insert result - Error hint:', error?.hint);
 
         if (error) {
+            // الخطأ الحقيقي من Supabase - هذا ما يطلبه المستخدم
+            console.error('SUPABASE ERROR DETAILS:');
+            console.error('error.message:', error.message);
+            console.error('error.hint:', error.hint);
+            console.error('error.code:', error.code);
+            console.error('error.details:', error.details);
+
             console.error('🛑 SUPABASE ERROR - Creating ad:', error);
-            console.error('🛑 Error message:', error.message);
-            console.error('🛑 Error code:', error.code);
-            console.error('🛑 Error details:', error.details);
-            console.error('🛑 Error hint:', error.hint);
             console.error('🛑 Ad data that caused error:', adData);
 
             // Check for common issues
@@ -279,22 +298,26 @@ export async function POST(request: Request) {
                 additional_help = 'Foreign Key Error: User ID may not exist in users table';
             }
 
-            // Return detailed error for debugging
-            return new Response(JSON.stringify({
+            // إرجاع رسالة واضحة في JSON - لا انهيار
+            const errorResponse = {
                 error: 'Failed to create ad',
-                supabase_error: error.message,
-                code: error.code,
-                details: error.details,
-                hint: error.hint,
-                additional_help: additional_help,
-                ad_data: adData,
-                troubleshooting: {
-                    '1_check_table': 'Verify ads table exists in Supabase dashboard',
-                    '2_check_rls': 'Check RLS policies allow INSERT for authenticated users',
-                    '3_check_user': 'Verify user exists in auth.users table',
-                    '4_check_fields': 'Ensure all field types match database schema'
+                supabase_message: error.message,
+                supabase_hint: error.hint,
+                supabase_code: error.code,
+                rejected_field: error.message?.includes('null value') ?
+                    error.message.match(/column "(\w+)"/)?.[1] : null,
+                sent_data: adData,
+                required_fields_check: {
+                    title: !!adData.title,
+                    category: !!adData.category,
+                    price: adData.price !== null && adData.price !== undefined,
+                    user_id: !!adData.user_id
                 }
-            }), {
+            };
+
+            console.error('FINAL ERROR RESPONSE:', JSON.stringify(errorResponse, null, 2));
+
+            return new Response(JSON.stringify(errorResponse), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
             });
