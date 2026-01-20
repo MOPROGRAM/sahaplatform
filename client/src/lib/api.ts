@@ -10,19 +10,19 @@ const getBaseUrl = () => {
 
 const API_URL = getBaseUrl();
 
-const getAuthHeaders = async (): Promise<Record<string, string>> => {
+const getAuthHeaders = (): Record<string, string> => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (typeof window !== 'undefined') {
         try {
-            const { data: { session } } = await import('@/lib/supabase').then(m => m.supabase.auth.getSession());
-            if (session?.access_token) {
-                headers['Authorization'] = `Bearer ${session.access_token}`;
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
                 console.log('🔐 Token found and added to request');
             } else {
-                console.warn('⚠️ No authentication session found');
+                console.warn('⚠️ No authentication token found');
             }
         } catch (error) {
-            console.warn('⚠️ Error getting auth session:', error);
+            console.warn('⚠️ Error getting auth token:', error);
         }
     }
     return headers;
@@ -83,12 +83,20 @@ export const apiService = {
         return this.get('/ads', filters);
     },
 
+    async getMyAds() {
+        return this.get('/ads/my');
+    },
+
     async getAd(id: string) {
         return this.get(`/ads/${id}`);
     },
 
     async createAd(adData: any) {
         return this.post('/ads', adData);
+    },
+
+    async deleteAd(id: string) {
+        return this.delete(`/ads/${id}`);
     },
 
     // Auth
@@ -107,5 +115,14 @@ export const apiService = {
 
     async sendMessage(conversationId: string, message: string) {
         return this.post(`/conversations/${conversationId}/messages`, { content: message });
+    },
+
+    // User Profile
+    async updateProfile(userData: { name?: string; email?: string; currentPassword?: string; newPassword?: string }) {
+        return this.put('/auth/me', userData);
+    },
+
+    async deleteAccount() {
+        return this.delete('/auth/me');
     }
 };

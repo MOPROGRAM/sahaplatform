@@ -99,7 +99,9 @@ async function main() {
         }
     }
 
-    console.log('✅ Global data seeding completed!');
+
+
+    console.log('✅ Global data and test ads seeding completed!');
 }
 
 main()

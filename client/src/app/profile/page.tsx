@@ -43,6 +43,15 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [updating, setUpdating] = useState(false);
+    const [profileData, setProfileData] = useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [updateMessage, setUpdateMessage] = useState('');
 
     useEffect(() => {
         if (!user) {
@@ -64,6 +73,43 @@ export default function ProfilePage() {
             console.error('Failed to fetch user ads:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setUpdating(true);
+        setUpdateMessage('');
+
+        try {
+            if (profileData.newPassword && profileData.newPassword !== profileData.confirmPassword) {
+                setUpdateMessage(language === 'ar' ? 'كلمة المرور غير متطابقة' : 'Passwords do not match');
+                return;
+            }
+
+            const updateData = {
+                name: profileData.name,
+                email: profileData.email,
+                ...(profileData.newPassword && {
+                    currentPassword: profileData.currentPassword,
+                    newPassword: profileData.newPassword
+                })
+            };
+
+            await apiService.updateProfile(updateData);
+            setUpdateMessage(language === 'ar' ? 'تم تحديث الملف الشخصي بنجاح' : 'Profile updated successfully');
+
+            // Clear password fields
+            setProfileData(prev => ({
+                ...prev,
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            }));
+        } catch (error: any) {
+            setUpdateMessage(error.message || (language === 'ar' ? 'فشل في تحديث الملف الشخصي' : 'Failed to update profile'));
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -317,6 +363,96 @@ export default function ProfilePage() {
                     {/* Settings Tab */}
                     {activeTab === 'settings' && (
                         <div className="space-y-4">
+                            <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
+                                <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">
+                                    {language === 'ar' ? 'تحديث الملف الشخصي' : 'Update Profile'}
+                                </h3>
+
+                                {updateMessage && (
+                                    <div className={`p-3 rounded-sm mb-4 text-[12px] font-bold ${updateMessage.includes('successfully') || updateMessage.includes('نجاح') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                        {updateMessage}
+                                    </div>
+                                )}
+
+                                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                                    <div>
+                                        <label className="block text-[12px] font-black text-gray-600 uppercase tracking-widest mb-2">
+                                            {language === 'ar' ? 'الاسم' : 'Name'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={profileData.name}
+                                            onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[12px] font-black text-gray-600 uppercase tracking-widest mb-2">
+                                            {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={profileData.email}
+                                            onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
+                                        />
+                                    </div>
+
+                                    <div className="border-t border-gray-200 pt-4">
+                                        <h4 className="font-black text-secondary text-[14px] mb-4">
+                                            {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
+                                        </h4>
+
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+                                                    {language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}
+                                                </label>
+                                                <input
+                                                    type="password"
+                                                    value={profileData.currentPassword}
+                                                    onChange={(e) => setProfileData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                                                    className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+                                                    {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
+                                                </label>
+                                                <input
+                                                    type="password"
+                                                    value={profileData.newPassword}
+                                                    onChange={(e) => setProfileData(prev => ({ ...prev, newPassword: e.target.value }))}
+                                                    className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+                                                    {language === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}
+                                                </label>
+                                                <input
+                                                    type="password"
+                                                    value={profileData.confirmPassword}
+                                                    onChange={(e) => setProfileData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                                                    className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={updating}
+                                        className="w-full bg-primary text-white py-3 rounded-sm font-black text-[12px] uppercase tracking-widest hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {updating ? (language === 'ar' ? 'جارٍ التحديث...' : 'Updating...') : (language === 'ar' ? 'تحديث الملف الشخصي' : 'Update Profile')}
+                                    </button>
+                                </form>
+                            </div>
+
                             <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
                                 <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">
                                     {language === 'ar' ? 'إعدادات الحساب' : 'Account Settings'}

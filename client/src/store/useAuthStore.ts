@@ -1,29 +1,31 @@
 import { create } from 'zustand';
 import { AuthUser, authService } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
 
 interface AuthState {
     user: AuthUser | null;
-    session: any;
+    token: string | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
     register: (email: string, password: string, name: string, userType?: string) => Promise<void>;
-    logout: () => Promise<void>;
-    initialize: () => Promise<void>;
+    logout: () => void;
+    initialize: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
-    session: null,
+    token: null,
     loading: true,
     login: async (email, password) => {
         set({ loading: true });
         try {
             const response = await authService.login(email, password);
+            authService.setToken(response.token);
             set({
                 user: response.user,
-                session: response.token
+                token: response.token
             });
+        } catch (error) {
+            throw error;
         } finally {
             set({ loading: false });
         }
@@ -32,35 +34,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.register(email, password, name, userType);
+            authService.setToken(response.token);
             set({
                 user: response.user,
-                session: response.token
+                token: response.token
             });
+        } catch (error) {
+            throw error;
         } finally {
             set({ loading: false });
         }
     },
-    logout: async () => {
-        await supabase.auth.signOut();
+    logout: () => {
         authService.removeToken();
-        set({ user: null, session: null });
+        set({ user: null, token: null });
     },
-    initialize: async () => {
+    initialize: () => {
         set({ loading: true });
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                set({
-                    user: {
-                        id: session.user.id,
-                        email: session.user.email,
-                        name: session.user.user_metadata?.name,
-                        role: session.user.role,
-                        userType: session.user.user_metadata?.userType,
-                        verified: session.user.email_confirmed_at ? true : false,
-                    },
-                    session: session.access_token
-                });
+            const token = authService.getToken();
+            if (token) {
+                // TODO: Validate token with backend and get user info
+                // For now, we'll just set the token
+                set({ token });
             }
         } catch (e) {
             console.error("Failed to initialize auth:", e);

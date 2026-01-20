@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { apiService } from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { formatRelativeTime } from "@/lib/utils";
@@ -25,7 +25,7 @@ interface Ad {
 
 export default function MyAdsPage() {
     const { language, t } = useLanguage();
-    const { user, session, loading: authLoading } = useAuthStore();
+    const { user, token, loading: authLoading } = useAuthStore();
     const router = useRouter();
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
@@ -40,57 +40,35 @@ export default function MyAdsPage() {
 
     // Fetch user's ads
     useEffect(() => {
-        if (user && session) {
+        if (user && token) {
             fetchMyAds();
         }
-    }, [user, session]);
+    }, [user, token]);
 
     const fetchMyAds = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/ads/my', {
-                headers: {
-                    'Authorization': `Bearer ${session}`,
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setAds(data);
-            } else {
-                const errorData = await response.json();
-                setError(errorData.error || t('failedToLoad'));
-            }
+            const data = await apiService.getMyAds();
+            setAds(data);
         } catch (err: any) {
             console.error('Error fetching ads:', err);
-            setError(t('failedToLoad'));
+            setError('Failed to load ads');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteAd = async (adId: string) => {
-        if (!confirm(t('confirmDelete'))) {
+        if (!confirm('Are you sure you want to delete this ad?')) {
             return;
         }
 
         try {
-            const response = await fetch(`/api/ads/${adId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${session}`,
-                },
-            });
-
-            if (response.ok) {
-                setAds(ads.filter(ad => ad.id !== adId));
-            } else {
-                const errorData = await response.json();
-                setError(errorData.error || t('failedToDelete'));
-            }
+            await apiService.deleteAd(adId);
+            setAds(ads.filter(ad => ad.id !== adId));
         } catch (err: any) {
             console.error('Error deleting ad:', err);
-            setError(t('failedToDelete'));
+            setError('Failed to delete ad');
         }
     };
 

@@ -109,8 +109,9 @@ export async function POST(request: Request, { params }: { params: { id: string 
     try {
         const { content, messageType = 'text', fileUrl, fileName, fileSize } = await request.json();
 
-        if (!content) {
-            return new Response(JSON.stringify({ error: 'Content is required' }), {
+        // Allow empty content for file types (file, image, voice, location)
+        if (!content && messageType === 'text') {
+            return new Response(JSON.stringify({ error: 'Content is required for text messages' }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
             });

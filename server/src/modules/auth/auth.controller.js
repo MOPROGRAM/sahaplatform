@@ -40,6 +40,56 @@ router.get('/me', authMiddleware, async (req, res) => {
     }
 });
 
+router.put('/me', authMiddleware, async (req, res) => {
+    try {
+        const { name, email, currentPassword, newPassword } = req.body;
+        const { PrismaClient } = require('@prisma/client');
+        const prisma = new PrismaClient();
+
+        const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const updateData = {};
+
+        // Update basic info
+        if (name) updateData.name = name;
+        if (email && email !== user.email) {
+            // Check if email is already taken
+            const existingUser = await prisma.user.findUnique({ where: { email } });
+            if (existingUser) {
+                return res.status(400).json({ error: 'Email already in use' });
+            }
+            updateData.email = email;
+        }
+
+        // Update password if provided
+        if (newPassword) {
+            if (!currentPassword) {
+                return res.status(400).json({ error: 'Current password is required to change password' });
+            }
+
+            const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+            if (!isValidPassword) {
+                return res.status(400).json({ error: 'Current password is incorrect' });
+            }
+
+            updateData.password = await bcrypt.hash(newPassword, 12);
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: req.user.id },
+            data: updateData,
+            select: { id: true, email: true, name: true, role: true, userType: true, verified: true }
+        });
+
+        res.json({ message: 'Profile updated successfully', user: updatedUser });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 router.delete('/me', authMiddleware, async (req, res) => {
     try {
         const { PrismaClient } = require('@prisma/client');

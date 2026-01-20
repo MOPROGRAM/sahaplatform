@@ -1,72 +1,52 @@
-import { supabase } from './supabase';
+import { apiService } from './api';
 
-// استخدام Supabase Auth
+// استخدام API Backend للمصادقة
 export const authService = {
     async login(email: string, password: string) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (error) {
-            throw new Error(error.message || 'Login failed');
-        }
+        const response = await apiService.login({ email, password });
 
         return {
-            token: data.session?.access_token,
+            token: response.token,
             user: {
-                id: data.user?.id,
-                email: data.user?.email,
-                name: data.user?.user_metadata?.name,
-                role: data.user?.role,
-                userType: data.user?.user_metadata?.userType,
-                verified: data.user?.email_confirmed_at ? true : false,
+                id: response.user.id,
+                email: response.user.email,
+                name: response.user.name,
+                role: response.user.role,
+                userType: response.user.userType,
+                verified: response.user.verified,
             },
         };
     },
 
     async register(email: string, password: string, name: string, userType: string = 'SEEKER') {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    name,
-                    userType,
-                },
-            },
-        });
-
-        if (error) {
-            throw new Error(error.message || 'Registration failed');
-        }
+        const response = await apiService.register({ email, password, name });
 
         return {
-            token: data.session?.access_token,
+            token: response.token,
             user: {
-                id: data.user?.id,
-                email: data.user?.email,
-                name: data.user?.user_metadata?.name,
-                role: data.user?.role,
-                userType: data.user?.user_metadata?.userType,
-                verified: data.user?.email_confirmed_at ? true : false,
+                id: response.user.id,
+                email: response.user.email,
+                name: response.user.name,
+                role: response.user.role,
+                userType: response.user.userType,
+                verified: response.user.verified,
             },
         };
     },
 
     getToken(): string | null {
         if (typeof window === 'undefined') return null;
-        return localStorage.getItem('supabase.auth.token');
+        return localStorage.getItem('auth_token');
     },
 
     setToken(token: string) {
         if (typeof window === 'undefined') return;
-        localStorage.setItem('supabase.auth.token', token);
+        localStorage.setItem('auth_token', token);
     },
 
     removeToken() {
         if (typeof window === 'undefined') return;
-        localStorage.removeItem('supabase.auth.token');
+        localStorage.removeItem('auth_token');
     }
 };
 

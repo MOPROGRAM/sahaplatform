@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Filter, Loader2, MapPin, Image as ImageIcon } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { apiService } from '@/lib/api';
 import { useLanguage } from '@/lib/language-context';
 import { useFilterStore } from '@/store/useFilterStore';
 import Header from '@/components/Header';
@@ -49,36 +49,34 @@ function AdsContent() {
     const fetchAds = async () => {
         setLoading(true);
         try {
-            let query = supabase
-                .from('ads')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(50);
+            const filters: Record<string, any> = {
+                limit: 50,
+                sortBy: 'created_at',
+                sortOrder: 'desc'
+            };
 
             // Filter by category if specified
             if (category) {
-                query = query.eq('category', category);
+                filters.category = category;
             }
 
             // Search in title and description
             if (searchQuery) {
-                query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+                filters.search = searchQuery;
             }
 
             // Location filter from tags
             const regions = ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة'];
             const selectedRegions = tags.filter(tag => regions.includes(tag));
             if (selectedRegions.length > 0) {
-                const locationConditions = selectedRegions.map(region => `location.ilike.%${region}%`);
-                query = query.or(locationConditions.join(','));
+                filters.location = selectedRegions.join(',');
             }
 
             // Type filter from tags
             const types = ['سكني', 'تجاري', 'إيجار', 'بيع', 'استثمار'];
             const selectedTypes = tags.filter(tag => types.includes(tag));
             if (selectedTypes.length > 0) {
-                const typeConditions = selectedTypes.flatMap(type => [`title.ilike.%${type}%`, `description.ilike.%${type}%`]);
-                query = query.or(typeConditions.join(','));
+                filters.type = selectedTypes.join(',');
             }
 
             // Price filter from tags
@@ -90,26 +88,19 @@ function AdsContent() {
             };
             const selectedPrices = tags.filter(tag => tag in priceRanges);
             if (selectedPrices.length > 0) {
-                const priceConditions = selectedPrices.map(tag => {
+                const priceFilters = selectedPrices.map(tag => {
                     const range = priceRanges[tag as keyof typeof priceRanges];
-                    let cond = '';
-                    if (range.min > 0) cond += `price.gte.${range.min}`;
-                    if (range.max < Infinity) cond += (cond ? ',' : '') + `price.lte.${range.max}`;
-                    return cond;
-                }).filter(Boolean);
-                if (priceConditions.length > 0) {
-                    query = query.or(priceConditions.join(','));
-                }
+                    return `${range.min}-${range.max}`;
+                });
+                filters.priceRange = priceFilters.join(',');
             }
 
             // Filter ads based on media availability
             if (!showAllAds) {
-                // Show only ads that have either images or map coordinates OR explicitly allow no media
-                query = query.or(`images_urls.neq.{},latitude.not.is.null,allow_no_media.eq.true`);
+                filters.hasMedia = true;
             }
 
-            const { data, error } = await query;
-            if (error) throw error;
+            const data = await apiService.getAds(filters);
             // Ensure data is always an array
             setAds(Array.isArray(data) ? data : []);
         } catch (error) {
