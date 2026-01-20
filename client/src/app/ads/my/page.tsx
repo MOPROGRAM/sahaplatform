@@ -59,18 +59,18 @@ export default function MyAdsPage() {
                 setAds(data);
             } else {
                 const errorData = await response.json();
-                setError(errorData.error || 'Failed to fetch ads');
+                setError(errorData.error || t('failedToLoad'));
             }
         } catch (err: any) {
             console.error('Error fetching ads:', err);
-            setError('Failed to load your ads');
+            setError(t('failedToLoad'));
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteAd = async (adId: string) => {
-        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this ad?')) {
+        if (!confirm(t('confirmDelete'))) {
             return;
         }
 
@@ -86,11 +86,11 @@ export default function MyAdsPage() {
                 setAds(ads.filter(ad => ad.id !== adId));
             } else {
                 const errorData = await response.json();
-                setError(errorData.error || 'Failed to delete ad');
+                setError(errorData.error || t('failedToDelete'));
             }
         } catch (err: any) {
             console.error('Error deleting ad:', err);
-            setError('Failed to delete ad');
+            setError(t('failedToDelete'));
         }
     };
 
@@ -118,7 +118,7 @@ export default function MyAdsPage() {
                         {t('myAds')}
                     </h1>
                     <p className="text-gray-600 text-sm">
-                        {language === 'ar' ? 'إدارة إعلاناتك المُنشرة' : 'Manage your published ads'}
+                        {t('manageAds')}
                     </p>
                 </div>
 
@@ -132,8 +132,8 @@ export default function MyAdsPage() {
                 <div className="flex justify-between items-center mb-6">
                     <div className="text-sm text-gray-600">
                         {language === 'ar'
-                            ? `${ads.length} إعلان${ads.length !== 1 ? '' : ''} مُنشر${ads.length !== 1 ? '' : ''}`
-                            : `${ads.length} ad${ads.length !== 1 ? 's' : ''} published`
+                            ? `${ads.length} إعلان${ads.length !== 1 ? '' : ''} ${ads.length !== 1 ? t('published') : t('publishedSingular')}`
+                            : `${ads.length} ad${ads.length !== 1 ? 's' : ''} ${t('published')}`
                         }
                     </div>
                     <button
@@ -155,10 +155,10 @@ export default function MyAdsPage() {
                             <Plus size={48} className="mx-auto" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-2">
-                            {language === 'ar' ? 'لا توجد إعلانات' : 'No ads yet'}
+                            {t('noAds')}
                         </h3>
                         <p className="text-gray-600 mb-6">
-                            {language === 'ar' ? 'ابدأ بنشر إعلانك الأول' : 'Start by posting your first ad'}
+                            {t('startPosting')}
                         </p>
                         <button
                             onClick={() => router.push('/post-ad')}
@@ -189,14 +189,14 @@ export default function MyAdsPage() {
                                         <button
                                             onClick={() => router.push(`/ads/view?id=${ad.id}`)}
                                             className="text-blue-600 hover:text-blue-800 p-1"
-                                            title={language === 'ar' ? 'عرض' : 'View'}
+                                            title={t('view')}
                                         >
                                             <Edit size={16} />
                                         </button>
                                         <button
                                             onClick={() => handleDeleteAd(ad.id)}
                                             className="text-red-600 hover:text-red-800 p-1"
-                                            title={language === 'ar' ? 'حذف' : 'Delete'}
+                                            title={t('delete')}
                                         >
                                             <Trash2 size={16} />
                                         </button>
