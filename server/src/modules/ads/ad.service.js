@@ -112,7 +112,13 @@ const getAllAds = async (filters) => {
             queryOptions.take = parseInt(limit);
         }
 
-        return await prisma.ad.findMany(queryOptions);
+        const ads = await prisma.ad.findMany(queryOptions);
+
+        // Ensure all ads have valid createdAt
+        return ads.map(ad => ({
+            ...ad,
+            createdAt: ad.createdAt || new Date().toISOString()
+        }));
     } catch (error) {
         console.log('Database error:', error.message);
         return [];
