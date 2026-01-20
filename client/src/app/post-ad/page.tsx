@@ -12,7 +12,7 @@ import Footer from '@/components/Footer';
 
 export default function PostAdPage() {
     const { language, t, currency } = useLanguage();
-    const { user, loading: authLoading } = useAuthStore();
+    const { user, session, loading: authLoading } = useAuthStore();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -88,52 +88,61 @@ export default function PostAdPage() {
             return;
         }
 
-        // Images are optional for all categories
-
         setLoading(true);
         try {
-            // Upload images to Supabase Storage
+            if (!session) {
+                throw new Error(language === 'ar' ? "يرجى تسجيل الدخول أولاً" : "Please login first");
+            }
+
+            // Upload images
             const imageUrls: string[] = [];
             for (const image of images) {
-                const fileName = `${Date.now()}-${image.name}`;
-                const { data, error } = await supabase.storage
-                    .from('ads-images')
-                    .upload(fileName, image);
+                const formDataUpload = new FormData();
+                formDataUpload.append('file', image);
 
-                if (error) {
-                    console.error('Error uploading image:', error);
+                const uploadResponse = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session}`,
+                    },
+                    body: formDataUpload,
+                });
+
+                if (uploadResponse.ok) {
+                    const uploadData = await uploadResponse.json();
+                    imageUrls.push(uploadData.url);
                 } else {
-                    const { data: urlData } = supabase.storage
-                        .from('ads-images')
-                        .getPublicUrl(fileName);
-                    imageUrls.push(urlData.publicUrl);
+                    console.error('Error uploading image');
                 }
             }
 
-            // Insert ad into database
-            const payload = {
+            // Create ad
+            const adPayload = {
                 title: formData.title,
                 description: formData.description,
                 price: Number(formData.price),
-                currencyId: 'sar', // Default currency
                 category: formData.category,
                 location: formData.enableLocation ? formData.location : null,
                 address: formData.address,
-                images: JSON.stringify(imageUrls),
-                authorId: user?.id,
+                imageUrls,
+                enableLocation: formData.enableLocation,
             };
-            console.log('Ad payload:', payload);
-            const { data, error } = await supabase
-                .from('Ad')
-                .insert(payload)
-                .select()
-                .single();
 
-            if (error) {
-                console.error('Error posting ad:', error);
-                setError(language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad.");
-            } else if (data) {
-                router.push(`/ads/view?id=${data.id}`);
+            const adResponse = await fetch('/api/ads', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session}`,
+                },
+                body: JSON.stringify(adPayload),
+            });
+
+            if (adResponse.ok) {
+                const adData = await adResponse.json();
+                router.push(`/ads/view?id=${adData.id}`);
+            } else {
+                const errorData = await adResponse.json();
+                setError(errorData.error || (language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad."));
             }
         } catch (err: any) {
             console.error("Failed to post ad:", err);
