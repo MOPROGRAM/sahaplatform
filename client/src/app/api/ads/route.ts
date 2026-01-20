@@ -3,14 +3,18 @@ export const runtime = 'edge';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: Request) {
+    console.log('🚀 ADS API CALLED - Starting request processing');
+
     try {
         // Check environment variables
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        console.log('Environment check:');
+        console.log('🔍 Environment check:');
         console.log('NEXT_PUBLIC_SUPABASE_URL exists:', !!supabaseUrl);
+        console.log('NEXT_PUBLIC_SUPABASE_URL value:', supabaseUrl ? 'SET' : 'NOT SET');
         console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!supabaseServiceKey);
+        console.log('SUPABASE_SERVICE_ROLE_KEY value:', supabaseServiceKey ? 'SET' : 'NOT SET');
 
         if (!supabaseUrl || !supabaseServiceKey) {
             console.error('Missing Supabase environment variables');
@@ -99,16 +103,57 @@ export async function POST(request: Request) {
             user_id: user.id, // Correct field name
         };
 
-        console.log('Creating ad with data:', adData);
-        console.log('User ID:', user.id);
-        console.log('Form data received:', formData);
+        // Test with minimal data first (without user_id to check foreign key)
+        const testAdData = {
+            title: String(formData.title).trim(),
+            category: String(formData.category),
+            price: Number(formData.price) || 0,
+        };
+
+        console.log('🧪 Testing insert with minimal data (no user_id):', JSON.stringify(testAdData, null, 2));
+
+        const { data: testAd, error: testInsertError } = await supabaseAdmin
+            .from('ads')
+            .insert(testAdData)
+            .select()
+            .single();
+
+        console.log('🧪 Minimal insert result:', { data: testAd, error: testInsertError });
+
+        // If minimal insert failed, stop here
+        if (testInsertError) {
+            console.error('🛑 Minimal insert failed, stopping...');
+            // Clean up the test record if it was created
+            if (testAd?.id) {
+                await supabaseAdmin.from('ads').delete().eq('id', testAd.id);
+            }
+        }
+
+        console.log('📝 Creating ad with data:', JSON.stringify(adData, null, 2));
+        console.log('👤 User ID:', user.id);
+        console.log('📋 Form data received:', JSON.stringify(formData, null, 2));
+        console.log('🔗 Supabase URL:', supabaseUrl);
+
+        // First, let's test if we can read from the table
+        console.log('🧪 Testing table access...');
+        const { data: testData, error: testError } = await supabaseAdmin
+            .from('ads')
+            .select('id')
+            .limit(1);
+
+        console.log('🧪 Table test result:', { data: testData, error: testError });
 
         // Insert ad into correct table
+        console.log('💾 Attempting to insert into ads table...');
+
         const { data: ad, error } = await supabaseAdmin
             .from('ads') // Correct table name (lowercase)
             .insert(adData)
             .select()
             .single();
+
+        console.log('📊 Insert result - Data:', ad);
+        console.log('❌ Insert result - Error:', error);
 
         if (error) {
             console.error('🛑 SUPABASE ERROR - Creating ad:', error);

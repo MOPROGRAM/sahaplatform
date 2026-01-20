@@ -118,6 +118,7 @@ export const translations = {
 
         // Dashboard
         overview: 'نظرة عامة',
+        myAds: 'إعلاناتي',
         myListings: 'إعلاناتي',
         messages: 'الرسائل',
         settings: 'الإعدادات',
@@ -269,6 +270,7 @@ export const translations = {
 
         // Dashboard
         overview: 'Overview',
+        myAds: 'My Ads',
         myListings: 'My Listings',
         messages: 'Messages',
         settings: 'Settings',
