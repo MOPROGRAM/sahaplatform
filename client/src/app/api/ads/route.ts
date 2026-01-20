@@ -8,9 +8,9 @@ export async function GET(request: Request) {
     try {
         // Check environment variables
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        if (!supabaseUrl || !supabaseAnonKey) {
+        if (!supabaseUrl || !supabaseServiceKey) {
             console.error('❌ MISSING SUPABASE ENVIRONMENT VARIABLES');
             return new Response(JSON.stringify({
                 error: 'Server configuration error: Missing Supabase credentials'
@@ -20,8 +20,8 @@ export async function GET(request: Request) {
             });
         }
 
-        // Create public client for read operations
-        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        // Create admin client for read operations (public access)
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
         // Extract search params
         const url = new URL(request.url);
@@ -51,14 +51,13 @@ export async function GET(request: Request) {
                 user_id,
                 views,
                 latitude,
-                longitude,
-                allow_no_media
+                longitude
             `)
             .eq('is_active', true); // Assuming there's an is_active column
 
         // Apply filters
         if (category) {
-            query = query.eq('category', category);
+            query = query.eq('category', category.toLowerCase());
         }
 
         if (location) {
@@ -74,7 +73,7 @@ export async function GET(request: Request) {
         }
 
         if (hasMedia) {
-            query = query.or('images_urls.not.is.null,allow_no_media.eq.true');
+            query = query.neq('images_urls', '[]');
         }
 
         // Sorting
