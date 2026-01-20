@@ -81,7 +81,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
             }
 
             messages.forEach(message => {
-                message.User = { name: userMap[message.senderid] || 'Unknown' };
+                message.sender = { name: userMap[message.senderid] || 'Unknown' };
             });
         }
 
