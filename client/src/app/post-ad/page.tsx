@@ -27,6 +27,7 @@ export default function PostAdPage() {
         phone: "",
         email: "",
         isBoosted: false,
+        enableLocation: true,
     });
     const [images, setImages] = useState<File[]>([]);
     const [video, setVideo] = useState<File | null>(null);
@@ -41,6 +42,10 @@ export default function PostAdPage() {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type, checked } = e.target as any;
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    };
+
+    const handleLocationToggle = (checked: boolean) => {
+        setFormData(prev => ({ ...prev, enableLocation: checked }));
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,8 +75,16 @@ export default function PostAdPage() {
         e.preventDefault();
         setError("");
 
-        if (!formData.title || !formData.category || !formData.price || !formData.location) {
+        if (!formData.title || !formData.category || !formData.price) {
             setError(language === 'ar' ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
+            return;
+        }
+        if (formData.enableLocation && !formData.location) {
+            setError(language === 'ar' ? "يرجى تحديد الموقع" : "Please specify the location");
+            return;
+        }
+        if (formData.category === 'realEstate' && !formData.enableLocation) {
+            setError(language === 'ar' ? "يجب تحديد الموقع للعقارات" : "Location is required for real estate ads");
             return;
         }
 
