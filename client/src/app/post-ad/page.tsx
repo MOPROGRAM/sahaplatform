@@ -115,13 +115,12 @@ export default function PostAdPage() {
                 title: formData.title,
                 description: formData.description,
                 price: Number(formData.price),
+                currencyId: 'sar', // Default currency
                 category: formData.category,
-                location: formData.location,
+                location: formData.enableLocation ? formData.location : null,
                 address: formData.address,
-                phone: formData.phone,
-                email: formData.email,
                 images: JSON.stringify(imageUrls),
-                user_id: user?.id,
+                authorId: user?.id,
             };
             console.log('Ad payload:', payload);
             const { data, error } = await supabase
