@@ -33,12 +33,17 @@ interface Ad {
     latitude?: number;
     longitude?: number;
     images_urls?: string[];
-    phone?: string;
-    email?: string;
     allow_no_media?: boolean;
     views: number;
     user_id: string;
     created_at: string;
+    author: {
+        id: string;
+        name: string;
+        verified: boolean;
+        phone?: string;
+        email?: string;
+    };
 }
 
 export default function AdDetailsContent({ id }: { id: string }) {
@@ -157,45 +162,47 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* Media Gallery - Moved to bottom */}
-                    <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
-                        <div className="max-h-96 bg-gray-900 relative">
+                    {/* Media Gallery - Only show if allow_no_media is false or if there are images */}
+                    {(ad.allow_no_media === false || (ad.allow_no_media !== true && ad.images_urls && ad.images_urls.length > 0)) && (
+                        <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
+                            <div className="max-h-96 bg-gray-900 relative">
+                                {(() => {
+                                    const images = ad.images_urls || [];
+                                    return images.length > 0 ? (
+                                        <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100 max-h-96" />
+                                    ) : (
+                                        <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                        </div>
+                                    );
+                                })()}
+                                <div className="absolute bottom-3 right-3 flex gap-2">
+                                    <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Maximize2 size={14} /></button>
+                                    <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Share2 size={14} /></button>
+                                </div>
+                            </div>
                             {(() => {
                                 const images = ad.images_urls || [];
-                                return images.length > 0 ? (
-                                    <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100 max-h-96" />
-                                ) : (
-                                    <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                        <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                return images.length > 1 ? (
+                                    <div className="p-4 border-t border-gray-100">
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {images.slice(1, 5).map((img: string, idx: number) => (
+                                                <img
+                                                    key={idx}
+                                                    src={img}
+                                                    alt={`View ${idx + 2}`}
+                                                    className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                );
+                                ) : null;
                             })()}
-                            <div className="absolute bottom-3 right-3 flex gap-2">
-                                <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Maximize2 size={14} /></button>
-                                <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Share2 size={14} /></button>
-                            </div>
                         </div>
-                        {(() => {
-                            const images = ad.images_urls || [];
-                            return images.length > 1 ? (
-                                <div className="p-4 border-t border-gray-100">
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {images.slice(1, 5).map((img: string, idx: number) => (
-                                            <img
-                                                key={idx}
-                                                src={img}
-                                                alt={`View ${idx + 2}`}
-                                                className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : null;
-                        })()}
-                    </div>
+                    )}
 
                     {/* Integrated Map - Free OpenStreetMap - Moved to bottom */}
-                    {ad.location && (
+                    {(ad.allow_no_media === false || ad.allow_no_media !== true) && ad.location && (
                         <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm overflow-hidden flex flex-col gap-3">
                             <h3 className="text-[12px] font-black uppercase text-secondary flex items-center gap-2">
                                 <MapPin size={14} className="text-primary" />
@@ -234,22 +241,22 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         </div>
 
                         {/* Contact Information Section */}
-                        {(ad.phone || ad.email) && (
+                        {(ad.author?.phone || ad.author?.email) && (
                             <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-xs">
                                 <h4 className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">
                                     {language === 'ar' ? 'معلومات الاتصال' : 'CONTACT INFO'}
                                 </h4>
                                 <div className="space-y-2">
-                                    {ad.phone && (
+                                    {ad.author?.phone && (
                                         <div className="flex items-center gap-2 text-[11px] font-medium">
                                             <Phone size={14} className="text-green-600" />
-                                            <span>{ad.phone}</span>
+                                            <span>{ad.author.phone}</span>
                                         </div>
                                     )}
-                                    {ad.email && (
+                                    {ad.author?.email && (
                                         <div className="flex items-center gap-2 text-[11px] font-medium">
                                             <MessageCircle size={14} className="text-blue-600" />
-                                            <span>{ad.email}</span>
+                                            <span>{ad.author.email}</span>
                                         </div>
                                     )}
                                 </div>
@@ -264,13 +271,13 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <MessageCircle size={16} />
                                 {language === 'ar' ? 'بدء محادثة فورية' : 'START REAL-TIME CHAT'}
                             </button>
-                            {ad.phone && (
+                            {ad.author?.phone && (
                                 <button
                                     onClick={() => setShowPhone(!showPhone)}
                                     className="w-full bg-secondary text-white py-3 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
                                 >
                                     <Phone size={16} />
-                                    {showPhone ? ad.phone : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
+                                    {showPhone ? ad.author.phone : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
                                 </button>
                             )}
                         </div>
