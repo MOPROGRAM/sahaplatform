@@ -50,16 +50,16 @@ export async function POST(request: Request) {
             });
         }
 
-        // Prepare ad data
+        // Prepare ad data with safe defaults
         const adData = {
-            title: formData.title,
-            description: formData.description,
-            price: Number(formData.price),
+            title: String(formData.title).trim(),
+            description: formData.description ? String(formData.description).trim() : '',
+            price: Number(formData.price) || 0,
             currencyId: 'sar',
-            category: formData.category,
-            location: formData.enableLocation ? formData.location : null,
-            address: formData.address,
-            images: JSON.stringify(formData.imageUrls || []),
+            category: String(formData.category),
+            location: formData.enableLocation && formData.location ? String(formData.location).trim() : null,
+            address: formData.address ? String(formData.address).trim() : '',
+            images: JSON.stringify(Array.isArray(formData.imageUrls) ? formData.imageUrls : []),
             authorId: user.id,
         };
 

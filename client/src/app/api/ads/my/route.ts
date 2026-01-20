@@ -59,7 +59,9 @@ export async function GET(request: Request) {
         }
 
         // Always return an array
-        return Response.json({ ads: Array.isArray(ads) ? ads : [] });
+        const safeAds = Array.isArray(ads) ? ads : [];
+        console.log('Returning ads for user:', user.id, 'Count:', safeAds.length);
+        return Response.json({ ads: safeAds });
     } catch (err) {
         console.error('Error in ads/my API:', err);
         return new Response(JSON.stringify({ error: 'Internal server error' }), {

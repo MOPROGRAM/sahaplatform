@@ -79,8 +79,9 @@ export default function DashboardPage() {
 
     const fetchDashboardData = async () => {
         try {
-            const myAds = await apiService.get('/ads/my');
-            const activeAdsOnly = myAds.filter((ad: any) => ad.isActive);
+            const response = await apiService.get('/ads/my');
+            const myAds = response.ads || [];
+            const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.isActive) : [];
             setAds(activeAdsOnly);
 
             const totalViews = activeAdsOnly.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
