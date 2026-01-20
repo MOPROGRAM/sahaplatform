@@ -116,15 +116,14 @@ export default function PostAdPage() {
                 }
             }
 
-            // Create ad - remove enableLocation from payload
+            // Create ad - match database schema exactly
             const adPayload = {
                 title: formData.title,
                 description: formData.description,
                 price: Number(formData.price),
                 category: formData.category,
                 location: formData.enableLocation ? formData.location : null,
-                address: formData.address,
-                imageUrls,
+                images_urls: imageUrls, // Match database field name
             };
 
             console.log('Sending ad payload:', adPayload);

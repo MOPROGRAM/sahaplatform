@@ -3,7 +3,7 @@ export const runtime = 'edge';
 import { createClient } from '@supabase/supabase-js';
 
 export async function GET(request: Request) {
-    console.log('🚀 ADS/MY API CALLED - Starting request processing');
+    console.log('🚀 ADS/MY API GET REQUEST RECEIVED');
 
     try {
         // Check environment variables
@@ -166,11 +166,25 @@ export async function GET(request: Request) {
         console.error('💥 Error stack:', err.stack);
         console.error('💥 Error name:', err.name);
         console.error('💥 Error message:', err.message);
+        console.error('💥 Full error details:', JSON.stringify(err, null, 2));
+
+        // If it's a Supabase error, extract more details
+        if (err.message && err.message.includes('supabase')) {
+            console.error('💥 Supabase-specific error detected');
+        }
 
         return new Response(JSON.stringify({
             error: 'Internal server error',
             details: err.message,
-            type: err.name
+            type: err.name,
+            stack: err.stack,
+            troubleshooting: {
+                'check_env_vars': 'Verify NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in Cloudflare Pages',
+                'check_table': 'Ensure ads table exists in Supabase database',
+                'check_rls': 'Verify RLS policies allow operations on ads table',
+                'check_user': 'Ensure user is properly authenticated',
+                'check_schema': 'Verify data types match database schema exactly'
+            }
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }

@@ -3,7 +3,7 @@ export const runtime = 'edge';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: Request) {
-    console.log('🚀 ADS API CALLED - Starting request processing');
+    console.log('🚀 ADS API POST REQUEST RECEIVED');
 
     try {
         // Check environment variables
@@ -77,25 +77,36 @@ export async function POST(request: Request) {
             });
         }
 
-        // Validate required fields
-        console.log('Received formData:', formData);
+        // Validate required fields exactly matching database schema
+        console.log('📋 Received formData:', JSON.stringify(formData, null, 2));
 
-        if (!formData.title || !formData.category || formData.price === undefined || formData.price === null) {
+        const validationErrors = [];
+
+        if (!formData.title || typeof formData.title !== 'string' || formData.title.trim() === '') {
+            validationErrors.push('title is required and must be a non-empty string');
+        }
+
+        if (!formData.category || typeof formData.category !== 'string' || formData.category.trim() === '') {
+            validationErrors.push('category is required and must be a non-empty string');
+        }
+
+        if (formData.price === undefined || formData.price === null || isNaN(Number(formData.price))) {
+            validationErrors.push('price is required and must be a valid number');
+        }
+
+        if (validationErrors.length > 0) {
+            console.error('❌ Validation errors:', validationErrors);
             return new Response(JSON.stringify({
-                error: 'Missing required fields',
-                received: {
-                    title: formData.title,
-                    category: formData.category,
-                    price: formData.price,
-                    hasTitle: !!formData.title,
-                    hasCategory: !!formData.category,
-                    hasPrice: formData.price !== undefined && formData.price !== null
-                }
+                error: 'Validation failed',
+                validation_errors: validationErrors,
+                received_data: formData
             }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
             });
         }
+
+        console.log('✅ Validation passed');
 
         // Validate user ID
         if (!user.id) {
@@ -260,11 +271,25 @@ export async function POST(request: Request) {
         console.error('💥 Error stack:', err.stack);
         console.error('💥 Error name:', err.name);
         console.error('💥 Error message:', err.message);
+        console.error('💥 Full error details:', JSON.stringify(err, null, 2));
+
+        // If it's a Supabase error, extract more details
+        if (err.message && err.message.includes('supabase')) {
+            console.error('💥 Supabase-specific error detected');
+        }
 
         return new Response(JSON.stringify({
             error: 'Internal server error',
             details: err.message,
-            type: err.name
+            type: err.name,
+            stack: err.stack,
+            troubleshooting: {
+                'check_env_vars': 'Verify NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in Cloudflare Pages',
+                'check_table': 'Ensure ads table exists in Supabase database',
+                'check_rls': 'Verify RLS policies allow operations on ads table',
+                'check_user': 'Ensure user is properly authenticated',
+                'check_schema': 'Verify data types match database schema exactly'
+            }
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
