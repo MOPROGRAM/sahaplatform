@@ -44,7 +44,7 @@ function AdsContent() {
         setLoading(true);
         try {
             let query = supabase
-                .from('ads')
+                .from('ad')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(20);
