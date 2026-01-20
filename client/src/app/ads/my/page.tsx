@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
+import { formatRelativeTime } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AdCard from "@/components/AdCard";
@@ -178,10 +179,11 @@ export default function MyAdsPage() {
                                     images={ad.images_urls}
                                     createdAt={ad.created_at}
                                     category={ad.category}
+                                    language={language}
                                 />
                                 <div className="p-4 border-t border-gray-100 flex justify-between items-center">
                                     <div className="text-xs text-gray-500">
-                                        {new Date(ad.created_at).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                        {formatRelativeTime(ad.created_at, language)}
                                     </div>
                                     <div className="flex gap-2">
                                         <button

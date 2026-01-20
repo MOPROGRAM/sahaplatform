@@ -175,6 +175,7 @@ function AdsContent() {
                                 images={ad.images_urls || []}
                                 createdAt={ad.created_at}
                                 category={ad.category}
+                                language={language}
                             />
                         ))}
                     </div>

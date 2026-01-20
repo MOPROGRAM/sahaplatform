@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import { apiService } from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
+import { formatRelativeTime } from "@/lib/utils";
 
 interface Ad {
     id: string;
@@ -134,7 +135,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                             SAR
                                         </span>
                                     </div>
-                                    <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">Listed {new Date(ad.created_at).toLocaleDateString()}</span>
+                                    <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">{language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}</span>
                                 </div>
                             </div>
 

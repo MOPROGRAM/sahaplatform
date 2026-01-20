@@ -173,6 +173,7 @@ export default function HomePage() {
                                     images={ad.images || []}
                                     createdAt={ad.createdAt}
                                     category={ad.category}
+                                    language={language}
                                 />
                             )) : (
                                 <div className="col-span-full bg-white p-12 text-center border border-dashed border-gray-300 rounded-md">

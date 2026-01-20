@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, MapPin, Clock } from "lucide-react";
+import { formatRelativeTime } from "@/lib/utils";
 
 interface AdCardProps {
     id: string;
@@ -16,6 +17,7 @@ interface AdCardProps {
     authorName?: string;
     category?: string;
     className?: string;
+    language?: 'ar' | 'en';
 }
 
 export default function AdCard({
@@ -28,7 +30,8 @@ export default function AdCard({
     createdAt,
     authorName,
     category,
-    className = ""
+    className = "",
+    language = 'ar'
 }: AdCardProps) {
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -37,18 +40,7 @@ export default function AdCard({
         setIsFavorite(!isFavorite);
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
 
-        if (diffInHours < 24) {
-            return `منذ ${diffInHours} ساعة`;
-        } else {
-            const diffInDays = Math.floor(diffInHours / 24);
-            return `منذ ${diffInDays} يوم`;
-        }
-    };
 
     return (
         <Link href={`/ads/view?id=${id}`} className={`ad-card-3d ${className}`}>
@@ -106,7 +98,7 @@ export default function AdCard({
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                     <div className="flex items-center gap-1 text-xs text-gray-500">
                         <Clock size={12} />
-                        {formatDate(createdAt)}
+                        {formatRelativeTime(createdAt, language)}
                     </div>
                     {category && (
                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
