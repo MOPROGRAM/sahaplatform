@@ -170,14 +170,9 @@ export async function POST(request: Request) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // Create user client to verify token
-        const supabaseUser = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
-        supabaseUser.auth.setAuth(authHeader.replace('Bearer ', ''));
-
-        const { data: { user }, error: authError } = await supabaseUser.auth.getUser();
+        // Verify JWT token using admin client
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
         if (authError || !user) {
             return new Response(JSON.stringify({ error: 'Authentication required' }), {
                 status: 401,
