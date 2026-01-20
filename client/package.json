@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.4",
+    "@supabase/supabase-js": "^2.91.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.1.7",
     "leaflet": "^1.9.4",
@@ -27,7 +27,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "autoprefixer": "^10.4.19",
+    "autoprefixer": "^10.4.23",
     "eslint": "^8",
     "eslint-config-next": "14.2.18",
     "postcss": "^8",

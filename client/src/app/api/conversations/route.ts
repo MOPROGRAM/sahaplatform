@@ -82,7 +82,7 @@ export async function GET(request: Request) {
 
             // Get sender names for messages
             if (messages && messages.length > 0) {
-                const senderIds = [...new Set(messages.map(m => m.senderid))];
+                const senderIds = Array.from(new Set(messages.map(m => m.senderid)));
                 const { data: users } = await supabaseAdmin
                     .from('users')
                     .select('id, name')
