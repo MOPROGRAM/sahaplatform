@@ -116,7 +116,7 @@ export default function PostAdPage() {
                 }
             }
 
-            // Create ad
+            // Create ad - remove enableLocation from payload
             const adPayload = {
                 title: formData.title,
                 description: formData.description,
@@ -125,7 +125,6 @@ export default function PostAdPage() {
                 location: formData.enableLocation ? formData.location : null,
                 address: formData.address,
                 imageUrls,
-                enableLocation: formData.enableLocation,
             };
 
             console.log('Sending ad payload:', adPayload);

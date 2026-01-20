@@ -32,10 +32,19 @@ export async function POST(request: Request) {
         }
 
         // Validate required fields
-        if (!formData.title || !formData.category || formData.price === undefined) {
+        console.log('Received formData:', formData);
+
+        if (!formData.title || !formData.category || formData.price === undefined || formData.price === null) {
             return new Response(JSON.stringify({
                 error: 'Missing required fields',
-                received: { title: !!formData.title, category: !!formData.category, price: formData.price }
+                received: {
+                    title: formData.title,
+                    category: formData.category,
+                    price: formData.price,
+                    hasTitle: !!formData.title,
+                    hasCategory: !!formData.category,
+                    hasPrice: formData.price !== undefined && formData.price !== null
+                }
             }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
@@ -50,18 +59,23 @@ export async function POST(request: Request) {
             });
         }
 
-        // Prepare ad data with safe defaults
-        const adData = {
+        // Prepare minimal ad data with required fields only
+        const adData: any = {
             title: String(formData.title).trim(),
             description: formData.description ? String(formData.description).trim() : '',
             price: Number(formData.price) || 0,
-            currencyId: 'sar',
             category: String(formData.category),
-            location: formData.enableLocation && formData.location ? String(formData.location).trim() : null,
-            address: formData.address ? String(formData.address).trim() : '',
-            images: JSON.stringify(Array.isArray(formData.imageUrls) ? formData.imageUrls : []),
             authorId: user.id,
         };
+
+        // Add optional fields if they exist
+        if (formData.location) adData.location = String(formData.location).trim();
+        if (formData.address) adData.address = String(formData.address).trim();
+        if (formData.imageUrls && Array.isArray(formData.imageUrls)) {
+            adData.images = JSON.stringify(formData.imageUrls);
+        } else {
+            adData.images = '[]';
+        }
 
         console.log('Creating ad with data:', adData);
 
@@ -74,7 +88,23 @@ export async function POST(request: Request) {
 
         if (error) {
             console.error('Error creating ad:', error);
-            return new Response(JSON.stringify({ error: error.message }), {
+            console.error('Error details:', JSON.stringify(error, null, 2));
+
+            // Return more specific error message
+            let errorMessage = 'Failed to create ad';
+            if (error.message?.includes('foreign key')) {
+                errorMessage = 'Invalid data: foreign key constraint failed';
+            } else if (error.message?.includes('unique')) {
+                errorMessage = 'Data already exists';
+            } else if (error.message?.includes('null')) {
+                errorMessage = 'Required field is missing';
+            }
+
+            return new Response(JSON.stringify({
+                error: errorMessage,
+                details: error.message,
+                code: error.code
+            }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
             });
