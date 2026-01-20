@@ -96,7 +96,7 @@ export async function GET(request: Request) {
                 }
 
                 messages.forEach(message => {
-                    message.sender = { name: userMap[message.senderid] || 'Unknown' };
+                    (message as any).sender = { name: userMap[message.senderid] || 'Unknown' };
                 });
             }
 
