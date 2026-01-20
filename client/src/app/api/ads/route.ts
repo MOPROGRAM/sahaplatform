@@ -17,10 +17,23 @@ export async function POST(request: Request) {
         console.log('SUPABASE_SERVICE_ROLE_KEY value:', supabaseServiceKey ? 'SET' : 'NOT SET');
 
         if (!supabaseUrl || !supabaseServiceKey) {
-            console.error('Missing Supabase environment variables');
+            console.error('❌ MISSING SUPABASE ENVIRONMENT VARIABLES');
+            console.error('NEXT_PUBLIC_SUPABASE_URL:', !!supabaseUrl);
+            console.error('SUPABASE_SERVICE_ROLE_KEY:', !!supabaseServiceKey);
+
             return new Response(JSON.stringify({
-                error: 'Server configuration error',
-                details: 'Missing Supabase credentials'
+                error: 'Server configuration error: Missing Supabase credentials',
+                details: 'Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Cloudflare Pages Environment Variables',
+                setup_instructions: {
+                    step1: 'Go to Cloudflare Pages Dashboard',
+                    step2: 'Select your Saha Platform project',
+                    step3: 'Go to Settings > Environment variables',
+                    step4: 'Add these variables:',
+                    variables: {
+                        NEXT_PUBLIC_SUPABASE_URL: 'your_supabase_project_url',
+                        SUPABASE_SERVICE_ROLE_KEY: 'your_supabase_service_role_key'
+                    }
+                }
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
@@ -86,10 +99,30 @@ export async function POST(request: Request) {
 
         // Validate user ID
         if (!user.id) {
+            console.error('❌ Invalid user authentication - no user ID');
             return new Response(JSON.stringify({ error: 'Invalid user authentication' }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
             });
+        }
+
+        console.log('✅ User authenticated:', user.id);
+
+        // Optional: Verify user exists in users table (for foreign key safety)
+        try {
+            const { data: userCheck, error: userCheckError } = await supabaseAdmin
+                .from('users')
+                .select('id')
+                .eq('id', user.id)
+                .single();
+
+            if (userCheckError && !userCheckError.message.includes('No rows found')) {
+                console.warn('⚠️ Could not verify user in users table:', userCheckError.message);
+            } else {
+                console.log('✅ User verified in users table');
+            }
+        } catch (verifyError) {
+            console.warn('⚠️ User verification skipped:', verifyError);
         }
 
         // Prepare ad data according to database schema
@@ -143,6 +176,33 @@ export async function POST(request: Request) {
 
         console.log('🧪 Table test result:', { data: testData, error: testError });
 
+        // First check if ads table exists and is accessible
+        console.log('🔍 Checking if ads table exists...');
+        const { data: tableCheck, error: tableError } = await supabaseAdmin
+            .from('ads')
+            .select('id')
+            .limit(1);
+
+        if (tableError) {
+            console.error('❌ ADS TABLE ACCESS ERROR:', tableError);
+            return new Response(JSON.stringify({
+                error: 'Database table access error',
+                details: 'Unable to access ads table. Please check if the table exists in Supabase.',
+                supabase_error: tableError.message,
+                code: tableError.code,
+                possible_solutions: [
+                    '1. Check if ads table exists in Supabase dashboard',
+                    '2. Verify RLS policies allow service role access',
+                    '3. Check if service role key has correct permissions'
+                ]
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        console.log('✅ Ads table is accessible');
+
         // Insert ad into correct table
         console.log('💾 Attempting to insert into ads table...');
 
@@ -163,6 +223,16 @@ export async function POST(request: Request) {
             console.error('🛑 Error hint:', error.hint);
             console.error('🛑 Ad data that caused error:', adData);
 
+            // Check for common issues
+            let additional_help = '';
+            if (error.message?.includes('permission denied')) {
+                additional_help = 'RLS Policy Issue: Check if ads table allows INSERT for authenticated users';
+            } else if (error.message?.includes('does not exist')) {
+                additional_help = 'Table Missing: Create ads table in Supabase or run migrations';
+            } else if (error.message?.includes('foreign key')) {
+                additional_help = 'Foreign Key Error: User ID may not exist in users table';
+            }
+
             // Return detailed error for debugging
             return new Response(JSON.stringify({
                 error: 'Failed to create ad',
@@ -170,7 +240,14 @@ export async function POST(request: Request) {
                 code: error.code,
                 details: error.details,
                 hint: error.hint,
-                ad_data: adData
+                additional_help: additional_help,
+                ad_data: adData,
+                troubleshooting: {
+                    '1_check_table': 'Verify ads table exists in Supabase dashboard',
+                    '2_check_rls': 'Check RLS policies allow INSERT for authenticated users',
+                    '3_check_user': 'Verify user exists in auth.users table',
+                    '4_check_fields': 'Ensure all field types match database schema'
+                }
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }

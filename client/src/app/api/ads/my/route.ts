@@ -15,10 +15,23 @@ export async function GET(request: Request) {
         console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!supabaseServiceKey);
 
         if (!supabaseUrl || !supabaseServiceKey) {
-            console.error('Missing Supabase environment variables for ads/my');
+            console.error('❌ MISSING SUPABASE ENVIRONMENT VARIABLES FOR ADS/MY');
+            console.error('NEXT_PUBLIC_SUPABASE_URL:', !!supabaseUrl);
+            console.error('SUPABASE_SERVICE_ROLE_KEY:', !!supabaseServiceKey);
+
             return new Response(JSON.stringify({
-                error: 'Server configuration error',
-                details: 'Missing Supabase credentials'
+                error: 'Server configuration error: Missing Supabase credentials',
+                details: 'Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Cloudflare Pages Environment Variables',
+                setup_instructions: {
+                    step1: 'Go to Cloudflare Pages Dashboard',
+                    step2: 'Select your Saha Platform project',
+                    step3: 'Go to Settings > Environment variables',
+                    step4: 'Add these variables:',
+                    variables: {
+                        NEXT_PUBLIC_SUPABASE_URL: 'your_supabase_project_url',
+                        SUPABASE_SERVICE_ROLE_KEY: 'your_supabase_service_role_key'
+                    }
+                }
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
@@ -60,6 +73,33 @@ export async function GET(request: Request) {
             });
         }
 
+        // First check if ads table exists and is accessible
+        console.log('🔍 Checking if ads table exists for ads/my...');
+        const { data: tableCheck, error: tableError } = await supabaseAdmin
+            .from('ads')
+            .select('id')
+            .limit(1);
+
+        if (tableError) {
+            console.error('❌ ADS TABLE ACCESS ERROR FOR ADS/MY:', tableError);
+            return new Response(JSON.stringify({
+                error: 'Database table access error',
+                details: 'Unable to access ads table. Please check if the table exists in Supabase.',
+                supabase_error: tableError.message,
+                code: tableError.code,
+                possible_solutions: [
+                    '1. Check if ads table exists in Supabase dashboard',
+                    '2. Verify RLS policies allow service role access',
+                    '3. Check if service role key has correct permissions'
+                ]
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        console.log('✅ Ads table is accessible for ads/my');
+
         // Get user's ads
         console.log('📝 Fetching ads for user:', user.id);
         console.log('🔗 Using Supabase URL:', supabaseUrl);
@@ -87,12 +127,30 @@ export async function GET(request: Request) {
             console.error('🛑 Error message:', error.message);
             console.error('🛑 Error code:', error.code);
             console.error('🛑 Error details:', error.details);
+            console.error('🛑 Error hint:', error.hint);
+
+            // Check for common issues
+            let additional_help = '';
+            if (error.message?.includes('permission denied')) {
+                additional_help = 'RLS Policy Issue: Check if ads table allows SELECT for authenticated users';
+            } else if (error.message?.includes('does not exist')) {
+                additional_help = 'Table Missing: Create ads table in Supabase or run migrations';
+            }
 
             return new Response(JSON.stringify({
                 error: 'Failed to fetch ads',
                 supabase_error: error.message,
                 code: error.code,
-                details: error.details
+                details: error.details,
+                hint: error.hint,
+                additional_help: additional_help,
+                user_id: user.id,
+                troubleshooting: {
+                    '1_check_table': 'Verify ads table exists in Supabase dashboard',
+                    '2_check_rls': 'Check RLS policies allow SELECT for authenticated users',
+                    '3_check_user': 'Verify user exists and has ads',
+                    '4_check_fields': 'Ensure field names match database schema'
+                }
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
