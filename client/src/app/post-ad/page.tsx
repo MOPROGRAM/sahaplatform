@@ -9,6 +9,7 @@ import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import Header from "@/components/Header";
 import Footer from '@/components/Footer';
+import MapSelector from '@/components/MapSelector';
 
 export default function PostAdPage() {
     const { language, t, currency } = useLanguage();
@@ -31,6 +32,7 @@ export default function PostAdPage() {
     });
     const [images, setImages] = useState<File[]>([]);
     const [video, setVideo] = useState<File | null>(null);
+    const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -46,6 +48,13 @@ export default function PostAdPage() {
 
     const handleLocationToggle = (checked: boolean) => {
         setFormData(prev => ({ ...prev, enableLocation: checked }));
+    };
+
+    const handleLocationSelect = (lat: number, lng: number, address?: string) => {
+        setCoordinates({ lat, lng });
+        if (address) {
+            setFormData(prev => ({ ...prev, location: address }));
+        }
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,6 +133,11 @@ export default function PostAdPage() {
                 category: formData.category,
                 location: formData.enableLocation ? formData.location : null,
                 images_urls: imageUrls, // Match database field name
+                phone: formData.phone || null, // Contact info (optional)
+                email: formData.email || null, // Contact info (optional)
+                latitude: coordinates?.lat || null, // Map coordinates
+                longitude: coordinates?.lng || null, // Map coordinates
+                allow_no_media: !images.length // Allow showing ad without media if no images
             };
 
             console.log('Sending ad payload:', adPayload);
@@ -286,6 +300,27 @@ export default function PostAdPage() {
                                         </div>
                                     </div>
 
+                                    {/* Map Selector - Required for Real Estate */}
+                                    {formData.category === 'realEstate' && (
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                                <MapPin size={12} />
+                                                {language === 'ar' ? 'تحديد الموقع على الخريطة' : 'Select Location on Map'}
+                                            </label>
+                                            <div className="bg-white border border-gray-200 rounded-md p-4">
+                                                <MapSelector
+                                                    onLocationSelect={handleLocationSelect}
+                                                    height="250px"
+                                                />
+                                                {coordinates && (
+                                                    <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
+                                                        ✅ {language === 'ar' ? 'تم تحديد الموقع' : 'Location selected'}: {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="flex flex-col gap-2">
                                         <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
                                             <div className="w-1 h-3 bg-black rounded-full"></div>
@@ -299,6 +334,48 @@ export default function PostAdPage() {
                                             className="bg-gray-50 border border-gray-200 p-4 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner resize-none leading-relaxed"
                                             placeholder={t('descriptionPlaceholder')}
                                         ></textarea>
+                                    </div>
+
+                                    {/* Contact Information Section */}
+                                    <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
+                                        <h3 className="text-[12px] font-black text-black uppercase tracking-widest mb-3 flex items-center gap-2">
+                                            <div className="w-1 h-3 bg-green-500 rounded-full"></div>
+                                            {language === 'ar' ? 'معلومات الاتصال (اختياري)' : 'Contact Information (Optional)'}
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="flex flex-col gap-2">
+                                                <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
+                                                    {t('phone')}
+                                                </label>
+                                                <input
+                                                    name="phone"
+                                                    type="tel"
+                                                    value={formData.phone}
+                                                    onChange={handleInputChange}
+                                                    className="bg-white border border-gray-200 p-3 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner"
+                                                    placeholder={language === 'ar' ? '+966 50 123 4567' : '+966 50 123 4567'}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
+                                                    {t('email')}
+                                                </label>
+                                                <input
+                                                    name="email"
+                                                    type="email"
+                                                    value={formData.email}
+                                                    onChange={handleInputChange}
+                                                    className="bg-white border border-gray-200 p-3 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner"
+                                                    placeholder="example@email.com"
+                                                />
+                                            </div>
+                                        </div>
+                                        <p className="text-[9px] text-gray-500 mt-2 font-medium">
+                                            {language === 'ar'
+                                                ? 'سيتم عرض هذه المعلومات للمشترين المهتمين في صفحة الإعلان'
+                                                : 'This information will be displayed to interested buyers on the ad page'
+                                            }
+                                        </p>
                                     </div>
 
                                     <div className="flex flex-col gap-2">

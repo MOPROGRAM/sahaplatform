@@ -32,19 +32,13 @@ interface Ad {
     location: string;
     latitude?: number;
     longitude?: number;
-    images: string;
+    images_urls?: string[];
+    phone?: string;
+    email?: string;
+    allow_no_media?: boolean;
     views: number;
-    isBoosted: boolean;
-    authorId: string;
-    currency_id?: string;
-    createdAt: string;
-    author?: {
-        id: string;
-        name: string;
-        phone?: string;
-        email?: string;
-        verified: boolean;
-    };
+    user_id: string;
+    created_at: string;
 }
 
 export default function AdDetailsContent({ id }: { id: string }) {
@@ -82,7 +76,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
             router.push('/login');
             return;
         }
-        if (user.id === ad?.authorId) {
+        if (user.id === ad?.user_id) {
             alert(language === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
             return;
         }
@@ -90,7 +84,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
         try {
             // Check or create conversation for this ad
             const conversation = await apiService.post('/conversations', {
-                participants: [ad?.authorId],
+                participants: [ad?.user_id],
                 adId: ad?.id
             });
             setConversationId(conversation.id);
@@ -132,10 +126,10 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                     <div className="flex items-baseline gap-1 text-primary">
                                         <span className="text-3xl font-black italic tracking-tighter">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}</span>
                                         <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                                            {ad.currency_id || 'SAR'}
+                                            SAR
                                         </span>
                                     </div>
-                                    <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">Listed {new Date(ad.createdAt).toLocaleDateString()}</span>
+                                    <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">Listed {new Date(ad.created_at).toLocaleDateString()}</span>
                                 </div>
                             </div>
 
@@ -167,23 +161,14 @@ export default function AdDetailsContent({ id }: { id: string }) {
                     <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
                         <div className="max-h-96 bg-gray-900 relative">
                             {(() => {
-                                try {
-                                    const images = JSON.parse(ad.images || "[]");
-                                    return images.length > 0 ? (
-                                        <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100 max-h-96" />
-                                    ) : (
-                                        <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
-                                        </div>
-                                    );
-                                } catch (e) {
-                                    console.error('Failed to parse ad images:', e);
-                                    return (
-                                        <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
-                                        </div>
-                                    );
-                                }
+                                const images = ad.images_urls || [];
+                                return images.length > 0 ? (
+                                    <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100 max-h-96" />
+                                ) : (
+                                    <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                        <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                    </div>
+                                );
                             })()}
                             <div className="absolute bottom-3 right-3 flex gap-2">
                                 <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Maximize2 size={14} /></button>
@@ -191,25 +176,21 @@ export default function AdDetailsContent({ id }: { id: string }) {
                             </div>
                         </div>
                         {(() => {
-                            try {
-                                const images = JSON.parse(ad.images || "[]");
-                                return images.length > 1 ? (
-                                    <div className="p-4 border-t border-gray-100">
-                                        <div className="grid grid-cols-4 gap-2">
-                                            {images.slice(1, 5).map((img: string, idx: number) => (
-                                                <img
-                                                    key={idx}
-                                                    src={img}
-                                                    alt={`View ${idx + 2}`}
-                                                    className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
-                                                />
-                                            ))}
-                                        </div>
+                            const images = ad.images_urls || [];
+                            return images.length > 1 ? (
+                                <div className="p-4 border-t border-gray-100">
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {images.slice(1, 5).map((img: string, idx: number) => (
+                                            <img
+                                                key={idx}
+                                                src={img}
+                                                alt={`View ${idx + 2}`}
+                                                className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
+                                            />
+                                        ))}
                                     </div>
-                                ) : null;
-                            } catch (e) {
-                                return null;
-                            }
+                                </div>
+                            ) : null;
                         })()}
                     </div>
 
@@ -252,6 +233,29 @@ export default function AdDetailsContent({ id }: { id: string }) {
                             </div>
                         </div>
 
+                        {/* Contact Information Section */}
+                        {(ad.phone || ad.email) && (
+                            <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-xs">
+                                <h4 className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">
+                                    {language === 'ar' ? 'معلومات الاتصال' : 'CONTACT INFO'}
+                                </h4>
+                                <div className="space-y-2">
+                                    {ad.phone && (
+                                        <div className="flex items-center gap-2 text-[11px] font-medium">
+                                            <Phone size={14} className="text-green-600" />
+                                            <span>{ad.phone}</span>
+                                        </div>
+                                    )}
+                                    {ad.email && (
+                                        <div className="flex items-center gap-2 text-[11px] font-medium">
+                                            <MessageCircle size={14} className="text-blue-600" />
+                                            <span>{ad.email}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="flex flex-col gap-2">
                             <button
                                 onClick={handleStartChat}
@@ -260,13 +264,15 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <MessageCircle size={16} />
                                 {language === 'ar' ? 'بدء محادثة فورية' : 'START REAL-TIME CHAT'}
                             </button>
-                            <button
-                                onClick={() => setShowPhone(!showPhone)}
-                                className="w-full bg-secondary text-white py-3 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
-                            >
-                                <Phone size={16} />
-                                {showPhone ? (ad.author?.phone || 'Not provided') : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
-                            </button>
+                            {ad.phone && (
+                                <button
+                                    onClick={() => setShowPhone(!showPhone)}
+                                    className="w-full bg-secondary text-white py-3 rounded-sm text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
+                                >
+                                    <Phone size={16} />
+                                    {showPhone ? ad.phone : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
+                                </button>
+                            )}
                         </div>
 
                         <div className="mt-6 flex flex-col gap-3">

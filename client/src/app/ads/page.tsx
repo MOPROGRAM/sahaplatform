@@ -16,13 +16,16 @@ interface Ad {
     title: string;
     description: string;
     price: number;
-    currencyId: string;
     category: string;
     location: string;
-    images: string;
-    isBoosted: boolean;
-    authorId: string;
-    createdAt: string;
+    images_urls: string[];
+    phone?: string;
+    email?: string;
+    latitude?: number;
+    longitude?: number;
+    allow_no_media?: boolean;
+    user_id: string;
+    created_at: string;
 }
 
 function AdsContent() {
@@ -36,6 +39,7 @@ function AdsContent() {
     const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
     const [locationFilter, setLocationFilter] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [showAllAds, setShowAllAds] = useState(false); // Show ads without media
 
     useEffect(() => {
         setSearchQuery(searchQueryParam || '');
@@ -46,25 +50,38 @@ function AdsContent() {
         setLoading(true);
         try {
             let query = supabase
-                .from('Ad')
+                .from('ads')
                 .select('*')
-                .order('createdAt', { ascending: false })
-                .limit(20);
+                .order('created_at', { ascending: false })
+                .limit(50);
 
+            // Filter by category if specified
             if (categoryQuery) {
                 query = query.eq('category', categoryQuery);
             }
+
+            // Search in title and description
             if (searchQuery) {
-                query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,titleAr.ilike.%${searchQuery}%,descriptionAr.ilike.%${searchQuery}%`);
+                query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
             }
+
+            // Location filter
             if (locationFilter) {
                 query = query.ilike('location', `%${locationFilter}%`);
             }
+
+            // Price range filter
             if (priceRange.min) {
                 query = query.gte('price', Number(priceRange.min));
             }
             if (priceRange.max) {
                 query = query.lte('price', Number(priceRange.max));
+            }
+
+            // Filter ads based on media availability
+            if (!showAllAds) {
+                // Show only ads that have either images or map coordinates OR explicitly allow no media
+                query = query.or(`images_urls.neq.{},latitude.not.is.null,allow_no_media.eq.true`);
             }
 
             const { data, error } = await query;
@@ -116,6 +133,15 @@ function AdsContent() {
                             />
                         </div>
                         <button onClick={fetchAds} className="bg-primary text-white px-4 py-1.5 text-[10px] font-black rounded-xs hover:bg-primary-hover transition-all uppercase tracking-widest shadow-lg active:scale-95">SYNC RESULTS</button>
+                        <label className="flex items-center gap-2 text-[10px] font-black text-gray-600">
+                            <input
+                                type="checkbox"
+                                checked={showAllAds}
+                                onChange={(e) => setShowAllAds(e.target.checked)}
+                                className="w-3 h-3"
+                            />
+                            {language === 'ar' ? 'عرض جميع الإعلانات' : 'Show All Ads'}
+                        </label>
                     </div>
                 </div>
             </div>
@@ -146,8 +172,8 @@ function AdsContent() {
                                 price={ad.price}
                                 currency="ريال"
                                 location={ad.location}
-                                images={JSON.parse(ad.images || '[]')}
-                                createdAt={ad.createdAt}
+                                images={ad.images_urls || []}
+                                createdAt={ad.created_at}
                                 category={ad.category}
                             />
                         ))}
