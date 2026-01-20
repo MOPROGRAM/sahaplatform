@@ -138,7 +138,7 @@ export default function Header() {
                         {t('ads')}
                     </Link>
                     <Link href="/advertise" className={`text-[11px] font-black uppercase tracking-widest transition-colors ${pathname === '/advertise' ? 'text-primary border-b-2 border-primary' : 'text-text-main hover:text-primary'}`}>
-                        Advertise
+                        {t('advertise')}
                     </Link>
                 </nav>
 

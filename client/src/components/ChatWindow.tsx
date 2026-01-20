@@ -272,9 +272,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 </button>
                 <label className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
                     <Paperclip size={12} /> ATTACH DOCUMENT
-                    <input type="file" className="hidden" onChange={(e) => {
+                    <input type="file" className="hidden" onChange={async (e) => {
                         const file = e.target.files?.[0];
-                        if (file) handleSend('file', `Attached: ${file.name}`, { fileName: file.name, fileUrl: '#' });
+                        if (file) {
+                            const uploadData = await handleFileUpload(file, 'file');
+                            if (uploadData) {
+                                handleSend('file', `Attached: ${file.name}`, uploadData);
+                            }
+                        }
                     }} />
                 </label>
             </div>

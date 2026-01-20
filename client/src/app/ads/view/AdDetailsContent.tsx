@@ -103,8 +103,8 @@ export default function AdDetailsContent({ id }: { id: string }) {
     if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-primary" /></div>;
     if (!ad) return <div className="text-center p-20 font-black uppercase">Ad not found</div>;
 
-    const lat = ad.latitude || 24.7136;
-    const lon = ad.longitude || 46.6753;
+    const lat = ad.latitude;
+    const lon = ad.longitude;
 
     return (
         <div className="bg-[#f0f2f5] min-h-screen" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -203,7 +203,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                     )}
 
                     {/* Integrated Map - Free OpenStreetMap - Moved to bottom */}
-                    {(ad.allow_no_media === false || ad.allow_no_media !== true) && ad.location && (
+                    {lat && lon && ad.location && (
                         <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm overflow-hidden flex flex-col gap-3">
                             <h3 className="text-[12px] font-black uppercase text-secondary flex items-center gap-2">
                                 <MapPin size={14} className="text-primary" />

@@ -5,11 +5,13 @@ import { useSearchParams } from 'next/navigation';
 import { Filter, Loader2, MapPin, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
+import { useFilterStore } from '@/store/useFilterStore';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
 import SearchBar from '@/components/SearchBar';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import AdvancedFilter from '@/components/AdvancedFilter';
 
 interface Ad {
     id: string;
@@ -31,20 +33,18 @@ interface Ad {
 function AdsContent() {
     const { language, t, currency } = useLanguage();
     const searchParams = useSearchParams();
-    const categoryQuery = searchParams.get('category');
     const searchQueryParam = searchParams.get('search');
+    const { category, tags } = useFilterStore();
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
-    const [locationFilter, setLocationFilter] = useState('');
-    const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     const [showAllAds, setShowAllAds] = useState(false); // Show ads without media
 
     useEffect(() => {
         setSearchQuery(searchQueryParam || '');
         fetchAds();
-    }, [categoryQuery, searchQueryParam]);
+    }, [category, tags, searchQueryParam]);
 
     const fetchAds = async () => {
         setLoading(true);
@@ -56,8 +56,8 @@ function AdsContent() {
                 .limit(50);
 
             // Filter by category if specified
-            if (categoryQuery) {
-                query = query.eq('category', categoryQuery);
+            if (category) {
+                query = query.eq('category', category);
             }
 
             // Search in title and description
@@ -65,17 +65,41 @@ function AdsContent() {
                 query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
             }
 
-            // Location filter
-            if (locationFilter) {
-                query = query.ilike('location', `%${locationFilter}%`);
+            // Location filter from tags
+            const regions = ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة'];
+            const selectedRegions = tags.filter(tag => regions.includes(tag));
+            if (selectedRegions.length > 0) {
+                const locationConditions = selectedRegions.map(region => `location.ilike.%${region}%`);
+                query = query.or(locationConditions.join(','));
             }
 
-            // Price range filter
-            if (priceRange.min) {
-                query = query.gte('price', Number(priceRange.min));
+            // Type filter from tags
+            const types = ['سكني', 'تجاري', 'إيجار', 'بيع', 'استثمار'];
+            const selectedTypes = tags.filter(tag => types.includes(tag));
+            if (selectedTypes.length > 0) {
+                const typeConditions = selectedTypes.flatMap(type => [`title.ilike.%${type}%`, `description.ilike.%${type}%`]);
+                query = query.or(typeConditions.join(','));
             }
-            if (priceRange.max) {
-                query = query.lte('price', Number(priceRange.max));
+
+            // Price filter from tags
+            const priceRanges = {
+                'أقل من 50k': { min: 0, max: 50000 },
+                '50k - 200k': { min: 50000, max: 200000 },
+                '200k - 500k': { min: 200000, max: 500000 },
+                '500k+': { min: 500000, max: Infinity }
+            };
+            const selectedPrices = tags.filter(tag => tag in priceRanges);
+            if (selectedPrices.length > 0) {
+                const priceConditions = selectedPrices.map(tag => {
+                    const range = priceRanges[tag as keyof typeof priceRanges];
+                    let cond = '';
+                    if (range.min > 0) cond += `price.gte.${range.min}`;
+                    if (range.max < Infinity) cond += (cond ? ',' : '') + `price.lte.${range.max}`;
+                    return cond;
+                }).filter(Boolean);
+                if (priceConditions.length > 0) {
+                    query = query.or(priceConditions.join(','));
+                }
             }
 
             // Filter ads based on media availability
@@ -100,39 +124,11 @@ function AdsContent() {
         <div className="min-h-screen bg-[#f0f2f5] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            {/* Filter Bar */}
-            <div className="bg-white border-b border-gray-200 py-2 px-4 sticky top-[53px] z-40 shadow-sm">
-                <div className="max-w-7xl mx-auto flex items-center gap-4">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-secondary bg-gray-100 px-3 py-1.5 rounded-xs border border-gray-200 uppercase tracking-widest italic">
-                        <Filter size={14} className="text-primary" />
-                        <span>Filter Matrix</span>
-                    </div>
-                    <div className="flex-1 flex items-center gap-2">
-                        <input
-                            type="text"
-                            placeholder={language === 'ar' ? 'البحث عن مدينة...' : 'Search Location...'}
-                            className="bg-gray-50 border border-gray-200 px-3 py-1.5 text-[10px] font-bold rounded-xs focus:border-primary focus:bg-white outline-none w-40 transition-all font-cairo"
-                            value={locationFilter}
-                            onChange={(e) => setLocationFilter(e.target.value)}
-                        />
-                        <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xs px-2 py-1">
-                            <input
-                                type="number"
-                                placeholder="MIN"
-                                className="bg-transparent text-[10px] font-black outline-none w-14 text-center placeholder:text-gray-300"
-                                value={priceRange.min}
-                                onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                            />
-                            <span className="text-[10px] opacity-20 font-black">/</span>
-                            <input
-                                type="number"
-                                placeholder="MAX"
-                                className="bg-transparent text-[10px] font-black outline-none w-14 text-center placeholder:text-gray-300"
-                                value={priceRange.max}
-                                onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                            />
-                        </div>
-                        <button onClick={fetchAds} className="bg-primary text-white px-4 py-1.5 text-[10px] font-black rounded-xs hover:bg-primary-hover transition-all uppercase tracking-widest shadow-lg active:scale-95">SYNC RESULTS</button>
+            {/* Advanced Filter */}
+            <div className="bg-gray-50 border-b border-gray-200 py-4 px-4">
+                <div className="max-w-7xl mx-auto">
+                    <AdvancedFilter />
+                    <div className="mt-4 flex items-center gap-2">
                         <label className="flex items-center gap-2 text-[10px] font-black text-gray-600">
                             <input
                                 type="checkbox"
@@ -152,7 +148,7 @@ function AdsContent() {
                     <div className="flex items-center gap-3">
                         <div className="w-1 h-4 bg-primary rounded-full"></div>
                         <h1 className="text-[14px] font-black uppercase text-secondary tracking-tight">
-                            {categoryQuery ? `${categoryQuery}` : 'Global Marketplace'}
+                            {category ? `${category}` : 'Global Marketplace'}
                             <span className="text-[10px] font-black text-gray-400 mr-3 border-r border-gray-200 pr-3 uppercase italic mx-2">{ads.length} listings identified</span>
                         </h1>
                     </div>
