@@ -1,6 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 import AdDetailsContent from "../view/AdDetailsContent";
 import { Suspense } from "react";
 

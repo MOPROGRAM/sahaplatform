@@ -5,7 +5,7 @@
     "main": "server/src/index.js",
     "scripts": {
         "build": "npm run build:client",
-        "build:client": "cd client && npm install --legacy-peer-deps && npx @cloudflare/next-on-pages@1",
+        "build:client": "cd client && npm install --legacy-peer-deps && npm run build",
         "start": "cd server && npm start",
         "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
         "dev:client": "cd client && npm run dev",
