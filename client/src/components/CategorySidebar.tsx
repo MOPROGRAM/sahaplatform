@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import {
     Home,
@@ -17,6 +17,7 @@ import {
 export default function CategorySidebar() {
     const { language, t } = useLanguage();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     // Only show on ads pages
     if (!pathname.startsWith('/ads')) {
@@ -43,7 +44,7 @@ export default function CategorySidebar() {
                 {categories.map((category) => {
                     const isActive = pathname === category.path ||
                         (pathname.startsWith('/ads') && category.key !== 'all' &&
-                            new URLSearchParams(window.location.search).get('category') === category.key);
+                            searchParams.get('category') === category.key);
 
                     return (
                         <Link

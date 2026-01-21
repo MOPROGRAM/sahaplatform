@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
 import { Inter, Cairo, Tajawal } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { LanguageProvider } from "@/lib/language-context";
-import CategorySidebar from "@/components/CategorySidebar";
+import dynamic from "next/dynamic";
+
+const LanguageProvider = dynamic(() => import("@/lib/language-context").then(mod => ({ default: mod.LanguageProvider })), {
+    ssr: false,
+});
+
+const ThemeProvider = dynamic(() => import("next-themes").then(mod => ({ default: mod.ThemeProvider })), {
+    ssr: false,
+});
+
+const CategorySidebar = dynamic(() => import("@/components/CategorySidebar"), {
+    ssr: false,
+});
 
 const inter = Inter({
     subsets: ['latin'],
@@ -24,8 +34,6 @@ const tajawal = Tajawal({
     display: 'swap',
     weight: ['300', '400', '500', '700'],
 });
-
-export const runtime = 'edge';
 
 export const metadata: Metadata = {
     title: "ساحة - مساحة واسعة من الفرص",
