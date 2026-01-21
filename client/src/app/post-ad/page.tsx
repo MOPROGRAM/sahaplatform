@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-export const dynamic = 'force-dynamic';
 import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,7 +8,12 @@ import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import Header from "@/components/Header";
 import Footer from '@/components/Footer';
-import MapSelector from '@/components/MapSelector';
+import dynamic from 'next/dynamic';
+
+const MapSelector = dynamic(() => import('@/components/MapSelector'), {
+    ssr: false,
+    loading: () => <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">Loading map...</div>
+});
 
 export default function PostAdPage() {
     const { language, t, currency } = useLanguage();
