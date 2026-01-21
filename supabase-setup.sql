@@ -253,8 +253,8 @@ CREATE POLICY "sessions_all" ON "sessions" USING (auth.role() = 'service_role');
 -- Verification tokens: service role only
 CREATE POLICY "verification_tokens_all" ON "verification_tokens" USING (auth.role() = 'service_role');
 
--- Ads: authenticated users can read, own ads full access
-CREATE POLICY "ads_select" ON "ads" FOR SELECT USING (auth.role() = 'authenticated');
+-- Ads: public read access, authenticated users full access for own ads
+CREATE POLICY "ads_select" ON "ads" FOR SELECT USING (true);
 CREATE POLICY "ads_insert" ON "ads" FOR INSERT WITH CHECK (auth.uid() = author_id);
 CREATE POLICY "ads_update" ON "ads" FOR UPDATE USING (auth.uid() = author_id);
 CREATE POLICY "ads_delete" ON "ads" FOR DELETE USING (auth.uid() = author_id);
