@@ -5,7 +5,7 @@ import { ArrowLeft, Star, TrendingUp, Users, Eye, Zap } from 'lucide-react';
 import { useLanguage } from '@/lib/language-context';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
-import { apiService } from '@/lib/api';
+// import { apiService } from '@/lib/api';
 
 export default function AdvertisePage() {
     const { language, t } = useLanguage();
@@ -73,21 +73,8 @@ export default function AdvertisePage() {
             return;
         }
 
-        try {
-            const priceValue = parseFloat(plan.price.replace(/[^0-9.]/g, ''));
-            const response = await apiService.post('/subscriptions', {
-                planName: plan.name,
-                price: priceValue
-            });
-
-            if (response && response.id) {
-                alert(language === 'ar' ? 'تم الاشتراك بنجاح!' : 'Subscription active!');
-                router.push('/dashboard');
-            }
-        } catch (error) {
-            console.error("Subscription failed:", error);
-            alert(language === 'ar' ? 'حدث خطأ أثناء تفعيل الاشتراك' : 'Failed to activate subscription');
-        }
+        // TODO: Implement subscription with Supabase
+        alert(language === 'ar' ? 'ميزة الاشتراكات ستكون متاحة قريباً!' : 'Subscription feature coming soon!');
     };
 
     return (

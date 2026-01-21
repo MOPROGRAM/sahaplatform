@@ -20,7 +20,8 @@ import Header from "@/components/Header";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
-import { apiService } from "@/lib/api";
+import { adsService, Ad as AdsAd } from "@/lib/ads";
+import { conversationsService } from "@/lib/conversations";
 import { useAuthStore } from "@/store/useAuthStore";
 import { formatRelativeTime } from "@/lib/utils";
 
@@ -67,12 +68,42 @@ export default function AdDetailsContent({ id }: { id: string }) {
         setLoading(true);
         try {
             console.log('[AD-VIEW] Fetching ad details for id:', adId);
-            const data = await apiService.get(`/ads/${adId}`);
+            const data = await adsService.getAd(adId);
             console.log('[AD-VIEW] Received ad data:', data);
-            console.log('[AD-VIEW] images:', data.images);
-            console.log('[AD-VIEW] allow_no_media:', data.allow_no_media);
-            console.log('[AD-VIEW] latitude:', data.latitude, 'longitude:', data.longitude, 'location:', data.location);
-            setAd(data);
+
+            if (data) {
+                // Transform data to match local Ad interface
+                const transformedAd: Ad = {
+                    id: data.id,
+                    title: data.title,
+                    description: data.description,
+                    price: data.price || 0,
+                    category: data.category,
+                    location: data.location || '',
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    images: JSON.parse(data.images || '[]'),
+                    views: data.views,
+                    user_id: data.author_id,
+                    created_at: data.created_at,
+                    author: data.author ? {
+                        id: data.author.id,
+                        name: data.author.name || '',
+                        verified: true, // Assume verified for now
+                        email: data.author.email
+                    } : {
+                        id: '',
+                        name: '',
+                        verified: false
+                    }
+                };
+
+                console.log('[AD-VIEW] Transformed ad data:', transformedAd);
+                setAd(transformedAd);
+
+                // Increment views
+                adsService.incrementViews(adId);
+            }
         } catch (error) {
             console.error('[AD-VIEW] Failed to fetch ad details:', error);
         } finally {
@@ -92,10 +123,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
         try {
             // Check or create conversation for this ad
-            const conversation = await apiService.post('/conversations', {
-                participants: [ad?.user_id],
-                adId: ad?.id
-            });
+            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.user_id || '');
             setConversationId(conversation.id);
             setShowChat(true);
         } catch (error) {

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Filter, Loader2, MapPin, Image as ImageIcon } from 'lucide-react';
-import { apiService } from '@/lib/api';
+import { adsService } from '@/lib/ads';
 import { useLanguage } from '@/lib/language-context';
 import { useFilterStore } from '@/store/useFilterStore';
 import Header from '@/components/Header';
@@ -110,7 +110,7 @@ function AdsContent() {
                 filters.hasMedia = true;
             }
 
-            const data = await apiService.getAds(filters);
+            const data = await adsService.getAds(filters);
             // Ensure data is always an array
             setAds(Array.isArray(data) ? data : []);
         } catch (error) {

@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { apiService } from "@/lib/api";
+// import { apiService } from "@/lib/api";
 import { useLanguage } from "@/lib/language-context";
 
 export default function AdminDashboard() {
@@ -49,14 +49,12 @@ export default function AdminDashboard() {
     const fetchAdminData = async () => {
         setLoading(true);
         try {
-            // In a real system, these would be specific admin endpoints
-            const allAds = await apiService.get('/ads');
-            setRecentAds(allAds.slice(0, 10));
-
-            // Mocking some admin stats for now
+            // TODO: Implement admin data fetching with Supabase
+            // For now, using mock data
+            setRecentAds([]);
             setStats({
                 totalUsers: 1420,
-                totalAds: allAds.length,
+                totalAds: 0,
                 activeSubscriptions: 85,
                 pendingReports: 3
             });

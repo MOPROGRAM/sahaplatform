@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { apiService } from "@/lib/api";
+import { adsService, Ad } from "@/lib/ads";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { formatRelativeTime } from "@/lib/utils";
@@ -11,17 +11,6 @@ import Footer from "@/components/Footer";
 import AdCard from "@/components/AdCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
-
-interface Ad {
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-    category: string;
-    location: string;
-    images_urls: string[];
-    created_at: string;
-}
 
 export default function MyAdsPage() {
     const { language, t } = useLanguage();
@@ -48,7 +37,7 @@ export default function MyAdsPage() {
     const fetchMyAds = async () => {
         try {
             setLoading(true);
-            const data = await apiService.getMyAds();
+            const data = await adsService.getMyAds();
             setAds(data);
         } catch (err: any) {
             console.error('Error fetching ads:', err);
@@ -64,7 +53,7 @@ export default function MyAdsPage() {
         }
 
         try {
-            await apiService.deleteAd(adId);
+            await adsService.deleteAd(adId);
             setAds(ads.filter(ad => ad.id !== adId));
         } catch (err: any) {
             console.error('Error deleting ad:', err);
@@ -154,7 +143,7 @@ export default function MyAdsPage() {
                                     title={ad.title}
                                     price={ad.price}
                                     location={ad.location}
-                                    images={ad.images_urls}
+                                    images={JSON.parse(ad.images || '[]')}
                                     createdAt={ad.created_at}
                                     category={ad.category}
                                     language={language}

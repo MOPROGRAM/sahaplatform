@@ -1,40 +1,15 @@
 import { create } from 'zustand';
-import { apiService } from '@/lib/api';
-
-interface Country {
-    id: string;
-    name: string;
-    nameAr: string;
-    nameEn: string;
-    code: string;
-    phoneCode: string;
-    flag: string;
-    currency: {
-        id: string;
-        code: string;
-        symbol: string;
-        nameAr: string;
-        nameEn: string;
-    };
-    cities: City[];
-}
-
-interface City {
-    id: string;
-    name: string;
-    nameAr: string;
-    nameEn: string;
-    latitude?: number;
-    longitude?: number;
-}
+import { countriesService, Country, City } from '@/lib/countries';
 
 interface LocationState {
     countries: Country[];
+    cities: City[];
     loading: boolean;
     error: string | null;
 
     // Actions
     fetchCountries: () => Promise<void>;
+    fetchCities: () => Promise<void>;
     getCountryById: (id: string) => Country | undefined;
     getCitiesByCountry: (countryId: string) => City[];
     getCityById: (id: string) => City | undefined;
@@ -42,17 +17,31 @@ interface LocationState {
 
 export const useLocationStore = create<LocationState>((set, get) => ({
     countries: [],
+    cities: [],
     loading: false,
     error: null,
 
     fetchCountries: async () => {
         set({ loading: true, error: null });
         try {
-            const countries = await apiService.getCountries();
+            const countries = await countriesService.getCountries();
             set({ countries, loading: false });
         } catch (error) {
             set({
                 error: error instanceof Error ? error.message : 'Failed to fetch countries',
+                loading: false
+            });
+        }
+    },
+
+    fetchCities: async () => {
+        set({ loading: true, error: null });
+        try {
+            const cities = await countriesService.getCities();
+            set({ cities, loading: false });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : 'Failed to fetch cities',
                 loading: false
             });
         }
@@ -63,15 +52,10 @@ export const useLocationStore = create<LocationState>((set, get) => ({
     },
 
     getCitiesByCountry: (countryId: string) => {
-        const country = get().countries.find(c => c.id === countryId);
-        return country?.cities || [];
+        return get().cities.filter(city => city.country_id === countryId);
     },
 
     getCityById: (id: string) => {
-        for (const country of get().countries) {
-            const city = country.cities.find(c => c.id === id);
-            if (city) return city;
-        }
-        return undefined;
+        return get().cities.find(city => city.id === id);
     }
 }));
