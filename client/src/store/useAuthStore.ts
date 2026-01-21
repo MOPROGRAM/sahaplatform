@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { AuthUser, authService } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 interface AuthState {
     user: AuthUser | null;
@@ -19,7 +20,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.login(email, password);
-            authService.setToken(response.token);
             set({
                 user: response.user,
                 token: response.token
@@ -34,7 +34,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.register(email, password, name, userType);
-            authService.setToken(response.token);
             set({
                 user: response.user,
                 token: response.token
@@ -45,18 +44,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ loading: false });
         }
     },
-    logout: () => {
-        authService.removeToken();
+    logout: async () => {
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
         set({ user: null, token: null });
     },
-    initialize: () => {
+    initialize: async () => {
         set({ loading: true });
         try {
-            const token = authService.getToken();
-            if (token) {
-                // TODO: Validate token with backend and get user info
-                // For now, we'll just set the token
-                set({ token });
+            const session = await authService.getCurrentSession();
+            if (session?.user) {
+                set({
+                    user: {
+                        id: session.user.id,
+                        email: session.user.email || '',
+                        name: session.user.user_metadata?.name || '',
+                        role: session.user.user_metadata?.role || 'USER',
+                        userType: session.user.user_metadata?.userType || 'SEEKER',
+                        verified: !!session.user.email_confirmed_at,
+                    },
+                    token: session.access_token
+                });
             }
         } catch (e) {
             console.error("Failed to initialize auth:", e);
