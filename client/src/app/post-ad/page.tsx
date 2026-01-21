@@ -104,6 +104,7 @@ export default function PostAdPage() {
 
             // Upload images
             const imageUrls: string[] = [];
+            console.log('[POST-AD] Starting upload of', images.length, 'images');
             for (const image of images) {
                 const formDataUpload = new FormData();
                 formDataUpload.append('file', image);
@@ -118,36 +119,36 @@ export default function PostAdPage() {
 
                 if (uploadResponse.ok) {
                     const uploadData = await uploadResponse.json();
+                    console.log('[POST-AD] Upload successful, URL:', uploadData.url);
                     imageUrls.push(uploadData.url);
                 } else {
-                    console.error('Error uploading image');
+                    console.error('[POST-AD] Error uploading image:', await uploadResponse.text());
                 }
             }
+            console.log('[POST-AD] Final imageUrls array:', imageUrls);
 
             // Create ad - match database schema exactly
-            const adPayload = {
-                title: formData.title,
-                description: formData.description,
-                price: Number(formData.price),
-                category: formData.category,
-                location: formData.enableLocation ? formData.location : null,
-                images_urls: imageUrls, // Match database field name
-                phone: formData.phone || null, // Contact info (optional)
-                email: formData.email || null, // Contact info (optional)
-                latitude: coordinates?.lat || null, // Map coordinates
-                longitude: coordinates?.lng || null, // Map coordinates
-                allow_no_media: !images.length // Allow showing ad without media if no images
-            };
+            const adFormData = new FormData();
+            adFormData.append('title', formData.title);
+            adFormData.append('description', formData.description);
+            adFormData.append('price', formData.price.toString());
+            adFormData.append('category', formData.category);
+            adFormData.append('location', formData.enableLocation ? formData.location : '');
+            adFormData.append('images', JSON.stringify(imageUrls)); // Match database field name
+            if (formData.phone) adFormData.append('phone', formData.phone);
+            if (formData.email) adFormData.append('email', formData.email);
+            if (coordinates?.lat) adFormData.append('latitude', coordinates.lat.toString());
+            if (coordinates?.lng) adFormData.append('longitude', coordinates.lng.toString());
+            adFormData.append('allow_no_media', (!images.length).toString());
 
-            console.log('Sending ad payload:', adPayload);
+            console.log('Sending ad formData:', Object.fromEntries(adFormData.entries()));
 
             const adResponse = await fetch('/api/ads', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify(adPayload),
+                body: adFormData,
             });
 
             if (adResponse.ok) {

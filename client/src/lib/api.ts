@@ -1,11 +1,7 @@
 const getBaseUrl = () => {
     if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-    if (typeof window !== 'undefined') {
-        const host = window.location.origin;
-        // If we are on render but env is missing, try to use current origin + /api
-        return `${host}/api`;
-    }
-    return 'http://localhost:5000/api';
+    // Use Next.js API routes
+    return '/api';
 };
 
 const API_URL = getBaseUrl();

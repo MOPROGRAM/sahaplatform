@@ -41,7 +41,7 @@ function AdsContent() {
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
-    const [showAllAds, setShowAllAds] = useState(false); // Show ads without media
+    const [showAllAds, setShowAllAds] = useState(true); // Show ads without media
 
     // Sync filters with URL on mount
     useEffect(() => {

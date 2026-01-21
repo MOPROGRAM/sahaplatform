@@ -54,6 +54,22 @@ export async function POST(request: Request) {
             });
         }
 
+        // Check if bucket exists and is accessible
+        try {
+            const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+            const bucketExists = buckets?.some(bucket => bucket.name === 'ads-images');
+            console.log('[UPLOAD] Bucket check - ads-images exists:', bucketExists);
+            if (!bucketExists) {
+                console.error('[UPLOAD] Bucket ads-images does not exist');
+                return new Response(JSON.stringify({ error: 'Storage bucket not configured' }), {
+                    status: 500,
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+        } catch (bucketError) {
+            console.error('[UPLOAD] Error checking bucket:', bucketError);
+        }
+
         // Upload file to Supabase Storage
         const fileName = `${Date.now()}-${file.name}`;
         const { data, error } = await supabaseAdmin.storage
@@ -73,6 +89,7 @@ export async function POST(request: Request) {
             .from('ads-images')
             .getPublicUrl(fileName);
 
+        console.log('[UPLOAD] Generated public URL:', urlData.publicUrl);
         return Response.json({ url: urlData.publicUrl });
     } catch (err) {
         console.error('Error in upload API:', err);

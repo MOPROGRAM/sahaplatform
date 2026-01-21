@@ -33,7 +33,7 @@ interface Ad {
     location: string;
     latitude?: number;
     longitude?: number;
-    images_urls?: string[];
+    images?: string[];
     allow_no_media?: boolean;
     views: number;
     user_id: string;
@@ -66,12 +66,15 @@ export default function AdDetailsContent({ id }: { id: string }) {
     const fetchAdDetails = async () => {
         setLoading(true);
         try {
-            console.log('Fetching ad details for id:', adId);
+            console.log('[AD-VIEW] Fetching ad details for id:', adId);
             const data = await apiService.get(`/ads/${adId}`);
-            console.log('Received ad data:', data);
+            console.log('[AD-VIEW] Received ad data:', data);
+            console.log('[AD-VIEW] images:', data.images);
+            console.log('[AD-VIEW] allow_no_media:', data.allow_no_media);
+            console.log('[AD-VIEW] latitude:', data.latitude, 'longitude:', data.longitude, 'location:', data.location);
             setAd(data);
         } catch (error) {
-            console.error('Failed to fetch ad details:', error);
+            console.error('[AD-VIEW] Failed to fetch ad details:', error);
         } finally {
             setLoading(false);
         }
@@ -163,12 +166,12 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* Media Gallery - Only show if allow_no_media is false or if there are images */}
-                    {(ad.allow_no_media === false || (ad.allow_no_media !== true && ad.images_urls && ad.images_urls.length > 0)) && (
+                    {/* Media Gallery - Only show when images exist */}
+                    {ad.images && ad.images.length > 0 && (
                         <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
                             <div className="max-h-96 bg-gray-900 relative">
                                 {(() => {
-                                    const images = ad.images_urls || [];
+                                    const images = ad.images || [];
                                     return images.length > 0 ? (
                                         <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100 max-h-96" />
                                     ) : (
@@ -183,7 +186,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 </div>
                             </div>
                             {(() => {
-                                const images = ad.images_urls || [];
+                                const images = ad.images || [];
                                 return images.length > 1 ? (
                                     <div className="p-4 border-t border-gray-100">
                                         <div className="grid grid-cols-4 gap-2">
@@ -203,7 +206,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                     )}
 
                     {/* Integrated Map - Free OpenStreetMap - Moved to bottom */}
-                    {lat && lon && ad.location && (
+                    {typeof lat === 'number' && typeof lon === 'number' && lat !== 0 && lon !== 0 && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && ad.location && (
                         <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm overflow-hidden flex flex-col gap-3">
                             <h3 className="text-[12px] font-black uppercase text-secondary flex items-center gap-2">
                                 <MapPin size={14} className="text-primary" />

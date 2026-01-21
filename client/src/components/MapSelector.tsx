@@ -1,6 +1,25 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import { useMapEvents } from 'react-leaflet';
+
+// Dynamically import map components to avoid SSR issues
+const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then((mod) => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then((mod) => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { ssr: false });
+
+import 'leaflet/dist/leaflet.css';
+
+// Fix for default markers in Leaflet
+import L from 'leaflet';
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface MapSelectorProps {
     onLocationSelect: (lat: number, lng: number, address?: string) => void;
@@ -8,31 +27,66 @@ interface MapSelectorProps {
     height?: string;
 }
 
-export default function MapSelector({ onLocationSelect, height = "300px" }: MapSelectorProps) {
-    const [selectedLocation, setSelectedLocation] = useState<string>('');
+// Component to handle map events
+function LocationMarker({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number, address?: string) => void }) {
+    const [position, setPosition] = useState<L.LatLng | null>(null);
 
-    const handleLocationInput = (location: string) => {
+    const map = useMapEvents({
+        click(e) {
+            setPosition(e.latlng);
+            onLocationSelect(e.latlng.lat, e.latlng.lng, `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`);
+        },
+    });
+
+    return position === null ? null : (
+        <Marker position={position} />
+    );
+}
+
+export default function MapSelector({ onLocationSelect, initialLocation = [24.7136, 46.6753], height = "300px" }: MapSelectorProps) {
+    const [selectedLocation, setSelectedLocation] = useState<string>('');
+    const [isClient, setIsClient] = useState(false);
+
+    // Ensure component only renders on client
+    useState(() => {
+        setIsClient(true);
+    });
+
+    const handleLocationInput = useCallback((location: string) => {
         setSelectedLocation(location);
         // For now, just pass a placeholder. In production, you'd use geocoding
         onLocationSelect(24.7136, 46.6753, location);
-    };
+    }, [onLocationSelect]);
+
+    if (!isClient) {
+        return (
+            <div className="w-full space-y-3">
+                <div
+                    className="bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300"
+                    style={{ height }}
+                >
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                        <p className="text-gray-600 font-medium mt-2">Loading map...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full space-y-3">
-            <div
-                className="bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300"
-                style={{ height }}
-            >
-                <div className="text-center">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                    </div>
-                    <p className="text-gray-600 font-medium mb-2">تحديد الموقع على الخريطة</p>
-                    <p className="text-sm text-gray-500">اضغط لاختيار موقع الإعلان</p>
-                </div>
+            <div className="bg-gray-100 rounded-lg overflow-hidden" style={{ height }}>
+                <MapContainer
+                    {...({ center: initialLocation, zoom: 10 } as any)}
+                    style={{ height: '100%', width: '100%' }}
+                    className="rounded-lg"
+                >
+                    <TileLayer
+                        {...({ url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' } as any)}
+                    />
+                    <LocationMarker onLocationSelect={onLocationSelect} />
+                </MapContainer>
             </div>
 
             <div className="space-y-2">

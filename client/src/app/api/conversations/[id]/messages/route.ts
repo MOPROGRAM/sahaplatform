@@ -105,9 +105,11 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
     const conversationId = params.id;
+    console.log('🚀 POST /conversations/[id]/messages called for conversationId:', conversationId);
 
     try {
         const { content, messageType = 'text', fileUrl, fileName, fileSize } = await request.json();
+        console.log('📦 Received payload:', { content: content?.substring(0, 50), messageType, fileUrl, fileName, fileSize });
 
         // Allow empty content for file types (file, image, voice, location)
         if (!content && messageType === 'text') {
@@ -136,6 +138,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         const token = authHeader.replace('Bearer ', '');
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
         if (authError || !user) {
+            console.log('❌ Auth failed:', authError);
             return new Response(JSON.stringify({ error: 'Authentication required' }), {
                 status: 401,
                 headers: { 'Content-Type': 'application/json' }
@@ -143,6 +146,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         }
 
         const userId = user.id;
+        console.log('✅ Auth successful for userId:', userId);
 
         // Check if user is part of the conversation
         const { data: conversation, error: convError } = await supabaseAdmin
@@ -152,6 +156,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
             .single();
 
         if (convError || !conversation) {
+            console.log('❌ Conversation not found:', convError);
             return new Response(JSON.stringify({ error: 'Conversation not found' }), {
                 status: 404,
                 headers: { 'Content-Type': 'application/json' }
@@ -159,6 +164,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         }
 
         if (conversation.buyerid !== userId && conversation.sellerid !== userId) {
+            console.log('❌ User not part of conversation:', { userId, buyerid: conversation.buyerid, sellerid: conversation.sellerid });
             return new Response(JSON.stringify({ error: 'Unauthorized' }), {
                 status: 403,
                 headers: { 'Content-Type': 'application/json' }
@@ -167,8 +173,19 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
         // Determine receiver
         const receiverId = conversation.buyerid === userId ? conversation.sellerid : conversation.buyerid;
+        console.log('✅ Conversation check passed, receiverId:', receiverId);
 
         // Create message
+        console.log('📝 Attempting to insert message:', {
+            conversationid: conversationId,
+            senderid: userId,
+            receiverid: receiverId,
+            content: content?.substring(0, 50),
+            messagetype: messageType,
+            fileurl: fileUrl,
+            filename: fileName,
+            filesize: fileSize,
+        });
         const { data: message, error } = await supabaseAdmin
             .from('message')
             .insert({
@@ -192,8 +209,18 @@ export async function POST(request: Request, { params }: { params: { id: string 
             `)
             .single();
 
+        if (error) {
+            console.log('❌ Insert error:', error);
+            return new Response(JSON.stringify({ error: error.message }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        console.log('✅ Message inserted successfully:', message.id);
+
         // Get sender name
-        if (message && !error) {
+        if (message) {
             const { data: userData } = await supabaseAdmin
                 .from('users')
                 .select('name')
@@ -201,13 +228,6 @@ export async function POST(request: Request, { params }: { params: { id: string 
                 .single();
 
             (message as any).sender = { name: userData?.name || 'Unknown' };
-        }
-
-        if (error) {
-            return new Response(JSON.stringify({ error: error.message }), {
-                status: 500,
-                headers: { 'Content-Type': 'application/json' }
-            });
         }
 
         return Response.json(message);

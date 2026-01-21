@@ -25,12 +25,11 @@ export default function CategorySidebar() {
 
     const categories = [
         { key: 'all', label: language === 'ar' ? 'جميع الفئات' : 'All Categories', icon: <Home size={16} />, path: '/ads' },
-        { key: 'realEstate', label: t('realEstate'), icon: <Building size={16} />, path: '/ads?category=realEstate' },
+        { key: 'realestate', label: t('realEstate'), icon: <Building size={16} />, path: '/ads?category=realestate' },
         { key: 'cars', label: t('cars'), icon: <Car size={16} />, path: '/ads?category=cars' },
         { key: 'jobs', label: t('jobs'), icon: <Briefcase size={16} />, path: '/ads?category=jobs' },
-        { key: 'goods', label: t('goods'), icon: <ShoppingBag size={16} />, path: '/ads?category=goods' },
+        { key: 'electronics', label: 'Electronics', icon: <ShoppingBag size={16} />, path: '/ads?category=electronics' },
         { key: 'services', label: t('services'), icon: <Wrench size={16} />, path: '/ads?category=services' },
-        { key: 'other', label: t('other'), icon: <MoreHorizontal size={16} />, path: '/ads?category=other' },
     ];
 
     return (

@@ -28,7 +28,9 @@ export async function GET(request: Request) {
         const searchParams = url.searchParams;
 
         const category = searchParams.get('category');
+        const type = searchParams.get('type');
         const location = searchParams.get('location');
+        const search = searchParams.get('search');
         const minPrice = searchParams.get('minPrice');
         const maxPrice = searchParams.get('maxPrice');
         const hasMedia = searchParams.get('hasMedia') === 'true';
@@ -46,7 +48,7 @@ export async function GET(request: Request) {
                 price,
                 category,
                 location,
-                images_urls,
+                images,
                 created_at,
                 user_id,
                 views,
@@ -58,10 +60,16 @@ export async function GET(request: Request) {
         // Apply filters
         if (category) {
             query = query.eq('category', category.toLowerCase());
+        } else if (type) {
+            query = query.eq('category', type.toLowerCase());
         }
 
         if (location) {
-            query = query.ilike('location', `%${location}%`);
+            const locations = location.split(',').map(l => l.trim()).filter(l => l);
+            if (locations.length > 0) {
+                const orConditions = locations.map(loc => `location.ilike.%${loc}%`).join(',');
+                query = query.or(orConditions);
+            }
         }
 
         if (minPrice) {
@@ -73,7 +81,11 @@ export async function GET(request: Request) {
         }
 
         if (hasMedia) {
-            query = query.neq('images_urls', '[]');
+            query = query.neq('images', '[]');
+        }
+
+        if (search) {
+            query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
         }
 
         // Sorting
@@ -151,7 +163,7 @@ export async function POST(request: Request) {
             });
         }
 
-        const formData = await request.json();
+        const formData = await request.formData();
 
         // Get authenticated user
         const authHeader = request.headers.get('Authorization');
@@ -205,10 +217,11 @@ export async function POST(request: Request) {
         }
 
         // Validate required fields exactly matching database schema
-        console.log('📋 RECEIVED PAYLOAD:', JSON.stringify(formData, null, 2));
-        console.log('📋 Payload keys:', Object.keys(formData));
+        const receivedData = Object.fromEntries(formData.entries());
+        console.log('📋 RECEIVED PAYLOAD:', JSON.stringify(receivedData, null, 2));
+        console.log('📋 Payload keys:', Array.from(formData.keys()));
         console.log('📋 Payload types:', Object.fromEntries(
-            Object.entries(formData).map(([k, v]) => [k, typeof v])
+            Array.from(formData.entries()).map(([k, v]) => [k, typeof v])
         ));
 
         // Expected database schema for comparison
@@ -218,22 +231,25 @@ export async function POST(request: Request) {
             price: 'number | null (required)',
             category: 'string | null (required)',
             location: 'string | null',
-            images_urls: 'string[] | null',
+            images: 'string[] | null',
             user_id: 'string (auto-added)'
         };
         console.log('🎯 EXPECTED DATABASE SCHEMA:', expectedSchema);
 
         const validationErrors = [];
+        const title = formData.get('title') as string;
+        const category = formData.get('category') as string;
+        const price = formData.get('price') as string;
 
-        if (!formData.title || typeof formData.title !== 'string' || formData.title.trim() === '') {
+        if (!title || typeof title !== 'string' || title.trim() === '') {
             validationErrors.push('title is required and must be a non-empty string');
         }
 
-        if (!formData.category || typeof formData.category !== 'string' || formData.category.trim() === '') {
+        if (!category || typeof category !== 'string' || category.trim() === '') {
             validationErrors.push('category is required and must be a non-empty string');
         }
 
-        if (formData.price === undefined || formData.price === null || isNaN(Number(formData.price))) {
+        if (price === null || price === undefined || isNaN(Number(price))) {
             validationErrors.push('price is required and must be a valid number');
         }
 
@@ -242,7 +258,7 @@ export async function POST(request: Request) {
             return new Response(JSON.stringify({
                 error: 'Validation failed',
                 validation_errors: validationErrors,
-                received_data: formData
+                received_data: receivedData
             }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
@@ -288,21 +304,37 @@ export async function POST(request: Request) {
         }
 
         // Prepare ad data according to database schema
+        console.log('[ADS-API] Received formData:', Object.fromEntries(formData.entries()));
+        const description = formData.get('description') as string;
+        const location = formData.get('location') as string;
+        const phone = formData.get('phone') as string;
+        const email = formData.get('email') as string;
+        const latitude = formData.get('latitude') as string;
+        const longitude = formData.get('longitude') as string;
+        const allow_no_media = formData.get('allow_no_media') as string;
+        const imagesJson = formData.get('images') as string;
+        const images = imagesJson ? JSON.parse(imagesJson) : null;
         const adData = {
-            title: String(formData.title).trim(),
-            description: formData.description ? String(formData.description).trim() : null,
-            price: Number(formData.price) || 0,
-            category: String(formData.category),
-            location: formData.location ? String(formData.location).trim() : null,
-            images_urls: formData.imageUrls && Array.isArray(formData.imageUrls) ? formData.imageUrls : null,
+            title: String(title).trim(),
+            description: description ? String(description).trim() : null,
+            price: Number(price) || 0,
+            category: String(category),
+            location: location ? String(location).trim() : null,
+            images: images,
+            phone: phone ? String(phone).trim() : null,
+            email: email ? String(email).trim() : null,
+            latitude: latitude ? Number(latitude) : null,
+            longitude: longitude ? Number(longitude) : null,
+            allow_no_media: allow_no_media === 'true',
             user_id: user.id, // Correct field name
         };
+        console.log('[ADS-API] Processed adData.images:', adData.images);
 
         // Test with minimal data first (without user_id to check foreign key)
         const testAdData = {
-            title: String(formData.title).trim(),
-            category: String(formData.category),
-            price: Number(formData.price) || 0,
+            title: String(title).trim(),
+            category: String(category),
+            price: Number(price) || 0,
         };
 
         console.log('🧪 Testing insert with minimal data (no user_id):', JSON.stringify(testAdData, null, 2));

@@ -12,7 +12,7 @@ function cn(...inputs: ClassValue[]) {
 
 export default function AdvancedFilter() {
     const router = useRouter();
-    const { category, setCategory, tags, toggleTag, resetFilters } = useFilterStore();
+    const { category, setCategory, searchQuery, setSearchQuery, tags, toggleTag, resetFilters } = useFilterStore();
 
     const handleCategoryChange = (newCategory: string | null) => {
         setCategory(newCategory);
@@ -60,6 +60,8 @@ export default function AdvancedFilter() {
                     <input
                         className="flex-1 bg-transparent outline-none px-2"
                         placeholder="عن ماذا تبحث اليوم؟ (وظائف، عقارات، سيارات...)"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <button className="bg-primary hover:bg-primary-dark text-white px-6 py-1.5 font-bold rounded-sm transition-colors flex items-center gap-2">
                         <Search size={16} />
