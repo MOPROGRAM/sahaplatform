@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { apiService } from "@/lib/api";
+import { adsService } from "@/lib/ads";
 
 function TestViewContent() {
     const searchParams = useSearchParams();
@@ -20,7 +20,7 @@ function TestViewContent() {
     const fetchAd = async () => {
         setLoading(true);
         try {
-            const data = await apiService.getAd(id!);
+            const data = await adsService.getAd(id!);
             setAd(data);
         } catch (err: any) {
             setError(err.message);

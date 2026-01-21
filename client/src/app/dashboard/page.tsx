@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { apiService } from "@/lib/api";
+import { adsService } from "@/lib/ads";
 import { useLanguage } from "@/lib/language-context";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -80,8 +80,7 @@ export default function DashboardPage() {
 
     const fetchDashboardData = async () => {
         try {
-            const response = await apiService.get('/ads/my');
-            const myAds = response.ads || [];
+            const myAds = await adsService.getMyAds();
             const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.isActive) : [];
             setAds(activeAdsOnly);
 
@@ -103,7 +102,7 @@ export default function DashboardPage() {
 
     const deleteAd = async (adId: string) => {
         try {
-            await apiService.delete('/ads/' + adId);
+            await adsService.deleteAd(adId);
             // Refresh the list
             fetchDashboardData();
             setDeleteModal({ open: false, adId: null, adTitle: '' });

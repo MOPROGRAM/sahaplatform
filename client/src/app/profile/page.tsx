@@ -20,19 +20,11 @@ import {
     AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
-import { apiService } from "@/lib/api";
+import { adsService, Ad } from "@/lib/ads";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-interface Ad {
-    id: string;
-    title: string;
-    price: number;
-    category: string;
-    createdAt: string;
-    views: number;
-    isActive: boolean;
-}
+
 
 export default function ProfilePage() {
     const { user, logout } = useAuthStore();
@@ -67,7 +59,7 @@ export default function ProfilePage() {
 
     const fetchUserAds = async () => {
         try {
-            const data = await apiService.get('/ads/my');
+            const data = await adsService.getMyAds();
             setAds(data);
         } catch (error) {
             console.error('Failed to fetch user ads:', error);
@@ -96,7 +88,8 @@ export default function ProfilePage() {
                 })
             };
 
-            await apiService.updateProfile(updateData);
+            // TODO: Implement profile update with Supabase
+            alert(language === 'ar' ? 'ميزة تحديث الملف الشخصي ستكون متاحة قريباً' : 'Profile update coming soon');
             setUpdateMessage(language === 'ar' ? 'تم تحديث الملف الشخصي بنجاح' : 'Profile updated successfully');
 
             // Clear password fields
@@ -121,7 +114,7 @@ export default function ProfilePage() {
 
         setDeleting(true);
         try {
-            await apiService.delete('/auth/me');
+            // TODO: Implement account deletion with Supabase
             logout();
             router.push('/');
         } catch (error) {
@@ -309,8 +302,8 @@ export default function ProfilePage() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
-                                                        <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                            {ad.isActive ? (language === 'ar' ? 'نشط' : 'Active') : (language === 'ar' ? 'معطل' : 'Inactive')}
+                                                        <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                            {ad.is_active ? (language === 'ar' ? 'نشط' : 'Active') : (language === 'ar' ? 'معطل' : 'Inactive')}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-center">

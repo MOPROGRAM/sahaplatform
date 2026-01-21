@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Mic } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { apiService } from "@/lib/api";
+import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
 // import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
@@ -72,17 +72,19 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const fetchChatData = async () => {
         setLoading(true);
         try {
-            const data = await apiService.get(`/conversations/${conversationId}`);
-            const processedMessages = (data.messages || []).map((msg: any) => ({
-                ...msg,
-                senderId: msg.senderid || msg.senderId,
-                messageType: msg.messagetype || msg.messageType,
-                createdAt: msg.createdat || msg.createdAt,
-                sender: msg.sender || { name: 'Unknown' }
-            }));
-            setMessages(processedMessages);
-            setParticipants(data.participants || []);
-            setAdInfo(data.ad);
+            const data = await conversationsService.getConversation(conversationId);
+            if (data) {
+                const processedMessages = (data.messages || []).map((msg: any) => ({
+                    ...msg,
+                    senderId: msg.senderid || msg.senderId,
+                    messageType: msg.messagetype || msg.messageType,
+                    createdAt: msg.createdat || msg.createdAt,
+                    sender: msg.sender || { name: 'Unknown' }
+                }));
+                setMessages(processedMessages);
+                setParticipants(data.conversation.participants || []);
+                setAdInfo(data.conversation.ad);
+            }
         } catch (error) {
             console.error("Failed to fetch chat:", error);
         } finally {
@@ -101,9 +103,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 messageType: type,
                 ...fileData
             };
-            const newMessage = await apiService.post(`/conversations/${conversationId}/messages`, payload);
+            await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
 
-            setMessages(prev => [...prev, newMessage]);
+            // Message will be added via Supabase Realtime subscription
             if (type === 'text') setInput("");
         } catch (error) {
             console.error("Failed to send message:", error);

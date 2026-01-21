@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
-import { apiService } from "@/lib/api";
+import { conversationsService } from "@/lib/conversations";
 
 export default function Header() {
     const { user, logout } = useAuthStore();
@@ -50,7 +50,7 @@ export default function Header() {
 
     const fetchUnreadCount = async () => {
         try {
-            const conversations = await apiService.get('/conversations');
+            const conversations = await conversationsService.getConversations();
             // Simplified unread count logic
             setUnreadCount(conversations.length > 0 ? 2 : 0); // Mocking for now as we don't have separate count API
         } catch (e) {

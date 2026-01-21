@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { MessageSquare, Search, Loader2, ShieldCheck, Clock, ChevronRight, Inbox, Filter } from "lucide-react";
 import Link from "next/link";
-import { apiService } from "@/lib/api";
+import { conversationsService } from "@/lib/conversations";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import Header from "@/components/Header";
@@ -24,7 +24,7 @@ export default function MessagesPage() {
     const fetchConversations = async () => {
         setLoading(true);
         try {
-            const data = await apiService.get('/conversations');
+            const data = await conversationsService.getConversations();
             setConversations(data);
             if (data.length > 0 && !selectedId) {
                 // Not automatically selecting to show inbox overview on mobile
