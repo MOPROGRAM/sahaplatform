@@ -403,7 +403,7 @@ export default function PostAdPage() {
                                                 </p>
                                             </div>
                                         </div>
-                                        {images.length > 0 && (
+                                        {typeof window !== 'undefined' && images.length > 0 && (
                                             <div className="grid grid-cols-4 gap-2 mt-2">
                                                 {images.map((image, index) => (
                                                     <div key={index} className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
