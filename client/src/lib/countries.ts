@@ -35,7 +35,7 @@ export interface City {
 export const countriesService = {
     // الحصول على جميع الدول
     async getCountries(): Promise<Country[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('countries')
             .select(`
                 *,
@@ -49,12 +49,12 @@ export const countriesService = {
             throw new Error('Failed to fetch countries');
         }
 
-        return data || [];
+        return (data || []) as Country[];
     },
 
     // الحصول على دولة واحدة
     async getCountry(id: string): Promise<Country | null> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('countries')
             .select(`
                 *,
@@ -69,12 +69,12 @@ export const countriesService = {
             return null;
         }
 
-        return data;
+        return data as Country | null;
     },
 
     // الحصول على مدن دولة معينة
     async getCitiesByCountry(countryId: string): Promise<City[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('cities')
             .select(`
                 *,
@@ -89,12 +89,12 @@ export const countriesService = {
             throw new Error('Failed to fetch cities');
         }
 
-        return data || [];
+        return (data || []) as City[];
     },
 
     // الحصول على جميع المدن
     async getCities(): Promise<City[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('cities')
             .select(`
                 *,
@@ -108,12 +108,12 @@ export const countriesService = {
             throw new Error('Failed to fetch cities');
         }
 
-        return data || [];
+        return (data || []) as City[];
     },
 
     // الحصول على مدينة واحدة
     async getCity(id: string): Promise<City | null> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('cities')
             .select(`
                 *,
@@ -128,6 +128,6 @@ export const countriesService = {
             return null;
         }
 
-        return data;
+        return data as City | null;
     }
 };
