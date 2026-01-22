@@ -16,12 +16,16 @@ function getSupabaseClient() {
  * Supabase client instance configured with environment variables
  * Used for database operations and authentication
  */
-export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>>, {
+let supabaseClient: ReturnType<typeof createClient<Database>> | null = null
+
+export const supabase: ReturnType<typeof createClient<Database>> = new Proxy({} as any, {
     get(target, prop) {
-        const client = getSupabaseClient()
-        const value = (client as any)[prop]
+        if (!supabaseClient) {
+            supabaseClient = getSupabaseClient()
+        }
+        const value = (supabaseClient as any)[prop]
         if (typeof value === 'function') {
-            return value.bind(client)
+            return value.bind(supabaseClient)
         }
         return value
     }
