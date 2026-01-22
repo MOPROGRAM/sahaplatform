@@ -94,8 +94,8 @@ model Ad {
   isBoosted   Boolean  @default(false)
   isActive    Boolean  @default(true)
   views       Int      @default(0)
-  authorId    String
-  author      User     @relation(fields: [authorId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   conversations Conversation[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

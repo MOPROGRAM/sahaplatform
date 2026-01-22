@@ -2,12 +2,12 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const getAllAds = async (filters) => {
-    const { category, cityId, minPrice, maxPrice, search, location, type, priceRange, hasMedia, limit, sortBy, sortOrder, authorId } = filters;
+    const { category, cityId, minPrice, maxPrice, search, location, type, priceRange, hasMedia, limit, sortBy, sortOrder, userId } = filters;
 
     try {
         const where = {};
-        if (authorId) {
-            where.authorId = authorId;
+        if (userId) {
+            where.userId = userId;
         } else {
             where.isActive = true;
         }
@@ -94,7 +94,7 @@ const getAllAds = async (filters) => {
         const queryOptions = {
             where,
             include: {
-                author: {
+                user: {
                     select: { id: true, name: true, verified: true, phone: true }
                 },
                 city: {
@@ -127,14 +127,14 @@ const getAllAds = async (filters) => {
 
 const createAd = async (adData, userId) => {
     try {
-        // Remove authorId from adData if it exists to avoid duplication with userId param
-        const { authorId, ...data } = adData;
+        // Remove userId from adData if it exists to avoid duplication with userId param
+        const { userId, ...data } = adData;
         // Normalize currencyId to lowercase
         if (data.currencyId) data.currencyId = data.currencyId.toLowerCase();
         return await prisma.ad.create({
             data: {
                 ...data,
-                authorId: userId
+                userId: userId
             }
         });
     } catch (error) {
@@ -154,7 +154,7 @@ const getAdById = async (id) => {
         return await prisma.ad.findUnique({
             where: { id },
             include: {
-                author: {
+                user: {
                     select: { id: true, name: true, verified: true, phone: true, email: true }
                 },
                 city: {
@@ -183,7 +183,7 @@ const updateAd = async (id, adData, userId) => {
     try {
         const ad = await prisma.ad.findUnique({ where: { id } });
         if (!ad) throw new Error('Ad not found');
-        if (ad.authorId !== userId) throw new Error('Unauthorized');
+        if (ad.userId !== userId) throw new Error('Unauthorized');
 
         return await prisma.ad.update({
             where: { id },
@@ -199,7 +199,7 @@ const deleteAd = async (id, userId) => {
     try {
         const ad = await prisma.ad.findUnique({ where: { id } });
         if (!ad) throw new Error('Ad not found');
-        if (ad.authorId !== userId) throw new Error('Unauthorized');
+        if (ad.userId !== userId) throw new Error('Unauthorized');
 
         // Soft delete
         return await prisma.ad.update({

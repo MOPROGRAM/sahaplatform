@@ -109,7 +109,7 @@ router.delete('/me', authMiddleware, async (req, res) => {
         await prisma.conversation.deleteMany({ where: { participants: { some: { id: req.user.id } } } });
         await prisma.payment.deleteMany({ where: { userId: req.user.id } });
         await prisma.subscription.deleteMany({ where: { userId: req.user.id } });
-        await prisma.ad.deleteMany({ where: { authorId: req.user.id } });
+        await prisma.ad.deleteMany({ where: { userId: req.user.id } });
 
         // Finally delete the user
         await prisma.user.delete({ where: { id: req.user.id } });

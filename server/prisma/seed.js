@@ -226,7 +226,7 @@ async function main() {
                 category: ad.category,
                 location: ad.location,
                 images: ad.images,
-                authorId: testUser.id,
+                userId: testUser.id,
                 createdAt: ad.createdAt,
             }
         });

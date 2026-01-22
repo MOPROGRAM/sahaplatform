@@ -5,7 +5,7 @@ import { Database } from '@/types/database.types'
 
 export type Ad = Database['public']['Tables']['Ad']['Row'] & {
     // علاقات
-    author?: {
+    user?: {
         id: string;
         name?: string;
         email: string;
@@ -43,7 +43,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email),
+                user:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -108,7 +108,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email),
+                user:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -136,11 +136,11 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email),
+                user:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
-            .eq('authorId', user.id)
+            .eq('userId', user.id)
             .order('createdAt', { ascending: false });
 
         if (error) {
@@ -174,12 +174,12 @@ export const adsService = {
             .from('Ad')
             .insert({
                 ...adData,
-                authorId: user.id,
+                userId: user.id,
                 currencyId: 'sar', // العملة الافتراضية
             })
             .select(`
                 *,
-                author:User(id, name, email),
+                user:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -205,10 +205,10 @@ export const adsService = {
             .from('Ad')
             .update(updates)
             .eq('id', id)
-            .eq('authorId', user.id)
+            .eq('userId', user.id)
             .select(`
                 *,
-                author:User(id, name, email),
+                user:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -234,7 +234,7 @@ export const adsService = {
             .from('Ad')
             .delete()
             .eq('id', id)
-            .eq('authorId', user.id);
+            .eq('userId', user.id);
 
         if (error) {
             console.error('Error deleting ad:', error);

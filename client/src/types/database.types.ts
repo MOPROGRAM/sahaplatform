@@ -32,7 +32,7 @@ export interface Database {
                     isBoosted: boolean
                     isActive: boolean
                     views: number
-                    authorId: string
+                    userId: string
                     createdAt: string
                     updatedAt: string
                 }
@@ -58,7 +58,7 @@ export interface Database {
                     isBoosted?: boolean
                     isActive?: boolean
                     views?: number
-                    authorId: string
+                    userId: string
                     createdAt?: string
                     updatedAt?: string
                 }
@@ -84,14 +84,14 @@ export interface Database {
                     isBoosted?: boolean
                     isActive?: boolean
                     views?: number
-                    authorId?: string
+                    userId?: string
                     createdAt?: string
                     updatedAt?: string
                 }
                 Relationships: [
                     {
-                        foreignKeyName: "ads_author_id_fkey"
-                        columns: ["authorId"]
+                        foreignKeyName: "ads_user_id_fkey"
+                        columns: ["userId"]
                         isOneToOne: false
                         referencedRelation: "User"
                         referencedColumns: ["id"]

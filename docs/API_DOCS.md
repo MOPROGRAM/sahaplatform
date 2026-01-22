@@ -94,8 +94,8 @@ GET /api/ads?category=Real%20Estate&location=الرياض&minPrice=100000
     "location": "الرياض، حي النرجس",
     "images": "[\"image1.jpg\", \"image2.jpg\"]",
     "isBoosted": false,
-    "authorId": "user_123",
-    "author": {
+    "userId": "user_123",
+    "user": {
       "name": "شركة العقارات المميزة",
       "verified": true
     },
@@ -140,7 +140,7 @@ Content-Type: application/json
   "location": "الرياض، حي الملقا",
   "images": "[\"image1.jpg\"]",
   "isBoosted": false,
-  "authorId": "user_123",
+  "userId": "user_123",
   "createdAt": "2024-01-15T12:00:00.000Z",
   "updatedAt": "2024-01-15T12:00:00.000Z"
 }
@@ -257,8 +257,8 @@ model Ad {
   images      String   @default("[]")
   video       String?
   isBoosted   Boolean  @default(false)
-  authorId    String
-  author      User     @relation(fields: [authorId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
