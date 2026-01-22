@@ -49,7 +49,7 @@ export default function HomePage() {
 
     const fetchAds = async () => {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .from('Ad')
                 .select('*')
                 .order('created_at', { ascending: false })

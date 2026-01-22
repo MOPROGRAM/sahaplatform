@@ -39,7 +39,7 @@ export const adsService = {
         sortBy?: string;
         sortOrder?: 'asc' | 'desc';
     } = {}) {
-        let query = supabase
+        let query = (supabase as any)
             .from('Ad')
             .select(`
                 *,
@@ -104,7 +104,7 @@ export const adsService = {
 
     // الحصول على إعلان واحد
     async getAd(id: string): Promise<Ad | null> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('Ad')
             .select(`
                 *,
@@ -132,7 +132,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('Ad')
             .select(`
                 *,
@@ -170,7 +170,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('Ad')
             .insert({
                 ...adData,
@@ -201,7 +201,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('Ad')
             .update(updates)
             .eq('id', id)
@@ -230,7 +230,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { error } = await supabase
+        const { error } = await (supabase as any)
             .from('Ad')
             .delete()
             .eq('id', id)
