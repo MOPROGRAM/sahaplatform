@@ -52,7 +52,7 @@ export const conversationsService = {
 
         // نحصل على المحادثات من خلال جدول المشاركين بطريقة مبسطة
         const { data: participantData, error: participantError } = await (supabase as any)
-            .from('_conversation_participants')
+            .from('_ConversationToUser')
             .select('a')
             .eq('b', user.id);
 
