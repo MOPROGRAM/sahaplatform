@@ -35,6 +35,8 @@ const tajawal = Tajawal({
     weight: ['300', '400', '500', '700'],
 });
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
     title: "ساحة - مساحة واسعة من الفرص",
     description: "مساحة واسعة من الفرص - منصة شاملة للإعلانات والخدمات في الشرق الأوسط",
