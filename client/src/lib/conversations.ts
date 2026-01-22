@@ -83,7 +83,7 @@ export const conversationsService = {
         }
 
         return (conversations || []).map(conv => ({
-            ...conv,
+            ...(conv as any),
             participants: [] // سنحصل عليهم لاحقاً إذا لزم الأمر
         }));
     },
@@ -140,7 +140,7 @@ export const conversationsService = {
         }
 
         return {
-            conversation,
+            conversation: conversation as any,
             messages: (messages as any) || []
         };
     },
@@ -167,7 +167,7 @@ export const conversationsService = {
             // التحقق من أن المستخدم مشارك
             const isParticipant = existingConversation.participants?.some(p => p.id === user.id);
             if (isParticipant) {
-                return existingConversation;
+                return existingConversation as any;
             }
         }
 
@@ -256,7 +256,7 @@ export const conversationsService = {
             })
             .eq('id', conversationId);
 
-        return message;
+        return message as any;
     },
 
     // وضع علامة كمقروء
