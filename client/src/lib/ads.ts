@@ -40,7 +40,7 @@ export const adsService = {
         sortOrder?: 'asc' | 'desc';
     } = {}) {
         let query = supabase
-            .from('ads')
+            .from('Ad')
             .select(`
                 *,
                 author:users(id, name, email),
@@ -133,7 +133,7 @@ export const adsService = {
         }
 
         const { data, error } = await supabase
-            .from('ads')
+            .from('Ad')
             .select(`
                 *,
                 author:users(id, name, email),

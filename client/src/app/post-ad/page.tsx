@@ -174,7 +174,7 @@ export default function PostAdPage() {
             console.log('Inserting ad data:', adData);
 
             const { data, error } = await supabase
-                .from('ads')
+                .from('Ad')
                 .insert(adData)
                 .select()
                 .single();
