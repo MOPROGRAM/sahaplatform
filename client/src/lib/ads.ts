@@ -1,31 +1,9 @@
 import { supabase } from './supabase';
 
 // أنواع البيانات للإعلانات
-export interface Ad {
-    id: string;
-    title: string;
-    title_ar?: string;
-    title_en?: string;
-    description: string;
-    description_ar?: string;
-    description_en?: string;
-    price?: number;
-    currency_id: string;
-    category: string;
-    location?: string;
-    address?: string;
-    payment_method?: string;
-    city_id?: string;
-    latitude?: number;
-    longitude?: number;
-    images: string;
-    video?: string;
-    is_boosted: boolean;
-    is_active: boolean;
-    views: number;
-    author_id: string;
-    created_at: string;
-    updated_at: string;
+import { Database } from '@/types/database.types'
+
+export type Ad = Database['public']['Tables']['ads']['Row'] & {
     // علاقات
     author?: {
         id: string;
