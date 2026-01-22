@@ -141,7 +141,7 @@ export const conversationsService = {
 
         return {
             conversation,
-            messages: messages || []
+            messages: (messages as any) || []
         };
     },
 
