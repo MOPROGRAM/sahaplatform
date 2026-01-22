@@ -43,11 +43,11 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:users(id, name, email),
+                author:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
-            .eq('is_active', true);
+            .eq('isActive', true);
 
         // تطبيق الفلاتر
         if (filters.category) {
@@ -83,9 +83,9 @@ export const adsService = {
         const sortOrder = filters.sortOrder || 'desc';
 
         if (sortBy === 'created_at') {
-            query = query.order('created_at', { ascending: sortOrder === 'asc' });
+            query = query.order('createdAt', { ascending: sortOrder === 'asc' });
         } else {
-            query = query.order('is_boosted', { ascending: false }).order('created_at', { ascending: false });
+            query = query.order('is_boosted', { ascending: false }).order('createdAt', { ascending: false });
         }
 
         // الحد
@@ -108,12 +108,12 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:users(id, name, email),
+                author:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
             .eq('id', id)
-            .eq('is_active', true)
+            .eq('isActive', true)
             .single();
 
         if (error) {
@@ -136,12 +136,12 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:users(id, name, email),
+                author:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
-            .eq('author_id', user.id)
-            .order('created_at', { ascending: false });
+            .eq('authorId', user.id)
+            .order('createdAt', { ascending: false });
 
         if (error) {
             console.error('Error fetching my ads:', error);
@@ -174,12 +174,12 @@ export const adsService = {
             .from('Ad')
             .insert({
                 ...adData,
-                author_id: user.id,
-                currency_id: 'sar', // العملة الافتراضية
+                authorId: user.id,
+                currencyId: 'sar', // العملة الافتراضية
             })
             .select(`
                 *,
-                author:users(id, name, email),
+                author:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -205,10 +205,10 @@ export const adsService = {
             .from('Ad')
             .update(updates)
             .eq('id', id)
-            .eq('author_id', user.id)
+            .eq('authorId', user.id)
             .select(`
                 *,
-                author:users(id, name, email),
+                author:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -234,7 +234,7 @@ export const adsService = {
             .from('Ad')
             .delete()
             .eq('id', id)
-            .eq('author_id', user.id);
+            .eq('authorId', user.id);
 
         if (error) {
             console.error('Error deleting ad:', error);
@@ -244,7 +244,7 @@ export const adsService = {
 
     // زيادة عدد المشاهدات
     async incrementViews(id: string): Promise<void> {
-        const { error } = await supabase.rpc('increment_ad_views', { ad_id: id });
+        const { error } = await supabase.rpc('increment_ad_views', { adId: id });
 
         if (error) {
             console.warn('Failed to increment views:', error);

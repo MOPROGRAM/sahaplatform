@@ -69,7 +69,7 @@ export const authService = {
         try {
             // محاولة إدراج أو تحديث بيانات المستخدم في جدول users
             const { error } = await (supabase as any)
-                .from('users')
+                .from('User')
                 .upsert({
                     id: user.id,
                     email: user.email,

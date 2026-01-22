@@ -4,11 +4,11 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 // أنواع البيانات للمحادثات والرسائل
 export interface Conversation {
     id: string;
-    last_message?: string;
-    last_message_time: string;
-    ad_id?: string;
-    created_at: string;
-    updated_at: string;
+    lastMessage?: string;
+    lastMessageTime: string;
+    adId?: string;
+    createdAt: string;
+    updatedAt: string;
     ad?: {
         id: string;
         title: string;
@@ -24,15 +24,15 @@ export interface Conversation {
 export interface Message {
     id: string;
     content: string;
-    message_type: string;
-    file_url?: string;
-    file_name?: string;
-    file_size?: number;
-    sender_id: string;
-    receiver_id: string;
-    conversation_id: string;
-    is_read: boolean;
-    created_at: string;
+    messageType: string;
+    fileUrl?: string;
+    fileName?: string;
+    fileSize?: number;
+    senderId: string;
+    receiverId: string;
+    conversationId: string;
+    isRead: boolean;
+    createdAt: string;
     sender?: {
         id: string;
         name?: string;
@@ -53,8 +53,8 @@ export const conversationsService = {
         // نحصل على المحادثات من خلال جدول المشاركين بطريقة مبسطة
         const { data: participantData, error: participantError } = await (supabase as any)
             .from('_ConversationToUser')
-            .select('a')
-            .eq('b', user.id);
+            .select('A')
+            .eq('B', user.id);
 
         if (participantError) {
             console.error('Error fetching conversation participants:', participantError);
@@ -65,17 +65,17 @@ export const conversationsService = {
             return [];
         }
 
-        const conversationIds = participantData.map(p => p.a);
+        const conversationIds = participantData.map(p => p.A);
 
         // الحصول على المحادثات
         const { data: conversations, error: conversationsError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .select(`
                 *,
-                ad:ads(id, title, images)
+                ad:Ad(id, title, images)
             `)
             .in('id', conversationIds)
-            .order('last_message_time', { ascending: false });
+            .order('lastMessageTime', { ascending: false });
 
         if (conversationsError) {
             console.error('Error fetching conversations:', conversationsError);
@@ -99,9 +99,9 @@ export const conversationsService = {
         // التحقق من أن المستخدم مشارك في المحادثة
         const { data: participantCheck, error: participantError } = await (supabase as any)
             .from('_conversation_participants')
-            .select('conversation_id')
-            .eq('a', id)
-            .eq('b', user.id)
+            .select('A')
+            .eq('A', id)
+            .eq('B', user.id)
             .single();
 
         if (participantError || !participantCheck) {
@@ -110,11 +110,11 @@ export const conversationsService = {
 
         // الحصول على المحادثة
         const { data: conversation, error: conversationError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .select(`
                 *,
-                ad:ads(id, title, images),
-                participants:users(id, name, email)
+                ad:Ad(id, title, images),
+                participants:User(id, name, email)
             `)
             .eq('id', id)
             .single();
@@ -126,13 +126,13 @@ export const conversationsService = {
 
         // الحصول على الرسائل
         const { data: messages, error: messagesError } = await (supabase as any)
-            .from('messages')
+            .from('Message')
             .select(`
                 *,
-                sender:users(id, name, email)
+                sender:User(id, name, email)
             `)
-            .eq('conversation_id', id)
-            .order('created_at', { ascending: true });
+            .eq('conversationId', id)
+            .order('createdAt', { ascending: true });
 
         if (messagesError) {
             console.error('Error fetching messages:', messagesError);
@@ -155,12 +155,12 @@ export const conversationsService = {
 
         // البحث عن محادثة موجودة بين المستخدمين لهذا الإعلان
         const { data: existingConversation, error: searchError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .select(`
                 *,
-                participants:users(id, name, email)
+                participants:User(id, name, email)
             `)
-            .eq('ad_id', adId)
+            .eq('adId', adId)
             .single();
 
         if (existingConversation && !searchError) {
@@ -173,13 +173,13 @@ export const conversationsService = {
 
         // إنشاء محادثة جديدة
         const { data: newConversation, error: createError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .insert({
-                ad_id: adId,
+                adId: adId,
             })
             .select(`
                 *,
-                ad:ads(id, title, images)
+                ad:Ad(id, title, images)
             `)
             .single();
 
@@ -190,8 +190,8 @@ export const conversationsService = {
 
         // إضافة المشاركين
         const participants = [
-            { a: newConversation.id, b: user.id },
-            { a: newConversation.id, b: participantId }
+            { A: newConversation.id, B: user.id },
+            { A: newConversation.id, B: participantId }
         ];
 
         const { error: participantsError } = await (supabase as any)
@@ -216,29 +216,29 @@ export const conversationsService = {
         // الحصول على المشارك الآخر
         const { data: participants, error: participantsError } = await (supabase as any)
             .from('_conversation_participants')
-            .select('b')
-            .eq('a', conversationId)
-            .neq('b', user.id);
+            .select('B')
+            .eq('A', conversationId)
+            .neq('B', user.id);
 
         if (participantsError || !participants?.length) {
             throw new Error('Cannot send message: invalid conversation');
         }
 
-        const receiverId = participants[0].b;
+        const receiverId = participants[0].B;
 
         // إدراج الرسالة
         const { data: message, error: messageError } = await (supabase as any)
-            .from('messages')
+            .from('Message')
             .insert({
                 content,
-                message_type: messageType,
-                sender_id: user.id,
-                receiver_id: receiverId,
-                conversation_id: conversationId,
+                messageType: messageType,
+                senderId: user.id,
+                receiverId: receiverId,
+                conversationId: conversationId,
             })
             .select(`
                 *,
-                sender:users(id, name, email)
+                sender:User(id, name, email)
             `)
             .single();
 
@@ -249,10 +249,10 @@ export const conversationsService = {
 
         // تحديث آخر رسالة في المحادثة
         await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .update({
-                last_message: content,
-                last_message_time: new Date().toISOString(),
+                lastMessage: content,
+                lastMessageTime: new Date().toISOString(),
             })
             .eq('id', conversationId);
 
@@ -268,10 +268,10 @@ export const conversationsService = {
         }
 
         const { error } = await (supabase as any)
-            .from('messages')
-            .update({ is_read: true })
+            .from('Message')
+            .update({ isRead: true })
             .in('id', messageIds)
-            .eq('receiver_id', user.id);
+            .eq('receiverId', user.id);
 
         if (error) {
             console.error('Error marking messages as read:', error);
@@ -287,8 +287,8 @@ export const conversationsService = {
                 {
                     event: 'INSERT',
                     schema: 'public',
-                    table: 'messages',
-                    filter: `conversation_id=eq.${conversationId}`,
+                    table: 'Message',
+                    filter: `conversationId=eq.${conversationId}`,
                 },
                 callback
             )
