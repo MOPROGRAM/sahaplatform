@@ -15,12 +15,13 @@ import AdCard from '@/components/AdCard';
 interface Ad {
     id: string;
     title: string;
-    price: number;
-    location: string;
+    price: number | null;
+    location: string | null;
     category: string;
-    createdAt: string;
-    images?: string[];
-    featured?: boolean;
+    created_at: string;
+    images: string;
+    is_boosted?: boolean;
+    author_id: string;
     currency?: {
         code: string;
         symbol: string;
@@ -146,11 +147,11 @@ export default function HomePage() {
                                     key={idx}
                                     id={ad.id}
                                     title={ad.title}
-                                    price={ad.price}
+                                    price={ad.price || 0}
                                     currency="ريال"
-                                    location={ad.location}
-                                    images={ad.images || []}
-                                    createdAt={ad.createdAt}
+                                    location={ad.location || ''}
+                                    images={ad.images ? JSON.parse(ad.images) : []}
+                                    createdAt={ad.created_at}
                                     category={ad.category}
                                     language={language}
                                 />
