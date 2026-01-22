@@ -17,17 +17,33 @@ interface Ad {
     id: string;
     title: string;
     description: string;
-    price: number;
+    price: number | null;
     category: string;
-    location: string;
-    images_urls: string[];
+    location: string | null;
+    images: string;
     phone?: string;
     email?: string;
     latitude?: number;
     longitude?: number;
-    allow_no_media?: boolean;
-    user_id: string;
+    author_id: string;
     created_at: string;
+    author?: {
+        id: string;
+        name?: string;
+        email: string;
+    };
+    city?: {
+        id: string;
+        name: string;
+        name_ar?: string;
+        name_en?: string;
+    };
+    currency?: {
+        id: string;
+        code: string;
+        symbol: string;
+        name: string;
+    };
 }
 
 function AdsContent() {
@@ -169,7 +185,7 @@ function AdsContent() {
                                 price={ad.price}
                                 currency="ريال"
                                 location={ad.location}
-                                images={ad.images_urls || []}
+                                images={ad.images ? JSON.parse(ad.images) : []}
                                 createdAt={ad.created_at}
                                 category={ad.category}
                                 language={language}
