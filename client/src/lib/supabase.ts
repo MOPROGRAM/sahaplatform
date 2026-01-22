@@ -9,7 +9,13 @@ function getSupabaseClient() {
         throw new Error('Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
     }
 
-    return createClient<Database>(supabaseUrl, supabaseAnonKey)
+    return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            storage: localStorage,
+            autoRefreshToken: true,
+            persistSession: true
+        }
+    })
 }
 
 /**

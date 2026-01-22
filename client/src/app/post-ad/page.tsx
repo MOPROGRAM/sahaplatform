@@ -46,6 +46,17 @@ export default function PostAdPage() {
         }
     }, [user, authLoading, router]);
 
+    // Recover session on page load
+    useEffect(() => {
+        const recoverSession = async () => {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error) {
+                console.error('Session recovery error:', error);
+            }
+        };
+        recoverSession();
+    }, []);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type, checked } = e.target as any;
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
@@ -104,6 +115,14 @@ export default function PostAdPage() {
 
         setLoading(true);
         try {
+            // Check current user authentication
+            const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+            if (userError || !currentUser) {
+                console.error('Auth check failed:', userError);
+                setError(language === 'ar' ? "يرجى تسجيل الدخول أولاً" : "Please log in first");
+                setLoading(false);
+                return;
+            }
 
             // Upload images
             const imageUrls: string[] = [];
@@ -111,7 +130,7 @@ export default function PostAdPage() {
             for (const image of images) {
                 // Create unique filename
                 const fileExt = image.name.split('.').pop();
-                const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+                const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
                 const filePath = `ads/${fileName}`;
 
                 const { data, error } = await supabase.storage
@@ -146,7 +165,7 @@ export default function PostAdPage() {
                 latitude: coordinates?.lat || null,
                 longitude: coordinates?.lng || null,
                 images: JSON.stringify(imageUrls),
-                author_id: user.id,
+                author_id: currentUser.id,
                 is_active: true,
                 is_boosted: false,
                 views: 0,
