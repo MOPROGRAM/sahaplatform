@@ -202,7 +202,7 @@ export const conversationsService = {
             console.error('Error adding participants:', participantsError);
         }
 
-        return newConversation;
+        return newConversation as any;
     },
 
     // إرسال رسالة
