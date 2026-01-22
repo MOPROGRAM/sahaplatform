@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 // أنواع البيانات للإعلانات
 import { Database } from '@/types/database.types'
 
-export type Ad = Database['public']['Tables']['ads']['Row'] & {
+export type Ad = Database['public']['Tables']['Ad']['Row'] & {
     // علاقات
     author?: {
         id: string;
@@ -105,7 +105,7 @@ export const adsService = {
     // الحصول على إعلان واحد
     async getAd(id: string): Promise<Ad | null> {
         const { data, error } = await supabase
-            .from('ads')
+            .from('Ad')
             .select(`
                 *,
                 author:users(id, name, email),
@@ -171,7 +171,7 @@ export const adsService = {
         }
 
         const { data, error } = await supabase
-            .from('ads')
+            .from('Ad')
             .insert({
                 ...adData,
                 author_id: user.id,
@@ -202,7 +202,7 @@ export const adsService = {
         }
 
         const { data, error } = await supabase
-            .from('ads')
+            .from('Ad')
             .update(updates)
             .eq('id', id)
             .eq('author_id', user.id)
@@ -231,7 +231,7 @@ export const adsService = {
         }
 
         const { error } = await supabase
-            .from('ads')
+            .from('Ad')
             .delete()
             .eq('id', id)
             .eq('author_id', user.id);

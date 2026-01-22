@@ -82,7 +82,7 @@ export default function DashboardPage() {
         try {
             const myAds = await adsService.getMyAds();
             const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.isActive) : [];
-            setAds(activeAdsOnly);
+            setAds(activeAdsOnly as any);
 
             const totalViews = activeAdsOnly.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
             const activeAds = activeAdsOnly.length;

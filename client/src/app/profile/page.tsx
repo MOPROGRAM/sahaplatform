@@ -60,7 +60,7 @@ export default function ProfilePage() {
     const fetchUserAds = async () => {
         try {
             const data = await adsService.getMyAds();
-            setAds(data);
+            setAds(data as any);
         } catch (error) {
             console.error('Failed to fetch user ads:', error);
         } finally {

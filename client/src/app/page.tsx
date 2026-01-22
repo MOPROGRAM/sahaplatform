@@ -50,7 +50,7 @@ export default function HomePage() {
     const fetchAds = async () => {
         try {
             const { data, error } = await supabase
-                .from('ads')
+                .from('Ad')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(20);
@@ -60,7 +60,7 @@ export default function HomePage() {
                 setAds([]);
             } else {
                 // Ensure data is always an array
-                setAds(Array.isArray(data) ? data : []);
+                setAds(Array.isArray(data as any) ? (data as any) : []);
             }
         } catch (error) {
             console.error('Failed to fetch ads:', error);

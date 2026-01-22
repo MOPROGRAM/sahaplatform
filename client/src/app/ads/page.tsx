@@ -128,7 +128,7 @@ function AdsContent() {
 
             const data = await adsService.getAds(filters);
             // Ensure data is always an array
-            setAds(Array.isArray(data) ? data : []);
+            setAds(Array.isArray(data as any) ? (data as any) : []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);

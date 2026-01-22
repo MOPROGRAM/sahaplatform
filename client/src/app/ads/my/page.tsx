@@ -38,7 +38,7 @@ export default function MyAdsPage() {
         try {
             setLoading(true);
             const data = await adsService.getMyAds();
-            setAds(data);
+            setAds(data as any);
         } catch (err: any) {
             console.error('Error fetching ads:', err);
             setError('Failed to load ads');
