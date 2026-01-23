@@ -1,10 +1,12 @@
 // Simple internationalization system
 export const translations = {
     ar: {
-        // Brand
         siteName: 'ساحة',
         siteBrand: 'ساحة للمزادات والعقارات',
         taglineFooter: 'بوابة الخليج العقارية والمهنية',
+        contactEmail: 'motwasel@yahoo.com',
+        contactPhone: '+966582003887',
+        contactWhatsApp: '+966582003887',
 
         // Navigation
         home: 'الرئيسية',
@@ -102,7 +104,7 @@ export const translations = {
 
         // Placeholders
         searchPlaceholder: 'ابحث عن وظائف، عقارات، سيارات...',
-        locationPlaceholder: 'الرياض، جدة، دبي...',
+        locationPlaceholder: 'المدينة أو المنطقة...',
         priceFrom: 'السعر من',
         priceTo: 'إلى',
         adTitlePlaceholder: 'مثال: شقة استثمارية في حي النرجس...',
