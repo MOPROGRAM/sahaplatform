@@ -2,13 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: NextRequest) {
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!resendApiKey || !supabaseUrl || !supabaseServiceKey) {
+        console.error('Missing environment variables for subscription service');
+        return NextResponse.json(
+            { error: 'Subscription service is currently unavailable' },
+            { status: 503 }
+        );
+    }
+
+    const resend = new Resend(resendApiKey);
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     try {
         const body = await request.json();
         const { userName, userEmail, userPhone, packageName, packagePrice, message, userId } = body;
