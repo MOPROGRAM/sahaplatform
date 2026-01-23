@@ -72,8 +72,8 @@ export const adsService = {
     },
 
     // الحصول على إعلان واحد
-    async getAd(id: string): Promise<Ad | null> {
-        const { data, error } = await (supabase as any)
+    async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
+        let query = (supabase as any)
             .from('Ad')
             .select(`
                 *,
@@ -81,9 +81,14 @@ export const adsService = {
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
-            .eq('id', id)
-            .eq('is_active', true)
-            .single();
+            .eq('id', id);
+
+        // إذا لم نكن نبحث عن الكل، نكتفي بالنشط فقط
+        if (!searchAll) {
+            query = query.eq('is_active', true);
+        }
+
+        const { data, error } = await query.single();
 
         if (error) {
             console.error('Error fetching ad:', error);

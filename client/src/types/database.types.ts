@@ -13,28 +13,24 @@ export interface Database {
                 Row: {
                     id: string
                     title: string
-                    titleAr: string | null
-                    titleEn: string | null
                     description: string
-                    descriptionAr: string | null
-                    descriptionEn: string | null
                     price: number | null
-                    currencyId: string
+                    currency_id: string
                     category: string
                     location: string | null
                     address: string | null
-                    paymentMethod: string | null
-                    cityId: string | null
+                    payment_method: string | null
+                    city_id: string | null
                     latitude: number | null
                     longitude: number | null
                     images: string
                     video: string | null
-                    isBoosted: boolean
-                    isActive: boolean
+                    is_boosted: boolean
+                    is_active: boolean
                     views: number
-                    userId: string
-                    createdAt: string
-                    updatedAt: string
+                    author_id: string
+                    created_at: string
+                    updated_at: string
                 }
                 Insert: {
                     id?: string
@@ -117,7 +113,11 @@ export interface Database {
                     id: string
                     name: string | null
                     email: string
-                    createdAt: string
+                    role: string | null
+                    user_type: string | null
+                    verified: boolean | null
+                    created_at: string
+                    updated_at: string | null
                 }
                 Insert: {
                     id: string

@@ -126,6 +126,21 @@ export default function ProfilePage() {
         }
     };
 
+    const handleDeleteAd = async (id: string) => {
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this ad?')) {
+            return;
+        }
+
+        try {
+            await adsService.deleteAd(id);
+            alert(language === 'ar' ? 'تم حذف الإعلان بنجاح' : 'Ad deleted successfully');
+            fetchUserAds();
+        } catch (error) {
+            console.error('Failed to delete ad:', error);
+            alert(language === 'ar' ? 'فشل في حذف الإعلان' : 'Failed to delete ad');
+        }
+    };
+
     if (!user) return null;
 
     const tabs = [

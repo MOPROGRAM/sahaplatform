@@ -49,7 +49,7 @@ export default function EditAdPage() {
 
     const fetchAdData = async () => {
         try {
-            const ad = await adsService.getAd(adId);
+            const ad = await adsService.getAd(adId, true);
             if (!ad) {
                 setError(language === 'ar' ? "الإعلان غير موجود" : "Ad not found");
                 return;
