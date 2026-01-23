@@ -154,9 +154,9 @@ export default function MyAdsPage() {
                                     </div>
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => router.push(`/ads/view?id=${ad.id}`)}
+                                            onClick={() => router.push(`/ads/${ad.id}/edit`)}
                                             className="text-blue-600 hover:text-blue-800 p-1"
-                                            title={t('view')}
+                                            title={language === 'ar' ? 'تعديل' : 'Edit'}
                                         >
                                             <Edit size={16} />
                                         </button>

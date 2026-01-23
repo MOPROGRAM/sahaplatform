@@ -325,9 +325,21 @@ export default function ProfilePage() {
                                                         <span className="text-[13px] font-black text-secondary">{ad.views || 0}</span>
                                                     </td>
                                                     <td className="px-6 py-4 text-right">
-                                                        <Link href={`/ads/view?id=${ad.id}`} className="px-3 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">
-                                                            {language === 'ar' ? 'عرض' : 'View'}
-                                                        </Link>
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <Link href={`/ads/view?id=${ad.id}`} title={language === 'ar' ? 'عرض' : 'View'} className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-xs hover:bg-secondary hover:text-white transition-all">
+                                                                <Eye size={14} />
+                                                            </Link>
+                                                            <Link href={`/ads/${ad.id}/edit`} title={language === 'ar' ? 'تعديل' : 'Edit'} className="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xs hover:bg-blue-600 hover:text-white transition-all">
+                                                                <Settings size={14} />
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => handleDeleteAd(ad.id)}
+                                                                title={language === 'ar' ? 'حذف' : 'Delete'}
+                                                                className="w-8 h-8 flex items-center justify-center bg-red-50 text-red-600 rounded-xs hover:bg-red-600 hover:text-white transition-all"
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

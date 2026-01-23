@@ -252,7 +252,7 @@ export default function DashboardPage() {
                                                             <div className="flex flex-col items-end gap-1.5">
                                                                 <div className="flex items-center gap-1">
                                                                     <Link href={`/ads/view?id=${ad.id}`} className="px-2 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
-                                                                    <Link href={`/ads/edit?id=${ad.id}`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
+                                                                    <Link href={`/ads/${ad.id}/edit`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
                                                                         <Edit size={10} />
                                                                     </Link>
                                                                     <button onClick={() => openDeleteModal(ad.id, ad.title)} className="px-2 py-1 bg-red-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm">
@@ -343,7 +343,7 @@ export default function DashboardPage() {
                                                     <td className="px-6 py-4 text-right">
                                                         <div className="flex items-center gap-1">
                                                             <Link href={`/ads/view?id=${ad.id}`} className="px-2 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
-                                                            <Link href={`/ads/edit?id=${ad.id}`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
+                                                            <Link href={`/ads/${ad.id}/edit`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
                                                                 <Edit size={10} />
                                                             </Link>
                                                             <button onClick={() => openDeleteModal(ad.id, ad.title)} className="px-2 py-1 bg-red-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm">
