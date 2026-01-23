@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useMapEvents } from 'react-leaflet';
 
@@ -48,15 +48,17 @@ export default function MapSelector({ onLocationSelect, initialLocation = [24.71
     const [isClient, setIsClient] = useState(false);
 
     // Ensure component only renders on client
-    useState(() => {
+    useEffect(() => {
         setIsClient(true);
-    });
+    }, []);
 
     const handleLocationInput = useCallback((location: string) => {
         setSelectedLocation(location);
-        // For now, just pass a placeholder. In production, you'd use geocoding
-        onLocationSelect(24.7136, 46.6753, location);
-    }, [onLocationSelect]);
+        // If we have an initial/current location, keep it, or just pass null for coordinates
+        // to indicate manual address only. But ads service usually expects both.
+        // For now, let's just update the address part if we don't have better geocoding.
+        onLocationSelect(initialLocation[0], initialLocation[1], location);
+    }, [onLocationSelect, initialLocation]);
 
     if (!isClient) {
         return (

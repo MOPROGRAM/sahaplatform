@@ -43,13 +43,37 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const audioChunksRef = useRef<Blob[]>([]);
 
     useEffect(() => {
+        let channel: any;
         if (conversationId) {
             fetchChatData();
-            // setupSocket();
+
+            // Subscribe to new messages
+            channel = conversationsService.subscribeToConversation(conversationId, (payload) => {
+                console.log('[CHAT-REALTIME] New message received:', payload);
+                const newMessage = payload.new;
+                // Transform to match local Message interface if needed
+                const processedMessage = {
+                    ...newMessage,
+                    senderId: newMessage.sender_id,
+                    messageType: newMessage.message_type,
+                    createdAt: newMessage.created_at,
+                    sender: newMessage.sender || { name: 'User' } // Note: payload.new might not have joined data
+                };
+
+                setMessages(prev => {
+                    // Avoid duplicates
+                    if (prev.find(m => m.id === processedMessage.id)) return prev;
+                    return [...prev, processedMessage as Message];
+                });
+
+                // Fetch full message with joins if necessary (since payload.new only contains raw row)
+                // fetchChatData(); // Or just manually add if we don't need joins immediately
+            });
         }
         return () => {
-            // Socket cleanup disabled
-            // if (socketRef.current) socketRef.current.disconnect();
+            if (channel) {
+                conversationsService.unsubscribe(channel);
+            }
         };
     }, [conversationId]);
 

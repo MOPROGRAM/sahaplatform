@@ -35,6 +35,8 @@ interface Ad {
     latitude?: number;
     longitude?: number;
     images?: string[];
+    phone?: string;
+    email?: string;
     allow_no_media?: boolean;
     views: number;
     user_id: string;
@@ -72,25 +74,29 @@ export default function AdDetailsContent({ id }: { id: string }) {
             console.log('[AD-VIEW] Received ad data:', data);
 
             if (data) {
+                const adData = data as any;
                 // Transform data to match local Ad interface
                 const transformedAd: Ad = {
-                    id: data.id,
-                    title: data.title,
-                    description: data.description,
-                    price: data.price || 0,
-                    category: data.category,
-                    location: data.location || '',
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                    images: JSON.parse(data.images || '[]'),
-                    views: data.views,
-                    user_id: data.author_id,
-                    created_at: data.created_at,
-                    author: data.author ? {
-                        id: data.author.id,
-                        name: data.author.name || '',
+                    id: adData.id,
+                    title: adData.title,
+                    description: adData.description,
+                    price: adData.price || 0,
+                    category: adData.category,
+                    location: adData.location || '',
+                    latitude: adData.latitude,
+                    longitude: adData.longitude,
+                    images: JSON.parse(adData.images || '[]'),
+                    phone: adData.phone,
+                    email: adData.email,
+                    views: adData.views,
+                    user_id: adData.author_id,
+                    created_at: adData.created_at,
+                    author: adData.author ? {
+                        id: adData.author.id,
+                        name: adData.author.name || '',
                         verified: true, // Assume verified for now
-                        email: data.author.email
+                        email: adData.author.email,
+                        phone: adData.author.phone
                     } : {
                         id: '',
                         name: '',
@@ -273,22 +279,22 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         </div>
 
                         {/* Contact Information Section */}
-                        {(ad.author?.phone || ad.author?.email) && (
+                        {(ad.phone || ad.email || ad.author?.phone || ad.author?.email) && (
                             <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-xs">
                                 <h4 className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">
                                     {language === 'ar' ? 'معلومات الاتصال' : 'CONTACT INFO'}
                                 </h4>
                                 <div className="space-y-2">
-                                    {ad.author?.phone && (
+                                    {(ad.phone || ad.author?.phone) && (
                                         <div className="flex items-center gap-2 text-[11px] font-medium">
                                             <Phone size={14} className="text-green-600" />
-                                            <span>{ad.author.phone}</span>
+                                            <span>{ad.phone || ad.author?.phone}</span>
                                         </div>
                                     )}
-                                    {ad.author?.email && (
+                                    {(ad.email || ad.author?.email) && (
                                         <div className="flex items-center gap-2 text-[11px] font-medium">
                                             <MessageCircle size={14} className="text-blue-600" />
-                                            <span>{ad.author.email}</span>
+                                            <span>{ad.email || ad.author?.email}</span>
                                         </div>
                                     )}
                                 </div>

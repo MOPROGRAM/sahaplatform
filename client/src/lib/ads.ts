@@ -4,11 +4,14 @@ import { supabase } from './supabase';
 import { Database } from '@/types/database.types'
 
 export type Ad = Database['public']['Tables']['Ad']['Row'] & {
+    phone?: string;
+    email?: string;
     // علاقات
-    user?: {
+    author?: {
         id: string;
         name?: string;
         email: string;
+        phone?: string;
     };
     city?: {
         id: string;
@@ -36,7 +39,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -74,7 +77,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -102,7 +105,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -129,6 +132,8 @@ export const adsService = {
         latitude?: number;
         longitude?: number;
         payment_method?: string;
+        phone?: string;
+        email?: string;
     }): Promise<Ad> {
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -145,7 +150,7 @@ export const adsService = {
             })
             .select(`
                 *,
-                author:User(id, name, email),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -174,7 +179,7 @@ export const adsService = {
             .eq('author_id', user.id)
             .select(`
                 *,
-                author:User(id, name, email),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)

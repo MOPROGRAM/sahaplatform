@@ -169,6 +169,8 @@ export default function PostAdPage() {
                 is_active: true,
                 is_boosted: false,
                 views: 0,
+                phone: formData.phone || null,
+                email: formData.email || null,
             };
 
             console.log('Inserting ad data:', adData);
