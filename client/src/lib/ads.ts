@@ -36,7 +36,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                user:User(id, name, email),
+                author:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -74,7 +74,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                user:User(id, name, email),
+                author:User(id, name, email),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -101,11 +101,11 @@ export const adsService = {
         const { data, error } = await (supabase as any)
             .from('Ad')
             .select(`
-            *,
-                user: User(id, name, email),
-                city: cities(id, name, name_ar, name_en),
-                currency: currencies(id, code, symbol, name)
-                    `)
+                *,
+                author:User(id, name, email),
+                city:cities(id, name, name_ar, name_en),
+                currency:currencies(id, code, symbol, name)
+            `)
             .eq('author_id', user.id)
             .order('created_at', { ascending: false });
 
@@ -144,11 +144,11 @@ export const adsService = {
                 currency_id: 'sar', // العملة الافتراضية
             })
             .select(`
-            *,
-                user: User(id, name, email),
-                city: cities(id, name, name_ar, name_en),
-                currency: currencies(id, code, symbol, name)
-                    `)
+                *,
+                author:User(id, name, email),
+                city:cities(id, name, name_ar, name_en),
+                currency:currencies(id, code, symbol, name)
+            `)
             .single();
 
         if (error) {
@@ -173,11 +173,11 @@ export const adsService = {
             .eq('id', id)
             .eq('author_id', user.id)
             .select(`
-            *,
-                user: User(id, name, email),
-                city: cities(id, name, name_ar, name_en),
-                currency: currencies(id, code, symbol, name)
-                `)
+                *,
+                author:User(id, name, email),
+                city:cities(id, name, name_ar, name_en),
+                currency:currencies(id, code, symbol, name)
+            `)
             .single();
 
         if (error) {
