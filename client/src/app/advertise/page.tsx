@@ -1,13 +1,27 @@
 "use client";
 
 import Link from 'next/link';
-import { ArrowLeft, Star, MessageCircle, Mail, Phone, Zap, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Star, MessageCircle, Mail, Phone, Zap, CheckCircle2, Loader2, Send } from 'lucide-react';
 import { useLanguage } from '@/lib/language-context';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export default function AdvertisePage() {
     const { language, t } = useLanguage();
+    const { user } = useAuthStore();
+
+    const [showForm, setShowForm] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        message: ''
+    });
 
     const contactEmail = 'motwasel@yahoo.com';
     const contactPhone = '+966582003887';
@@ -66,6 +80,63 @@ export default function AdvertisePage() {
             ? `مرحباً،\n\nأرغب في الاشتراك في ${planName} للإعلانات المدفوعة.\n\nيرجى إرسال تفاصيل الدفع والخطوات التالية.\n\nشكراً`
             : `Hello,\n\nI would like to subscribe to ${planName} for premium ads.\n\nPlease send payment details and next steps.\n\nThank you`;
         window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    };
+
+    const openSubscriptionForm = (plan: any) => {
+        if (!user) {
+            alert(language === 'ar' ? 'يرجى تسجيل الدخول أولاً' : 'Please login first');
+            window.location.href = '/login?redirect=/advertise';
+            return;
+        }
+        setSelectedPlan(plan);
+        setFormData({
+            ...formData,
+            name: user.name || '',
+            email: user.email || '',
+            phone: (user as any).phone || ''
+        });
+        setShowForm(true);
+        setMessage('');
+    };
+
+    const handleFormSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage('');
+
+        try {
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userName: formData.name,
+                    userEmail: formData.email,
+                    userPhone: formData.phone,
+                    packageName: selectedPlan.name,
+                    packagePrice: selectedPlan.price,
+                    message: formData.message,
+                    userId: user?.id
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setMessage(language === 'ar'
+                    ? 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً.'
+                    : 'Your request has been sent successfully! We will contact you soon.');
+                setFormData({ name: '', email: '', phone: '', message: '' });
+                setTimeout(() => setShowForm(false), 3000);
+            } else {
+                setMessage(language === 'ar' ? `خطأ: ${result.error}` : `Error: ${result.error}`);
+            }
+        } catch (error) {
+            setMessage(language === 'ar' ? 'فشل في إرسال الطلب. يرجى المحاولة لاحقاً.' : 'Failed to send request. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -154,23 +225,109 @@ export default function AdvertisePage() {
 
                             <div className="space-y-2">
                                 <button
-                                    onClick={() => handleWhatsAppContact(plan.name)}
-                                    className="w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2"
+                                    onClick={() => openSubscriptionForm(plan)}
+                                    className={`w-full py-3 rounded-lg font-bold transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 ${plan.popular ? 'bg-primary text-white hover:bg-primary-hover' : 'bg-gray-800 text-white hover:bg-gray-900'}`}
                                 >
-                                    <MessageCircle size={18} />
-                                    {language === 'ar' ? 'اطلب عبر واتساب' : 'Order via WhatsApp'}
+                                    <Zap size={18} />
+                                    {language === 'ar' ? 'اشترك الآن' : 'Subscribe Now'}
                                 </button>
-                                <button
-                                    onClick={() => handleEmailContact(plan.name)}
-                                    className="w-full bg-gray-100 text-gray-900 py-3 rounded-lg font-bold hover:bg-gray-200 transition-all active:scale-95 flex items-center justify-center gap-2"
-                                >
-                                    <Mail size={18} />
-                                    {language === 'ar' ? 'اطلب عبر البريد' : 'Order via Email'}
-                                </button>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => handleWhatsAppContact(plan.name)}
+                                        className="bg-green-500 text-white py-2 rounded-lg font-bold hover:bg-green-600 transition-all text-xs flex items-center justify-center gap-1"
+                                    >
+                                        <MessageCircle size={14} />
+                                        {language === 'ar' ? 'واتساب' : 'WhatsApp'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleEmailContact(plan.name)}
+                                        className="bg-blue-500 text-white py-2 rounded-lg font-bold hover:bg-blue-600 transition-all text-xs flex items-center justify-center gap-1"
+                                    >
+                                        <Mail size={14} />
+                                        {language === 'ar' ? 'بريد' : 'Email'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
+
+                {/* Subscription Form Modal */}
+                {showForm && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+                            <div className="bg-primary p-6 text-white relative">
+                                <button
+                                    onClick={() => setShowForm(false)}
+                                    className="absolute top-4 right-4 hover:bg-white/20 p-1 rounded-full transition-colors"
+                                >
+                                    <ArrowLeft size={24} className={language === 'ar' ? '' : 'rotate-180'} />
+                                </button>
+                                <h3 className="text-2xl font-black">{language === 'ar' ? 'طلب اشتراك' : 'Subscription Request'}</h3>
+                                <p className="opacity-90">{selectedPlan?.name} - {selectedPlan?.price}</p>
+                            </div>
+
+                            <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
+                                {message && (
+                                    <div className={`p-4 rounded-lg text-sm font-bold ${message.includes('نجاح') || message.includes('successfully') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                                        {message}
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-sm font-black text-gray-700 mb-1 uppercase tracking-wider">{language === 'ar' ? 'الاسم' : 'Name'}</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-black text-gray-700 mb-1 uppercase tracking-wider">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-black text-gray-700 mb-1 uppercase tracking-wider">{language === 'ar' ? 'رقم الهاتف' : 'Phone'}</label>
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-black text-gray-700 mb-1 uppercase tracking-wider">{language === 'ar' ? 'رسالة (اختياري)' : 'Message (Optional)'}</label>
+                                    <textarea
+                                        rows={3}
+                                        value={formData.message}
+                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                        className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full bg-primary text-white py-4 rounded-lg font-black uppercase tracking-widest hover:bg-primary-hover shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                >
+                                    {loading ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+                                    {loading ? (language === 'ar' ? 'جارٍ الإرسال...' : 'Sending...') : (language === 'ar' ? 'إرسال الطلب' : 'Send Request')}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
 
                 {/* Benefits Section */}
                 <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-12 text-center relative overflow-hidden">

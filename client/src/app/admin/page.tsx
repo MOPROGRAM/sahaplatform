@@ -9,33 +9,42 @@ import {
     BarChart3,
     Settings,
     Search,
-    PlusCircle,
     LogOut,
     AlertTriangle,
     CheckCircle2,
     XCircle,
     Eye,
     ChevronRight,
-    Loader2
+    Loader2,
+    Clock,
+    DollarSign,
+    Check,
+    X,
+    Trash2,
+    ExternalLink
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-// import { apiService } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/lib/language-context";
 
 export default function AdminDashboard() {
     const { user, logout } = useAuthStore();
     const { language, t } = useLanguage();
     const router = useRouter();
+
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         totalUsers: 0,
         totalAds: 0,
-        activeSubscriptions: 0,
-        pendingReports: 0
+        pendingSubscriptions: 0,
+        activeSubscriptions: 0
     });
-    const [recentAds, setRecentAds] = useState<any[]>([]);
-    const [view, setView] = useState('overview'); // overview, users, ads, settings
+
+    const [dataList, setDataList] = useState<any[]>([]);
+    const [view, setView] = useState('overview'); // overview, users, ads, subscriptions
+    const [searchTerm, setSearchTerm] = useState('');
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     useEffect(() => {
         // Strict Admin Check
@@ -43,182 +52,435 @@ export default function AdminDashboard() {
             router.push('/');
             return;
         }
-        fetchAdminData();
-    }, [user, router]);
+        fetchDashboardData();
+    }, [user, router, view]);
 
-    const fetchAdminData = async () => {
+    const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            // TODO: Implement admin data fetching with Supabase
-            // For now, using mock data
-            setRecentAds([]);
-            setStats({
-                totalUsers: 1420,
-                totalAds: 0,
-                activeSubscriptions: 85,
-                pendingReports: 3
-            });
+            if (view === 'overview') {
+                const [usersCount, adsCount, subsPending, subsActive] = await Promise.all([
+                    supabase.from('User').select('*', { count: 'exact', head: true }),
+                    supabase.from('Ad').select('*', { count: 'exact', head: true }),
+                    supabase.from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                    supabase.from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'completed')
+                ]);
+
+                setStats({
+                    totalUsers: usersCount.count || 0,
+                    totalAds: adsCount.count || 0,
+                    pendingSubscriptions: subsPending.count || 0,
+                    activeSubscriptions: subsActive.count || 0
+                });
+
+                // Fetch recent ads for overview
+                const { data: recentAds } = await supabase
+                    .from('Ad')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                setDataList(recentAds || []);
+
+            } else if (view === 'users') {
+                const { data } = await supabase
+                    .from('User')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                setDataList(data || []);
+            } else if (view === 'ads') {
+                const { data } = await supabase
+                    .from('Ad')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                setDataList(data || []);
+            } else if (view === 'subscriptions') {
+                const { data } = await supabase
+                    .from('subscription_requests')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                setDataList(data || []);
+            }
         } catch (error) {
-            console.error("Admin data fetch failed:", error);
+            console.error("Fetch failed:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleUpdateAdStatus = async (id: string, active: boolean) => {
+        setActionLoading(id);
+        try {
+            await supabase.from('Ad').update({ is_active: active }).eq('id', id);
+            fetchDashboardData();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleUpdateSubStatus = async (id: string, status: string) => {
+        setActionLoading(id);
+        try {
+            await supabase.from('subscription_requests').update({ status }).eq('id', id);
+            fetchDashboardData();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleDeleteAd = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this ad?')) return;
+        setActionLoading(id);
+        try {
+            await supabase.from('Ad').delete().eq('id', id);
+            fetchDashboardData();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(null);
         }
     };
 
     if (!user || user.role !== 'ADMIN') return null;
 
     return (
-        <div className="min-h-screen bg-[#0f111a] text-white flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {/* Admin Top Bar */}
-            <header className="bg-black/50 backdrop-blur-md border-b border-white/10 py-2 px-6 flex justify-between items-center sticky top-0 z-50">
+        <div className="min-h-screen bg-[#0a0c10] text-[#e1e1e1] flex flex-col font-sans" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            {/* Minimal High-Tech Top Bar */}
+            <header className="bg-[#12141c] border-b border-[#2a2d3a] h-14 flex items-center justify-between px-6 sticky top-0 z-50">
                 <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-primary rounded-xs flex items-center justify-center shadow-lg shadow-primary/20">
-                        <ShieldCheck size={18} className="text-white" />
+                    <div className="w-9 h-9 bg-primary/20 border border-primary/50 text-primary flex items-center justify-center rounded-sm">
+                        <ShieldCheck size={20} />
                     </div>
                     <div>
-                        <h1 className="text-xs font-black uppercase tracking-[0.2em]">{language === 'ar' ? 'لوحة تحكم الإدارة' : 'SYSTEM ADMINISTRATION'}</h1>
-                        <p className="text-[8px] font-bold text-primary/80 uppercase">SAHA HUB • v2.0.4</p>
+                        <h1 className="text-[11px] font-black uppercase tracking-[0.2em] leading-none mb-1">
+                            {language === 'ar' ? 'بوابة الإشراف المركزية' : 'CENTRAL ADMINISTRATION PORTAL'}
+                        </h1>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Saha Core v3.0</span>
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+                        </div>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-3 px-3 py-1 bg-white/5 rounded-xs border border-white/5">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-[10px] font-black uppercase tracking-wider">{language === 'ar' ? 'النظام متصل' : 'CORE ONLINE'}</span>
+                    <div className="hidden md:flex items-center gap-4 border-l border-[#2a2d3a] pl-6 h-14">
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] font-black text-white leading-none uppercase">{user.name}</span>
+                            <span className="text-[8px] font-bold text-primary uppercase mt-1">SUPER_ADMIN</span>
+                        </div>
+                        <button onClick={() => { logout(); router.push('/'); }} className="w-8 h-8 rounded-full bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all border border-transparent hover:border-red-500/30">
+                            <LogOut size={16} />
+                        </button>
                     </div>
-                    <button onClick={() => { logout(); router.push('/'); }} className="text-[10px] font-black text-red-500 hover:text-red-400 flex items-center gap-2">
-                        <LogOut size={14} />
-                        {language === 'ar' ? 'خروج' : 'TERMINATE'}
-                    </button>
                 </div>
             </header>
 
             <div className="flex flex-1 overflow-hidden">
-                {/* Admin Sidebar */}
-                <aside className="w-56 bg-black/30 border-r border-white/5 p-4 flex flex-col gap-1 shrink-0">
-                    <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-4 px-2">Main Navigation</div>
+                {/* Sleek Dark Sidebar */}
+                <aside className="w-64 bg-[#0a0c10] border-r border-[#1a1c23] p-4 flex flex-col gap-1.5">
+                    <div className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 mt-2 px-3">System Modules</div>
                     {[
-                        { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'System Overview', icon: <BarChart3 size={16} /> },
-                        { id: 'users', label: language === 'ar' ? 'المستخدمين' : 'User Database', icon: <Users size={16} /> },
-                        { id: 'ads', label: language === 'ar' ? 'الإعلانات' : 'Ads Moderation', icon: <Package size={16} /> },
-                        { id: 'settings', label: language === 'ar' ? 'الإعدادات' : 'Global Settings', icon: <Settings size={16} /> }
+                        { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'DASHBOARD OVERVIEW', icon: <BarChart3 size={18} /> },
+                        { id: 'subscriptions', label: language === 'ar' ? 'طلبات الاشتراكات' : 'PAID AD REQUESTS', icon: <DollarSign size={18} />, badge: stats.pendingSubscriptions },
+                        { id: 'ads', label: language === 'ar' ? 'إدارة الإعلانات' : 'AD MODERATION', icon: <Package size={18} /> },
+                        { id: 'users', label: language === 'ar' ? 'قاعدة المستخدمين' : 'USER DATABASE', icon: <Users size={18} /> },
                     ].map((item) => (
                         <button
                             key={item.id}
                             onClick={() => setView(item.id)}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-xs text-[11px] font-bold transition-all ${view === item.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                            className={`flex items-center justify-between group px-4 py-3 rounded-sm transition-all duration-200 border ${view === item.id
+                                ? 'bg-primary/10 border-primary/30 text-primary shadow-[inset_0_0_20px_rgba(var(--primary-color),0.05)]'
+                                : 'text-gray-400 border-transparent hover:bg-white/5 hover:text-white'}`}
                         >
-                            {item.icon}
-                            {item.label}
+                            <div className="flex items-center gap-3">
+                                {item.icon}
+                                <span className="text-[11px] font-black tracking-wider">{item.label}</span>
+                            </div>
+                            {item.badge ? (
+                                <span className="bg-primary text-black text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full animate-pulse">
+                                    {item.badge}
+                                </span>
+                            ) : (
+                                <ChevronRight size={14} className={`opacity-0 group-hover:opacity-100 transition-all ${language === 'ar' ? 'rotate-180' : ''}`} />
+                            )}
                         </button>
                     ))}
 
-                    <div className="mt-auto p-3 bg-primary/5 border border-primary/10 rounded-xs">
-                        <div className="flex items-center gap-2 mb-2">
-                            <AlertTriangle size={14} className="text-primary" />
-                            <span className="text-[10px] font-black text-primary uppercase">Security Log</span>
+                    <div className="mt-auto p-4 bg-gradient-to-br from-primary/5 to-transparent border border-primary/10 rounded-sm">
+                        <div className="flex items-center gap-2 mb-2 text-primary">
+                            <ShieldCheck size={14} />
+                            <span className="text-[9px] font-black uppercase tracking-[0.1em]">Verified Access</span>
                         </div>
-                        <p className="text-[9px] text-gray-500 font-bold leading-tight">Last admin login from 192.168.1.1 at 10:45 AM.</p>
+                        <p className="text-[9px] text-gray-500 font-bold leading-tight uppercase">Admin session secured via encrypted protocol.</p>
                     </div>
                 </aside>
 
-                {/* Admin Body */}
-                <main className="flex-1 overflow-y-auto p-6">
+                {/* Main Content Area */}
+                <main className="flex-1 overflow-y-auto bg-[#0a0c10] p-8 custom-scrollbar">
                     {loading ? (
-                        <div className="h-full flex flex-col items-center justify-center opacity-20">
-                            <Loader2 className="animate-spin mb-4" size={48} />
-                            <span className="text-[10px] font-black uppercase tracking-widest italic">Syncing with Mainframe...</span>
+                        <div className="h-full flex flex-col items-center justify-center">
+                            <div className="relative w-16 h-16">
+                                <Loader2 className="animate-spin text-primary absolute inset-0" size={64} strokeWidth={1} />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <ShieldCheck size={24} className="text-primary/50" />
+                                </div>
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] mt-8 text-primary animate-pulse">Initializing Interface...</span>
                         </div>
                     ) : (
-                        <div className="max-w-6xl mx-auto space-y-6">
-                            {/* Stats Grid */}
-                            <div className="grid grid-cols-4 gap-4">
-                                {[
-                                    { label: 'Total Users', value: stats.totalUsers, icon: <Users size={18} />, color: 'text-blue-500' },
-                                    { label: 'Active Ads', value: stats.totalAds, icon: <Package size={18} />, color: 'text-orange-500' },
-                                    { label: 'Subscriptions', value: stats.activeSubscriptions, icon: <CheckCircle2 size={18} />, color: 'text-green-500' },
-                                    { label: 'Pending Reports', value: stats.pendingReports, icon: <AlertTriangle size={18} />, color: 'text-red-500' }
-                                ].map((s, i) => (
-                                    <div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xs flex flex-col gap-2 hover:bg-white/[0.07] transition-all">
-                                        <div className="flex justify-between items-center">
-                                            <span className={`w-8 h-8 flex items-center justify-center rounded-xs bg-black/30 ${s.color}`}>{s.icon}</span>
-                                            <span className="text-[8px] font-black text-white/30 uppercase">Live Update</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-3xl font-black italic tracking-tighter leading-none">{s.value}</span>
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">{s.label}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                            {/* Tables Container */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Recent Ads Feed */}
-                                <div className="bg-white/5 border border-white/10 rounded-xs overflow-hidden flex flex-col">
-                                    <div className="p-3 border-b border-white/10 flex justify-between items-center bg-black/20">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                            <Package size={14} className="text-primary" />
-                                            Live Ad Stream
-                                        </h3>
-                                        <button className="text-[9px] font-black text-primary hover:underline">VIEW ALL</button>
-                                    </div>
-                                    <div className="divide-y divide-white/5">
-                                        {recentAds.map((ad, i) => (
-                                            <div key={ad.id} className="p-3 flex items-center justify-between hover:bg-white/[0.03] transition-colors group">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-black/40 border border-white/5 rounded-xs flex items-center justify-center text-[10px] font-black italic text-white/20">#{i + 1}</div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="text-[11px] font-black truncate group-hover:text-primary transition-colors">{ad.title}</span>
-                                                        <span className="text-[9px] text-gray-500 font-bold uppercase">{ad.category} • {ad.location}</span>
-                                                    </div>
-                                                </div>
-                                                <button className="w-6 h-6 flex items-center justify-center bg-white/5 rounded-xs hover:bg-primary hover:text-white transition-all">
-                                                    <ChevronRight size={14} />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
+                            {/* Page Heading */}
+                            <div className="flex items-end justify-between border-b border-white/5 pb-6">
+                                <div>
+                                    <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2 italic">
+                                        {view === 'overview' && (language === 'ar' ? 'النظرة العامة' : 'SYSTEM STATUS')}
+                                        {view === 'subscriptions' && (language === 'ar' ? 'الاشتراكات المدفوعة' : 'FINANCIAL OPS')}
+                                        {view === 'ads' && (language === 'ar' ? 'الرقابة على الإعلانات' : 'CONTENT MODERATION')}
+                                        {view === 'users' && (language === 'ar' ? 'قاعدة البيانات' : 'USER INFRASTRUCTURE')}
+                                    </h2>
+                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Real-time synchronization active • No latency detected</p>
                                 </div>
 
-                                {/* System Logs / Recent Users */}
-                                <div className="bg-white/5 border border-white/10 rounded-xs overflow-hidden flex flex-col">
-                                    <div className="p-3 border-b border-white/10 flex justify-between items-center bg-black/20">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                            <Users size={14} className="text-blue-500" />
-                                            Recent Access
-                                        </h3>
+                                {view !== 'overview' && (
+                                    <div className="relative group">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors" size={14} />
+                                        <input
+                                            type="text"
+                                            placeholder="FILTER ARCHIVES..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="bg-white/5 border border-white/10 rounded-sm py-2 pl-9 pr-4 text-[11px] font-bold outline-none focus:border-primary/50 focus:ring-4 ring-primary/5 transition-all w-64 uppercase tracking-wider"
+                                        />
                                     </div>
-                                    <div className="p-3 space-y-3">
+                                )}
+                            </div>
+
+                            {view === 'overview' && (
+                                <>
+                                    {/* Advanced Stats Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                                         {[
-                                            { user: 'Ahmed K.', action: 'Listed a new Ad: Real Estate', time: '2m ago' },
-                                            { user: 'Sarah S.', action: 'Renewed Premium Subscription', time: '15m ago' },
-                                            { user: 'System', action: 'Daily database backup successful', time: '1h ago' },
-                                            { user: 'Admin', action: 'Approved 15 pending merchant accounts', time: '3h ago' }
-                                        ].map((log, i) => (
-                                            <div key={i} className="flex gap-3 text-[10px] border-b border-white/5 pb-2 last:border-0">
-                                                <span className="text-primary font-black shrink-0">[{log.time}]</span>
-                                                <div className="flex flex-col">
-                                                    <span className="font-black text-white/90">{log.user}</span>
-                                                    <span className="text-gray-500 font-medium">{log.action}</span>
+                                            { label: 'Network Nodes', value: stats.totalUsers, icon: <Users size={20} />, color: 'bg-blue-500/10 border-blue-500/20 text-blue-500', trend: '+12% INC' },
+                                            { label: 'Active Assets', value: stats.totalAds, icon: <Package size={20} />, color: 'bg-orange-500/10 border-orange-500/20 text-orange-500', trend: 'STABLE' },
+                                            { label: 'Pending Subs', value: stats.pendingSubscriptions, icon: <Clock size={20} />, color: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500', trend: 'CRITICAL', highlight: stats.pendingSubscriptions > 0 },
+                                            { label: 'Completed Rev', value: stats.activeSubscriptions, icon: <DollarSign size={20} />, color: 'bg-green-500/10 border-green-500/20 text-green-500', trend: 'OPTIMIZED' }
+                                        ].map((s, i) => (
+                                            <div key={i} className={`group relative bg-[#12141c] border rounded-sm p-6 overflow-hidden transition-all hover:bg-[#181a24] ${s.highlight ? 'border-primary ring-1 ring-primary/50' : 'border-[#2a2d3a]'}`}>
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div className={`w-10 h-10 flex items-center justify-center rounded-sm ${s.color}`}>
+                                                        {s.icon}
+                                                    </div>
+                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${s.color} opacity-80`}>{s.trend}</span>
                                                 </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-4xl font-black tracking-tighter italic leading-none mb-2">{s.value}</span>
+                                                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">{s.label}</span>
+                                                </div>
+                                                {/* Futuristic Decor */}
+                                                <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-white/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all"></div>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-                            </div>
 
-                            {/* Alert Banner */}
-                            <div className="bg-red-500/10 border border-red-500/20 p-3 flex items-center justify-between rounded-xs">
-                                <div className="flex items-center gap-3">
-                                    <XCircle size={18} className="text-red-500" />
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black uppercase text-red-500 tracking-widest">Urgent Maintenance</span>
-                                        <p className="text-[9px] font-bold text-gray-400">Database optimization scheduled for 03:00 AM UTC. Please notify active users.</p>
+                                    {/* Action Feed */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="bg-[#12141c] border border-[#2a2d3a] rounded-sm flex flex-col min-h-[400px]">
+                                            <div className="p-4 border-b border-[#2a2d3a] flex justify-between items-center">
+                                                <h3 className="text-[11px] font-black tracking-[0.2em] flex items-center gap-2">
+                                                    <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                                                    RECENT ASSETS
+                                                </h3>
+                                                <button onClick={() => setView('ads')} className="text-[9px] font-black text-primary hover:tracking-widest transition-all uppercase">DECRYPT ALL</button>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto">
+                                                {dataList.length === 0 ? (
+                                                    <div className="h-full flex flex-col items-center justify-center opacity-30 italic p-12 text-center">
+                                                        <Package size={32} className="mb-4" />
+                                                        <span className="text-[10px] font-black uppercase">Archive Empty</span>
+                                                    </div>
+                                                ) : (
+                                                    dataList.map((ad, i) => (
+                                                        <div key={ad.id} className="p-4 flex items-center justify-between border-b border-white/[0.03] hover:bg-white/[0.02] transition-all group">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 bg-black/40 border border-white/5 flex items-center justify-center text-[10px] font-black italic text-gray-600">ID.{i + 1}</div>
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[12px] font-black group-hover:text-primary transition-colors">{ad.title}</span>
+                                                                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{ad.category} • {ad.location}</span>
+                                                                </div>
+                                                            </div>
+                                                            <Link href={`/ads/view?id=${ad.id}`} target="_blank" className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-sm hover:bg-primary hover:text-black transition-all">
+                                                                <ChevronRight size={16} />
+                                                            </Link>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-[#12141c] border border-[#2a2d3a] rounded-sm flex flex-col min-h-[400px]">
+                                            <div className="p-4 border-b border-[#2a2d3a] flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                                <h3 className="text-[11px] font-black tracking-[0.2em]">SECURITY BROADCAST</h3>
+                                            </div>
+                                            <div className="p-6 space-y-6">
+                                                {[
+                                                    { icon: <Clock size={16} />, title: "NEW ENTRY DETECTED", desc: "A user has registered from a new IP segment.", time: "18:04:12" },
+                                                    { icon: <DollarSign size={16} />, title: "REVENUE OPPORTUNITY", desc: "Premium ad request awaiting manual verification.", time: "17:42:01", highlight: true },
+                                                    { icon: <AlertTriangle size={16} />, title: "ASSET MODERATION", desc: "User reported a suspicious listing in Real Estate section.", time: "15:20:55" },
+                                                    { icon: <CheckCircle2 size={16} />, title: "SYNC SUCCESSFUL", desc: "Full database backup committed to secondary server cluster.", time: "12:00:00" },
+                                                ].map((log, i) => (
+                                                    <div key={i} className={`flex gap-4 p-4 rounded-sm border ${log.highlight ? 'bg-primary/10 border-primary/30' : 'bg-black/20 border-white/5'}`}>
+                                                        <div className={log.highlight ? 'text-primary' : 'text-gray-500'}>{log.icon}</div>
+                                                        <div className="flex flex-col">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <span className={`text-[10px] font-black uppercase tracking-widest ${log.highlight ? 'text-primary' : 'text-white'}`}>{log.title}</span>
+                                                                <span className="text-[8px] font-bold text-gray-500">@{log.time}</span>
+                                                            </div>
+                                                            <p className="text-[10px] font-bold text-gray-400 italic">"{log.desc}"</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
+                                </>
+                            )}
+
+                            {view !== 'overview' && (
+                                <div className="bg-[#12141c] border border-[#2a2d3a] rounded-sm overflow-hidden shadow-2xl">
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="bg-black/40 border-b border-[#2a2d3a]">
+                                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Identification / Meta</th>
+                                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Current Status</th>
+                                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Operation / Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/[0.03]">
+                                            {dataList.filter(item =>
+                                                view === 'users' ? (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) || item.email?.toLowerCase().includes(searchTerm.toLowerCase())) :
+                                                    view === 'ads' ? (item.title?.toLowerCase().includes(searchTerm.toLowerCase())) :
+                                                        (item.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) || item.package_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+                                            ).map((item) => (
+                                                <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
+                                                    <td className="p-4">
+                                                        {view === 'users' && (
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors">{item.name}</span>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.email}</span>
+                                                                <span className="text-[8px] font-black text-primary/50 uppercase mt-1 tracking-[0.2em]">{item.role || 'USER'}</span>
+                                                            </div>
+                                                        )}
+                                                        {view === 'ads' && (
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors">{item.title}</span>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.category} • {item.location}</span>
+                                                                <span className="text-[8px] font-black text-gray-600 uppercase mt-1">ID: {item.id}</span>
+                                                            </div>
+                                                        )}
+                                                        {view === 'subscriptions' && (
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors truncate max-w-[200px]">{item.package_name}</span>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.user_name} • {item.user_phone}</span>
+                                                                <span className="text-[10px] font-black text-primary uppercase mt-1">{item.package_price}</span>
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="p-4">
+                                                        {view === 'users' && (
+                                                            <div className="flex items-center gap-2">
+                                                                {item.verified ? (
+                                                                    <span className="bg-green-500/10 text-green-500 border border-green-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">VERIFIED</span>
+                                                                ) : (
+                                                                    <span className="bg-orange-500/10 text-orange-500 border border-orange-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">PENDING_KYC</span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {view === 'ads' && (
+                                                            <div className="flex items-center gap-2">
+                                                                {item.is_active ? (
+                                                                    <span className="bg-green-500/10 text-green-500 border border-green-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">BROADCASTING</span>
+                                                                ) : (
+                                                                    <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">OFFLINE</span>
+                                                                )}
+                                                                {item.is_boosted && (
+                                                                    <span className="bg-primary/20 text-primary border border-primary/30 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">BOOSTED</span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {view === 'subscriptions' && (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm border ${item.status === 'completed' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                                                                        item.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                                                                            'bg-red-500/10 text-red-500 border-red-500/20'
+                                                                    }`}>
+                                                                    {item.status}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-2">
+                                                            {view === 'ads' && (
+                                                                <>
+                                                                    <button
+                                                                        disabled={actionLoading === item.id}
+                                                                        onClick={() => handleUpdateAdStatus(item.id, !item.is_active)}
+                                                                        className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all ${item.is_active ? 'bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white' : 'bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white'}`}
+                                                                    >
+                                                                        {item.is_active ? <X size={16} /> : <Check size={16} />}
+                                                                    </button>
+                                                                    <Link href={`/ads/view?id=${item.id}`} target="_blank" className="w-8 h-8 flex items-center justify-center rounded-sm bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all">
+                                                                        <ExternalLink size={16} />
+                                                                    </Link>
+                                                                    <button
+                                                                        disabled={actionLoading === item.id}
+                                                                        onClick={() => handleDeleteAd(item.id)}
+                                                                        className="w-8 h-8 flex items-center justify-center rounded-sm bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                                                                    >
+                                                                        <Trash2 size={16} />
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {view === 'subscriptions' && (
+                                                                <>
+                                                                    <button
+                                                                        disabled={actionLoading === item.id}
+                                                                        onClick={() => handleUpdateSubStatus(item.id, 'completed')}
+                                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-green-500/20 text-green-500 text-[9px] font-black uppercase tracking-widest hover:bg-green-500 hover:text-black transition-all"
+                                                                    >
+                                                                        <Check size={12} />
+                                                                        Approve
+                                                                    </button>
+                                                                    <button
+                                                                        disabled={actionLoading === item.id}
+                                                                        onClick={() => handleUpdateSubStatus(item.id, 'cancelled')}
+                                                                        className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-red-500/20 text-red-500 text-[9px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                                                                    >
+                                                                        <X size={12} />
+                                                                        Reject
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {view === 'users' && (
+                                                                <button className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-black transition-all">
+                                                                    <ShieldCheck size={12} />
+                                                                    Manage
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <button className="bg-red-500 text-white px-4 py-1 text-[9px] font-black rounded-xs">BROADCAST</button>
-                            </div>
+                            )}
+
                         </div>
                     )}
                 </main>
