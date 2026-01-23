@@ -141,32 +141,17 @@ function AdsContent() {
         <div className="min-h-screen bg-[#f0f2f5] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            {/* Advanced Filter */}
-            <div className="bg-gray-50 border-b border-gray-200 py-4 px-4">
-                <div className="max-w-7xl mx-auto">
-                    <AdvancedFilter />
-                    <div className="mt-4 flex items-center gap-2">
-                        <label className="flex items-center gap-2 text-[10px] font-black text-gray-600">
-                            <input
-                                type="checkbox"
-                                checked={showAllAds}
-                                onChange={(e) => setShowAllAds(e.target.checked)}
-                                className="w-3 h-3"
-                            />
-                            {language === 'ar' ? 'عرض جميع الإعلانات' : 'Show All Ads'}
-                        </label>
-                    </div>
-                </div>
-            </div>
-
+            {/* Simple Result Info */}
             <main className="max-w-7xl mx-auto w-full p-3 flex-1">
                 {/* Result Info */}
-                <div className="flex items-center justify-between mb-4 px-1">
+                <div className="flex items-center justify-between mb-6 px-1 border-b border-gray-200 pb-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-1 h-4 bg-primary rounded-full"></div>
-                        <h1 className="text-[14px] font-black uppercase text-secondary tracking-tight">
+                        <div className="w-1.5 h-6 bg-primary rounded-full"></div>
+                        <h1 className="text-[18px] font-black uppercase text-secondary tracking-tight">
                             {category ? `${category}` : 'Global Marketplace'}
-                            <span className="text-[10px] font-black text-gray-400 mr-3 border-r border-gray-200 pr-3 uppercase italic mx-2">{ads.length} listings identified</span>
+                            <span className="text-[12px] font-medium text-gray-400 mr-4 bg-gray-100 px-3 py-1 rounded-full uppercase italic">
+                                {ads.length} listings identified
+                            </span>
                         </h1>
                     </div>
                 </div>
@@ -193,7 +178,10 @@ function AdsContent() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center p-20 text-gray-300 font-black uppercase text-sm italic tracking-widest">No matching listings in the matrix</div>
+                    <div className="text-center p-20 bg-white border border-dashed border-gray-300 rounded-lg">
+                        <div className="text-gray-400 font-black uppercase text-sm italic tracking-widest">No matching listings in the matrix</div>
+                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 text-primary font-bold hover:underline">Clear all filters</button>
+                    </div>
                 )}
             </main>
             <Footer />

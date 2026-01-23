@@ -29,15 +29,8 @@ export const adsService = {
     // الحصول على جميع الإعلانات مع الفلاتر
     async getAds(filters: {
         category?: string;
-        type?: string;
-        location?: string;
         search?: string;
-        minPrice?: number;
-        maxPrice?: number;
-        hasMedia?: boolean;
         limit?: number;
-        sortBy?: string;
-        sortOrder?: 'asc' | 'desc';
     } = {}) {
         let query = (supabase as any)
             .from('Ad')
@@ -49,46 +42,19 @@ export const adsService = {
             `)
             .eq('is_active', true);
 
-        // تطبيق الفلاتر
+        // فلترة بسيطة جداً بالقسم فقط
         if (filters.category) {
             query = query.eq('category', filters.category.toLowerCase());
         }
 
-        if (filters.location) {
-            const locations = filters.location.split(',').map(l => l.trim()).filter(l => l);
-            if (locations.length > 0) {
-                const orConditions = locations.map(loc => `location.ilike.%${loc}%`).join(',');
-                query = query.or(orConditions);
-            }
-        }
-
-        if (filters.minPrice !== undefined) {
-            query = query.gte('price', filters.minPrice);
-        }
-
-        if (filters.maxPrice !== undefined) {
-            query = query.lte('price', filters.maxPrice);
-        }
-
-        if (filters.hasMedia) {
-            query = query.neq('images', '[]');
-        }
-
+        // بحث بسيط بالاسم
         if (filters.search) {
-            query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+            query = query.ilike('title', `%${filters.search}%`);
         }
 
-        // الترتيب
-        const sortBy = filters.sortBy || 'created_at';
-        const sortOrder = filters.sortOrder || 'desc';
+        // ترتيب ثابت ومضمون
+        query = query.order('created_at', { ascending: false });
 
-        if (sortBy === 'created_at') {
-            query = query.order('created_at', { ascending: sortOrder === 'asc' });
-        } else {
-            query = query.order('is_boosted', { ascending: false }).order('created_at', { ascending: false });
-        }
-
-        // الحد
         const limit = filters.limit || 50;
         query = query.limit(limit);
 
@@ -96,7 +62,7 @@ export const adsService = {
 
         if (error) {
             console.error('Error fetching ads:', error);
-            throw new Error('Failed to fetch ads');
+            return []; // إرجاع مصفوفة فارغة بدلاً من رمي خطأ لضمان استقرار الموقع
         }
 
         return data || [];
