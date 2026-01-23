@@ -42,9 +42,9 @@ export const adsService = {
             `)
             .eq('is_active', true);
 
-        // فلترة بسيطة جداً بالقسم فقط
+        // فلترة بالقسم (I-LIKE للتوافق مع حالات الأحرف)
         if (filters.category) {
-            query = query.eq('category', filters.category.toLowerCase());
+            query = query.ilike('category', filters.category);
         }
 
         // بحث بسيط بالاسم
