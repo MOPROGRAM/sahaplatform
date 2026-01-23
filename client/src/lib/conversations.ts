@@ -124,7 +124,7 @@ export const conversationsService = {
             .from('Message')
             .select(`
                 *,
-                sender:User(id, name, email)
+                sender:sender_id(id, name, email)
             `)
             .eq('conversation_id', id)
             .order('created_at', { ascending: true });
@@ -232,7 +232,7 @@ export const conversationsService = {
             })
             .select(`
                 *,
-                sender:User(id, name, email)
+                sender:sender_id(id, name, email)
             `)
             .single();
 
