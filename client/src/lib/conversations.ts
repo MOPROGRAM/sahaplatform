@@ -96,33 +96,28 @@ export const conversationsService = {
             throw new Error('User not authenticated');
         }
 
-        // التحقق من أن المستخدم مشارك في المحادثة
-        const { data: participantCheck, error: participantError } = await (supabase as any)
-            .from('_conversation_participants')
-            .select('conversation_id')
-            .eq('conversation_id', id)
-            .eq('user_id', user.id)
-            .single();
-
-        if (participantError || !participantCheck) {
-            throw new Error('Access denied to this conversation');
-        }
-
-        // الحصول على المحادثة
+        // الحصول على المحادثة مع الإعلان والمشاركين
         const { data: conversation, error: conversationError } = await (supabase as any)
             .from('Conversation')
             .select(`
                 *,
-                ad:Ad(id, title, images),
-                participants:User(id, name, email)
+                ad:Ad(id, title, images)
             `)
             .eq('id', id)
             .single();
 
-        if (conversationError) {
+        if (conversationError || !conversation) {
             console.error('Error fetching conversation:', conversationError);
             return null;
         }
+
+        // الحصول على المشاركين يدوياً لضمان الدقة
+        const { data: participants, error: pError } = await (supabase as any)
+            .from('_conversation_participants')
+            .select('user:User(id, name, email)')
+            .eq('conversation_id', id);
+
+        const transformedParticipants = participants?.map((p: any) => p.user) || [];
 
         // الحصول على الرسائل
         const { data: messages, error: messagesError } = await (supabase as any)
@@ -140,7 +135,10 @@ export const conversationsService = {
         }
 
         return {
-            conversation: conversation as any,
+            conversation: {
+                ...conversation,
+                participants: transformedParticipants
+            } as any,
             messages: (messages as any) || []
         };
     },
@@ -153,34 +151,33 @@ export const conversationsService = {
             throw new Error('User not authenticated');
         }
 
-        // البحث عن محادثة موجودة بين المستخدمين لهذا الإعلان
-        const { data: existingConversation, error: searchError } = await (supabase as any)
-            .from('Conversation')
-            .select(`
-                *,
-                participants:_conversation_participants(user:User(id, name, email))
-            `)
-            .eq('ad_id', adId)
-            .single();
+        // 1. البحث عن محادثة موجودة لهذا الإعلان يشارك فيها المستخدم
+        const { data: myParticipations } = await (supabase as any)
+            .from('_conversation_participants')
+            .select('conversation_id')
+            .eq('user_id', user.id);
 
-        if (existingConversation && !searchError) {
-            // التحقق من أن المستخدم مشارك
-            const isParticipant = existingConversation.participants?.some(p => p.id === user.id);
-            if (isParticipant) {
-                return existingConversation as any;
+        const myConvIds = myParticipations?.map(p => p.conversation_id) || [];
+
+        if (myConvIds.length > 0) {
+            const { data: existingConv } = await (supabase as any)
+                .from('Conversation')
+                .select('id')
+                .eq('ad_id', adId)
+                .in('id', myConvIds)
+                .single();
+
+            if (existingConv) {
+                const fullConv = await this.getConversation(existingConv.id);
+                if (fullConv) return fullConv.conversation;
             }
         }
 
-        // إنشاء محادثة جديدة
+        // 2. إنشاء محادثة جديدة إذا لم توجد
         const { data: newConversation, error: createError } = await (supabase as any)
             .from('Conversation')
-            .insert({
-                ad_id: adId,
-            })
-            .select(`
-                *,
-                ad:Ad(id, title, images)
-            `)
+            .insert({ ad_id: adId })
+            .select()
             .single();
 
         if (createError) {
@@ -188,21 +185,18 @@ export const conversationsService = {
             throw new Error('Failed to create conversation');
         }
 
-        // إضافة المشاركين
-        const participants = [
-            { conversation_id: newConversation.id, user_id: user.id },
-            { conversation_id: newConversation.id, user_id: participantId }
-        ];
-
-        const { error: participantsError } = await (supabase as any)
+        // 3. إضافة المشاركين
+        await (supabase as any)
             .from('_conversation_participants')
-            .insert(participants);
+            .insert([
+                { conversation_id: newConversation.id, user_id: user.id },
+                { conversation_id: newConversation.id, user_id: participantId }
+            ]);
 
-        if (participantsError) {
-            console.error('Error adding participants:', participantsError);
-        }
+        const finalConv = await this.getConversation(newConversation.id);
+        if (!finalConv) throw new Error('Failed to retrieve newly created conversation');
 
-        return newConversation as any;
+        return finalConv.conversation;
     },
 
     // إرسال رسالة
