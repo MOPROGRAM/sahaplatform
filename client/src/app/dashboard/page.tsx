@@ -33,7 +33,7 @@ interface Ad {
     title: string;
     price: number;
     category: string;
-    isActive: boolean;
+    is_active: boolean;
     views: number;
     currency?: {
         code: string;
@@ -81,7 +81,7 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
         try {
             const myAds = await adsService.getMyAds();
-            const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.isActive) : [];
+            const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.is_active) : [];
             setAds(activeAdsOnly as any);
 
             const totalViews = activeAdsOnly.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
@@ -236,8 +236,8 @@ export default function DashboardPage() {
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <div className="flex flex-col items-center gap-1">
-                                                                <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                                    {ad.isActive ? 'Operation: Active' : 'Operation: Pause'}
+                                                                <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                                    {ad.is_active ? 'Operation: Active' : 'Operation: Pause'}
                                                                 </span>
                                                                 <span className="text-[7px] font-black text-gray-300 uppercase italic">Code: {ad.id?.substring(0, 8)}</span>
                                                             </div>
@@ -260,7 +260,7 @@ export default function DashboardPage() {
                                                                     </button>
                                                                 </div>
                                                                 <div className="flex items-center gap-1 text-[8px] font-black text-gray-300 uppercase tracking-tighter">
-                                                                    <Clock size={8} /> {getRelativeTime(ad.createdAt)}
+                                                                    <Clock size={8} /> {getRelativeTime(ad.created_at)}
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -331,8 +331,8 @@ export default function DashboardPage() {
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
                                                         <div className="flex flex-col items-center gap-1">
-                                                            <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                                {ad.isActive ? 'Operation: Active' : 'Operation: Pause'}
+                                                            <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                                {ad.is_active ? 'Operation: Active' : 'Operation: Pause'}
                                                             </span>
                                                             <span className="text-[7px] font-black text-gray-300 uppercase italic">Code: {ad.id?.substring(0, 8)}</span>
                                                         </div>

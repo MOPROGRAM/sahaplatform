@@ -75,7 +75,7 @@ export const authService = {
                     email: user.email,
                     name: user.user_metadata?.name || '',
                     role: user.user_metadata?.role || 'USER',
-                    userType: user.user_metadata?.userType || 'SEEKER',
+                    user_type: user.user_metadata?.userType || 'SEEKER',
                     verified: !!user.email_confirmed_at,
                 }, {
                     onConflict: 'id'

@@ -47,7 +47,7 @@ export const adsService = {
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
-            .eq('isActive', true);
+            .eq('is_active', true);
 
         // تطبيق الفلاتر
         if (filters.category) {
@@ -83,9 +83,9 @@ export const adsService = {
         const sortOrder = filters.sortOrder || 'desc';
 
         if (sortBy === 'created_at') {
-            query = query.order('createdAt', { ascending: sortOrder === 'asc' });
+            query = query.order('created_at', { ascending: sortOrder === 'asc' });
         } else {
-            query = query.order('is_boosted', { ascending: false }).order('createdAt', { ascending: false });
+            query = query.order('is_boosted', { ascending: false }).order('created_at', { ascending: false });
         }
 
         // الحد
@@ -113,7 +113,7 @@ export const adsService = {
                 currency:currencies(id, code, symbol, name)
             `)
             .eq('id', id)
-            .eq('isActive', true)
+            .eq('is_active', true)
             .single();
 
         if (error) {
@@ -135,13 +135,13 @@ export const adsService = {
         const { data, error } = await (supabase as any)
             .from('Ad')
             .select(`
-                *,
-                user:User(id, name, email),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
-            `)
-            .eq('userId', user.id)
-            .order('createdAt', { ascending: false });
+            *,
+                user: User(id, name, email),
+                city: cities(id, name, name_ar, name_en),
+                currency: currencies(id, code, symbol, name)
+                    `)
+            .eq('author_id', user.id)
+            .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching my ads:', error);
@@ -174,15 +174,15 @@ export const adsService = {
             .from('Ad')
             .insert({
                 ...adData,
-                userId: user.id,
-                currencyId: 'sar', // العملة الافتراضية
+                author_id: user.id,
+                currency_id: 'sar', // العملة الافتراضية
             })
             .select(`
-                *,
-                user:User(id, name, email),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
-            `)
+            *,
+                user: User(id, name, email),
+                city: cities(id, name, name_ar, name_en),
+                currency: currencies(id, code, symbol, name)
+                    `)
             .single();
 
         if (error) {
@@ -205,13 +205,13 @@ export const adsService = {
             .from('Ad')
             .update(updates)
             .eq('id', id)
-            .eq('userId', user.id)
+            .eq('author_id', user.id)
             .select(`
-                *,
-                user:User(id, name, email),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
-            `)
+            *,
+                user: User(id, name, email),
+                city: cities(id, name, name_ar, name_en),
+                currency: currencies(id, code, symbol, name)
+                `)
             .single();
 
         if (error) {
@@ -234,7 +234,7 @@ export const adsService = {
             .from('Ad')
             .delete()
             .eq('id', id)
-            .eq('userId', user.id);
+            .eq('author_id', user.id);
 
         if (error) {
             console.error('Error deleting ad:', error);
