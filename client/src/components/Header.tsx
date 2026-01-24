@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, MapPin, ChevronDown } from "lucide-react";
+import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, MapPin, ChevronDown, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -168,7 +168,10 @@ export default function Header() {
                                     </div>
                                     <div className="flex flex-col leading-none max-w-[80px] sm:max-w-none">
                                         <span className="text-[11px] sm:text-[12px] font-[1000] text-text-main uppercase tracking-tight truncate">{user.name}</span>
-                                        <span className="text-[8px] sm:text-[9px] font-bold text-text-muted mt-0.5 truncate">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
+                                        <span className="text-[8px] sm:text-[9px] font-bold text-emerald-500 mt-0.5 truncate flex items-center gap-1">
+                                            <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
+                                            {language === 'ar' ? 'عضو موثق' : 'Verified Member'}
+                                        </span>
                                     </div>
                                     <ChevronDown size={12} className="text-gray-400 ml-1" />
                                 </button>
@@ -179,9 +182,9 @@ export default function Header() {
                                         <div className="absolute top-full right-0 mt-2 w-48 bg-card-bg border-2 border-border-color shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-md py-2 z-[110] animate-in fade-in slide-in-from-top-2 duration-200">
                                             <div className="space-y-1">
                                                 {user.role === 'ADMIN' && (
-                                                    <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-primary hover:bg-primary/5 transition-colors" onClick={() => setShowUserMenu(false)}>
-                                                        <ShieldCheck size={14} />
-                                                        {language === 'ar' ? 'لوحة الإدارة' : 'Admin Portal'}
+                                                    <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                        <Settings size={14} />
+                                                        {language === 'ar' ? 'إدارة النظام' : 'System Management'}
                                                     </Link>
                                                 )}
                                                 <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
