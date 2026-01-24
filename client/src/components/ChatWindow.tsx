@@ -49,25 +49,25 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
             // Subscribe to new messages
             channel = conversationsService.subscribeToConversation(conversationId, (payload) => {
-                console.log('[CHAT-REALTIME] New message received:', payload);
-                const newMessage = payload.new;
-                // Transform to match local Message interface if needed
-                const processedMessage = {
-                    ...newMessage,
-                    senderId: newMessage.sender_id,
-                    messageType: newMessage.message_type,
-                    createdAt: newMessage.created_at,
-                    sender: newMessage.sender || { name: 'User' } // Note: payload.new might not have joined data
-                };
+                console.log('[CHAT-REALTIME] Payload received:', payload);
+                if (payload.eventType === 'INSERT') {
+                    const newMessage = payload.new;
 
-                setMessages(prev => {
-                    // Avoid duplicates
-                    if (prev.find(m => m.id === processedMessage.id)) return prev;
-                    return [...prev, processedMessage as Message];
-                });
+                    // Transform raw DB fields to UI interface
+                    const processedMessage: Message = {
+                        id: newMessage.id,
+                        senderId: newMessage.sender_id,
+                        content: newMessage.content,
+                        messageType: newMessage.message_type,
+                        createdAt: newMessage.created_at,
+                        sender: { name: 'User' } // Default name since joins don't come in realtime
+                    };
 
-                // Fetch full message with joins if necessary (since payload.new only contains raw row)
-                // fetchChatData(); // Or just manually add if we don't need joins immediately
+                    setMessages(prev => {
+                        if (prev.find(m => m.id === processedMessage.id)) return prev;
+                        return [...prev, processedMessage];
+                    });
+                }
             });
         }
         return () => {
