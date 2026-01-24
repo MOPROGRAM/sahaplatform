@@ -178,6 +178,12 @@ export default function Header() {
                                         <div className="fixed inset-0 z-[105]" onClick={() => setShowUserMenu(false)}></div>
                                         <div className="absolute top-full right-0 mt-2 w-48 bg-card-bg border-2 border-border-color shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-md py-2 z-[110] animate-in fade-in slide-in-from-top-2 duration-200">
                                             <div className="space-y-1">
+                                                {user.role === 'ADMIN' && (
+                                                    <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-primary hover:bg-primary/5 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                        <ShieldCheck size={14} />
+                                                        {language === 'ar' ? 'لوحة الإدارة' : 'Admin Portal'}
+                                                    </Link>
+                                                )}
                                                 <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <LayoutDashboard size={14} />
                                                     {t('dashboard')}

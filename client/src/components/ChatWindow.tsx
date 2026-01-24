@@ -59,7 +59,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         senderId: newMessage.sender_id,
                         content: newMessage.content,
                         messageType: newMessage.message_type,
-                        createdAt: newMessage.created_at,
+                        createdAt: newMessage.created_at || new Date().toISOString(),
                         sender: { name: 'User' } // Default name since joins don't come in realtime
                     };
 
@@ -283,7 +283,10 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             )}
 
                             <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-gray-400'}`}>
-                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {(() => {
+                                    const date = new Date(msg.createdAt);
+                                    return isNaN(date.getTime()) ? '...' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                })()}
                             </span>
                         </div>
                     </div>
