@@ -37,10 +37,11 @@ export default function SearchBar({
     };
 
     return (
-        <form className={`search-form ${className}`} onSubmit={handleSubmit}>
+        <form className={`search-form input-glow flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 transition-all duration-300 w-full max-w-lg shadow-sm hover:shadow-md ${className}`} onSubmit={handleSubmit}>
+            <Search className="text-gray-400 w-5 h-5 shrink-0" />
             <input
                 type="text"
-                className="search-input"
+                className="search-input w-full bg-transparent border-none outline-none px-3 text-sm font-medium text-gray-700 placeholder-gray-400"
                 placeholder={placeholder}
                 value={searchValue}
                 onChange={handleChange}
@@ -48,14 +49,13 @@ export default function SearchBar({
             {searchValue && (
                 <button
                     type="button"
-                    className="search-reset"
+                    className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors"
                     onClick={handleClear}
-                    aria-label="مسح البحث"
+                    aria-label="Clear Search"
                 >
-                    <X size={16} />
+                    <X size={14} />
                 </button>
             )}
-            <Search />
         </form>
     );
 }

@@ -115,7 +115,7 @@ export default function RootLayout({
             <body>
                 <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
                     <LanguageProvider>
-                        <div className="flex min-h-screen">
+                        <div className="flex min-h-screen bg-aurora-subtle transition-colors duration-500">
                             <CategorySidebar />
                             <main className="flex-1 overflow-x-hidden">
                                 {children}
