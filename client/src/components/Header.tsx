@@ -166,9 +166,9 @@ export default function Header() {
                                     <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-[15px] font-[1000] text-primary border-2 border-primary/20 uppercase shrink-0">
                                         {user.name?.substring(0, 1)}
                                     </div>
-                                    <div className="hidden sm:flex flex-col leading-none">
-                                        <span className="text-[12px] font-[1000] text-text-main uppercase tracking-tight">{user.name}</span>
-                                        <span className="text-[9px] font-bold text-text-muted mt-1">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
+                                    <div className="flex flex-col leading-none max-w-[80px] sm:max-w-none">
+                                        <span className="text-[11px] sm:text-[12px] font-[1000] text-text-main uppercase tracking-tight truncate">{user.name}</span>
+                                        <span className="text-[8px] sm:text-[9px] font-bold text-text-muted mt-0.5 truncate">{user.role === 'ADMIN' ? t('adminLabel') : t('merchantLabel')}</span>
                                     </div>
                                     <ChevronDown size={12} className="text-gray-400 ml-1" />
                                 </button>

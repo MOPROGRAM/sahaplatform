@@ -200,17 +200,27 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* Media Gallery - Only show when images exist */}
+                    {/* Media Gallery - Premium Full Visibility */}
                     {ad.images && ad.images.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
-                            <div className="max-h-96 bg-gray-900 relative">
+                        <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm relative group">
+                            <div className="h-[450px] bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                                {/* Blurred Background Backdrop */}
+                                <div
+                                    className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-30"
+                                    style={{ backgroundImage: `url(${ad.images[0]})` }}
+                                ></div>
+
                                 {(() => {
                                     const images = ad.images || [];
                                     return images.length > 0 ? (
-                                        <img src={images[0]} alt={ad.title} className="w-full h-full object-cover opacity-90 transition-opacity hover:opacity-100 max-h-96" />
+                                        <img
+                                            src={images[0]}
+                                            alt={ad.title}
+                                            className="relative z-10 max-w-full max-h-full object-contain shadow-2xl"
+                                        />
                                     ) : (
-                                        <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                            <span className="text-white/10 text-6xl font-black italic select-none">SAHA PREVIEW</span>
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 italic font-black text-gray-200 text-6xl">
+                                            {t('siteName')}
                                         </div>
                                     );
                                 })()}

@@ -11,9 +11,9 @@ function getSupabaseClient() {
 
     return createClient<Database>(supabaseUrl, supabaseAnonKey, {
         auth: {
-            storage: localStorage,
-            autoRefreshToken: true,
-            persistSession: true
+            storage: typeof window !== 'undefined' ? localStorage : undefined,
+            autoRefreshToken: typeof window !== 'undefined',
+            persistSession: typeof window !== 'undefined'
         }
     })
 }

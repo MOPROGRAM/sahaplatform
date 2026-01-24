@@ -3,29 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --primary: #ff6700;
-  --primary-hover: #e55c00;
-  --primary-dark: #cc5200;
-  --navy: #0f172a;
-  --emerald: #059669;
-  --amber: #d97706;
-  --black: #000000;
+  --primary: #f97316;
+  /* Professional Orange */
+  --primary-hover: #ea580c;
+  --primary-dark: #c2410c;
+  --navy: #1e293b;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --black: #0f172a;
   --white: #ffffff;
-  --gray-bg: #f4f7fa;
+  --gray-bg: #f8fafc;
   --card-bg: #ffffff;
-  --text-main: #1c1e21;
+  --text-main: #0f172a;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
 }
 
 [data-theme="dark"] {
-  --gray-bg: #0f111a;
-  --card-bg: #1a1d29;
+  --gray-bg: #020617;
+  --card-bg: #0f172a;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --border-color: #2d3142;
+  --border-color: #1e293b;
   --black: #ffffff;
-  --white: #12141d;
+  --white: #020617;
 }
 
 * {
@@ -254,7 +255,7 @@ textarea:focus {
   background: var(--card-bg);
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 20px rgba(255, 103, 0, 0.08);
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
   transition: all 0.3s ease;
   overflow: hidden;
   color: var(--text-main);

@@ -47,7 +47,6 @@ export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState('overview');
     const [ads, setAds] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const branch = 'feature/cloudflare-migration';
     const [stats, setStats] = useState([
         { label: "Views", value: "0", icon: <Eye size={12} />, color: "text-blue-500" },
         { label: "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
@@ -145,8 +144,8 @@ export default function DashboardPage() {
 
                     <div className="bg-white border border-gray-200 p-3 rounded-sm shadow-sm">
                         <div className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                            <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            <span>Branch: {branch}</span>
+                            <div className="w-2 h-2 bg-emerald rounded-full animate-pulse"></div>
+                            <span>ID: {user.id.substring(0, 8)}</span>
                         </div>
                     </div>
 
@@ -342,7 +341,7 @@ export default function DashboardPage() {
                                                     </td>
                                                     <td className="px-6 py-4 text-right">
                                                         <div className="flex items-center gap-1">
-                                                            <Link href={`/ads/view?id=${ad.id}`} className="px-2 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
+                                                            <Link href={`/ads/${ad.id}`} className="px-2 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
                                                             <Link href={`/ads/${ad.id}/edit`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
                                                                 <Edit size={10} />
                                                             </Link>

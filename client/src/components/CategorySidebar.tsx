@@ -34,7 +34,7 @@ export default function CategorySidebar() {
     ];
 
     return (
-        <aside className="w-64 bg-white border-r border-gray-200 h-screen sticky top-0 overflow-y-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <aside className="hidden lg:block w-64 bg-white border-r border-gray-200 h-screen sticky top-0 overflow-y-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className="p-4 border-b border-gray-100">
                 <h2 className="text-lg font-black text-secondary uppercase tracking-tight">
                     {language === 'ar' ? 'الفئات' : 'Categories'}

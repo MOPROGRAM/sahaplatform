@@ -123,7 +123,7 @@ export default function HomePage() {
                 </aside>
 
                 {/* Central Feed */}
-                <section className="col-span-12 md:col-span-8 flex flex-col gap-3">
+                <section className="col-span-12 md:col-span-10 flex flex-col gap-3">
                     <div className="flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-md shadow-sm">
                         <div className="flex items-center gap-2">
                             <Sparkles className="text-primary" size={16} />
@@ -141,7 +141,7 @@ export default function HomePage() {
                             <LoadingSpinner size={32} />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                             {ads.length > 0 ? ads.map((ad, idx) => (
                                 <AdCard
                                     key={idx}
@@ -164,8 +164,8 @@ export default function HomePage() {
                     )}
                 </section>
 
-                {/* Right Widgets */}
-                <aside className="col-span-12 md:col-span-2 space-y-3">
+                {/* Right Widgets - Hidden on medium to allow 5-column feed */}
+                <aside className="hidden xl:col-span-2 xl:flex flex-col gap-3">
                     <div className="bg-white border border-gray-200 p-3 rounded-md shadow-sm">
                         <div className="flex items-center gap-2 mb-3 text-black border-r-4 border-primary pr-2 leading-none">
                             <Zap size={14} className="text-primary fill-primary" />

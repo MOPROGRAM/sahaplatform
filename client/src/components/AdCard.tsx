@@ -43,7 +43,7 @@ export default function AdCard({
 
 
     return (
-        <Link href={`/ads/view?id=${id}`} className={`ad-card-3d ${className}`}>
+        <Link href={`/ads/${id}`} className={`ad-card-3d ${className}`}>
             <div className="relative">
                 {/* Favorite Button */}
                 <button
@@ -58,13 +58,13 @@ export default function AdCard({
 
                 {/* Image */}
                 {images.length > 0 ? (
-                    <div className="relative h-48 rounded-t-xl overflow-hidden">
+                    <div className="relative h-44 rounded-t-xl overflow-hidden bg-gray-50 flex items-center justify-center">
                         <Image
                             src={images[0]}
                             alt={title}
                             fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-contain"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
                         />
                         {images.length > 1 && (
                             <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
