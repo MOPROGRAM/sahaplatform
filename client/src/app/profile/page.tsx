@@ -273,7 +273,7 @@ export default function ProfilePage() {
                     {/* Listings/Services Tab */}
                     {(activeTab === 'listings' || activeTab === 'services') && (
                         <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
-                            <div className="px-4 py-3 bg-card/60 border-b border-border-color flex items-center justify-between">
+                            <div className="px-4 py-3 bg-card border-b border-border-color flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Package size={14} className="text-primary" />
                                     <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">

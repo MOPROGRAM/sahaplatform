@@ -96,7 +96,7 @@ export default function MessagesPage() {
                                         <button
                                             key={conv.id}
                                             onClick={() => setSelectedId(conv.id)}
-                                            className={`p-4 border-b border-border-color flex gap-3 transition-all hover:bg-card/60 text-right ${isActive ? 'bg-primary/5 border-r-4 border-r-primary' : ''}`}
+                                            className={`p-4 border-b border-border-color flex gap-3 transition-all hover-bg-card text-right ${isActive ? 'bg-primary/5 border-r-4 border-r-primary' : ''}`}
                                         >
                                             <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-black text-primary border border-gray-200 shrink-0">
                                                 {otherMember.name.substring(0, 2).toUpperCase()}

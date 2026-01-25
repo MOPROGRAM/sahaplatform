@@ -88,7 +88,7 @@ export default function EditAdPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [adId, user, language]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -249,7 +249,7 @@ export default function EditAdPage() {
                                     name="category"
                                     value={formData.category}
                                     onChange={handleInputChange}
-                                    className="w-full bg-card border border-border-color p-3 text-sm font-bold rounded-md outline-none focus:border-primary focus:bg-card/80 cursor-pointer transition-all mt-2"
+                                    className="w-full bg-card border border-border-color p-3 text-sm font-bold rounded-md outline-none focus:border-primary focus:bg-card cursor-pointer transition-all mt-2"
                                     required
                                 >
                                     <option value="">{t('chooseCategory')}</option>

@@ -159,7 +159,7 @@ function AdsContent() {
                         <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                         <h1 className="text-[18px] font-black uppercase text-secondary tracking-tight">
                             {category ? `${category}` : 'Global Marketplace'}
-                            <span className="text-[12px] font-medium text-text-muted mr-4 bg-card/10 px-3 py-1 rounded-full uppercase italic">
+                            <span className="text-[12px] font-medium text-text-muted mr-4 bg-card px-3 py-1 rounded-full uppercase italic">
                                 {ads.length} listings identified
                             </span>
                         </h1>

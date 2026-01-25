@@ -289,8 +289,10 @@ textarea:focus {
 }
 
 .btn-saha-outline {
-  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px] hover:bg-card/60;
+  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px];
 }
+
+.btn-saha-outline:hover { background: var(--card-bg); }
 
 /* Attract Style - Orange Border for Highlights (User request) */
 .btn-saha-attract {
