@@ -161,3 +161,37 @@ https://[your-cloudflare-domain]/api/setup-database
 4. اختبر البناء محلياً أولاً
 
 الموقع الآن جاهز لاستقبال المستخدمين الحقيقيين! 🎉
+
+---
+
+## Cloudflare Production Checklist (مهم جداً) 🔧
+1. **Enable Cloudflare Images (optional but recommended)**
+   - Upload optimized versions of frequently-served images to Cloudflare Images (AVIF/WebP enabled there).
+   - Alternatively, configure Cloudflare to auto-convert images via Image Resizing / Polish.
+
+2. **Cache & Headers**
+   - Add cache rules to set long-lived `Cache-Control` for static assets (images, JS/CSS, fonts).
+   - Use `Cache-Control: public, max-age=31536000, immutable` for hashed assets and `Cache-Control: s-maxage=60, stale-while-revalidate=86400` for dynamic pages.
+
+3. **Build & Export**
+   - Use the included script for Cloudflare Pages export:
+     ```bash
+     cd client
+     npm run build
+     npm run export
+     ```
+   - The export uses `@cloudflare/next-on-pages` to generate a Pages-compatible output.
+
+4. **Lighthouse Audit (Recommended on preview URL)**
+   - Deploy to a preview/production URL first (Cloudflare Pages preview). Then run Lighthouse from your workstation:
+     - Open Chrome and run devtools Lighthouse (or `npx lighthouse <preview-url> --output html --output-path=report.html`).
+   - Fix high-impact items: images (AVIF/WebP), caching, unused JS, and critical CSS.
+
+5. **Security & Rate-Limits**
+   - Protect admin endpoints with IP allowlist or role checks.
+   - Monitor Supabase rate limits and add rate-limiting at the edge if required.
+
+6. **CI Automation (Optional)**
+   - Add a CI step that runs `npm run build` and `npx lighthouse-ci` on preview deploys to gate merging.
+
+If you’d like, I can add an automated `lighthouse-ci` config and a GitHub Action that runs on pull requests and deploy previews. (I will add it automatically if you want me to proceed.)
