@@ -9,8 +9,10 @@ import { adsService } from "@/lib/ads";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
-
+import DepthInput from '@/components/ui/DepthInput';
+import DepthTextarea from '@/components/ui/DepthTextarea';
 const MapSelector = dynamic(() => import('@/components/MapSelector'), {
     ssr: false,
     loading: () => <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">Loading map...</div>
@@ -131,7 +133,7 @@ export default function EditAdPage() {
             }
 
             // Upload new images if any
-            let imageUrls = [...existingImages];
+            const imageUrls = [...existingImages];
             if (newImages.length > 0) {
                 for (const image of newImages) {
                     const fileExt = image.name.split('.').pop();
@@ -247,7 +249,7 @@ export default function EditAdPage() {
                                     name="category"
                                     value={formData.category}
                                     onChange={handleInputChange}
-                                    className="w-full bg-gray-50 border border-gray-200 p-3 text-sm font-bold rounded-md outline-none focus:border-primary focus:bg-white cursor-pointer transition-all mt-2"
+                                    className="w-full bg-card border border-border-color p-3 text-sm font-bold rounded-md outline-none focus:border-primary focus:bg-card/80 cursor-pointer transition-all mt-2"
                                     required
                                 >
                                     <option value="">{t('chooseCategory')}</option>
@@ -268,7 +270,7 @@ export default function EditAdPage() {
                                     type="number"
                                     value={formData.price}
                                     onChange={handleInputChange}
-                                    className="w-full bg-gray-50 border border-gray-200 p-3 text-sm font-bold rounded-md outline-none focus:border-primary focus:bg-white transition-all mt-2"
+                                    className="w-full bg-card border border-border-color p-3 text-sm font-bold rounded-md outline-none focus:border-primary focus:bg-card/80 transition-all mt-2"
                                     required
                                 />
                             </div>
@@ -349,7 +351,7 @@ export default function EditAdPage() {
                                 <div className="grid grid-cols-4 gap-2 mb-3">
                                     {existingImages.map((img, idx) => (
                                         <div key={idx} className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
-                                            <img src={img} alt={`Image ${idx + 1}`} className="w-full h-full object-cover" />
+                                            <Image src={img} alt={`Image ${idx + 1}`} fill className="object-cover" />
                                         </div>
                                     ))}
                                 </div>

@@ -7,13 +7,10 @@ import {
     Users,
     Package,
     BarChart3,
-    Settings,
     Search,
     LogOut,
     AlertTriangle,
     CheckCircle2,
-    XCircle,
-    Eye,
     ChevronRight,
     Loader2,
     Clock,
@@ -184,7 +181,7 @@ export default function AdminDashboard() {
                             <span className="text-[10px] font-black text-white leading-none uppercase">{user.name}</span>
                             <span className="text-[8px] font-bold text-primary uppercase mt-1">SUPER_ADMIN</span>
                         </div>
-                        <button onClick={() => { logout(); router.push('/'); }} className="w-8 h-8 rounded-full bg-card hover:bg-red-500/20 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all border border-transparent hover:border-red-500/30">
+                        <button onClick={() => { logout(); router.push('/'); }} className="w-8 h-8 rounded-full bg-card hover:bg-red-500/20 text-text-muted hover:text-red-500 flex items-center justify-center transition-all border border-transparent hover:border-red-500/30">
                             <LogOut size={16} />
                         </button>
                     </div>
@@ -206,7 +203,7 @@ export default function AdminDashboard() {
                             onClick={() => setView(item.id)}
                             className={`flex items-center justify-between group px-4 py-3 rounded-sm transition-all duration-200 border ${view === item.id
                                 ? 'bg-primary/10 border-primary/30 text-primary shadow-[inset_0_0_20px_rgba(var(--primary-color),0.05)]'
-                                : 'text-gray-400 border-transparent hover:bg-card hover:text-white'}`}
+                                : 'text-text-muted border-transparent hover:bg-card hover:text-white'}`}
                         >
                             <div className="flex items-center gap-3">
                                 {item.icon}
@@ -255,7 +252,7 @@ export default function AdminDashboard() {
                                         {view === 'ads' && (language === 'ar' ? 'الرقابة على الإعلانات' : 'CONTENT MODERATION')}
                                         {view === 'users' && (language === 'ar' ? 'قاعدة البيانات' : 'USER INFRASTRUCTURE')}
                                     </h2>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Real-time synchronization active • No latency detected</p>
+                                    <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Real-time synchronization active • No latency detected</p>
                                 </div>
 
                                 {view !== 'overview' && (
@@ -353,7 +350,7 @@ export default function AdminDashboard() {
                                                                 <span className={`text-[10px] font-black uppercase tracking-widest ${log.highlight ? 'text-primary' : 'text-white'}`}>{log.title}</span>
                                                                 <span className="text-[8px] font-bold text-gray-500">@{log.time}</span>
                                                             </div>
-                                                            <p className="text-[10px] font-bold text-gray-400 italic">"{log.desc}"</p>
+                                                            <p className="text-[10px] font-bold text-text-muted italic">&quot;{log.desc}&quot;</p>
                                                         </div>
                                                     </div>
                                                 ))}

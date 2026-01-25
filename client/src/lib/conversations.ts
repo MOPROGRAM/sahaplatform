@@ -51,7 +51,7 @@ export const conversationsService = {
         }
 
         // نحصل على المحادثات من خلال جدول المشاركين بطريقة مبسطة
-        const { data: participantData, error: participantError } = await (supabase as any)
+        const { data: participantData, error: participantError } = await supabase
             .from('_conversation_participants')
             .select('conversation_id')
             .eq('user_id', user.id);
@@ -68,7 +68,7 @@ export const conversationsService = {
         const conversationIds = participantData.map(p => p.conversation_id);
 
         // الحصول على المحادثات
-        const { data: conversations, error: conversationsError } = await (supabase as any)
+        const { data: conversations, error: conversationsError } = await supabase
             .from('Conversation')
             .select(`
                 *,
@@ -97,7 +97,7 @@ export const conversationsService = {
         }
 
         // الحصول على المحادثة مع الإعلان والمشاركين
-        const { data: conversation, error: conversationError } = await (supabase as any)
+        const { data: conversation, error: conversationError } = await supabase
             .from('Conversation')
             .select(`
                 *,
@@ -112,7 +112,7 @@ export const conversationsService = {
         }
 
         // الحصول على المشاركين يدوياً لضمان الدقة
-        const { data: participants, error: pError } = await (supabase as any)
+        const { data: participants, error: pError } = await supabase
             .from('_conversation_participants')
             .select('user:User(id, name, email)')
             .eq('conversation_id', id);
@@ -120,7 +120,7 @@ export const conversationsService = {
         const transformedParticipants = participants?.map((p: any) => p.user) || [];
 
         // الحصول على الرسائل
-        const { data: messages, error: messagesError } = await (supabase as any)
+        const { data: messages, error: messagesError } = await supabase
             .from('Message')
             .select(`
                 *,
@@ -152,7 +152,7 @@ export const conversationsService = {
         }
 
         // 1. البحث عن محادثة موجودة لهذا الإعلان يشارك فيها المستخدم
-        const { data: myParticipations } = await (supabase as any)
+        const { data: myParticipations } = await supabase
             .from('_conversation_participants')
             .select('conversation_id')
             .eq('user_id', user.id);
@@ -160,7 +160,7 @@ export const conversationsService = {
         const myConvIds = myParticipations?.map(p => p.conversation_id) || [];
 
         if (myConvIds.length > 0) {
-            const { data: existingConv } = await (supabase as any)
+            const { data: existingConv } = await supabase
                 .from('Conversation')
                 .select('id')
                 .eq('ad_id', adId)
@@ -174,7 +174,7 @@ export const conversationsService = {
         }
 
         // 2. إنشاء محادثة جديدة إذا لم توجد
-        const { data: newConversation, error: createError } = await (supabase as any)
+        const { data: newConversation, error: createError } = await supabase
             .from('Conversation')
             .insert({ ad_id: adId })
             .select()
@@ -186,7 +186,7 @@ export const conversationsService = {
         }
 
         // 3. إضافة المشاركين
-        await (supabase as any)
+        await supabase
             .from('_conversation_participants')
             .insert([
                 { conversation_id: newConversation.id, user_id: user.id },
@@ -208,7 +208,7 @@ export const conversationsService = {
         }
 
         // الحصول على المشارك الآخر
-        const { data: participants, error: participantsError } = await (supabase as any)
+        const { data: participants, error: participantsError } = await supabase
             .from('_conversation_participants')
             .select('user_id')
             .eq('conversation_id', conversationId)
@@ -221,7 +221,7 @@ export const conversationsService = {
         const receiverId = participants[0].user_id;
 
         // إدراج الرسالة
-        const { data: message, error: messageError } = await (supabase as any)
+        const { data: message, error: messageError } = await supabase
             .from('Message')
             .insert({
                 content,
@@ -242,7 +242,7 @@ export const conversationsService = {
         }
 
         // تحديث آخر رسالة في المحادثة
-        await (supabase as any)
+        await supabase
             .from('Conversation')
             .update({
                 last_message: content,
@@ -261,7 +261,7 @@ export const conversationsService = {
             throw new Error('User not authenticated');
         }
 
-        const { error } = await (supabase as any)
+        const { error } = await supabase
             .from('Message')
             .update({ is_read: true })
             .in('id', messageIds)

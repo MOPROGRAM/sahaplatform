@@ -48,11 +48,11 @@ export default function AdvancedFilter() {
     ];
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-sm shadow-sm overflow-hidden text-[13px]">
+        <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden text-[13px]">
             {/* Search Header */}
-            <div className="p-3 border-b border-gray-100 dark:border-gray-800 flex flex-wrap gap-2 items-center">
+            <div className="p-3 border-b border-border-color flex flex-wrap gap-2 items-center">
                 <div className="flex-1 flex gap-2 border border-primary/30 p-1 rounded-sm">
-                    <div className="flex items-center gap-1 px-2 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800 cursor-pointer text-xs">
+                    <div className="flex items-center gap-1 px-2 border-l border-border-color bg-card cursor-pointer text-xs">
                         <MapPin size={14} className="text-primary" />
                         <span>الرياض</span>
                         <ChevronDown size={12} />
@@ -72,7 +72,7 @@ export default function AdvancedFilter() {
 
             {/* Row 1: Main Categories */}
             <div className="flex border-b border-gray-50 dark:border-gray-800">
-                <div className="w-24 bg-gray-50 dark:bg-slate-800 p-2 text-gray-400 font-bold shrink-0">التصنيف</div>
+                <div className="w-24 bg-card p-2 text-text-muted font-bold shrink-0">التصنيف</div>
                 <div className="flex flex-wrap gap-x-4 gap-y-2 p-2 px-4">
                     <button
                         onClick={() => handleCategoryChange(null)}
@@ -95,7 +95,7 @@ export default function AdvancedFilter() {
             {/* Row 2 & 3: Dynamic Sub-filters */}
             {subFilters.map((row, idx) => (
                 <div key={idx} className="flex border-b border-gray-50 dark:border-gray-100 last:border-0 dark:border-gray-800">
-                    <div className="w-24 bg-gray-50 dark:bg-slate-800 p-2 text-gray-400 font-bold shrink-0">{row.label}</div>
+                    <div className="w-24 bg-card p-2 text-text-muted font-bold shrink-0">{row.label}</div>
                     <div className="flex flex-wrap gap-x-4 gap-y-2 p-2 px-4">
                         {row.items.map((item) => (
                             <button
@@ -116,7 +116,7 @@ export default function AdvancedFilter() {
             {/* Selected Tags Summary */}
             {tags.length > 0 && (
                 <div className="bg-primary/5 p-2 px-4 flex gap-2 items-center flex-wrap">
-                    <span className="text-[11px] text-gray-400">الفلاتر النشطة:</span>
+                    <span className="text-[11px] text-text-muted">الفلاتر النشطة:</span>
                     {tags.map(tag => (
                         <span key={tag} className="bg-white dark:bg-slate-800 border border-primary/20 text-primary px-2 py-0.5 rounded-sm flex items-center gap-1 text-[11px]">
                             {tag}
@@ -130,7 +130,7 @@ export default function AdvancedFilter() {
                     ))}
                     <button
                         onClick={() => resetFilters()}
-                        className="text-[11px] text-gray-400 hover:text-red-500 underline underline-offset-2"
+                        className="text-[11px] text-text-muted hover:text-red-500 underline underline-offset-2"
                     >
                         مسح الكل
                     </button>

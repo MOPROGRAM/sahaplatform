@@ -35,7 +35,7 @@ export const adsService = {
         search?: string;
         limit?: number;
     } = {}) {
-        let query = (supabase as any)
+        let query = supabase
             .from('Ad')
             .select(`
                 *,
@@ -73,7 +73,7 @@ export const adsService = {
 
     // الحصول على إعلان واحد
     async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
-        let query = (supabase as any)
+        let query = supabase
             .from('Ad')
             .select(`
                 *,
@@ -106,7 +106,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
             .from('Ad')
             .select(`
                 *,
@@ -146,7 +146,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
             .from('Ad')
             .insert({
                 ...adData,
@@ -177,7 +177,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
             .from('Ad')
             .update(updates)
             .eq('id', id)
@@ -206,7 +206,7 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { error } = await (supabase as any)
+        const { error } = await supabase
             .from('Ad')
             .delete()
             .eq('id', id)

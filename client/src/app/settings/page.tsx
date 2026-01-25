@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DepthInput from '@/components/ui/DepthInput';
 
 export default function SettingsPage() {
     const { language, setLanguage, t, theme, toggleTheme } = useLanguage();
@@ -165,7 +166,7 @@ export default function SettingsPage() {
 
                 <div className="grid gap-6">
                     {/* Appearance Settings */}
-                    <div className="glass-card p-4">
+                    <div className="depth-card p-4">
                         <div className="flex items-center gap-3 mb-4">
                             <Palette className="text-primary" size={20} />
                             <h2 className="text-lg font-bold text-text-main">
@@ -217,7 +218,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Notifications Settings */}
-                    <div className="glass-card p-4">
+                    <div className="depth-card p-4">
                         <div className="flex items-center gap-3 mb-4">
                             <Bell className="text-primary" size={20} />
                             <h2 className="text-lg font-bold text-text-main">
@@ -296,20 +297,20 @@ export default function SettingsPage() {
                             )}
 
                             {showPasswordChange && (
-                                <div className="space-y-3 p-4 bg-gray-50 rounded-md">
+                                <div className="space-y-3 p-4 bg-card border border-border-color rounded-md">
                                     <input
                                         type="password"
                                         placeholder={language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
                                         value={passwordData.newPassword}
                                         onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                                        className="w-full p-3 border border-gray-200 rounded-md"
+                                        className="w-full p-3 border border-border-color rounded-md bg-card text-text-main"
                                     />
-                                    <input
+                                    <DepthInput
                                         type="password"
                                         placeholder={language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
                                         value={passwordData.confirmPassword}
                                         onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                        className="w-full p-3 border border-gray-200 rounded-md"
+                                        label={language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
                                     />
                                     <div className="flex gap-2">
                                         <button
@@ -334,20 +335,20 @@ export default function SettingsPage() {
                             )}
 
                             {showProfileUpdate && (
-                                <div className="space-y-3 p-4 bg-gray-50 rounded-md">
+                                <div className="space-y-3 p-4 bg-card border border-border-color rounded-md">
                                     <input
                                         type="text"
                                         placeholder={language === 'ar' ? 'الاسم' : 'Name'}
                                         value={profileData.name}
                                         onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full p-3 border border-gray-200 rounded-md"
+                                        className="w-full p-3 border border-border-color rounded-md bg-card text-text-main"
                                     />
-                                    <input
+                                    <DepthInput
                                         type="tel"
                                         placeholder={language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
                                         value={profileData.phone}
                                         onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                                        className="w-full p-3 border border-gray-200 rounded-md"
+                                        label={language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
                                     />
                                     <div className="flex gap-2">
                                         <button

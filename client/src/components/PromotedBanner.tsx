@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from 'next/image';
 import { supabase } from "@/lib/supabase";
 import { Zap } from "lucide-react";
 
@@ -37,8 +38,7 @@ export default function PromotedBanner() {
                     {ads.map(ad => (
                         <Link key={ad.id} href={`/ads/${ad.id}`} className="flex-shrink-0 w-64 p-3 bg-[#0b0b0b] rounded-lg border border-primary/10 hover:scale-[1.01] transition-transform flex items-center gap-3 shadow-[0_8px_30px_rgba(255,77,0,0.06)]">
                             {ad.images && JSON.parse(ad.images || '[]')[0] && (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={JSON.parse(ad.images)[0]} alt={ad.title} className="w-16 h-12 rounded-md object-cover" />
+                                <Image src={JSON.parse(ad.images)[0]} alt={ad.title} width={64} height={48} className="rounded-md object-cover" />
                             )}
                             <div className="flex-1 text-sm">
                                 <div className="font-extrabold truncate">{ad.title}</div>

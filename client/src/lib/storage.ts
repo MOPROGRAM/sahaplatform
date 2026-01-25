@@ -3,8 +3,8 @@ import { supabase } from './supabase';
 // خدمة رفع الملفات باستخدام Supabase Storage
 export const storageService = {
     // رفع صورة إعلان
-    async uploadAdImage(file: File, adId?: string): Promise<string> {
-        const { data: { user } } = await (supabase as any).auth.getUser();
+    async uploadAdImage(file: File): Promise<string> {
+        const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             throw new Error('User not authenticated');
@@ -15,7 +15,7 @@ export const storageService = {
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
         const filePath = `ads/${fileName}`;
 
-        const { data, error } = await (supabase as any).storage
+        const { data, error } = await supabase.storage
             .from('images')
             .upload(filePath, file, {
                 cacheControl: '3600',
@@ -28,7 +28,7 @@ export const storageService = {
         }
 
         // الحصول على الرابط العام للصورة
-        const { data: { publicUrl } } = (supabase as any).storage
+        const { data: { publicUrl } } = supabase.storage
             .from('images')
             .getPublicUrl(filePath);
 
@@ -51,7 +51,7 @@ export const storageService = {
 
         const filePath = urlParts[1];
 
-        const { error } = await (supabase as any).storage
+        const { error } = await supabase.storage
             .from('images')
             .remove([filePath]);
 
@@ -63,7 +63,7 @@ export const storageService = {
 
     // رفع صورة الملف الشخصي
     async uploadProfileImage(file: File): Promise<string> {
-        const { data: { user } } = await (supabase as any).auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             throw new Error('User not authenticated');
@@ -74,7 +74,7 @@ export const storageService = {
         const fileName = `profile-${user.id}.${fileExt}`;
         const filePath = `profiles/${fileName}`;
 
-        const { data, error } = await (supabase as any).storage
+        const { data, error } = await supabase.storage
             .from('images')
             .upload(filePath, file, {
                 cacheControl: '3600',
@@ -87,12 +87,12 @@ export const storageService = {
         }
 
         // الحصول على الرابط العام للصورة
-        const { data: { publicUrl } } = (supabase as any).storage
+        const { data: { publicUrl } } = supabase.storage
             .from('images')
             .getPublicUrl(filePath);
 
         // تحديث الصورة في جدول المستخدمين
-        await (supabase as any)
+        await supabase
             .from('User')
             .update({ image: publicUrl })
             .eq('id', user.id);
@@ -102,7 +102,7 @@ export const storageService = {
 
     // رفع ملف مرفق للرسالة
     async uploadMessageFile(file: File): Promise<string> {
-        const { data: { user } } = await (supabase as any).auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             throw new Error('User not authenticated');
@@ -113,7 +113,7 @@ export const storageService = {
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
         const filePath = `messages/${fileName}`;
 
-        const { data, error } = await (supabase as any).storage
+        const { data, error } = await supabase.storage
             .from('files')
             .upload(filePath, file, {
                 cacheControl: '3600',
@@ -126,7 +126,7 @@ export const storageService = {
         }
 
         // الحصول على الرابط العام للملف
-        const { data: { publicUrl } } = (supabase as any).storage
+        const { data: { publicUrl } } = supabase.storage
             .from('files')
             .getPublicUrl(filePath);
 

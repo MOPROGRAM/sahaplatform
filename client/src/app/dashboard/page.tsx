@@ -6,17 +6,13 @@ import {
     LayoutDashboard,
     Package,
     MessageSquare,
-    Heart,
     Settings,
     LogOut,
     Eye,
     TrendingUp,
     Clock,
-    ExternalLink,
-    ChevronRight,
     Loader2,
     PlusCircle,
-    Search,
     ShieldCheck,
     Edit,
     Trash2
@@ -156,7 +152,7 @@ export default function DashboardPage() {
                             { label: t('messages'), icon: <MessageSquare size={14} />, id: 'messages' },
                             { label: t('settings'), icon: <Settings size={14} />, id: 'settings' },
                         ].map((item, i) => (
-                            <button key={i} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-gray-50 last:border-0 transition-all ${activeTab === item.id ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary' : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'}`}>
+                            <button key={i} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-border-color last:border-0 transition-all ${activeTab === item.id ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary' : 'text-text-muted hover:bg-card/60 hover:text-secondary'}`}>
                                 {item.icon}
                                 <span>{item.label}</span>
                             </button>
@@ -179,20 +175,20 @@ export default function DashboardPage() {
                                 {stats.map((stat, i) => (
                                     <div key={i} className="glass-card p-4 flex flex-col gap-2 relative overflow-hidden group">
                                         <div className={`absolute bottom-0 right-0 w-12 h-12 ${stat.color} opacity-[0.03] -mr-4 -mb-4 group-hover:scale-150 transition-transform`}>{stat.icon}</div>
-                                        <span className={`w-8 h-8 flex items-center justify-center rounded-xs bg-gray-50 ${stat.color} p-1 border border-black/5 shadow-inner`}>
+                                        <span className={`w-8 h-8 flex items-center justify-center rounded-xs bg-card ${stat.color} p-1 border border-black/5 shadow-inner`}>
                                             {stat.icon}
                                         </span>
                                         <div className="flex flex-col">
                                             <span className="text-2xl font-black italic tracking-tighter text-secondary leading-none">{stat.value}</span>
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1 opacity-60">{stat.label} Matrix</span>
+                                            <span className="text-[9px] font-black text-text-muted uppercase tracking-widest mt-1 opacity-60">{stat.label} Matrix</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Listings Table - High Density Professional */}
-                            <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
-                                <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+                                <div className="px-4 py-3 bg-card/60 border-b border-border-color flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <Package size={14} className="text-primary" />
                                         <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-secondary">Operational Fleet / Listings</h3>
@@ -212,8 +208,8 @@ export default function DashboardPage() {
                                             <div key={ad.id} className={`depth-card p-4 ${ad.is_boosted ? 'bento-large' : 'bento-small'}`}>
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center shrink-0">
-                                                            <Package size={18} className="text-gray-400" />
+                                                        <div className="w-10 h-10 bg-card border border-border-color rounded-lg flex items-center justify-center shrink-0">
+                                                            <Package size={18} className="text-text-muted" />
                                                         </div>
                                                         <div className="min-w-0 flex-1">
                                                             <h4 className="font-black text-white block truncate text-sm">{ad.title}</h4>
@@ -221,7 +217,7 @@ export default function DashboardPage() {
                                                                 <span className="text-primary font-bold text-sm">
                                                                     {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}
                                                                 </span>
-                                                                <span className="text-xs text-gray-400">{ad.category}</span>
+                                                                <span className="text-xs text-text-muted">{ad.category}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -230,7 +226,7 @@ export default function DashboardPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-4 text-xs text-gray-400">
+                                                    <div className="flex items-center gap-4 text-xs text-text-muted">
                                                         <span className="flex items-center gap-1">
                                                             <Eye size={12} />
                                                             {ad.views || 0}
@@ -255,13 +251,13 @@ export default function DashboardPage() {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="depth-card flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 p-16">
-                                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shadow-inner">
+                                        <div className="depth-card flex-1 flex flex-col items-center justify-center text-text-muted gap-3 p-16">
+                                            <div className="w-16 h-16 bg-card rounded-full flex items-center justify-center border border-border-color shadow-inner">
                                                 <Package size={32} className="opacity-10" />
                                             </div>
                                             <div className="text-center">
-                                                <h4 className="text-lg font-black uppercase tracking-wide text-gray-300">No Ads Found</h4>
-                                                <p className="text-sm font-bold text-gray-300 mt-1">Start your journey by posting your first ad</p>
+                                                <h4 className="text-lg font-black uppercase tracking-wide text-text-muted">No Ads Found</h4>
+                                                <p className="text-sm font-bold text-text-muted mt-1">Start your journey by posting your first ad</p>
                                             </div>
                                             <Link href="/post-ad" className="mt-4 bg-primary text-white text-sm font-black px-6 py-3 rounded-lg shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all uppercase tracking-wide">
                                                 Post Ad Now
@@ -275,8 +271,8 @@ export default function DashboardPage() {
 
                     {/* Listings Tab */}
                     {activeTab === 'listings' && (
-                        <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
-                            <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                        <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+                            <div className="px-4 py-3 bg-card/60 border-b border-border-color flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Package size={14} className="text-primary" />
                                     <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-secondary">My Listings</h3>
@@ -292,7 +288,7 @@ export default function DashboardPage() {
                                 ) : ads.length > 0 ? (
                                     <table className="w-full text-[10px] border-collapse">
                                         <thead>
-                                            <tr className="bg-gray-100/50 text-gray-400 font-black uppercase text-[8px] tracking-widest border-b border-gray-200">
+                                            <tr className="bg-card/60 text-text-muted font-black uppercase text-[8px] tracking-widest border-b border-border-color">
                                                 <th className="px-6 py-3 text-left">Unit Identification / Details</th>
                                                 <th className="px-6 py-3 text-center">Status Matrix</th>
                                                 <th className="px-6 py-3 text-center">Engagement</th>
@@ -304,7 +300,7 @@ export default function DashboardPage() {
                                                 <tr key={ad.id} className="hover:bg-primary/[0.02] transition-colors group">
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-9 h-9 bg-gray-50 border border-gray-100 rounded-xs flex items-center justify-center shrink-0 shadow-inner group-hover:border-primary/20 transition-colors">
+                                                            <div className="w-9 h-9 bg-card border border-border-color rounded-xs flex items-center justify-center shrink-0 shadow-inner group-hover:border-primary/20 transition-colors">
                                                                 <Package size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
                                                             </div>
                                                             <div className="min-w-0">
@@ -312,7 +308,7 @@ export default function DashboardPage() {
                                                                 <div className="flex items-center gap-2 mt-0.5">
                                                                     <span className="text-primary font-black italic">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}</span>
                                                                     <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
-                                                                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">{ad.category}</span>
+                                                                    <span className="text-[8px] font-black text-text-muted uppercase tracking-tighter">{ad.category}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -344,7 +340,7 @@ export default function DashboardPage() {
                                         </tbody>
                                     </table>
                                 ) : (
-                                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 p-16">
+                                    <div className="flex-1 flex flex-col items-center justify-center text-text-muted gap-3 p-16">
                                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shadow-inner">
                                             <Package size={32} className="opacity-10" />
                                         </div>
@@ -363,7 +359,7 @@ export default function DashboardPage() {
                     {activeTab === 'messages' && (
                         <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm text-center">
                             <MessageSquare size={48} className="text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-black text-gray-400 uppercase tracking-tight">
+                            <h3 className="text-lg font-black text-text-muted uppercase tracking-tight">
                                 {language === 'ar' ? 'الرسائل' : 'Messages'}
                             </h3>
                             <p className="text-[12px] text-gray-500 mt-2">
@@ -432,7 +428,7 @@ export default function DashboardPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-gray-50 p-3 rounded-md mb-6">
+                            <div className="bg-card p-3 rounded-md mb-6">
                                 <p className="text-sm font-bold text-secondary">{deleteModal.adTitle}</p>
                                 <p className="text-xs text-gray-500 mt-1">{language === 'ar' ? 'لا يمكن التراجع عن هذا الإجراء' : 'This action cannot be undone'}</p>
                             </div>
@@ -440,7 +436,7 @@ export default function DashboardPage() {
                             <div className="flex gap-3 justify-end">
                                 <button
                                     onClick={closeDeleteModal}
-                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all"
+                                    className="px-4 py-2 border border-border-color text-text-main rounded-md hover:bg-card/60 transition-all"
                                 >
                                     {language === 'ar' ? 'إلغاء' : 'Cancel'}
                                 </button>

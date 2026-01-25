@@ -25,12 +25,12 @@ export default function BottomNav() {
                 >
                     <div className={`p-2 rounded-full transition-all ${item.center
                         ? 'bg-primary text-white shadow-lg shadow-primary/40 p-4 border-4 border-white dark:border-slate-900'
-                        : pathname === item.path ? 'text-primary' : 'text-gray-400'
+                        : pathname === item.path ? 'text-primary' : 'text-text-muted'
                         }`}>
                         {item.icon}
                     </div>
                     {!item.center && (
-                        <span className={`text-[10px] font-bold ${pathname === item.path ? 'text-primary' : 'text-gray-400'}`}>
+                        <span className={`text-[10px] font-bold ${pathname === item.path ? 'text-primary' : 'text-text-muted'}`}>
                             {item.label}
                         </span>
                     )}

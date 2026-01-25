@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Heart, MessageSquare, PlusCircle, Sparkles, Zap, ChevronLeft, Clock, Image as ImageIcon, Globe, Grid, TrendingUp, Loader2, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';
+import { Sparkles, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -29,8 +29,7 @@ interface Ad {
 }
 
 export default function HomePage() {
-    const { language, setLanguage, t } = useLanguage();
-    const { user } = useAuthStore();
+    const { language, t } = useLanguage();
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -51,7 +50,7 @@ export default function HomePage() {
     const fetchCategoryCounts = async () => {
         try {
             const updated = await Promise.all(categoriesList.map(async (cat) => {
-                const { count, error } = await (supabase as any)
+                const { count, error } = await supabase
                     .from('Ad')
                     .select('*', { count: 'exact', head: true })
                     .eq('is_active', true)
@@ -70,7 +69,7 @@ export default function HomePage() {
 
     const fetchAds = async () => {
         try {
-            const { data, error } = await (supabase as any)
+            const { data, error } = await supabase
                 .from('Ad')
                 .select('*')
                 .order('created_at', { ascending: false })
@@ -110,13 +109,13 @@ export default function HomePage() {
                                 <Link
                                     key={idx}
                                     href={`/ads?category=${cat.key}`}
-                                    className="flex items-center justify-between px-4 py-3 hover:bg-primary/10 text-sm font-bold text-gray-300 hover:text-white transition-colors group border-b border-gray-800 last:border-0"
+                                    className="flex items-center justify-between px-4 py-3 hover:bg-primary/10 text-sm font-bold text-text-muted hover:text-text-main transition-colors group border-b border-border-color last:border-0"
                                 >
                                     <span className="flex items-center gap-3 group-hover:text-primary transition-colors">
-                                        <cat.icon size={16} className="text-gray-500 group-hover:text-primary transition-colors" />
+                                        <cat.icon size={16} className="text-text-muted group-hover:text-primary transition-colors" />
                                         {cat.name}
                                     </span>
-                                    <span className="text-sm text-gray-400 font-bold group-hover:text-primary/50">{cat.count}</span>
+                                    <span className="text-sm text-text-muted font-bold group-hover:text-primary/50">{cat.count}</span>
                                 </Link>
                             ))}
                         </nav>
@@ -128,12 +127,12 @@ export default function HomePage() {
                     <div className="depth-card flex items-center justify-between px-6 py-4">
                         <div className="flex items-center gap-3">
                             <Sparkles className="text-primary" size={20} />
-                            <h2 className="text-lg font-black uppercase tracking-tight text-white">{t('latestOffers')}</h2>
+                            <h2 className="text-lg font-black uppercase tracking-tight text-text-main">{t('latestOffers')}</h2>
                         </div>
-                        <div className="flex gap-4 text-sm font-bold text-gray-400">
+                        <div className="flex gap-4 text-sm font-bold text-text-muted">
                             <span className="text-primary border-b-2 border-primary pb-1 cursor-pointer">{t('viewAll')}</span>
-                            <span className="hover:text-white cursor-pointer transition-colors uppercase">{t('featured')}</span>
-                            <span className="hover:text-white cursor-pointer transition-colors uppercase">{t('newAd')}</span>
+                            <span className="hover:text-text-main cursor-pointer transition-colors uppercase">{t('featured')}</span>
+                            <span className="hover:text-text-main cursor-pointer transition-colors uppercase">{t('newAd')}</span>
                         </div>
                     </div>
 

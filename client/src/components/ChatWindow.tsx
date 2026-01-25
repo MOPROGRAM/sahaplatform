@@ -236,7 +236,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         </span>
                         <div className="flex items-center gap-1.5 mt-0.5">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
-                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Active - Verified {otherMember.role}</span>
+                            <span className="text-[9px] font-black text-text-muted uppercase tracking-tighter">Active - Verified {otherMember.role}</span>
                         </div>
                     </div>
                 </div>
@@ -247,7 +247,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             <span className="text-[9px] font-black text-secondary truncate max-w-[100px] uppercase italic">{adInfo.title}</span>
                         </div>
                     )}
-                    <button onClick={onClose} className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all rounded-xs"><X size={16} /></button>
+                    <button onClick={onClose} className="p-1.5 hover:bg-red-50 text-text-muted hover:text-red-500 transition-all rounded-xs"><X size={16} /></button>
                 </div>
             </div>
 
@@ -292,7 +292,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 </div>
                             )}
 
-                            <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-gray-400'}`}>
+                            <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-text-muted'}`}>
                                 {(() => {
                                     const date = new Date(msg.createdAt);
                                     return isNaN(date.getTime()) ? '...' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

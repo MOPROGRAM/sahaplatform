@@ -156,19 +156,19 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen flex flex-col bg-[var(--gray-bg)] text-text-main" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
             <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
                 {/* Left Sidebar */}
                 <aside className="w-full md:w-56 space-y-3 shrink-0">
-                    <div className="bg-white border border-gray-200 p-5 rounded-sm shadow-sm relative overflow-hidden group">
+                    <div className="bg-card border border-border-color p-5 rounded-sm shadow-sm relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform"></div>
                         <div className="relative z-10 text-center">
-                            <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
+                            <div className="w-14 h-14 bg-card border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
                                 <span className="text-lg font-black text-primary italic">{user.name?.substring(0, 2).toUpperCase()}</span>
                             </div>
-                            <h4 className="text-[12px] font-black text-secondary uppercase tracking-tight truncate">{user.name}</h4>
+                            <h4 className="text-[12px] font-black text-text-main uppercase tracking-tight truncate">{user.name}</h4>
                             <div className="flex items-center justify-center gap-1 mt-1 text-primary">
                                 <ShieldCheck size={12} className="fill-primary/10" />
                                 <span className="text-[8px] font-black uppercase tracking-widest">
@@ -178,14 +178,14 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    <nav className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
+                    <nav className="bg-card border border-border-color rounded-sm overflow-hidden shadow-sm">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-gray-50 last:border-0 transition-all ${activeTab === tab.id
-                                    ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary'
-                                    : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'
+                                className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-border-color last:border-0 transition-all ${activeTab === tab.id
+                                    ? 'text-primary bg-primary/10 border-r-2 border-r-primary'
+                                    : 'text-text-muted hover:bg-card hover:text-text-main'
                                     }`}
                             >
                                 {tab.icon}
@@ -200,25 +200,25 @@ export default function ProfilePage() {
                     {/* Overview Tab */}
                     {activeTab === 'overview' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
+                            <div className="bg-card border border-border-color p-6 rounded-sm shadow-sm">
                                 <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">
                                     {language === 'ar' ? 'معلومات الحساب' : 'Account Information'}
                                 </h3>
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                        <span className="text-[11px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'الاسم' : 'Name'}
                                         </span>
                                         <span className="text-[13px] font-bold text-secondary">{user.name}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                        <span className="text-[11px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                                         </span>
                                         <span className="text-[13px] font-bold text-secondary">{user.email}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                        <span className="text-[11px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'نوع الحساب' : 'Account Type'}
                                         </span>
                                         <span className="text-[13px] font-bold text-primary uppercase">
@@ -226,7 +226,7 @@ export default function ProfilePage() {
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                        <span className="text-[11px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'تاريخ الانضمام' : 'Joined'}
                                         </span>
                                         <span className="text-[13px] font-bold text-secondary">
@@ -241,27 +241,27 @@ export default function ProfilePage() {
                                     {language === 'ar' ? 'الإحصائيات' : 'Statistics'}
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="text-center p-3 bg-gray-50 rounded-sm">
+                                    <div className="text-center p-3 bg-card rounded-sm">
                                         <div className="text-2xl font-black text-primary">0</div>
-                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                        <div className="text-[9px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'الإعلانات' : 'Ads'}
                                         </div>
                                     </div>
-                                    <div className="text-center p-3 bg-gray-50 rounded-sm">
+                                    <div className="text-center p-3 bg-card rounded-sm">
                                         <div className="text-2xl font-black text-primary">0</div>
-                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                        <div className="text-[9px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'المشاهدات' : 'Views'}
                                         </div>
                                     </div>
-                                    <div className="text-center p-3 bg-gray-50 rounded-sm">
+                                    <div className="text-center p-3 bg-card rounded-sm">
                                         <div className="text-2xl font-black text-primary">0</div>
-                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                        <div className="text-[9px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'الرسائل' : 'Messages'}
                                         </div>
                                     </div>
-                                    <div className="text-center p-3 bg-gray-50 rounded-sm">
+                                    <div className="text-center p-3 bg-card rounded-sm">
                                         <div className="text-2xl font-black text-primary">0</div>
-                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                        <div className="text-[9px] font-black text-text-muted uppercase tracking-widest">
                                             {language === 'ar' ? 'المفضلة' : 'Favorites'}
                                         </div>
                                     </div>
@@ -272,11 +272,11 @@ export default function ProfilePage() {
 
                     {/* Listings/Services Tab */}
                     {(activeTab === 'listings' || activeTab === 'services') && (
-                        <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
-                            <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                        <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+                            <div className="px-4 py-3 bg-card/60 border-b border-border-color flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Package size={14} className="text-primary" />
-                                    <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-secondary">
+                                    <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">
                                         {activeTab === 'services' ? (language === 'ar' ? 'خدماتي' : 'My Services') : (language === 'ar' ? 'إعلاناتي' : 'My Listings')}
                                     </h3>
                                 </div>
@@ -291,7 +291,7 @@ export default function ProfilePage() {
                                 ) : ads.length > 0 ? (
                                     <table className="w-full text-[10px] border-collapse">
                                         <thead>
-                                            <tr className="bg-gray-100/50 text-gray-400 font-black uppercase text-[8px] tracking-widest border-b border-gray-200">
+                                            <tr className="bg-card/60 text-text-muted font-black uppercase text-[8px] tracking-widest border-b border-border-color">
                                                 <th className="px-6 py-3 text-left">{language === 'ar' ? 'التفاصيل' : 'Details'}</th>
                                                 <th className="px-6 py-3 text-center">{language === 'ar' ? 'الحالة' : 'Status'}</th>
                                                 <th className="px-6 py-3 text-center">{language === 'ar' ? 'المشاهدات' : 'Views'}</th>
@@ -303,15 +303,15 @@ export default function ProfilePage() {
                                                 <tr key={ad.id} className="hover:bg-primary/[0.02] transition-colors group">
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-9 h-9 bg-gray-50 border border-gray-100 rounded-xs flex items-center justify-center shrink-0 shadow-inner group-hover:border-primary/20 transition-colors">
-                                                                <Package size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                                                            <div className="w-9 h-9 bg-card border border-border-color rounded-xs flex items-center justify-center shrink-0 shadow-inner group-hover:border-primary/20 transition-colors">
+                                                                <Package size={16} className="text-text-muted group-hover:text-primary transition-colors" />
                                                             </div>
                                                             <div className="min-w-0">
                                                                 <span className="font-black text-secondary block truncate group-hover:text-primary transition-colors uppercase tracking-tight">{ad.title}</span>
                                                                 <div className="flex items-center gap-2 mt-0.5">
                                                                     <span className="text-primary font-black italic">{ad.price} SAR</span>
                                                                     <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
-                                                                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">{ad.category}</span>
+                                                                    <span className="text-[8px] font-black text-text-muted uppercase tracking-tighter">{ad.category}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -346,7 +346,7 @@ export default function ProfilePage() {
                                         </tbody>
                                     </table>
                                 ) : (
-                                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 p-16">
+                                    <div className="flex-1 flex flex-col items-center justify-center text-text-muted gap-3 p-16">
                                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shadow-inner">
                                             <Package size={32} className="opacity-10" />
                                         </div>
@@ -371,7 +371,7 @@ export default function ProfilePage() {
                     {activeTab === 'favorites' && (
                         <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm text-center">
                             <Heart size={48} className="text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-black text-gray-400 uppercase tracking-tight">
+                            <h3 className="text-lg font-black text-text-muted uppercase tracking-tight">
                                 {language === 'ar' ? 'المفضلة' : 'Favorites'}
                             </h3>
                             <p className="text-[12px] text-gray-500 mt-2">

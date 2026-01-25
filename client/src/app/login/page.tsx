@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguage } from '@/lib/language-context';
-import { User, Mail, Lock, ShieldCheck, ChevronRight, Briefcase, Search } from 'lucide-react';
+import { User, Mail, Lock, ShieldCheck, ChevronRight } from 'lucide-react';
+import DepthInput from '@/components/ui/DepthInput';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -42,32 +43,33 @@ export default function LoginPage() {
                 {/* Branding Accent */}
                 <div className="flex flex-col items-center mb-8">
                     <Link href="/" className="flex flex-col group items-center">
-                        <span className="text-4xl font-[1000] tracking-tighter text-black leading-none uppercase -mb-0.5">{t('siteName')}</span>
+                        <span className="text-4xl font-[1000] tracking-tighter text-text-main leading-none uppercase -mb-0.5">{t('siteName')}</span>
                         <div className="h-1.5 w-16 bg-primary mt-2 shadow-md group-hover:w-24 transition-all"></div>
                     </Link>
                 </div>
 
                 {/* Main Card */}
-                <div className="glass-card !p-8 shadow-2xl">
+                <div className="glass-card !p-8 shadow-2xl bg-card">
                     <div className="mb-8">
-                        <h2 className="text-xl font-[1000] text-black uppercase tracking-tight">{isLogin ? t('loginTitle') : t('registerTitle')}</h2>
+                        <h2 className="text-xl font-[1000] text-text-main uppercase tracking-tight">{isLogin ? t('loginTitle') : t('registerTitle')}</h2>
                         <div className="h-0.5 w-10 bg-primary mt-2"></div>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {!isLogin && (
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t('name')}</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">{t('name')}</label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-3 flex items-center text-gray-400 group-focus-within:text-primary transition-colors">
+                                    <div className="absolute inset-y-0 left-3 flex items-center text-text-muted group-focus-within:text-primary transition-colors">
                                         <User size={16} />
                                     </div>
-                                    <input
+                                    <DepthInput
                                         type="text"
                                         placeholder={t('placeholderName')}
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md font-bold text-[14px] focus:bg-white transition-all shadow-inner"
+                                        className="pl-10 pr-4 py-3"
+                                        label={undefined}
                                         required={!isLogin}
                                     />
                                 </div>
@@ -75,34 +77,36 @@ export default function LoginPage() {
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t('email')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">{t('email')}</label>
                             <div className="relative group">
-                                <div className="absolute inset-y-0 left-3 flex items-center text-gray-400 group-focus-within:text-primary transition-colors">
+                                <div className="absolute inset-y-0 left-3 flex items-center text-text-muted group-focus-within:text-primary transition-colors">
                                     <Mail size={16} />
                                 </div>
-                                <input
+                                <DepthInput
                                     type="email"
                                     placeholder={t('placeholderEmail')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md font-bold text-[14px] focus:bg-white transition-all shadow-inner"
+                                    className="pl-10 pr-4 py-3"
+                                    label={undefined}
                                     required
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t('password')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">{t('password')}</label>
                             <div className="relative group">
-                                <div className="absolute inset-y-0 left-3 flex items-center text-gray-400 group-focus-within:text-primary transition-colors">
+                                <div className="absolute inset-y-0 left-3 flex items-center text-text-muted group-focus-within:text-primary transition-colors">
                                     <Lock size={16} />
                                 </div>
-                                <input
+                                <DepthInput
                                     type="password"
                                     placeholder={t('placeholderPassword')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md font-bold text-[14px] focus:bg-white transition-all shadow-inner"
+                                    className="pl-10 pr-4 py-3"
+                                    label={undefined}
                                     required
                                 />
                             </div>
@@ -121,7 +125,7 @@ export default function LoginPage() {
                     <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center gap-4">
                         <button
                             onClick={() => setIsLogin(!isLogin)}
-                            className="text-[11px] font-[1000] text-gray-400 hover:text-primary uppercase tracking-widest transition-colors flex items-center gap-2"
+                            className="text-[11px] font-[1000] text-text-muted hover:text-primary uppercase tracking-widest transition-colors flex items-center gap-2"
                         >
                             {isLogin ? t('noAccount') : t('alreadyHaveAccount')}
                             <ChevronRight size={14} className={language === 'ar' ? 'rotate-180' : ''} />

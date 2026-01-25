@@ -91,7 +91,7 @@ export default function RootLayout({
                 }} />
             </head>
             <body>
-                <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                     <LanguageProvider>
                         <div className="flex min-h-screen bg-aurora-subtle transition-colors duration-500">
                             <CategorySidebar />

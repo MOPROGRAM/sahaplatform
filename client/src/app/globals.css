@@ -109,7 +109,24 @@ h5,
 h6 {
   color: var(--text-main);
   letter-spacing: -0.02em;
+  font-family: var(--font-readex), var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-weight: 700; /* stronger headings for clarity */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
+
+/* Improve body font clarity */
+body {
+  font-weight: 500; /* increased weight for better legibility */
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ensure high-contrast text utility */
+.text-text-main { color: var(--text-main) !important; }
+.text-muted { color: var(--text-muted) !important; }
 
 /* High Contrast Borders & Surfaces */
 .depth-panel {
@@ -272,7 +289,7 @@ textarea:focus {
 }
 
 .btn-saha-outline {
-  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px] hover:bg-gray-50;
+  @apply btn-saha bg-white text-black border-black border-b-[4px] px-3 py-1.5 text-xs hover:-translate-y-[1px] hover:bg-card/60;
 }
 
 /* Attract Style - Orange Border for Highlights (User request) */

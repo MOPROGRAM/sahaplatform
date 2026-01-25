@@ -8,12 +8,14 @@ import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
-import Footer from '@/components/Footer';
-import dynamic from 'next/dynamic';
+import Footer from '@/components/Footer';import Image from 'next/image';import dynamic from 'next/dynamic';
+import DepthInput from '@/components/ui/DepthInput';
+import DepthSelect from '@/components/ui/DepthSelect';
+import DepthTextarea from '@/components/ui/DepthTextarea';
 
 const MapSelector = dynamic(() => import('@/components/MapSelector'), {
     ssr: false,
-    loading: () => <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">Loading map...</div>
+    loading: () => <div className="h-64 bg-card rounded-lg flex items-center justify-center">Loading map...</div>
 });
 
 export default function PostAdPage() {
@@ -175,7 +177,7 @@ export default function PostAdPage() {
 
             console.log('Inserting ad data:', adData);
 
-            const { data, error } = await (supabase as any)
+            const { data, error } = await supabase
                 .from('Ad')
                 .insert(adData)
                 .select()
@@ -218,7 +220,7 @@ export default function PostAdPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Left Info Column */}
                     <div className="md:col-span-1 space-y-4">
-                        <div className="glass-card p-5 text-white shadow-xl relative overflow-hidden group">
+                        <div className="depth-card p-5 text-text-main shadow-xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-card rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
                             <h2 className="text-xl font-[1000] italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
                             <p className="text-[10px] font-bold opacity-90 mt-2 leading-tight relative z-10">{t('joinThousands')}</p>
@@ -235,20 +237,20 @@ export default function PostAdPage() {
                             </div>
                         </div>
 
-                        <div className="glass-card p-4 flex gap-3">
+                        <div className="depth-card p-4 flex gap-3">
                             <i className="text-secondary shrink-0">
                                 <Info size={18} className="text-primary" />
                             </i>
                             <div className="flex flex-col">
-                                <span className="text-[11px] font-black uppercase text-black tracking-widest leading-none">{t('marketRules')}</span>
-                                <p className="text-[10px] text-gray-500 font-bold mt-2 leading-relaxed">{t('marketRulesDesc')}</p>
+                                <span className="text-[11px] font-black uppercase text-text-main tracking-widest leading-none">{t('marketRules')}</span>
+                                <p className="text-[10px] text-text-muted font-bold mt-2 leading-relaxed">{t('marketRulesDesc')}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Form Column */}
                     <div className="md:col-span-2">
-                        <form onSubmit={handleSubmit} className="glass-card shadow-xl shadow-black/[0.01] overflow-hidden flex flex-col">
+                        <form onSubmit={handleSubmit} className="depth-card shadow-xl shadow-black/[0.01] overflow-hidden flex flex-col bg-card">
                             <div className="p-5 space-y-5">
                                 {error && (
                                     <div className="bg-red-50 text-red-600 p-3 text-[12px] font-black border-r-4 border-red-500 rounded-md uppercase tracking-tight flex items-center gap-3">
@@ -263,12 +265,12 @@ export default function PostAdPage() {
                                             <div className="w-1 h-3 bg-primary rounded-full"></div>
                                             {t('professionalTitle')} *
                                         </label>
-                                        <input
+                                        <DepthInput
                                             name="title"
                                             value={formData.title}
                                             onChange={handleInputChange}
-                                            className="glass-input p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-card transition-all shadow-inner uppercase tracking-tight"
                                             placeholder={t('adTitlePlaceholder')}
+                                            label={t('professionalTitle')}
                                             required
                                         />
                                     </div>
@@ -283,7 +285,7 @@ export default function PostAdPage() {
                                                 name="category"
                                                 value={formData.category}
                                                 onChange={handleInputChange}
-                                                className="glass-input p-3 text-[13px] font-black rounded-md outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner"
+                                                className="depth-input p-3 text-[13px] font-black rounded-md outline-none focus:border-primary bg-card cursor-pointer transition-all shadow-inner text-text-main"
                                                 required
                                             >
                                                 <option value="">{t('chooseCategory')}</option>
@@ -300,13 +302,13 @@ export default function PostAdPage() {
                                                 <div className="w-1 h-3 bg-emerald rounded-full"></div>
                                                 {t('askingPrice')} *
                                             </label>
-                                            <input
+                                            <DepthInput
                                                 name="price"
                                                 type="number"
                                                 value={formData.price}
                                                 onChange={handleInputChange}
-                                                className="bg-gray-50 border border-gray-200 p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner italic"
                                                 placeholder="0.00"
+                                                label={t('askingPrice')}
                                                 required
                                             />
                                         </div>
@@ -318,12 +320,12 @@ export default function PostAdPage() {
                                             {t('deploymentLocation')} *
                                         </label>
                                         <div className="relative">
-                                            <input
+                                            <DepthInput
                                                 name="location"
                                                 value={formData.location}
                                                 onChange={handleInputChange}
-                                                className="w-full bg-gray-50 border border-gray-200 p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tight"
                                                 placeholder={t('locationPlaceholder')}
+                                                label={t('deploymentLocation')}
                                                 required
                                             />
                                             <MapPin size={18} className="absolute right-3 top-3 text-primary opacity-30" />
@@ -337,7 +339,7 @@ export default function PostAdPage() {
                                                 <MapPin size={12} />
                                                 {language === 'ar' ? 'تحديد الموقع على الخريطة' : 'Select Location on Map'}
                                             </label>
-                                            <div className="bg-white border border-gray-200 rounded-md p-4">
+                                            <div className="bg-card border border-border-color rounded-md p-4">
                                                 <MapSelector
                                                     onLocationSelect={handleLocationSelect}
                                                     height="250px"
@@ -356,19 +358,19 @@ export default function PostAdPage() {
                                             <div className="w-1 h-3 bg-black rounded-full"></div>
                                             {t('detailedBriefing')}
                                         </label>
-                                        <textarea
+                                        <DepthTextarea
                                             name="description"
                                             value={formData.description}
                                             onChange={handleInputChange}
                                             rows={5}
-                                            className="bg-gray-50 border border-gray-200 p-4 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner resize-none leading-relaxed"
                                             placeholder={t('descriptionPlaceholder')}
-                                        ></textarea>
+                                            label={t('detailedBriefing')}
+                                        />
                                     </div>
 
                                     {/* Contact Information Section */}
-                                    <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-                                        <h3 className="text-[12px] font-black text-black uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <div className="bg-card p-4 rounded-md border border-border-color">
+                                        <h3 className="text-[12px] font-black text-text-main uppercase tracking-widest mb-3 flex items-center gap-2">
                                             <div className="w-1 h-3 bg-green-500 rounded-full"></div>
                                             {language === 'ar' ? 'معلومات الاتصال (اختياري)' : 'Contact Information (Optional)'}
                                         </h3>
@@ -377,26 +379,26 @@ export default function PostAdPage() {
                                                 <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
                                                     {t('phone')}
                                                 </label>
-                                                <input
+                                                <DepthInput
                                                     name="phone"
                                                     type="tel"
                                                     value={formData.phone}
                                                     onChange={handleInputChange}
-                                                    className="bg-white border border-gray-200 p-3 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner"
                                                     placeholder={language === 'ar' ? '+966 50 123 4567' : '+966 50 123 4567'}
+                                                    label={t('phone')}
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
                                                     {t('email')}
                                                 </label>
-                                                <input
+                                                <DepthInput
                                                     name="email"
                                                     type="email"
                                                     value={formData.email}
                                                     onChange={handleInputChange}
-                                                    className="bg-white border border-gray-200 p-3 text-[14px] font-medium rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner"
                                                     placeholder="example@email.com"
+                                                    label={t('email')}
                                                 />
                                             </div>
                                         </div>
@@ -422,11 +424,11 @@ export default function PostAdPage() {
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                             />
                                             <div className="bg-gray-50 border-2 border-dashed border-gray-300 p-6 rounded-md text-center hover:border-primary transition-colors group">
-                                                <Camera className="mx-auto text-gray-400 group-hover:text-primary transition-colors mb-2" size={24} />
+                                                <Camera className="mx-auto text-text-muted group-hover:text-primary transition-colors mb-2" size={24} />
                                                 <p className="text-[12px] font-black text-gray-500 uppercase tracking-tight">
                                                     {images.length > 0 ? `${images.length} ${t('imagesSelected')}` : t('clickToAddPhotos')}
                                                 </p>
-                                                <p className="text-[10px] text-gray-400 mt-1 font-bold">
+                                                <p className="text-[10px] text-text-muted mt-1 font-bold">
                                                     {t('max5Images')} • 5MB {t('each')}
                                                 </p>
                                             </div>
@@ -434,11 +436,13 @@ export default function PostAdPage() {
                                         {typeof window !== 'undefined' && images.length > 0 && (
                                             <div className="grid grid-cols-4 gap-2 mt-2">
                                                 {images.map((image, index) => (
-                                                    <div key={index} className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
-                                                        <img
+                                                    <div key={index} className="relative aspect-square bg-card rounded-md overflow-hidden">
+                                                        <Image
                                                             src={URL.createObjectURL(image)}
                                                             alt={`Preview ${index + 1}`}
-                                                            className="w-full h-full object-cover"
+                                                            fill
+                                                            unoptimized
+                                                            className="object-cover"
                                                         />
                                                         <button
                                                             type="button"
@@ -491,9 +495,9 @@ export default function PostAdPage() {
                                         {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} className="group-hover:rotate-90 transition-transform" />}
                                         {loading ? t('loading') : t('deployListing')}
                                     </button>
-                                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                                    <div className="flex items-center gap-2 bg-card px-3 py-1 rounded-full border border-border-color">
                                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{t('secureProtocol')}</span>
+                                        <span className="text-[9px] font-black text-text-muted uppercase tracking-widest">{t('secureProtocol')}</span>
                                     </div>
                                 </div>
                             </div>

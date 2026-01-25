@@ -129,7 +129,7 @@ export default function AdCard({
                 <div className="card-header relative z-10">
                     <h3 className={`${isFeatured ? 'text-lg' : 'text-sm'} card-title line-clamp-1 group-hover:text-primary transition-colors duration-300`}>{title}</h3>
                     <div className="card-price flex items-baseline gap-1">
-                        {price.toLocaleString()} <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{currency}</span>
+                        {price.toLocaleString()} <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">{currency}</span>
                     </div>
                 </div>
 
@@ -142,7 +142,7 @@ export default function AdCard({
                 {/* Modern Glass Footer */}
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100/50">
                     {createdAt && (
-                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-2 py-1 rounded-sm">
+                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-text-muted uppercase tracking-wider bg-card px-2 py-1 rounded-sm">
                             <Clock size={10} />
                             {formatRelativeTime(createdAt, language)}
                         </div>

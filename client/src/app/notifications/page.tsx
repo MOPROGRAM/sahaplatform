@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Bell, ShieldCheck, Zap, Info, Package, MessageSquare, Loader2, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { useState } from "react";
+import { Bell, ShieldCheck, Zap, Info, Package, MessageSquare, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import Header from "@/components/Header";
@@ -19,7 +18,7 @@ interface Notification {
 
 export default function NotificationsPage() {
     const { user } = useAuthStore();
-    const { language, t } = useLanguage();
+    const { language } = useLanguage();
     const [notifications, setNotifications] = useState<Notification[]>([
         { id: '1', title: 'Welcome to Saha Hub', message: 'Your professional account is now active. Explore the marketplace.', type: 'success', createdAt: new Date().toISOString(), isRead: false },
         { id: '2', title: 'Ad Approved', message: 'Your listing "Luxury Villa" has been verified and published.', type: 'ad', createdAt: new Date(Date.now() - 3600000).toISOString(), isRead: true },
@@ -36,7 +35,7 @@ export default function NotificationsPage() {
             case 'warning': return <AlertCircle size={16} className="text-orange-500" />;
             case 'ad': return <Package size={16} className="text-primary" />;
             case 'message': return <MessageSquare size={16} className="text-blue-500" />;
-            default: return <Info size={16} className="text-gray-400" />;
+            default: return <Info size={16} className="text-text-muted" />;
         }
     };
 
@@ -46,11 +45,11 @@ export default function NotificationsPage() {
 
             <main className="max-w-3xl mx-auto w-full p-4 flex-1 flex flex-col gap-4">
                 <div className="flex items-center justify-between px-1">
-                    <h1 className="text-[14px] font-black uppercase tracking-[0.2em] text-secondary flex items-center gap-3">
+                    <h1 className="text-[14px] font-black uppercase tracking-[0.2em] text-text-main flex items-center gap-3">
                         <Bell size={18} className="text-primary animate-pulse" />
                         Command Notifications Matrix
                     </h1>
-                    <button className="text-[10px] font-black text-gray-400 hover:text-primary transition-colors uppercase tracking-widest italic">Mark All as Processed</button>
+                    <button className="text-[10px] font-black text-text-muted hover:text-primary transition-colors uppercase tracking-widest italic">Mark All as Processed</button>
                 </div>
 
                 <div className="space-y-2">
@@ -58,9 +57,9 @@ export default function NotificationsPage() {
                         notifications.map((notif) => (
                             <div
                                 key={notif.id}
-                                className={`bg-white border border-gray-200 p-4 rounded-sm shadow-sm flex gap-4 transition-all hover:border-primary group relative overflow-hidden ${!notif.isRead ? 'border-r-4 border-r-primary' : ''}`}
+                                className={`bg-card border border-border-color p-4 rounded-sm shadow-sm flex gap-4 transition-all hover:border-primary group relative overflow-hidden ${!notif.isRead ? 'border-r-4 border-r-primary' : ''}`}
                             >
-                                <div className={`w-10 h-10 rounded-xs flex items-center justify-center shrink-0 border border-gray-50 shadow-inner ${!notif.isRead ? 'bg-primary/5' : 'bg-gray-50'}`}>
+                                <div className={`w-10 h-10 rounded-xs flex items-center justify-center shrink-0 border border-border-color shadow-inner ${!notif.isRead ? 'bg-primary/5' : 'bg-card'}`}>
                                     {getIcon(notif.type)}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -68,7 +67,7 @@ export default function NotificationsPage() {
                                         <h3 className={`text-[12px] font-black uppercase tracking-tight text-secondary ${!notif.isRead ? 'opacity-100' : 'opacity-70'}`}>
                                             {notif.title}
                                         </h3>
-                                        <span className="text-[8px] font-black text-gray-400 uppercase italic whitespace-nowrap">{new Date(notif.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-[8px] font-black text-text-muted uppercase italic whitespace-nowrap">{new Date(notif.createdAt).toLocaleDateString()}</span>
                                     </div>
                                     <p className="text-[10px] font-bold text-gray-500 mt-1 leading-relaxed opacity-80 italic">
                                         {notif.message}

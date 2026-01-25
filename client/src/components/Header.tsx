@@ -60,7 +60,7 @@ export default function Header() {
     };
 
     return (
-        <header className={`glass-card shadow-sm sticky top-0 z-[100] transition-all duration-300 ${isScrolled ? 'py-1' : 'py-2'}`}>
+        <header className={`depth-card shadow-sm sticky top-0 z-[100] transition-all duration-300 ${isScrolled ? 'py-1' : 'py-2'}`}>
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
                 {/* Brand - Sharp High Density */}
                 <Link href="/" className="flex flex-col group shrink-0">
@@ -72,11 +72,11 @@ export default function Header() {
                 <div className="relative">
                     <button
                         onClick={() => setShowRegion(!showRegion)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-slate-900 border border-border-color rounded-md hover:border-primary transition-all group"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-md hover:border-primary transition-all group"
                     >
                         <MapPin size={12} className="text-primary" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-text-main">{t(country as any)} | {t(currency as any)}</span>
-                        <ChevronDown size={10} className="text-gray-400 group-hover:text-primary transition-colors" />
+                        <ChevronDown size={10} className="text-text-muted group-hover:text-primary transition-colors" />
                     </button>
 
                     {showRegion && (
@@ -116,7 +116,7 @@ export default function Header() {
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
-                            className="flex-1 px-4 py-2.5 text-[14px] outline-none font-bold bg-transparent text-text-main placeholder:text-gray-400"
+                            className="flex-1 px-4 py-2.5 text-[14px] outline-none font-bold bg-transparent text-text-main placeholder:text-text-muted"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/ads?search=${encodeURIComponent(searchQuery)}`); }}
@@ -174,7 +174,7 @@ export default function Header() {
                                             {language === 'ar' ? 'عضو موثق' : 'Verified Member'}
                                         </span>
                                     </div>
-                                    <ChevronDown size={12} className="text-gray-400 ml-1" />
+                                    <ChevronDown size={12} className="text-text-muted ml-1" />
                                 </button>
 
                                 {showUserMenu && (

@@ -161,8 +161,8 @@ export default function AdvertisePage() {
 
             <main className="max-w-6xl mx-auto px-4 py-12 flex-1">
                 {/* Contact Info Banner */}
-                <div className="bg-white border-2 border-primary rounded-lg p-6 mb-12 shadow-xl">
-                    <h2 className="text-2xl font-black text-center mb-6 text-gray-900">
+                <div className="bg-card border-2 border-primary rounded-lg p-6 mb-12 shadow-xl">
+                    <h2 className="text-2xl font-black text-center mb-6 text-text-main">
                         {language === 'ar' ? 'للاشتراك تواصل معنا' : 'Contact Us to Subscribe'}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -201,7 +201,7 @@ export default function AdvertisePage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                     {plans.map((plan, index) => (
-                        <div key={index} className={`bg-white rounded-xl shadow-lg border-2 p-8 relative flex flex-col ${plan.popular ? 'border-primary ring-4 ring-primary/10 transform scale-105' : 'border-gray-200'}`}>
+                        <div key={index} className={`bg-card rounded-xl shadow-lg border-2 p-8 relative flex flex-col ${plan.popular ? 'border-primary ring-4 ring-primary/10 transform scale-105' : 'border-border-color'}`}>
                             {plan.popular && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-1 rounded-full text-sm font-black uppercase tracking-wider">
                                     {language === 'ar' ? 'الأكثر شعبية' : 'Most Popular'}

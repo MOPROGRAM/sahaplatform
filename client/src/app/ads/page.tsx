@@ -1,17 +1,26 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Filter, Loader2, MapPin, Image as ImageIcon } from 'lucide-react';
 import { adsService } from '@/lib/ads';
 import { useLanguage } from '@/lib/language-context';
 import { useFilterStore } from '@/store/useFilterStore';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
-import SearchBar from '@/components/SearchBar';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import AdvancedFilter from '@/components/AdvancedFilter';
+
+type Filters = {
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    category?: string;
+    search?: string;
+    location?: string;
+    type?: string;
+    priceRange?: string;
+    hasMedia?: boolean;
+};
 
 interface Ad {
     id: string;
@@ -47,7 +56,7 @@ interface Ad {
 }
 
 function AdsContent() {
-    const { language, t, currency } = useLanguage();
+    const { language } = useLanguage();
     const searchParams = useSearchParams();
     const router = useRouter();
     const searchQueryParam = searchParams.get('search');
@@ -66,21 +75,14 @@ function AdsContent() {
         }
     }, [categoryParam, category, setCategory]);
 
-    // Update search query and fetch ads when dependencies change
-    useEffect(() => {
-        setSearchQuery(searchQueryParam || '');
-        fetchAds();
-    }, [category, tags, searchQueryParam]);
-
-    const fetchAds = async () => {
+    const fetchAds = useCallback(async () => {
         setLoading(true);
         try {
-            const filters: Record<string, any> = {
+            const filters: Filters = {
                 limit: 50,
                 sortBy: 'created_at',
                 sortOrder: 'desc'
             };
-
             // Filter by category if specified
             if (category) {
                 filters.category = category;
@@ -135,7 +137,15 @@ function AdsContent() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [category, tags, searchQuery, showAllAds]);
+
+    useEffect(() => {
+        setSearchQuery(searchQueryParam || '');
+    }, [searchQueryParam]);
+
+    useEffect(() => {
+        fetchAds();
+    }, [fetchAds]);
 
     return (
         <div className="min-h-screen bg-[#f0f2f5] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -149,7 +159,7 @@ function AdsContent() {
                         <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                         <h1 className="text-[18px] font-black uppercase text-secondary tracking-tight">
                             {category ? `${category}` : 'Global Marketplace'}
-                            <span className="text-[12px] font-medium text-gray-400 mr-4 bg-gray-100 px-3 py-1 rounded-full uppercase italic">
+                            <span className="text-[12px] font-medium text-text-muted mr-4 bg-card/10 px-3 py-1 rounded-full uppercase italic">
                                 {ads.length} listings identified
                             </span>
                         </h1>
@@ -179,7 +189,7 @@ function AdsContent() {
                     </div>
                 ) : (
                     <div className="text-center p-20 bg-white border border-dashed border-gray-300 rounded-lg">
-                        <div className="text-gray-400 font-black uppercase text-sm italic tracking-widest">No matching listings in the matrix</div>
+                        <div className="text-text-muted font-black uppercase text-sm italic tracking-widest">No matching listings in the matrix</div>
                         <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 text-primary font-bold hover:underline">Clear all filters</button>
                     </div>
                 )}

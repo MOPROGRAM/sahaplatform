@@ -9,14 +9,13 @@ import {
     ChevronLeft,
     MessageCircle,
     Phone,
-    Info,
     Loader2,
     Share2,
-    Heart,
     Maximize2
 } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
 import Header from "@/components/Header";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
@@ -63,59 +62,57 @@ export default function AdDetailsContent({ id }: { id: string }) {
     const [showPhone, setShowPhone] = useState(false);
 
     useEffect(() => {
-        fetchAdDetails();
-    }, [adId]);
+        let mounted = true;
+        const load = async () => {
+            setLoading(true);
+            try {
+                const data = await adsService.getAd(adId);
+                if (!mounted) return;
 
-    const fetchAdDetails = async () => {
-        setLoading(true);
-        try {
-            console.log('[AD-VIEW] Fetching ad details for id:', adId);
-            const data = await adsService.getAd(adId);
-            console.log('[AD-VIEW] Received ad data:', data);
+                if (data) {
+                    const adData: AdsAd = data;
 
-            if (data) {
-                const adData = data as any;
-                // Transform data to match local Ad interface
-                const transformedAd: Ad = {
-                    id: adData.id,
-                    title: adData.title,
-                    description: adData.description,
-                    price: adData.price || 0,
-                    category: adData.category,
-                    location: adData.location || '',
-                    latitude: adData.latitude,
-                    longitude: adData.longitude,
-                    images: JSON.parse(adData.images || '[]'),
-                    phone: adData.phone,
-                    email: adData.email,
-                    views: adData.views,
-                    user_id: adData.author_id,
-                    created_at: adData.created_at,
-                    author: adData.author ? {
-                        id: adData.author.id,
-                        name: adData.author.name || '',
-                        verified: true, // Assume verified for now
-                        email: adData.author.email,
-                        phone: adData.author.phone
-                    } : {
-                        id: '',
-                        name: '',
-                        verified: false
-                    }
-                };
+                    const transformedAd: Ad = {
+                        id: adData.id,
+                        title: adData.title || '',
+                        description: adData.description || '',
+                        price: adData.price || 0,
+                        category: adData.category || '',
+                        location: adData.location || '',
+                        latitude: adData.latitude ?? undefined,
+                        longitude: adData.longitude ?? undefined,
+                        images: typeof adData.images === 'string' ? JSON.parse(adData.images || '[]') : adData.images || [],
+                        phone: adData.phone ?? undefined,
+                        email: adData.email ?? undefined,
+                        views: adData.views || 0,
+                        user_id: adData.author_id || adData.user_id || '',
+                        created_at: adData.created_at ?? null,
+                        author: adData.author ? {
+                            id: adData.author.id,
+                            name: adData.author.name || '',
+                            verified: true,
+                            email: adData.author.email,
+                            phone: adData.author.phone
+                        } : { id: '', name: '', verified: false }
+                    };
 
-                console.log('[AD-VIEW] Transformed ad data:', transformedAd);
-                setAd(transformedAd);
-
-                // Increment views
-                adsService.incrementViews(adId);
+                    setAd(transformedAd);
+                    // increment views (fire-and-forget)
+                    void adsService.incrementViews(adId);
+                } else {
+                    setAd(null);
+                }
+            } catch (err) {
+                console.error('[AD-VIEW] Failed to fetch ad details:', err);
+                if (mounted) setAd(null);
+            } finally {
+                if (mounted) setLoading(false);
             }
-        } catch (error) {
-            console.error('[AD-VIEW] Failed to fetch ad details:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
+
+        load();
+        return () => { mounted = false; };
+    }, [adId]);
 
     const handleStartChat = async () => {
         if (!user) {
@@ -144,26 +141,26 @@ export default function AdDetailsContent({ id }: { id: string }) {
     const lon = ad.longitude;
 
     return (
-        <div className="bg-gradient-to-br from-gray-bg via-primary/5 to-primary/10 min-h-screen" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-solid-overlay text-text-main" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            <div className="max-w-7xl mx-auto px-2 py-1.5 text-[10px] text-gray-400 flex items-center gap-1">
+            <div className="max-w-7xl mx-auto px-2 py-1.5 text-[10px] text-text-muted flex items-center gap-1">
                 <Link href="/" className="hover:text-primary">{t('home')}</Link>
                 <ChevronLeft size={10} className="opacity-30" />
-                <span className="truncate max-w-[150px] font-bold text-gray-600 uppercase tracking-tighter">{ad.title}</span>
+                <span className="truncate max-w-[150px] font-bold text-text-main uppercase tracking-tighter">{ad.title}</span>
             </div>
 
             <main className="max-w-7xl mx-auto grid grid-cols-12 gap-3 p-2 pt-0">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-9 order-2 lg:order-1 flex flex-col gap-3">
                     {/* Content Section */}
-                    <div className="glass-card p-6 rounded-sm relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 opacity-30"></div>
+                    <div className="depth-card p-6 rounded-sm relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 opacity-30"></div>
                         <div className="relative z-10">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex flex-col gap-1">
-                                    <h1 className="text-2xl font-black text-secondary leading-tight tracking-tight">{ad.title}</h1>
-                                    <span className="text-[10px] font-black text-primary bg-primary/5 px-2 py-0.5 rounded-full inline-block uppercase tracking-widest w-fit">{ad.category}</span>
+                                    <h1 className="text-2xl font-black text-text-main leading-tight tracking-tight">{ad.title}</h1>
+                                    <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full inline-block uppercase tracking-widest w-fit">{ad.category}</span>
                                 </div>
                                 <div className="text-right flex flex-col items-end">
                                     <div className="flex items-baseline gap-1 text-primary">
@@ -172,28 +169,28 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                             SAR
                                         </span>
                                     </div>
-                                    {ad.created_at && <span className="text-[9px] font-black text-gray-400 mt-1 uppercase italic tracking-tighter">{language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}</span>}
+                                    {ad.created_at && <span className="text-[9px] font-black text-text-muted mt-1 uppercase italic tracking-tighter">{language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}</span>}
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-4 border-y border-gray-50 py-4 my-4">
+                            <div className="grid grid-cols-3 gap-4 border-y border-border-color py-4 my-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-xs bg-gray-50 flex items-center justify-center text-primary"><MapPin size={16} /></div>
-                                    <div className="flex flex-col"><span className="text-[9px] font-black text-gray-400 uppercase">Location</span><span className="text-[11px] font-black text-secondary">{ad.location}</span></div>
+                                    <div className="w-8 h-8 rounded-xs bg-card flex items-center justify-center text-primary"><MapPin size={16} /></div>
+                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">Location</span><span className="text-[11px] font-black text-text-main">{ad.location}</span></div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-xs bg-gray-50 flex items-center justify-center text-primary"><Calendar size={16} /></div>
-                                    <div className="flex flex-col"><span className="text-[9px] font-black text-gray-400 uppercase">Availability</span><span className="text-[11px] font-black text-secondary">Immediate</span></div>
+                                    <div className="w-8 h-8 rounded-xs bg-card flex items-center justify-center text-primary"><Calendar size={16} /></div>
+                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">Availability</span><span className="text-[11px] font-black text-text-main">Immediate</span></div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-xs bg-gray-50 flex items-center justify-center text-primary"><Eye size={16} /></div>
-                                    <div className="flex flex-col"><span className="text-[9px] font-black text-gray-400 uppercase">Traffic</span><span className="text-[11px] font-black text-secondary">{ad.views} Views</span></div>
+                                    <div className="w-8 h-8 rounded-xs bg-card flex items-center justify-center text-primary"><Eye size={16} /></div>
+                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">Traffic</span><span className="text-[11px] font-black text-text-main">{ad.views} Views</span></div>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
-                                <h3 className="text-[14px] font-black uppercase text-secondary border-b-2 border-primary w-fit pb-1">{t('description')}</h3>
-                                <p className="text-[12px] font-medium leading-relaxed text-gray-600 bg-card p-4 rounded-xs border border-gray-100 italic">
+                                <h3 className="text-[14px] font-black uppercase text-text-main border-b-2 border-primary w-fit pb-1">{t('description')}</h3>
+                                <p className="text-[12px] font-medium leading-relaxed text-text-main bg-card p-4 rounded-xs border border-border-color italic">
                                     {ad.description}
                                 </p> 
                             </div>
@@ -202,45 +199,40 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                     {/* Media Gallery - Premium Full Visibility */}
                     {ad.images && ad.images.length > 0 && (
-                        <div className="glass-card rounded-sm overflow-hidden relative group">
-                            <div className="h-[450px] bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                        <div className="depth-card rounded-sm overflow-hidden relative group">
+                            <div className="h-[450px] bg-card relative overflow-hidden flex items-center justify-center">
                                 {/* Decorative Background (no blur) */}
                                 <div
-                                    className="absolute inset-0 bg-cover bg-center scale-110 opacity-30 bg-card"
+                                    className="absolute inset-0 bg-cover bg-center scale-110 opacity-25"
                                     style={{ backgroundImage: `url(${ad.images[0]})` }}
                                 ></div> 
 
                                 {(() => {
                                     const images = ad.images || [];
                                     return images.length > 0 ? (
-                                        <img
-                                            src={images[0]}
-                                            alt={ad.title}
-                                            className="relative z-10 max-w-full max-h-full object-contain shadow-2xl"
-                                        />
+                                        <div className="relative z-10 w-full h-full">
+                                            <Image src={images[0]} alt={ad.title} fill style={{ objectFit: 'contain' }} className="shadow-2xl" />
+                                        </div>
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 italic font-black text-gray-200 text-6xl">
+                                        <div className="w-full h-full flex items-center justify-center bg-card italic font-black text-text-muted text-6xl">
                                             {t('siteName')}
                                         </div>
                                     );
                                 })()}
                                 <div className="absolute bottom-3 right-3 flex gap-2">
-                                    <button className="bg-primary text-white p-1.5 rounded-xs hover:bg-primary-hover transition-all"><Maximize2 size={14} /></button>
-                                    <button className="bg-primary text-white p-1.5 rounded-xs hover:bg-primary-hover transition-all"><Share2 size={14} /></button>
+                                    <button className="depth-button text-white p-1.5 rounded-xs hover:scale-105 transition-all"><Maximize2 size={14} /></button>
+                                    <button className="depth-button text-white p-1.5 rounded-xs hover:scale-105 transition-all"><Share2 size={14} /></button>
                                 </div> 
                             </div>
                             {(() => {
                                 const images = ad.images || [];
                                 return images.length > 1 ? (
-                                    <div className="p-4 border-t border-gray-100">
+                                    <div className="p-4 border-t border-border-color">
                                         <div className="grid grid-cols-4 gap-2">
                                             {images.slice(1, 5).map((img: string, idx: number) => (
-                                                <img
-                                                    key={idx}
-                                                    src={img}
-                                                    alt={`View ${idx + 2}`}
-                                                    className="aspect-square object-cover rounded-sm border border-gray-200 cursor-pointer hover:border-primary transition-all"
-                                                />
+                                                <div key={idx} className="aspect-square rounded-sm overflow-hidden border border-border-color cursor-pointer hover:border-primary transition-all">
+                                                    <Image src={img} alt={`View ${idx + 2}`} fill style={{ objectFit: 'cover' }} />
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
@@ -251,12 +243,12 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                     {/* Integrated Map - Free OpenStreetMap - Moved to bottom */}
                     {typeof lat === 'number' && typeof lon === 'number' && lat !== 0 && lon !== 0 && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && ad.location && (
-                        <div className="glass-card p-4 rounded-sm overflow-hidden flex flex-col gap-3">
-                            <h3 className="text-[12px] font-black uppercase text-secondary flex items-center gap-2">
+                        <div className="depth-card p-4 rounded-sm overflow-hidden flex flex-col gap-3">
+                            <h3 className="text-[12px] font-black uppercase text-text-main flex items-center gap-2">
                                 <MapPin size={14} className="text-primary" />
                                 {language === 'ar' ? 'موقع العقار / السلعة' : 'PRECISE LOCATION'}
                             </h3>
-                            <div className="h-48 rounded-xs border border-gray-100 overflow-hidden relative shadow-inner">
+                            <div className="h-48 rounded-xs border border-border-color overflow-hidden relative shadow-inner">
                                 <iframe
                                     width="100%"
                                     height="100%"
@@ -266,7 +258,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                     marginWidth={0}
                                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02}%2C${lat - 0.02}%2C${lon + 0.02}%2C${lat + 0.02}&layer=mapnik&marker=${lat}%2C${lon}`}
                                 ></iframe>
-                                <div className="absolute bottom-2 right-2 bg-card text-gray-500 px-2 py-1 text-[8px] font-black border border-gray-200 uppercase tracking-tighter">Precision Map Data © OpenStreetMap</div>
+                                <div className="absolute bottom-2 right-2 bg-card text-text-muted px-2 py-1 text-[8px] font-black border border-border-color uppercase tracking-tighter">Precision Map Data © OpenStreetMap</div>
                             </div>
                         </div>
                     )}
@@ -274,35 +266,35 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                 {/* Sidebar */}
                 <aside className="col-span-12 lg:col-span-3 order-1 flex flex-col gap-3">
-                    <div className="glass-card p-4 rounded-sm sticky top-[80px]">
-                        <div className="flex items-center gap-3 mb-6 bg-primary/5 p-3 rounded-xs border border-primary/10 transition-colors hover:bg-primary/10">
+                    <div className="depth-card p-4 rounded-sm sticky top-[80px]">
+                        <div className="flex items-center gap-3 mb-6 bg-primary/10 p-3 rounded-xs border border-primary/10 transition-colors hover:bg-primary/20">
                             <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
                                 <span className="font-black text-primary text-sm italic">SE</span>
                             </div> 
                             <div className="flex flex-col min-w-0">
-                                <h4 className="text-[12px] font-black text-secondary truncate flex items-center gap-1">
+                                <h4 className="text-[12px] font-black text-text-main truncate flex items-center gap-1">
                                     Seller
                                     <ShieldCheck size={14} className="text-blue-500 fill-blue-500/10" />
                                 </h4>
-                                <span className="text-[9px] font-black text-gray-400 uppercase italic tracking-tighter">Senior Merchant</span>
+                                <span className="text-[9px] font-black text-text-muted uppercase italic tracking-tighter">Senior Merchant</span>
                             </div>
                         </div>
 
                         {/* Contact Information Section */}
                         {(ad.phone || ad.email || ad.author?.phone || ad.author?.email) && (
-                            <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-xs">
-                                <h4 className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">
+                            <div className="mb-4 p-3 bg-card border border-border-color rounded-xs">
+                                <h4 className="text-[10px] font-black text-text-main uppercase tracking-widest mb-2">
                                     {language === 'ar' ? 'معلومات الاتصال' : 'CONTACT INFO'}
                                 </h4>
                                 <div className="space-y-2">
                                     {(ad.phone || ad.author?.phone) && (
-                                        <div className="flex items-center gap-2 text-[11px] font-medium">
+                                        <div className="flex items-center gap-2 text-[11px] font-medium text-text-main">
                                             <Phone size={14} className="text-green-600" />
                                             <span>{ad.phone || ad.author?.phone}</span>
                                         </div>
                                     )}
                                     {(ad.email || ad.author?.email) && (
-                                        <div className="flex items-center gap-2 text-[11px] font-medium">
+                                        <div className="flex items-center gap-2 text-[11px] font-medium text-text-main">
                                             <MessageCircle size={14} className="text-blue-600" />
                                             <span>{ad.email || ad.author?.email}</span>
                                         </div>
@@ -331,9 +323,9 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         </div>
 
                         <div className="mt-6 flex flex-col gap-3">
-                            <div className="bg-gray-50 border border-gray-100 p-3 rounded-xs flex gap-3">
+                            <div className="bg-card border border-border-color p-3 rounded-xs flex gap-3">
                                 <ShieldCheck size={20} className="text-blue-500 shrink-0" />
-                                <div className="flex flex-col"><span className="text-[10px] font-black text-blue-700 uppercase tracking-tighter">Verified Seller</span><p className="text-[9px] text-gray-500 font-bold leading-tight">This seller has provided valid identity documents for safety.</p></div>
+                                <div className="flex flex-col"><span className="text-[10px] font-black text-blue-700 uppercase tracking-tighter">Verified Seller</span><p className="text-[9px] text-text-muted font-bold leading-tight">This seller has provided valid identity documents for safety.</p></div>
                             </div>
                             <button
                                 onClick={() => {
@@ -341,7 +333,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                         alert(language === 'ar' ? 'تم الإبلاغ بنجاح' : 'Reported successfully');
                                     }
                                 }}
-                                className="text-[9px] font-black text-gray-400 hover:text-red-500 transition-colors uppercase italic underline w-fit"
+                                className="text-[9px] font-black text-text-muted hover:text-red-500 transition-colors uppercase italic underline w-fit"
                             >
                                 {language === 'ar' ? 'الإبلاغ عن محتوى مشبوه' : 'Report Suspicious Content'}
                             </button>

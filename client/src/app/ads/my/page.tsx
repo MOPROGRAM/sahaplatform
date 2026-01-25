@@ -118,7 +118,7 @@ export default function MyAdsPage() {
                     </div>
                 ) : ads.length === 0 ? (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                        <div className="text-gray-400 mb-4">
+                        <div className="text-text-muted mb-4">
                             <Plus size={48} className="mx-auto" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-2">

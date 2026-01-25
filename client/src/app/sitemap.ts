@@ -28,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Fetch dynamic routes (Ads) from Supabase
     try {
-        const { data: ads, error } = await (supabase as any)
+        const { data: ads, error } = await supabase
             .from('Ad')
             .select('id, updated_at, created_at')
             .eq('is_active', true)
