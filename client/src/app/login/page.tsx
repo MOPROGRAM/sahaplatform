@@ -48,7 +48,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="glass-card !p-8 shadow-2xl backdrop-blur-xl bg-white/80 border border-white/20">
+                <div className="glass-card !p-8 shadow-2xl">
                     <div className="mb-8">
                         <h2 className="text-xl font-[1000] text-black uppercase tracking-tight">{isLogin ? t('loginTitle') : t('registerTitle')}</h2>
                         <div className="h-0.5 w-10 bg-primary mt-2"></div>

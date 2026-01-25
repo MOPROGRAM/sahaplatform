@@ -165,7 +165,7 @@ export default function SettingsPage() {
 
                 <div className="grid gap-6">
                     {/* Appearance Settings */}
-                    <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20">
+                    <div className="glass-card p-4">
                         <div className="flex items-center gap-3 mb-4">
                             <Palette className="text-primary" size={20} />
                             <h2 className="text-lg font-bold text-text-main">
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Notifications Settings */}
-                    <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20">
+                    <div className="glass-card p-4">
                         <div className="flex items-center gap-3 mb-4">
                             <Bell className="text-primary" size={20} />
                             <h2 className="text-lg font-bold text-text-main">
@@ -269,7 +269,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Account Settings */}
-                    <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20">
+                    <div className="glass-card p-4">
                         <div className="flex items-center gap-3 mb-4">
                             <User className="text-primary" size={20} />
                             <h2 className="text-lg font-bold text-text-main">
@@ -371,7 +371,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Security Settings */}
-                    <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20">
+                    <div className="glass-card p-4">
                         <div className="flex items-center gap-3 mb-4">
                             <Shield className="text-primary" size={20} />
                             <h2 className="text-lg font-bold text-text-main">
