@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { adsService } from "@/lib/ads";
 
@@ -15,9 +15,9 @@ function TestViewContent() {
         if (id) {
             fetchAd();
         }
-    }, [id]);
+    }, [fetchAd]);
 
-    const fetchAd = async () => {
+    const fetchAd = useCallback(async () => {
         setLoading(true);
         try {
             const data = await adsService.getAd(id!);
@@ -27,7 +27,7 @@ function TestViewContent() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
     if (!id) return <div>No ID provided</div>;
 

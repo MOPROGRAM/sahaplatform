@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2, Save, X, Camera, MapPin } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
@@ -47,9 +47,9 @@ export default function EditAdPage() {
             return;
         }
         fetchAdData();
-    }, [adId, user]);
+    }, [user, router, fetchAdData]);
 
-    const fetchAdData = async () => {
+    const fetchAdData = useCallback(async () => {
         try {
             const ad = await adsService.getAd(adId, true);
             if (!ad) {

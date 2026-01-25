@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/store/useAuthStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     LayoutDashboard,
     Package,
@@ -71,9 +71,9 @@ export default function DashboardPage() {
             return;
         }
         fetchDashboardData();
-    }, [user, router, activeTab]);
+    }, [user, router, activeTab, fetchDashboardData]);
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         try {
             const myAds = await adsService.getMyAds();
             const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.is_active) : [];
@@ -93,7 +93,7 @@ export default function DashboardPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [language]);
 
     const deleteAd = async (adId: string) => {
         try {

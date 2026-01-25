@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Mic } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
@@ -75,7 +75,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 conversationsService.unsubscribe(channel);
             }
         };
-    }, [conversationId]);
+    }, [conversationId, fetchChatData]);
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,7 +93,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     //     });
     // };
 
-    const fetchChatData = async () => {
+    const fetchChatData = useCallback(async () => {
         setLoading(true);
         try {
             const data = await conversationsService.getConversation(conversationId);
@@ -114,7 +114,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         } finally {
             setLoading(false);
         }
-    };
+    }, [conversationId]);
 
     const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' = 'text', content?: string, fileData?: any) => {
         const messageContent = content || input;
