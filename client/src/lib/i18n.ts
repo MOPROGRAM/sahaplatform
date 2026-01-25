@@ -97,6 +97,10 @@ export const translations = {
         newAd: 'جديد',
         hotOffer: 'عرض ساخن',
         trending: 'رائج الآن',
+        availability: 'التوفر',
+        immediate: 'فوري',
+        traffic: 'الزيارات',
+        views: 'مشاهدات',
         tickerMessage1: 'عروض حصرية لمشتركي باقة "ساحة بيزنس" - خصم 50%',
         tickerMessage2: 'أفضل وقت لنشر إعلانات السيارات: الآن!',
         footerNotice: 'جميع الحقوق محفوظة لمنصة ساحة 2026',
@@ -167,7 +171,7 @@ export const translations = {
     },
     en: {
         // Brand
-        siteName: 'Saha',
+        siteName: 'saha',
         siteBrand: 'Saha Auctions & Real Estate',
         taglineFooter: 'GCC Real Estate & Career Portal',
 
@@ -260,6 +264,10 @@ export const translations = {
         newAd: 'New',
         hotOffer: 'HOT OFFER',
         trending: 'TRENDING',
+        availability: 'Availability',
+        immediate: 'Immediate',
+        traffic: 'Traffic',
+        views: 'Views',
         tickerMessage1: 'Exclusive offers for Saha Business members - 50% OFF',
         tickerMessage2: 'Best time to post Car ads: NOW!',
         footerNotice: 'All rights reserved to Saha Platform 2026',

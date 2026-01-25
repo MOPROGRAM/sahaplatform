@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, MapPin, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
@@ -22,6 +23,8 @@ interface AdCardProps {
 }
 
 export default function AdCard({
+    // call hooks at top level to satisfy rules
+
     id,
     title,
     price,
@@ -35,6 +38,7 @@ export default function AdCard({
     language = 'ar',
     isFeatured = false
 }: AdCardProps) {
+    const { t } = useLanguage();
     const [isFavorite, setIsFavorite] = useState(false);
     const [showImageViewer, setShowImageViewer] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -118,7 +122,7 @@ export default function AdCard({
                         </div>
                     ) : (
                         <div className={`${isFeatured ? 'h-64' : 'h-48'} bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden group-hover:bg-primary/5 transition-colors`}>
-                            <div className="text-gray-300 font-black text-4xl opacity-20 select-none scale-150 rotate-12">SAHA</div>
+                            <div className="text-gray-300 font-black text-4xl opacity-20 select-none scale-150 rotate-12">{t('siteName')}</div>
                         </div>
                     )}
                 </div>

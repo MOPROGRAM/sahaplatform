@@ -129,20 +129,27 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             };
             const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
 
+            // Normalize returned fields (snake_case vs camelCase)
+            const id = sentMessage.id || sentMessage.ID || sentMessage.message_id;
+            const contentResp = sentMessage.content || sentMessage.body || '';
+            const messageType = (sentMessage.messageType as string) || (sentMessage.message_type as string) || type;
+            const createdAt = sentMessage.createdAt || sentMessage.created_at || new Date().toISOString();
+
             // Add message locally immediately
             const newMessage: Message = {
-                id: sentMessage.id,
+                id: id,
                 senderId: user?.id || '',
-                content: sentMessage.content,
-                messageType: sentMessage.messageType as any,
-                createdAt: sentMessage.createdAt,
+                content: contentResp,
+                messageType: messageType as any,
+                createdAt: createdAt,
                 sender: { name: user?.name || 'You' }
             };
             setMessages(prev => [...prev, newMessage]);
 
             if (type === 'text') setInput("");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to send message:", error);
+            alert((error && error.message) ? error.message : (language === 'ar' ? 'فشل في إرسال الرسالة' : 'Failed to send message'));
         } finally {
             setSending(false);
         }

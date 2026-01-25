@@ -176,15 +176,15 @@ export default function AdDetailsContent({ id }: { id: string }) {
                             <div className="grid grid-cols-3 gap-4 border-y border-border-color py-4 my-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-xs bg-card flex items-center justify-center text-primary"><MapPin size={16} /></div>
-                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">Location</span><span className="text-[11px] font-black text-text-main">{ad.location}</span></div>
+                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">{t('location')}</span><span className="text-[11px] font-black text-text-main">{ad.location}</span></div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-xs bg-card flex items-center justify-center text-primary"><Calendar size={16} /></div>
-                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">Availability</span><span className="text-[11px] font-black text-text-main">Immediate</span></div>
+                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">{t('availability') || 'Availability'}</span><span className="text-[11px] font-black text-text-main">{t('immediate') || 'Immediate'}</span></div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-xs bg-card flex items-center justify-center text-primary"><Eye size={16} /></div>
-                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">Traffic</span><span className="text-[11px] font-black text-text-main">{ad.views} Views</span></div>
+                                    <div className="flex flex-col"><span className="text-[9px] font-black text-text-muted uppercase">{t('traffic') || 'Traffic'}</span><span className="text-[11px] font-black text-text-main">{ad.views} {t('views') || 'Views'}</span></div>
                                 </div>
                             </div>
 

@@ -73,6 +73,7 @@ export default function RootLayout({
                             -webkit-font-smoothing: antialiased;
                             -moz-osx-font-smoothing: grayscale;
                             font-size: 14px;
+                            font-weight: 500; /* body weight per spec */
                             margin: 0;
                             padding: 0;
                             transition: background-color 0.22s ease, color 0.22s ease;
@@ -80,7 +81,7 @@ export default function RootLayout({
                         [dir="ltr"] body {
                             font-family: var(--font-inter), -apple-system, "SF Pro", system-ui, sans-serif;
                         }
-                        h1,h2,h3,h4 { font-family: var(--font-readex), var(--font-inter), system-ui, sans-serif; }
+                        h1,h2,h3,h4 { font-family: var(--font-readex), var(--font-inter), system-ui, sans-serif; font-weight: 700; }
                         ::-webkit-scrollbar { width: 6px; height: 6px; }
                         ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); border-radius: 10px; }
                         ::-webkit-scrollbar-thumb:hover { background: var(--primary-hover); }
