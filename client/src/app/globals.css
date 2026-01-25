@@ -17,6 +17,12 @@
   --text-main: #0f172a;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
+
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-blur: blur(10px);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 [data-theme="dark"] {
@@ -27,6 +33,13 @@
   --border-color: #1e293b;
   --black: #ffffff;
   --white: #020617;
+
+  /* Dark Glassmorphism Variables */
+  --glass-bg: rgba(15, 23, 42, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.125);
+  --glass-blur: blur(10px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
 }
 
 * {
@@ -41,7 +54,8 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  background: var(--gray-bg);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
   color: var(--text-main);
   text-rendering: optimizeLegibility;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -73,9 +87,12 @@ h6 {
 
 /* High Contrast Borders & Surfaces */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
 }
 
 .shadow-premium {
@@ -84,6 +101,46 @@ h6 {
 
 [data-theme="dark"] .shadow-premium {
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Glassmorphism Utility Classes */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-input {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1), var(--glass-shadow);
+}
+
+.glass-button {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px 0 rgba(31, 38, 135, 0.5);
 }
 
 /* Custom Scrollbar - Sharp & Clean */

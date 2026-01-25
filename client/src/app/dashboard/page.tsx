@@ -122,13 +122,13 @@ export default function DashboardPage() {
     if (!user) return null;
 
     return (
-        <div className="bg-[#f0f2f5] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
             <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
                 {/* Left Mini Sidebar - Professional Tech Style */}
                 <aside className="w-full md:w-56 space-y-3 shrink-0">
-                    <div className="bg-white border border-gray-200 p-5 rounded-sm shadow-sm relative overflow-hidden group">
+                    <div className="glass-card p-5 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform"></div>
                         <div className="relative z-10 text-center">
                             <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
@@ -142,14 +142,14 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 p-3 rounded-sm shadow-sm">
+                    <div className="glass-card p-3">
                         <div className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                             <div className="w-2 h-2 bg-emerald rounded-full animate-pulse"></div>
                             <span>ID: {user.id.substring(0, 8)}</span>
                         </div>
                     </div>
 
-                    <nav className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
+                    <nav className="glass-card overflow-hidden">
                         {[
                             { label: t('overview'), icon: <LayoutDashboard size={14} />, id: 'overview' },
                             { label: t('myListings'), icon: <Package size={14} />, id: 'listings' },
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                         ))}
                     </nav>
 
-                    <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50/50 hover:bg-red-50 transition-all border border-red-100/50 rounded-sm">
+                    <button onClick={() => logout()} className="glass-button w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50/50 hover:bg-red-50 transition-all border border-red-100/50 rounded-sm">
                         <LogOut size={14} />
                         <span>Sign Out System</span>
                     </button>
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                             {/* Compact Stats Grid */}
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                                 {stats.map((stat, i) => (
-                                    <div key={i} className="bg-white border border-gray-200 p-4 rounded-sm flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                                    <div key={i} className="glass-card p-4 flex flex-col gap-2 relative overflow-hidden group">
                                         <div className={`absolute bottom-0 right-0 w-12 h-12 ${stat.color} opacity-[0.03] -mr-4 -mb-4 group-hover:scale-150 transition-transform`}>{stat.icon}</div>
                                         <span className={`w-8 h-8 flex items-center justify-center rounded-xs bg-gray-50 ${stat.color} p-1 border border-black/5 shadow-inner`}>
                                             {stat.icon}

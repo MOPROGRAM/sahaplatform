@@ -59,7 +59,7 @@ export default function Header() {
     };
 
     return (
-        <header className={`bg-card border-color shadow-sm sticky top-0 z-[100] transition-all duration-300 ${isScrolled ? 'py-1' : 'py-2'}`}>
+        <header className={`glass-card shadow-sm sticky top-0 z-[100] transition-all duration-300 ${isScrolled ? 'py-1' : 'py-2'}`}>
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
                 {/* Brand - Sharp High Density */}
                 <Link href="/" className="flex flex-col group shrink-0">
@@ -111,7 +111,7 @@ export default function Header() {
 
                 {/* Micro Search Bar */}
                 <div className="flex-1 max-w-xl relative group">
-                    <div className="flex border border-border-color rounded-sm overflow-hidden bg-gray-50 focus-within:border-primary focus-within:bg-card-bg transition-all shadow-sm">
+                    <div className="glass-input flex border border-border-color rounded-sm overflow-hidden bg-gray-50 focus-within:border-primary focus-within:bg-card-bg transition-all shadow-sm">
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}

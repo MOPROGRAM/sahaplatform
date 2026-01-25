@@ -71,11 +71,11 @@ export default function HomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
             {/* Ticker - Localized and High Contrast */}
-            <div className="bg-black text-white py-2 overflow-hidden text-[13px] font-black uppercase tracking-widest border-b border-white/10 shadow-lg">
+            <div className="bg-black/80 backdrop-blur-glass text-white py-2 overflow-hidden text-[13px] font-black uppercase tracking-widest border-b border-white/10 shadow-lg">
                 <div className="animate-marquee flex gap-32">
                     <span className="flex items-center gap-3">
                         <span className="bg-primary text-white px-2 py-0.5 rounded-sm text-[11px] font-black italic">{t('hotOffer')}</span>
@@ -93,7 +93,7 @@ export default function HomePage() {
             <main className="max-w-7xl mx-auto w-full p-2 grid grid-cols-12 gap-3">
                 {/* Left Sidebar */}
                 <aside className="col-span-12 md:col-span-2 space-y-3">
-                    <div className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm">
+                    <div className="glass-card overflow-hidden">
                         <div className="bg-gray-100 px-3 py-1.5 text-[11px] font-black border-b border-gray-200 text-black uppercase tracking-tight">
                             {t('categories')}
                         </div>
@@ -114,7 +114,7 @@ export default function HomePage() {
                         </nav>
                     </div>
 
-                    <div className="bg-navy p-4 rounded-md text-white shadow-xl shadow-navy/10 relative overflow-hidden group">
+                    <div className="glass-card p-4 text-white shadow-xl shadow-navy/10 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-20 h-20 bg-primary/20 rounded-full -mr-10 -mt-10 blur-2xl group-hover:scale-150 transition-transform"></div>
                         <h4 className="text-[11px] font-black mb-1 italic text-primary uppercase tracking-tighter relative z-10">{t('siteName')} PRO</h4>
                         <p className="text-[9px] font-bold leading-tight mb-3 opacity-90 relative z-10">{t('joinThousands')}</p>
@@ -124,7 +124,7 @@ export default function HomePage() {
 
                 {/* Central Feed */}
                 <section className="col-span-12 md:col-span-10 flex flex-col gap-3">
-                    <div className="flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-md shadow-sm">
+                    <div className="glass-card flex items-center justify-between px-3 py-2">
                         <div className="flex items-center gap-2">
                             <Sparkles className="text-primary" size={16} />
                             <h2 className="text-[13px] font-[1000] uppercase tracking-tight text-black">{t('latestOffers')}</h2>
@@ -156,7 +156,7 @@ export default function HomePage() {
                                     language={language}
                                 />
                             )) : (
-                                <div className="col-span-full bg-white p-12 text-center border border-dashed border-gray-300 rounded-md">
+                                <div className="col-span-full glass-card p-12 text-center border border-dashed border-gray-300 rounded-md">
                                     <div className="text-gray-300 font-bold uppercase tracking-widest text-[11px]">{t('noResults')}</div>
                                 </div>
                             )}
@@ -166,7 +166,7 @@ export default function HomePage() {
 
                 {/* Right Widgets - Hidden on medium to allow 5-column feed */}
                 <aside className="hidden xl:col-span-2 xl:flex flex-col gap-3">
-                    <div className="bg-white border border-gray-200 p-3 rounded-md shadow-sm">
+                    <div className="glass-card p-3">
                         <div className="flex items-center gap-2 mb-3 text-black border-r-4 border-primary pr-2 leading-none">
                             <Zap size={14} className="text-primary fill-primary" />
                             <h3 className="text-[12px] font-black uppercase italic tracking-tight">{t('trending')}</h3>
@@ -186,7 +186,7 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 p-4 rounded-md text-center relative overflow-hidden flex flex-col justify-center items-center group shadow-sm hover:shadow-md transition-all">
+                    <div className="glass-card p-4 text-center relative overflow-hidden flex flex-col justify-center items-center group shadow-sm hover:shadow-md transition-all">
                         <h4 className="text-[13px] font-[1000] text-black relative z-10 leading-none uppercase tracking-tighter">{t('siteBrand')}</h4>
                         <p className="text-[9px] text-gray-400 mt-2 relative z-10 leading-tight font-bold uppercase tracking-widest opacity-80">{t('taglineFooter')}</p>
                         <button className="btn-saha-attract !w-full !px-3 !py-1.5 !text-[10px] !border-b-[3px] mt-3 relative z-10">{t('register')}</button>
