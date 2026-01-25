@@ -123,6 +123,75 @@ app.get('/api', (req, res) => {
     res.json({ message: "Welcome to Saha Platform API (ساحة)" });
 });
 
+// Admin setup endpoint - Secure with environment variable
+app.post('/api/setup-admin', async (req, res) => {
+    try {
+        const { adminKey, email, password, name } = req.body;
+
+        // Security check - only allow with correct admin key
+        if (!adminKey || adminKey !== process.env.ADMIN_SETUP_KEY) {
+            return res.status(403).json({
+                success: false,
+                error: 'Unauthorized - Invalid admin key'
+            });
+        }
+
+        // Validate required fields
+        if (!email || !password || !name) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required fields: email, password, name'
+            });
+        }
+
+        // Hash password
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create or update admin user
+        const adminUser = await prisma.user.upsert({
+            where: { email: email },
+            update: {
+                name: name,
+                password: hashedPassword,
+                role: 'ADMIN',
+                verified: true,
+                phoneVerified: true
+            },
+            create: {
+                name: name,
+                email: email,
+                password: hashedPassword,
+                role: 'ADMIN',
+                verified: true,
+                phoneVerified: true,
+                phone: '+966500000000'
+            }
+        });
+
+        console.log(`✅ Admin user created/updated: ${adminUser.email}`);
+
+        res.json({
+            success: true,
+            message: 'Admin user created successfully',
+            user: {
+                id: adminUser.id,
+                email: adminUser.email,
+                name: adminUser.name,
+                role: adminUser.role
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error creating admin user:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to create admin user',
+            details: error.message
+        });
+    }
+});
+
 // Import Modules
 const authRoutes = require('./modules/auth/auth.controller');
 const adRoutes = require('./modules/ads/ad.controller');
@@ -158,6 +227,11 @@ io.on('connection', (socket) => {
 // Documentation route
 app.get('/docs', (req, res) => {
     res.sendFile(__dirname + '/docs/index.html');
+});
+
+// Admin setup page route
+app.get('/setup-admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'setup-admin.html'));
 });
 
 // Health check for Koyeb

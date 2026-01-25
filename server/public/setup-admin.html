@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعداد مدير Saha Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff6b35 0%, #f97316 50%, #ea580c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+    </style>
+</head>
+<body>
+    <div class="w-full max-w-md p-6">
+        <div class="glass-card p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-black text-white mb-2">إعداد المدير</h1>
+                <p class="text-white/80">إنشاء حساب مدير لمنصة ساحة</p>
+            </div>
+
+            <form id="adminForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-white mb-2">مفتاح الإعداد الإداري</label>
+                    <input
+                        type="password"
+                        id="adminKey"
+                        required
+                        class="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        placeholder="أدخل مفتاح الإعداد"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-white mb-2">الاسم الكامل</label>
+                    <input
+                        type="text"
+                        id="name"
+                        required
+                        class="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        placeholder="اسم المدير"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-white mb-2">البريد الإلكتروني</label>
+                    <input
+                        type="email"
+                        id="email"
+                        required
+                        class="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        placeholder="admin@saha.com"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-white mb-2">كلمة المرور</label>
+                    <input
+                        type="password"
+                        id="password"
+                        required
+                        minlength="8"
+                        class="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        placeholder="كلمة مرور قوية"
+                    >
+                </div>
+
+                <button
+                    type="submit"
+                    id="submitBtn"
+                    class="w-full bg-white text-orange-600 font-bold py-3 px-6 rounded-lg hover:bg-orange-50 transition-all duration-200 shadow-lg"
+                >
+                    إنشاء حساب المدير
+                </button>
+            </form>
+
+            <div id="message" class="mt-6 p-4 rounded-lg hidden"></div>
+
+            <div class="mt-6 text-center">
+                <a href="/" class="text-white/80 hover:text-white text-sm">العودة للصفحة الرئيسية</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+
+            // Get form data
+            const adminKey = document.getElementById('adminKey').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جاري الإنشاء...';
+
+            try {
+                const response = await fetch('/api/setup-admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        adminKey,
+                        name,
+                        email,
+                        password
+                    })
+                });
+
+                const data = await response.json();
+
+                messageDiv.className = `mt-6 p-4 rounded-lg ${data.success ? 'bg-green-500/20 border border-green-500/30 text-green-100' : 'bg-red-500/20 border border-red-500/30 text-red-100'}`;
+                messageDiv.textContent = data.success ? '✅ تم إنشاء حساب المدير بنجاح! يمكنك الآن تسجيل الدخول من /admin' : `❌ خطأ: ${data.error}`;
+                messageDiv.classList.remove('hidden');
+
+                if (data.success) {
+                    // Redirect to admin login after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = '/admin';
+                    }, 3000);
+                }
+
+            } catch (error) {
+                messageDiv.className = 'mt-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-100';
+                messageDiv.textContent = '❌ خطأ في الاتصال بالخادم';
+                messageDiv.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'إنشاء حساب المدير';
+            }
+        });
+    </script>
+</body>
+</html>
