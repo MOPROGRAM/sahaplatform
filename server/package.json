@@ -9,6 +9,7 @@
         "prisma:generate": "prisma generate",
         "prisma:migrate": "prisma migrate dev",
         "prisma:seed": "node prisma/seed.js",
+        "make-admin": "node make-admin.js",
         "postinstall": "prisma generate"
     },
     "prisma": {

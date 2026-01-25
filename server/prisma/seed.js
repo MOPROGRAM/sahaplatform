@@ -118,6 +118,23 @@ async function main() {
         }
     });
 
+    // 4.1. Create admin user
+    const adminUser = await prisma.user.upsert({
+        where: { email: 'admin@saha.com' },
+        update: {},
+        create: {
+            name: 'Saha Administrator',
+            email: 'admin@saha.com',
+            password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: "password"
+            role: 'ADMIN',
+            verified: true,
+            phone: '+966500000000',
+            phoneVerified: true,
+            countryId: (await prisma.country.findUnique({ where: { code: 'SA' } })).id,
+            cityId: (await prisma.city.findFirst({ where: { nameAr: 'الرياض' } })).id
+        }
+    });
+
     // 5. Create test ads with different categories and created_at dates
     const ads = [
         {
