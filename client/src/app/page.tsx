@@ -35,12 +35,12 @@ export default function HomePage() {
     const [loading, setLoading] = useState(true);
 
     const categoriesList = [
-        { name: t('jobs'), icon: Briefcase, key: 'jobs', count: "3.6k" },
-        { name: t('realEstate'), icon: Building2, key: 'realEstate', count: "8.5k" },
-        { name: t('cars'), icon: Car, key: 'cars', count: "12.3k" },
-        { name: t('goods'), icon: ShoppingBag, key: 'goods', count: "15k" },
-        { name: t('services'), icon: Wrench, key: 'services', count: "4k" },
-        { name: t('other'), icon: Layers, key: 'other', count: "2k" }
+        { name: t('jobs'), icon: Briefcase, key: 'jobs', count: "156" },
+        { name: t('realEstate'), icon: Building2, key: 'realEstate', count: "89" },
+        { name: t('cars'), icon: Car, key: 'cars', count: "234" },
+        { name: t('goods'), icon: ShoppingBag, key: 'goods', count: "145" },
+        { name: t('services'), icon: Wrench, key: 'services', count: "67" },
+        { name: t('other'), icon: Layers, key: 'other', count: "23" }
     ];
 
     useEffect(() => {
@@ -141,25 +141,52 @@ export default function HomePage() {
                             <LoadingSpinner size={32} />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                            {ads.length > 0 ? ads.map((ad, idx) => (
-                                <AdCard
-                                    key={idx}
-                                    id={ad.id}
-                                    title={ad.title}
-                                    price={ad.price || 0}
-                                    currency="ريال"
-                                    location={ad.location || ''}
-                                    images={ad.images ? JSON.parse(ad.images) : []}
-                                    createdAt={ad.created_at}
-                                    category={ad.category}
-                                    language={language}
-                                />
-                            )) : (
-                                <div className="col-span-full glass-card p-12 text-center border border-dashed border-gray-300 rounded-md">
-                                    <div className="text-gray-300 font-bold uppercase tracking-widest text-[11px]">{t('noResults')}</div>
+                        <div className="space-y-6">
+                            {/* Featured Ads - Larger Grid */}
+                            {ads.filter(ad => ad.is_boosted).length > 0 && (
+                                <div>
+                                    <h3 className="text-lg font-bold mb-4 text-primary">{language === 'ar' ? 'إعلانات مميزة' : 'Featured Ads'}</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {ads.filter(ad => ad.is_boosted).map((ad, idx) => (
+                                            <AdCard
+                                                key={`featured-${idx}`}
+                                                id={ad.id}
+                                                title={ad.title}
+                                                price={ad.price || 0}
+                                                currency="ريال"
+                                                location={ad.location || ''}
+                                                images={ad.images ? JSON.parse(ad.images) : []}
+                                                createdAt={ad.created_at}
+                                                category={ad.category}
+                                                language={language}
+                                                isFeatured={true}
+                                                className="md:col-span-2 lg:col-span-3"
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
                             )}
+
+                            {/* Regular Ads */}
+                            <div>
+                                <h3 className="text-lg font-bold mb-4">{language === 'ar' ? 'الإعلانات' : 'Ads'}</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                                    {ads.filter(ad => !ad.is_boosted).map((ad, idx) => (
+                                        <AdCard
+                                            key={`regular-${idx}`}
+                                            id={ad.id}
+                                            title={ad.title}
+                                            price={ad.price || 0}
+                                            currency="ريال"
+                                            location={ad.location || ''}
+                                            images={ad.images ? JSON.parse(ad.images) : []}
+                                            createdAt={ad.created_at}
+                                            category={ad.category}
+                                            language={language}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     )}
                 </section>

@@ -144,7 +144,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
     const lon = ad.longitude;
 
     return (
-        <div className="bg-[#f0f2f5] min-h-screen" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="bg-gradient-to-br from-gray-bg via-primary/5 to-primary/10 min-h-screen" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
             <div className="max-w-7xl mx-auto px-2 py-1.5 text-[10px] text-gray-400 flex items-center gap-1">
@@ -157,7 +157,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-9 order-2 lg:order-1 flex flex-col gap-3">
                     {/* Content Section */}
-                    <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm relative overflow-hidden">
+                    <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20 p-6 rounded-sm shadow-sm relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
                         <div className="relative z-10">
                             <div className="flex justify-between items-start mb-4">
@@ -202,7 +202,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                     {/* Media Gallery - Premium Full Visibility */}
                     {ad.images && ad.images.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm relative group">
+                        <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20 rounded-sm overflow-hidden shadow-sm relative group">
                             <div className="h-[450px] bg-slate-100 relative overflow-hidden flex items-center justify-center">
                                 {/* Blurred Background Backdrop */}
                                 <div
@@ -251,7 +251,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                     {/* Integrated Map - Free OpenStreetMap - Moved to bottom */}
                     {typeof lat === 'number' && typeof lon === 'number' && lat !== 0 && lon !== 0 && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 && ad.location && (
-                        <div className="bg-white border border-gray-200 p-4 rounded-sm shadow-sm overflow-hidden flex flex-col gap-3">
+                        <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20 p-4 rounded-sm shadow-sm overflow-hidden flex flex-col gap-3">
                             <h3 className="text-[12px] font-black uppercase text-secondary flex items-center gap-2">
                                 <MapPin size={14} className="text-primary" />
                                 {language === 'ar' ? 'موقع العقار / السلعة' : 'PRECISE LOCATION'}
@@ -274,7 +274,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                 {/* Sidebar */}
                 <aside className="col-span-12 lg:col-span-3 order-1 flex flex-col gap-3">
-                    <div className="bg-white border border-gray-200 rounded-sm shadow-sm p-4 sticky top-[80px]">
+                    <div className="glass-card backdrop-blur-xl bg-white/80 border border-white/20 rounded-sm shadow-sm p-4 sticky top-[80px]">
                         <div className="flex items-center gap-3 mb-6 bg-primary/5 p-3 rounded-xs border border-primary/10 transition-colors hover:bg-primary/10">
                             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
                                 <span className="font-black text-primary text-sm italic">SE</span>

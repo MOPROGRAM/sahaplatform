@@ -167,7 +167,7 @@ export default function PostAdPage() {
                 images: JSON.stringify(imageUrls),
                 author_id: currentUser.id,
                 is_active: true,
-                is_boosted: false,
+                is_boosted: formData.isBoosted,
                 views: 0,
                 phone: formData.phone || null,
                 email: formData.email || null,
@@ -199,7 +199,7 @@ export default function PostAdPage() {
     // Show loading while checking auth
     if (authLoading) {
         return (
-            <div className="bg-[#f8fafc] min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="animate-spin text-primary" size={40} />
             </div>
         );
@@ -211,14 +211,14 @@ export default function PostAdPage() {
     }
 
     return (
-        <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
             <main className="max-w-5xl mx-auto w-full p-2 md:p-4 flex-1">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Left Info Column */}
                     <div className="md:col-span-1 space-y-4">
-                        <div className="bg-primary p-5 rounded-md text-white shadow-xl relative overflow-hidden group">
+                        <div className="glass-card p-5 text-white shadow-xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform"></div>
                             <h2 className="text-xl font-[1000] italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
                             <p className="text-[10px] font-bold opacity-90 mt-2 leading-tight relative z-10">{t('joinThousands')}</p>
@@ -235,7 +235,7 @@ export default function PostAdPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white border border-gray-200 p-4 rounded-md shadow-sm flex gap-3">
+                        <div className="glass-card p-4 flex gap-3">
                             <i className="text-secondary shrink-0">
                                 <Info size={18} className="text-primary" />
                             </i>
@@ -248,7 +248,7 @@ export default function PostAdPage() {
 
                     {/* Form Column */}
                     <div className="md:col-span-2">
-                        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-md shadow-xl shadow-black/[0.01] overflow-hidden flex flex-col">
+                        <form onSubmit={handleSubmit} className="glass-card shadow-xl shadow-black/[0.01] overflow-hidden flex flex-col">
                             <div className="p-5 space-y-5">
                                 {error && (
                                     <div className="bg-red-50 text-red-600 p-3 text-[12px] font-black border-r-4 border-red-500 rounded-md uppercase tracking-tight flex items-center gap-3">
@@ -267,7 +267,7 @@ export default function PostAdPage() {
                                             name="title"
                                             value={formData.title}
                                             onChange={handleInputChange}
-                                            className="bg-gray-50 border border-gray-200 p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tight"
+                                            className="glass-input p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tight"
                                             placeholder={t('adTitlePlaceholder')}
                                             required
                                         />
@@ -283,7 +283,7 @@ export default function PostAdPage() {
                                                 name="category"
                                                 value={formData.category}
                                                 onChange={handleInputChange}
-                                                className="bg-gray-50 border border-gray-200 p-3 text-[13px] font-black rounded-md outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner"
+                                                className="glass-input p-3 text-[13px] font-black rounded-md outline-none focus:border-primary focus:bg-white cursor-pointer transition-all shadow-inner"
                                                 required
                                             >
                                                 <option value="">{t('chooseCategory')}</option>
@@ -451,6 +451,34 @@ export default function PostAdPage() {
                                                 ))}
                                             </div>
                                         )}
+                                    </div>
+                                </div>
+
+                                {/* Boost Options */}
+                                <div className="bg-gradient-to-r from-primary/5 to-primary/10 p-4 rounded-md border border-primary/20">
+                                    <h3 className="text-[12px] font-black text-black uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        <div className="w-1 h-3 bg-primary rounded-full"></div>
+                                        {language === 'ar' ? 'خيارات الترقية (اختياري)' : 'Boost Options (Optional)'}
+                                    </h3>
+                                    <div className="space-y-3">
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                name="isBoosted"
+                                                checked={formData.isBoosted}
+                                                onChange={handleInputChange}
+                                                className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                            />
+                                            <div>
+                                                <span className="text-[12px] font-black text-black uppercase tracking-tight">
+                                                    {language === 'ar' ? 'إعلان مميز' : 'Featured Ad'}
+                                                </span>
+                                                <p className="text-[10px] text-gray-600">
+                                                    {language === 'ar' ? 'يظهر في الأعلى ويحصل على مشاهدات أكثر' : 'Appears at the top and gets more views'}
+                                                </p>
+                                            </div>
+                                            <span className="text-[12px] font-black text-primary ml-auto">50 SAR</span>
+                                        </label>
                                     </div>
                                 </div>
 

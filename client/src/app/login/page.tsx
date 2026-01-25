@@ -37,7 +37,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-bg transition-colors duration-300">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-bg via-primary/5 to-primary/10 transition-colors duration-300">
             <div className="w-full max-w-[420px] space-y-4">
                 {/* Branding Accent */}
                 <div className="flex flex-col items-center mb-8">
@@ -48,7 +48,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="saha-card !p-8 shadow-2xl">
+                <div className="glass-card !p-8 shadow-2xl backdrop-blur-xl bg-white/80 border border-white/20">
                     <div className="mb-8">
                         <h2 className="text-xl font-[1000] text-black uppercase tracking-tight">{isLogin ? t('loginTitle') : t('registerTitle')}</h2>
                         <div className="h-0.5 w-10 bg-primary mt-2"></div>

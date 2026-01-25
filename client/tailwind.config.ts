@@ -56,7 +56,7 @@ const config: Config = {
         'glass': '10px',
       },
       backgroundImage: {
-        'mesh-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'mesh-gradient': 'linear-gradient(135deg, #ff6b35 0%, #f97316 50%, #ea580c 100%)',
       },
     },
   },

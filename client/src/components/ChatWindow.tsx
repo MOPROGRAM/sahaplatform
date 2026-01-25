@@ -127,9 +127,19 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 messageType: type,
                 ...fileData
             };
-            await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
+            const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
 
-            // Message will be added via Supabase Realtime subscription
+            // Add message locally immediately
+            const newMessage: Message = {
+                id: sentMessage.id,
+                senderId: user?.id || '',
+                content: sentMessage.content,
+                messageType: sentMessage.messageType as any,
+                createdAt: sentMessage.createdAt,
+                sender: { name: user?.name || 'You' }
+            };
+            setMessages(prev => [...prev, newMessage]);
+
             if (type === 'text') setInput("");
         } catch (error) {
             console.error("Failed to send message:", error);

@@ -18,6 +18,7 @@ interface AdCardProps {
     category?: string;
     className?: string;
     language?: 'ar' | 'en';
+    isFeatured?: boolean;
 }
 
 export default function AdCard({
@@ -31,7 +32,8 @@ export default function AdCard({
     authorName,
     category,
     className = "",
-    language = 'ar'
+    language = 'ar',
+    isFeatured = false
 }: AdCardProps) {
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -45,6 +47,13 @@ export default function AdCard({
     return (
         <Link href={`/ads/${id}`} className={`ad-card-3d card-hover-effect overflow-hidden group ${className}`}>
             <div className="relative overflow-hidden">
+                {/* Featured Badge */}
+                {isFeatured && (
+                    <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-orange-400 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
+                        {language === 'ar' ? 'مميز' : 'Featured'}
+                    </div>
+                )}
+
                 {/* Favorite Button */}
                 <button
                     onClick={handleFavoriteClick}
@@ -58,7 +67,7 @@ export default function AdCard({
 
                 {/* Image */}
                 {images.length > 0 ? (
-                    <div className="relative h-48 bg-gray-50 flex items-center justify-center overflow-hidden">
+                    <div className={`relative ${isFeatured ? 'h-64' : 'h-48'} bg-gray-50 flex items-center justify-center overflow-hidden`}>
                         <div className="absolute inset-0 bg-cover bg-center blur-xl opacity-20 scale-125 transition-all group-hover:scale-110" style={{ backgroundImage: `url(${images[0]})` }}></div>
                         <Image
                             src={images[0]}
@@ -74,7 +83,7 @@ export default function AdCard({
                         )}
                     </div>
                 ) : (
-                    <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden group-hover:bg-primary/5 transition-colors">
+                    <div className={`${isFeatured ? 'h-64' : 'h-48'} bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden group-hover:bg-primary/5 transition-colors`}>
                         <div className="absolute w-20 h-20 bg-primary/10 rounded-full blur-2xl -top-10 -right-10 animate-pulse"></div>
                         <div className="text-gray-300 font-black text-4xl opacity-20 select-none scale-150 rotate-12">SAHA</div>
                     </div>
@@ -82,9 +91,9 @@ export default function AdCard({
             </div>
 
             {/* Content */}
-            <div className="p-4 relative">
+            <div className={`${isFeatured ? 'p-6' : 'p-4'} relative`}>
                 <div className="card-header relative z-10">
-                    <h3 className="card-title line-clamp-1 group-hover:text-primary transition-colors duration-300">{title}</h3>
+                    <h3 className={`${isFeatured ? 'text-lg' : 'text-sm'} card-title line-clamp-1 group-hover:text-primary transition-colors duration-300`}>{title}</h3>
                     <div className="card-price flex items-baseline gap-1">
                         {price.toLocaleString()} <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{currency}</span>
                     </div>
