@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function makeAdmin() {
-    const email = process.argv[2] || 'admin@saha.com';
+    const email = process.argv[2] || 'motwasel@yahoo.com';
 
     try {
         // Update user to admin
