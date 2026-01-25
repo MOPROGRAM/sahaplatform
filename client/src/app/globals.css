@@ -37,27 +37,35 @@
   --white: #0a0a0a;
 
   /* Dark Depth & Matte Variables (subdued) */
-  --glow-border: 1px solid rgba(255,255,255,0.02);
-  --glow-border-hover: 1px solid rgba(255,255,255,0.04);
-  --glow-shadow: 0 2px 8px rgba(2,6,23,0.04);
-  --glow-shadow-hover: 0 4px 12px rgba(2,6,23,0.06);
+  --glow-border: 1px solid rgba(255,77,0,0.06);
+  --glow-border-hover: 1px solid rgba(255,77,0,0.12);
+  --glow-shadow: 0 6px 20px rgba(255,77,0,0.06);
+  --glow-shadow-hover: 0 10px 32px rgba(255,77,0,0.12);
+  --card-bg: #0a0a0a; /* solid dark cards */
+  --gray-bg: #000000; /* absolute black */
+  --primary: #FF4D00;
+  --primary-hover: #FF9E00;
+}
+
+:root {
+  --glow-orange: 0 8px 30px rgba(255,77,0,0.12);
 }
 
 /* Simple Light Theme (explicit) */
 .light, [data-theme="light"] {
-  --gray-bg: #ffffff;
+  --gray-bg: #ffffff; /* absolute white */
   --card-bg: #ffffff;
-  --text-main: #071124;
-  --text-muted: #475569;
-  --border-color: rgba(7,17,36,0.06);
-  --black: #0a0a0a;
+  --text-main: #000000; /* absolute black text */
+  --text-muted: #334155;
+  --border-color: rgba(0,0,0,0.06);
+  --black: #000000;
   --white: #ffffff;
 
-  /* Light Depth & Subtle Variables */
-  --glow-border: 1px solid rgba(2,6,23,0.02);
-  --glow-border-hover: 1px solid rgba(2,6,23,0.04);
-  --glow-shadow: 0 1px 6px rgba(2, 6, 23, 0.03);
-  --glow-shadow-hover: 0 4px 12px rgba(2, 6, 23, 0.05);
+  /* Light Depth & Subtle Variables (orange glow for active elements) */
+  --glow-border: 1px solid rgba(255,77,0,0.06);
+  --glow-border-hover: 1px solid rgba(255,77,0,0.12);
+  --glow-shadow: 0 6px 18px rgba(255,77,0,0.06);
+  --glow-shadow-hover: 0 10px 28px rgba(255,77,0,0.12);
 }
 
 * {
@@ -278,6 +286,27 @@ textarea:focus {
   border: 1px solid var(--border-color);
   @apply rounded-md shadow-sm transition-all hover:shadow-xl p-3;
 }
+
+/* Solid background utilities to replace translucent/blur effects (No-Glass) */
+.bg-card {
+  background: var(--card-bg) !important;
+}
+
+.bg-solid-overlay {
+  background: var(--gray-bg) !important;
+}
+
+/* subtle hover tint used where a small hover feedback was previously achieved with translucency */
+.hover-bg-card:hover {
+  background: rgba(255,77,0,0.03) !important;
+}
+
+/* Remove large decorative blurs in new design — prefer solid shapes */
+.no-glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 
 /* Focus States */
 input:focus,
@@ -1099,27 +1128,24 @@ textarea:focus {
   animation: aurora 20s ease infinite;
 }
 
-/* Glass / Matte Utilities - toned down for simplicity */
+/* Glass / Matte Utilities - legacy glass neutralized (No-Glass) */
 .glass-morphism {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  /* Replaced translucent blur with solid, theme-aware surface */
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   box-shadow: 0 6px 18px rgba(2,6,23,0.04);
   border-radius: 10px;
-}
+} 
 
-/* Dark variants: use solid dark surfaces, remove strong blur/glow */
+/* Dark variants: use solid dark surfaces (no blur) */
 .dark .glass-morphism,
 .dark .glass-card,
 [data-theme="dark"] .glass-morphism,
 [data-theme="dark"] .glass-card {
-  background: rgba(10, 10, 10, 0.96);
+  background: var(--card-bg);
   border: 1px solid rgba(255,255,255,0.03);
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
+} 
 
 /* Add a simple glass-card and glass-input (matte defaults) */
 .glass-card {
@@ -1181,37 +1207,51 @@ textarea:focus {
   transform: translateY(0);
 }
 
-/* Neon Button */
+/* Neon/Button Glow Utilities */
 .btn-neon {
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.24s ease;
   z-index: 1;
 }
 
 .btn-neon::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--primary);
+  inset: 0;
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   z-index: -2;
+  opacity: 0.9;
 }
 
 .btn-neon::before {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0%;
-  height: 100%;
-  background-color: var(--primary-dark);
-  transition: all 0.3s ease;
+  inset: 0;
+  box-shadow: var(--glow-orange);
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   z-index: -1;
 }
 
 .btn-neon:hover::before {
-  width: 100%;
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Glow utility to apply orange glow */
+.glow-active {
+  box-shadow: var(--glow-orange);
+  border: 1px solid rgba(255,77,0,0.12);
+}
+
+/* Promoted banner pulse */
+.pulse-orange {
+  animation: pulse-orange 1.6s infinite;
+}
+
+@keyframes pulse-orange {
+  0% { box-shadow: 0 0 0 0 rgba(255,77,0,0.16); }
+  70% { box-shadow: 0 0 0 18px rgba(255,77,0,0.0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,77,0,0); }
 }

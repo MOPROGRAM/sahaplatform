@@ -78,7 +78,7 @@ export default function HelpPage() {
                         <p className="text-gray-600 text-sm mb-4">
                             {language === 'ar' ? 'تحدث معنا مباشرة' : 'Chat with us directly'}
                         </p>
-                        <button className="glass-button text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors" onClick={() => window.open('https://wa.me/96650000000', '_blank')}>
+                        <button className="btn-saha-primary px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors" onClick={() => window.open('https://wa.me/96650000000', '_blank')}>
                             {language === 'ar' ? 'ابدأ المحادثة' : 'Start Chat'}
                         </button>
                     </div>
@@ -89,7 +89,7 @@ export default function HelpPage() {
                         <p className="text-gray-600 text-sm mb-4">
                             support@saha.com
                         </p>
-                        <button className="glass-button text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors" onClick={() => window.location.href = 'mailto:support@saha.com'}>
+                        <button className="btn-saha-primary px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors" onClick={() => window.location.href = 'mailto:support@saha.com'}>
                             {language === 'ar' ? 'أرسل بريد' : 'Send Email'}
                         </button>
                     </div>
@@ -102,7 +102,7 @@ export default function HelpPage() {
                         <p className="text-gray-600 text-sm mb-4">
                             +966 50 000 0000
                         </p>
-                        <button className="glass-button text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors" onClick={() => window.location.href = 'tel:+96650000000'}>
+                        <button className="btn-saha-primary px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors" onClick={() => window.location.href = 'tel:+96650000000'}>
                             {language === 'ar' ? 'اتصل الآن' : 'Call Now'}
                         </button>
                     </div>

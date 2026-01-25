@@ -21,7 +21,8 @@ import {
     Check,
     X,
     Trash2,
-    ExternalLink
+    ExternalLink,
+    Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -144,6 +145,18 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleToggleBoost = async (id: string, boost: boolean) => {
+        setActionLoading(id);
+        try {
+            await supabase.from('Ad').update({ is_boosted: boost }).eq('id', id);
+            fetchDashboardData();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     if (!user || user.role !== 'ADMIN') return null;
 
     return (
@@ -171,7 +184,7 @@ export default function AdminDashboard() {
                             <span className="text-[10px] font-black text-white leading-none uppercase">{user.name}</span>
                             <span className="text-[8px] font-bold text-primary uppercase mt-1">SUPER_ADMIN</span>
                         </div>
-                        <button onClick={() => { logout(); router.push('/'); }} className="w-8 h-8 rounded-full bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all border border-transparent hover:border-red-500/30">
+                        <button onClick={() => { logout(); router.push('/'); }} className="w-8 h-8 rounded-full bg-card hover:bg-red-500/20 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all border border-transparent hover:border-red-500/30">
                             <LogOut size={16} />
                         </button>
                     </div>
@@ -193,7 +206,7 @@ export default function AdminDashboard() {
                             onClick={() => setView(item.id)}
                             className={`flex items-center justify-between group px-4 py-3 rounded-sm transition-all duration-200 border ${view === item.id
                                 ? 'bg-primary/10 border-primary/30 text-primary shadow-[inset_0_0_20px_rgba(var(--primary-color),0.05)]'
-                                : 'text-gray-400 border-transparent hover:bg-white/5 hover:text-white'}`}
+                                : 'text-gray-400 border-transparent hover:bg-card hover:text-white'}`}
                         >
                             <div className="flex items-center gap-3">
                                 {item.icon}
@@ -253,7 +266,7 @@ export default function AdminDashboard() {
                                             placeholder="FILTER ARCHIVES..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="bg-white/5 border border-white/10 rounded-sm py-2 pl-9 pr-4 text-[11px] font-bold outline-none focus:border-primary/50 focus:ring-4 ring-primary/5 transition-all w-64 uppercase tracking-wider"
+                                            className="bg-card border border-[#2a2d3a] rounded-sm py-2 pl-9 pr-4 text-[11px] font-bold outline-none focus:border-primary/50 focus:ring-4 ring-primary/5 transition-all w-64 uppercase tracking-wider"
                                         />
                                     </div>
                                 )}
@@ -280,8 +293,8 @@ export default function AdminDashboard() {
                                                     <span className="text-4xl font-black tracking-tighter italic leading-none mb-2">{s.value}</span>
                                                     <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">{s.label}</span>
                                                 </div>
-                                                {/* Futuristic Decor */}
-                                                <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-white/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all"></div>
+                                                {/* Futuristic Decor - solid shape (no blur) */}
+                                                <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-card rounded-full group-hover:bg-primary/10 transition-all"></div>
                                             </div>
                                         ))}
                                     </div>
@@ -304,15 +317,15 @@ export default function AdminDashboard() {
                                                     </div>
                                                 ) : (
                                                     dataList.map((ad, i) => (
-                                                        <div key={ad.id} className="p-4 flex items-center justify-between border-b border-white/[0.03] hover:bg-white/[0.02] transition-all group">
+                                                        <div key={ad.id} className="p-4 flex items-center justify-between border-b border-[#1a1a1a] hover:bg-card transition-all group">
                                                             <div className="flex items-center gap-4">
-                                                                <div className="w-10 h-10 bg-black/40 border border-white/5 flex items-center justify-center text-[10px] font-black italic text-gray-600">ID.{i + 1}</div>
+                                                                <div className="w-10 h-10 bg-card border border-[#1a1a1a] flex items-center justify-center text-[10px] font-black italic text-gray-600">ID.{i + 1}</div>
                                                                 <div className="flex flex-col">
                                                                     <span className="text-[12px] font-black group-hover:text-primary transition-colors">{ad.title}</span>
                                                                     <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{ad.category} • {ad.location}</span>
                                                                 </div>
                                                             </div>
-                                                            <Link href={`/ads/view?id=${ad.id}`} target="_blank" className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-sm hover:bg-primary hover:text-black transition-all">
+                                                            <Link href={`/ads/view?id=${ad.id}`} target="_blank" className="w-8 h-8 flex items-center justify-center bg-card rounded-sm hover:bg-primary hover:text-black transition-all">
                                                                 <ChevronRight size={16} />
                                                             </Link>
                                                         </div>
@@ -333,7 +346,7 @@ export default function AdminDashboard() {
                                                     { icon: <AlertTriangle size={16} />, title: "ASSET MODERATION", desc: "User reported a suspicious listing in Real Estate section.", time: "15:20:55" },
                                                     { icon: <CheckCircle2 size={16} />, title: "SYNC SUCCESSFUL", desc: "Full database backup committed to secondary server cluster.", time: "12:00:00" },
                                                 ].map((log, i) => (
-                                                    <div key={i} className={`flex gap-4 p-4 rounded-sm border ${log.highlight ? 'bg-primary/10 border-primary/30' : 'bg-black/20 border-white/5'}`}>
+                                                    <div key={i} className={`flex gap-4 p-4 rounded-sm border ${log.highlight ? 'bg-primary/10 border-primary/30' : 'bg-card border-[#1a1a1a]'}`}>
                                                         <div className={log.highlight ? 'text-primary' : 'text-gray-500'}>{log.icon}</div>
                                                         <div className="flex flex-col">
                                                             <div className="flex items-center gap-2 mb-1">
@@ -354,7 +367,7 @@ export default function AdminDashboard() {
                                 <div className="depth-card overflow-hidden shadow-2xl">
                                     <table className="w-full text-left">
                                         <thead>
-                                            <tr className="bg-black/40 border-b border-[#2a2d3a]">
+                                            <tr className="bg-card border-b border-[#2a2d3a]">
                                                 <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Identification / Meta</th>
                                                 <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Current Status</th>
                                                 <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Operation / Action</th>
@@ -366,7 +379,7 @@ export default function AdminDashboard() {
                                                     view === 'ads' ? (item.title?.toLowerCase().includes(searchTerm.toLowerCase())) :
                                                         (item.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) || item.package_name?.toLowerCase().includes(searchTerm.toLowerCase()))
                                             ).map((item) => (
-                                                <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
+                                                <tr key={item.id} className="hover:bg-card transition-colors group">
                                                     <td className="p-4">
                                                         {view === 'users' && (
                                                             <div className="flex flex-col">
@@ -433,6 +446,13 @@ export default function AdminDashboard() {
                                                                         className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all ${item.is_active ? 'bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white' : 'bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white'}`}
                                                                     >
                                                                         {item.is_active ? <X size={16} /> : <Check size={16} />}
+                                                                    </button>
+                                                                    <button
+                                                                        disabled={actionLoading === item.id}
+                                                                        onClick={() => handleToggleBoost(item.id, !item.is_boosted)}
+                                                                        className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all ${item.is_boosted ? 'bg-primary/20 text-primary hover:bg-primary hover:text-white glow-active' : 'bg-card text-gray-700 hover:bg-primary/10'}`}
+                                                                    >
+                                                                        <Sparkles size={14} />
                                                                     </button>
                                                                     <Link href={`/ads/view?id=${item.id}`} target="_blank" className="w-8 h-8 flex items-center justify-center rounded-sm bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all">
                                                                         <ExternalLink size={16} />

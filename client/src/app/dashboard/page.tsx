@@ -163,7 +163,7 @@ export default function DashboardPage() {
                         ))}
                     </nav>
 
-                    <button onClick={() => logout()} className="glass-button w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50/50 hover:bg-red-50 transition-all border border-red-100/50 rounded-sm">
+                    <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-card hover:bg-red-50 transition-all border border-red-100 rounded-sm">
                         <LogOut size={14} />
                         <span>Sign Out System</span>
                     </button>
@@ -420,7 +420,7 @@ export default function DashboardPage() {
             {/* Delete Confirmation Modal */}
             {deleteModal.open && (
                 <>
-                    <div className="fixed inset-0 bg-black/50 z-[50] flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-solid-overlay z-[50] flex items-center justify-center p-4">
                         <div className="bg-white border-2 border-gray-200 rounded-md shadow-2xl max-w-md w-full p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">

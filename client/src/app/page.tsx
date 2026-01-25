@@ -50,24 +50,18 @@ export default function HomePage() {
 
     const fetchCategoryCounts = async () => {
         try {
-            const { data, error } = await (supabase as any)
-                .from('Ad')
-                .select('category')
-                .eq('is_active', true);
-
-            if (error) {
-                console.error('Failed to fetch category counts:', error);
-                return;
-            }
-
-            const counts: Record<string, number> = {};
-            data.forEach((ad: any) => {
-                counts[ad.category] = (counts[ad.category] || 0) + 1;
-            });
+            const updated = await Promise.all(categoriesList.map(async (cat) => {
+                const { count, error } = await (supabase as any)
+                    .from('Ad')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_active', true)
+                    .eq('category', cat.key);
+                return { key: cat.key, count: count || 0 };
+            }));
 
             setCategoriesList(prev => prev.map(cat => ({
                 ...cat,
-                count: counts[cat.key] || 0
+                count: updated.find(u => u.key === cat.key)?.count || 0
             })));
         } catch (error) {
             console.error('Failed to fetch category counts:', error);
@@ -100,42 +94,9 @@ export default function HomePage() {
         <div className="min-h-screen flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
             <Header />
 
-            {/* Paid Ads Sticky Slider */}
-            <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-primary/20 py-3">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex items-center gap-3 mb-2">
-                        <Zap className="text-primary" size={18} />
-                        <h3 className="text-sm font-black uppercase tracking-wide text-white">
-                            {language === 'ar' ? 'إعلانات مدفوعة' : 'Sponsored Ads'}
-                        </h3>
-                    </div>
-                    <div className="flex gap-4 overflow-x-auto scrollbar-hide">
-                        {ads.filter(ad => ad.is_boosted).slice(0, 5).map((ad, idx) => (
-                            <Link
-                                key={`sponsored-${idx}`}
-                                href={`/ads/${ad.id}`}
-                                className="flex-shrink-0 w-64 depth-card p-3 hover:border-primary/50 transition-all"
-                            >
-                                <div className="flex items-center gap-3">
-                                    {ad.images && JSON.parse(ad.images).length > 0 && (
-                                        <img
-                                            src={JSON.parse(ad.images)[0]}
-                                            alt={ad.title}
-                                            className="w-12 h-12 rounded-lg object-cover"
-                                        />
-                                    )}
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-bold text-white truncate">{ad.title}</h4>
-                                        <p className="text-xs text-gray-400">
-                                            {ad.price ? `${ad.price} ريال` : 'مجاناً'}
-                                        </p>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            </div>
+            {/* Paid Ads Sticky Slider (replaced by PromotedBanner) */}
+            {/* Replaced with site-wide PromotedBanner via Header for consistent UX */}
+            
 
             <main className="max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Left Sidebar */}

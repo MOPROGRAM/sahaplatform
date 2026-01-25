@@ -254,12 +254,12 @@ export default function AdvertisePage() {
 
                 {/* Subscription Form Modal */}
                 {showForm && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-solid-overlay">
+                        <div className="bg-card rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
                             <div className="bg-primary p-6 text-white relative">
                                 <button
                                     onClick={() => setShowForm(false)}
-                                    className="absolute top-4 right-4 hover:bg-white/20 p-1 rounded-full transition-colors"
+                                    className="absolute top-4 right-4 hover:bg-primary/10 p-1 rounded-full transition-colors"
                                 >
                                     <ArrowLeft size={24} className={language === 'ar' ? '' : 'rotate-180'} />
                                 </button>
@@ -337,17 +337,17 @@ export default function AdvertisePage() {
                         {language === 'ar' ? 'لماذا الإعلانات المدفوعة؟' : 'Why Premium Ads?'}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 relative z-10">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+                        <div className="bg-white rounded-lg p-6">
                             <div className="text-4xl font-black text-primary mb-2">5x</div>
-                            <p className="text-white font-bold">{language === 'ar' ? 'زيادة في المشاهدات' : 'More Views'}</p>
+                            <p className="text-black font-bold">{language === 'ar' ? 'زيادة في المشاهدات' : 'More Views'}</p>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+                        <div className="bg-white rounded-lg p-6">
                             <div className="text-4xl font-black text-primary mb-2">3x</div>
-                            <p className="text-white font-bold">{language === 'ar' ? 'زيادة في التواصل' : 'More Contacts'}</p>
+                            <p className="text-black font-bold">{language === 'ar' ? 'زيادة في التواصل' : 'More Contacts'}</p>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+                        <div className="bg-white rounded-lg p-6">
                             <div className="text-4xl font-black text-primary mb-2">10x</div>
-                            <p className="text-white font-bold">{language === 'ar' ? 'فرص بيع أكبر' : 'Better Sales'}</p>
+                            <p className="text-black font-bold">{language === 'ar' ? 'فرص بيع أكبر' : 'Better Sales'}</p>
                         </div>
                     </div>
                 </div>

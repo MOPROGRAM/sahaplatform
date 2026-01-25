@@ -193,9 +193,9 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                             <div className="space-y-4">
                                 <h3 className="text-[14px] font-black uppercase text-secondary border-b-2 border-primary w-fit pb-1">{t('description')}</h3>
-                                <p className="text-[12px] font-medium leading-relaxed text-gray-600 bg-gray-50/50 p-4 rounded-xs border border-gray-100 italic">
+                                <p className="text-[12px] font-medium leading-relaxed text-gray-600 bg-card p-4 rounded-xs border border-gray-100 italic">
                                     {ad.description}
-                                </p>
+                                </p> 
                             </div>
                         </div>
                     </div>
@@ -204,11 +204,11 @@ export default function AdDetailsContent({ id }: { id: string }) {
                     {ad.images && ad.images.length > 0 && (
                         <div className="glass-card rounded-sm overflow-hidden relative group">
                             <div className="h-[450px] bg-slate-100 relative overflow-hidden flex items-center justify-center">
-                                {/* Blurred Background Backdrop */}
+                                {/* Decorative Background (no blur) */}
                                 <div
-                                    className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-30"
+                                    className="absolute inset-0 bg-cover bg-center scale-110 opacity-30 bg-card"
                                     style={{ backgroundImage: `url(${ad.images[0]})` }}
-                                ></div>
+                                ></div> 
 
                                 {(() => {
                                     const images = ad.images || [];
@@ -225,9 +225,9 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                     );
                                 })()}
                                 <div className="absolute bottom-3 right-3 flex gap-2">
-                                    <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Maximize2 size={14} /></button>
-                                    <button className="bg-black/50 backdrop-blur-md text-white p-1.5 rounded-xs hover:bg-primary transition-all"><Share2 size={14} /></button>
-                                </div>
+                                    <button className="bg-primary text-white p-1.5 rounded-xs hover:bg-primary-hover transition-all"><Maximize2 size={14} /></button>
+                                    <button className="bg-primary text-white p-1.5 rounded-xs hover:bg-primary-hover transition-all"><Share2 size={14} /></button>
+                                </div> 
                             </div>
                             {(() => {
                                 const images = ad.images || [];
@@ -266,7 +266,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                     marginWidth={0}
                                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02}%2C${lat - 0.02}%2C${lon + 0.02}%2C${lat + 0.02}&layer=mapnik&marker=${lat}%2C${lon}`}
                                 ></iframe>
-                                <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 text-[8px] font-black border border-gray-200 uppercase tracking-tighter">Precision Map Data © OpenStreetMap</div>
+                                <div className="absolute bottom-2 right-2 bg-card text-gray-500 px-2 py-1 text-[8px] font-black border border-gray-200 uppercase tracking-tighter">Precision Map Data © OpenStreetMap</div>
                             </div>
                         </div>
                     )}
@@ -276,9 +276,9 @@ export default function AdDetailsContent({ id }: { id: string }) {
                 <aside className="col-span-12 lg:col-span-3 order-1 flex flex-col gap-3">
                     <div className="glass-card p-4 rounded-sm sticky top-[80px]">
                         <div className="flex items-center gap-3 mb-6 bg-primary/5 p-3 rounded-xs border border-primary/10 transition-colors hover:bg-primary/10">
-                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
+                            <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
                                 <span className="font-black text-primary text-sm italic">SE</span>
-                            </div>
+                            </div> 
                             <div className="flex flex-col min-w-0">
                                 <h4 className="text-[12px] font-black text-secondary truncate flex items-center gap-1">
                                     Seller

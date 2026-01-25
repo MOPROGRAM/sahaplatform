@@ -219,16 +219,16 @@ export default function PostAdPage() {
                     {/* Left Info Column */}
                     <div className="md:col-span-1 space-y-4">
                         <div className="glass-card p-5 text-white shadow-xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform"></div>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-card rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
                             <h2 className="text-xl font-[1000] italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
                             <p className="text-[10px] font-bold opacity-90 mt-2 leading-tight relative z-10">{t('joinThousands')}</p>
 
                             <div className="mt-5 flex flex-col gap-2 relative z-10">
-                                <div className="flex items-center gap-3 bg-white/10 p-2 rounded-md border border-white/10">
+                                <div className="flex items-center gap-3 bg-card p-2 rounded-md border border-[#2a2d3a]">
                                     <CheckCircle2 size={16} />
                                     <span className="text-[9px] font-black uppercase tracking-widest">{t('verified')}</span>
                                 </div>
-                                <div className="flex items-center gap-3 bg-white/10 p-2 rounded-md border border-white/10">
+                                <div className="flex items-center gap-3 bg-card p-2 rounded-md border border-[#2a2d3a]">
                                     <Tag size={16} />
                                     <span className="text-[9px] font-black uppercase tracking-widest">{t('featured')}</span>
                                 </div>
@@ -267,7 +267,7 @@ export default function PostAdPage() {
                                             name="title"
                                             value={formData.title}
                                             onChange={handleInputChange}
-                                            className="glass-input p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-white transition-all shadow-inner uppercase tracking-tight"
+                                            className="glass-input p-3 text-[14px] font-black rounded-md outline-none focus:border-primary focus:bg-card transition-all shadow-inner uppercase tracking-tight"
                                             placeholder={t('adTitlePlaceholder')}
                                             required
                                         />

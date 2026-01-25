@@ -224,7 +224,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     return (
         <div className="flex flex-col h-[600px] bg-white border border-gray-200 rounded-sm shadow-2xl overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Header - High Density */}
-            <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/80 backdrop-blur-md">
+            <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black border border-primary/20 text-xs shadow-sm">
                         {otherMember.name?.substring(0, 2).toUpperCase()}
@@ -242,7 +242,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 </div>
                 <div className="flex items-center gap-3">
                     {adInfo && (
-                        <div className="hidden md:flex items-center gap-2 px-2 py-1 bg-white border border-gray-100 rounded-xs">
+                        <div className="hidden md:flex items-center gap-2 px-2 py-1 bg-card border border-[#2a2d3a] rounded-xs">
                             <div className="w-6 h-6 bg-gray-50 rounded-xs flex items-center justify-center"><ImageIcon size={12} className="text-gray-300" /></div>
                             <span className="text-[9px] font-black text-secondary truncate max-w-[100px] uppercase italic">{adInfo.title}</span>
                         </div>
@@ -252,7 +252,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             </div>
 
             {/* Safety Bar */}
-            <div className="bg-orange-50/50 py-1.5 px-3 border-b border-orange-100/50 flex items-center gap-2">
+            <div className="bg-orange-50 py-1.5 px-3 border-b border-orange-100 flex items-center gap-2">
                 <div className="text-orange-600"><ShieldCheck size={12} /></div>
                 <p className="text-[9px] font-black text-orange-800 uppercase italic tracking-tight">Security Alert: Always keep transactions within Saha platform.</p>
             </div>
@@ -283,7 +283,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             )}
 
                             {msg.messageType === 'file' && (
-                                <div className="flex items-center gap-3 bg-black/5 p-2 rounded-xs">
+                                <div className="flex items-center gap-3 bg-card p-2 rounded-xs">
                                     <FileText size={20} className="text-primary" />
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-[10px] font-black truncate">{msg.fileName || 'Attached File'}</span>
@@ -305,11 +305,11 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             </div>
 
             {/* Input Tools - Compressed */}
-            <div className="p-2 bg-gray-50 border-t border-gray-100 flex gap-2 overflow-x-auto no-scrollbar">
-                <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
+            <div className="p-2 bg-card border-t border-[#2a2d3a] flex gap-2 overflow-x-auto no-scrollbar">
+                <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
                     <MapPin size={12} /> SHARE LOCATION
                 </button>
-                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
                     <Paperclip size={12} /> ATTACH DOCUMENT
                     <input type="file" className="hidden" onChange={async (e) => {
                         const file = e.target.files?.[0];

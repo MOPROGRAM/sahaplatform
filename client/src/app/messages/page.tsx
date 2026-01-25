@@ -23,14 +23,14 @@ export default function MessagesPage() {
             fetchConversations();
             // Subscribe to real-time updates
             const channel = supabase
-                .channel('conversations')
+                .channel(`user-messages-${user.id}`)
                 .on('postgres_changes', {
-                    event: '*',
+                    event: 'INSERT',
                     schema: 'public',
                     table: 'Message',
-                    filter: `senderId=eq.${user.id},receiverId=eq.${user.id}`
+                    filter: `receiver_id=eq.${user.id}`
                 }, (payload) => {
-                    console.log('Real-time message update:', payload);
+                    console.log('Real-time incoming message for user:', payload);
                     fetchConversations(); // Refresh conversations on new message
                 })
                 .subscribe();

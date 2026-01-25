@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, MapPin, ChevronDown, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
+import PromotedBanner from '@/components/PromotedBanner';
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
@@ -230,6 +231,10 @@ export default function Header() {
                         {t('postAd')}
                     </Link>
                 </div>
+            </div>
+            {/* Promoted Ads Banner (sticky under header content) */}
+            <div className="w-full">
+                <PromotedBanner />
             </div>
         </header>
     );
