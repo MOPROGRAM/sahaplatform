@@ -6,6 +6,7 @@ import Link from "next/link";
 import { conversationsService } from "@/lib/conversations";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
+import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWindow from "@/components/ChatWindow";
@@ -18,7 +19,26 @@ export default function MessagesPage() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (user) fetchConversations();
+        if (user) {
+            fetchConversations();
+            // Subscribe to real-time updates
+            const channel = supabase
+                .channel('conversations')
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'Message',
+                    filter: `senderId=eq.${user.id},receiverId=eq.${user.id}`
+                }, (payload) => {
+                    console.log('Real-time message update:', payload);
+                    fetchConversations(); // Refresh conversations on new message
+                })
+                .subscribe();
+
+            return () => {
+                supabase.removeChannel(channel);
+            };
+        }
     }, [user]);
 
     const fetchConversations = async () => {

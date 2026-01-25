@@ -261,15 +261,15 @@ export default function AdminDashboard() {
 
                             {view === 'overview' && (
                                 <>
-                                    {/* Advanced Stats Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    {/* Advanced Bento Grid Stats */}
+                                    <div className="bento-grid">
                                         {[
-                                            { label: 'Network Nodes', value: stats.totalUsers, icon: <Users size={20} />, color: 'bg-blue-500/10 border-blue-500/20 text-blue-500', trend: '+12% INC' },
-                                            { label: 'Active Assets', value: stats.totalAds, icon: <Package size={20} />, color: 'bg-orange-500/10 border-orange-500/20 text-orange-500', trend: 'STABLE' },
-                                            { label: 'Pending Subs', value: stats.pendingSubscriptions, icon: <Clock size={20} />, color: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500', trend: 'CRITICAL', highlight: stats.pendingSubscriptions > 0 },
-                                            { label: 'Completed Rev', value: stats.activeSubscriptions, icon: <DollarSign size={20} />, color: 'bg-green-500/10 border-green-500/20 text-green-500', trend: 'OPTIMIZED' }
+                                            { label: 'Network Nodes', value: stats.totalUsers, icon: <Users size={20} />, color: 'bg-blue-500/10 border-blue-500/20 text-blue-500', trend: '+12% INC', size: 'bento-small' },
+                                            { label: 'Active Assets', value: stats.totalAds, icon: <Package size={20} />, color: 'bg-orange-500/10 border-orange-500/20 text-orange-500', trend: 'STABLE', size: 'bento-small' },
+                                            { label: 'Pending Subs', value: stats.pendingSubscriptions, icon: <Clock size={20} />, color: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500', trend: 'CRITICAL', highlight: stats.pendingSubscriptions > 0, size: 'bento-large' },
+                                            { label: 'Completed Rev', value: stats.activeSubscriptions, icon: <DollarSign size={20} />, color: 'bg-green-500/10 border-green-500/20 text-green-500', trend: 'OPTIMIZED', size: 'bento-small' }
                                         ].map((s, i) => (
-                                            <div key={i} className={`group relative bg-[#12141c] border rounded-sm p-6 overflow-hidden transition-all hover:bg-[#181a24] ${s.highlight ? 'border-primary ring-1 ring-primary/50' : 'border-[#2a2d3a]'}`}>
+                                            <div key={i} className={`depth-card group relative p-6 overflow-hidden ${s.size} ${s.highlight ? 'ring-1 ring-primary/50' : ''}`}>
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div className={`w-10 h-10 flex items-center justify-center rounded-sm ${s.color}`}>
                                                         {s.icon}
@@ -287,8 +287,8 @@ export default function AdminDashboard() {
                                     </div>
 
                                     {/* Action Feed */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="bg-[#12141c] border border-[#2a2d3a] rounded-sm flex flex-col min-h-[400px]">
+                                    <div className="bento-grid">
+                                        <div className="depth-card flex flex-col min-h-[400px] bento-large">
                                             <div className="p-4 border-b border-[#2a2d3a] flex justify-between items-center">
                                                 <h3 className="text-[11px] font-black tracking-[0.2em] flex items-center gap-2">
                                                     <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
                                             </div>
                                         </div>
 
-                                        <div className="bg-[#12141c] border border-[#2a2d3a] rounded-sm flex flex-col min-h-[400px]">
+                                        <div className="depth-card flex flex-col min-h-[400px] bento-small">
                                             <div className="p-4 border-b border-[#2a2d3a] flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                                                 <h3 className="text-[11px] font-black tracking-[0.2em]">SECURITY BROADCAST</h3>
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
                             )}
 
                             {view !== 'overview' && (
-                                <div className="bg-[#12141c] border border-[#2a2d3a] rounded-sm overflow-hidden shadow-2xl">
+                                <div className="depth-card overflow-hidden shadow-2xl">
                                     <table className="w-full text-left">
                                         <thead>
                                             <tr className="bg-black/40 border-b border-[#2a2d3a]">

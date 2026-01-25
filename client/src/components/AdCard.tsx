@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, MapPin, Clock } from "lucide-react";
+import { Heart, MapPin, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 
 interface AdCardProps {
@@ -36,16 +36,33 @@ export default function AdCard({
     isFeatured = false
 }: AdCardProps) {
     const [isFavorite, setIsFavorite] = useState(false);
+    const [showImageViewer, setShowImageViewer] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
         e.preventDefault();
         setIsFavorite(!isFavorite);
     };
 
+    const handleImageClick = (e: React.MouseEvent, index: number) => {
+        e.preventDefault();
+        setCurrentImageIndex(index);
+        setShowImageViewer(true);
+    };
+
+    const nextImage = () => {
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
 
 
     return (
-        <Link href={`/ads/${id}`} className={`ad-card-3d card-hover-effect overflow-hidden group ${className}`}>
+        <>
+            <Link href={`/ads/${id}`} className={`depth-card overflow-hidden group ${className}`}>
             <div className="relative overflow-hidden">
                 {/* Featured Badge */}
                 {isFeatured && (
@@ -57,7 +74,7 @@ export default function AdCard({
                 {/* Favorite Button */}
                 <button
                     onClick={handleFavoriteClick}
-                    className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-md hover:bg-white text-gray-500 hover:text-red-500 transition-all shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
+                    className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-md hover:bg-white text-gray-500 hover:text-red-500 transition-all shadow-sm hover:shadow-md"
                 >
                     <Heart
                         size={16}
@@ -68,13 +85,14 @@ export default function AdCard({
                 {/* Image */}
                 {images.length > 0 ? (
                     <div className={`relative ${isFeatured ? 'h-64' : 'h-48'} bg-gray-50 flex items-center justify-center overflow-hidden`}>
-                        <div className="absolute inset-0 bg-cover bg-center blur-xl opacity-20 scale-125 transition-all group-hover:scale-110" style={{ backgroundImage: `url(${images[0]})` }}></div>
+                        <div className="absolute inset-0 bg-cover bg-center blur-xl opacity-20 scale-125 transition-all" style={{ backgroundImage: `url(${images[0]})` }}></div>
                         <Image
                             src={images[0]}
                             alt={title}
                             fill
-                            className="object-contain card-animated-element transition-transform duration-700 ease-out group-hover:scale-110 z-10"
+                            className="object-contain card-animated-element transition-transform duration-700 ease-out z-10 cursor-pointer"
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
+                            onClick={(e) => handleImageClick(e, 0)}
                         />
                         {images.length > 1 && (
                             <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded-sm text-[9px] font-black uppercase tracking-wider z-20">
@@ -121,5 +139,58 @@ export default function AdCard({
                 </div>
             </div>
         </Link>
+
+        {/* Image Viewer Modal */}
+        {showImageViewer && images.length > 0 && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+                <div className="relative max-w-4xl max-h-screen p-4">
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setShowImageViewer(false)}
+                        className="absolute top-2 right-2 z-10 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                    >
+                        <X size={20} />
+                    </button>
+
+                    {/* Navigation Buttons */}
+                    {images.length > 1 && (
+                        <>
+                            <button
+                                onClick={prevImage}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+                            <button
+                                onClick={nextImage}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                            >
+                                <ChevronRight size={20} />
+                            </button>
+                        </>
+                    )}
+
+                    {/* Main Image */}
+                    <div className="relative">
+                        <Image
+                            src={images[currentImageIndex]}
+                            alt={title}
+                            width={800}
+                            height={600}
+                            className="max-w-full max-h-[80vh] object-contain rounded-lg"
+                            onClick={() => setShowImageViewer(false)}
+                        />
+                    </div>
+
+                    {/* Image Counter */}
+                    {images.length > 1 && (
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                            {currentImageIndex + 1} / {images.length}
+                        </div>
+                    )}
+                </div>
+            </div>
+        )}
+        </>
     );
 }

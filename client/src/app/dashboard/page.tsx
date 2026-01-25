@@ -128,7 +128,7 @@ export default function DashboardPage() {
             <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
                 {/* Left Mini Sidebar - Professional Tech Style */}
                 <aside className="w-full md:w-56 space-y-3 shrink-0">
-                    <div className="glass-card p-5 relative overflow-hidden group">
+                    <div className="depth-card p-5 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform"></div>
                         <div className="relative z-10 text-center">
                             <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
@@ -142,7 +142,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="glass-card p-3">
+                    <div className="depth-card p-3">
                         <div className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                             <div className="w-2 h-2 bg-emerald rounded-full animate-pulse"></div>
                             <span>ID: {user.id.substring(0, 8)}</span>
@@ -202,81 +202,70 @@ export default function DashboardPage() {
                                     </Link>
                                 </div>
 
-                                <div className="overflow-x-auto">
+                                <div className="bento-grid">
                                     {loading ? (
-                                        <div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin text-primary opacity-20" /></div>
+                                        <div className="depth-card h-64 flex items-center justify-center">
+                                            <Loader2 className="animate-spin text-primary opacity-20" size={40} />
+                                        </div>
                                     ) : ads.length > 0 ? (
-                                        <table className="w-full text-[10px] border-collapse">
-                                            <thead>
-                                                <tr className="bg-gray-100/50 text-gray-400 font-black uppercase text-[8px] tracking-widest border-b border-gray-200">
-                                                    <th className="px-6 py-3 text-left">Unit Identification / Details</th>
-                                                    <th className="px-6 py-3 text-center">Status Matrix</th>
-                                                    <th className="px-6 py-3 text-center">Engagement</th>
-                                                    <th className="px-6 py-3 text-right">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-gray-50">
-                                                {ads.map(ad => (
-                                                    <tr key={ad.id} className="hover:bg-primary/[0.02] transition-colors group">
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-9 h-9 bg-gray-50 border border-gray-100 rounded-xs flex items-center justify-center shrink-0 shadow-inner group-hover:border-primary/20 transition-colors">
-                                                                    <Package size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
-                                                                </div>
-                                                                <div className="min-w-0">
-                                                                    <span className="font-black text-secondary block truncate group-hover:text-primary transition-colors uppercase tracking-tight">{ad.title}</span>
-                                                                    <div className="flex items-center gap-2 mt-0.5">
-                                                                        <span className="text-primary font-black italic">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}</span>
-                                                                        <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
-                                                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">{ad.category}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center">
-                                                            <div className="flex flex-col items-center gap-1">
-                                                                <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                                    {ad.is_active ? 'Operation: Active' : 'Operation: Pause'}
+                                        ads.map(ad => (
+                                            <div key={ad.id} className={`depth-card p-4 ${ad.is_boosted ? 'bento-large' : 'bento-small'}`}>
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                                                            <Package size={18} className="text-gray-400" />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <h4 className="font-black text-white block truncate text-sm">{ad.title}</h4>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <span className="text-primary font-bold text-sm">
+                                                                    {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}
                                                                 </span>
-                                                                <span className="text-[7px] font-black text-gray-300 uppercase italic">Code: {ad.id?.substring(0, 8)}</span>
+                                                                <span className="text-xs text-gray-400">{ad.category}</span>
                                                             </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center">
-                                                            <div className="flex flex-col items-center">
-                                                                <span className="text-[13px] font-black text-secondary leading-none">{ad.views || 0}</span>
-                                                                <span className="text-[7px] font-black text-gray-400 uppercase tracking-tighter mt-1 italic">Total Imprints</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-right">
-                                                            <div className="flex flex-col items-end gap-1.5">
-                                                                <div className="flex items-center gap-1">
-                                                                    <Link href={`/ads/view?id=${ad.id}`} className="px-2 py-1 bg-secondary text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-sm">Inspect</Link>
-                                                                    <Link href={`/ads/${ad.id}/edit`} className="px-2 py-1 bg-blue-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-sm">
-                                                                        <Edit size={10} />
-                                                                    </Link>
-                                                                    <button onClick={() => openDeleteModal(ad.id, ad.title)} className="px-2 py-1 bg-red-500 text-white rounded-xs text-[8px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm">
-                                                                        <Trash2 size={10} />
-                                                                    </button>
-                                                                </div>
-                                                                <div className="flex items-center gap-1 text-[8px] font-black text-gray-300 uppercase tracking-tighter">
-                                                                    <Clock size={8} /> {getRelativeTime(ad.created_at)}
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                                        </div>
+                                                    </div>
+                                                    <div className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                        {ad.is_active ? 'Active' : 'Paused'}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-4 text-xs text-gray-400">
+                                                        <span className="flex items-center gap-1">
+                                                            <Eye size={12} />
+                                                            {ad.views || 0}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock size={12} />
+                                                            {getRelativeTime(ad.created_at)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <Link href={`/ads/view?id=${ad.id}`} className="px-3 py-1 bg-secondary text-white rounded text-xs font-bold hover:bg-black transition-all">
+                                                            View
+                                                        </Link>
+                                                        <Link href={`/ads/${ad.id}/edit`} className="px-3 py-1 bg-blue-500 text-white rounded text-xs font-bold hover:bg-blue-600 transition-all">
+                                                            Edit
+                                                        </Link>
+                                                        <button onClick={() => openDeleteModal(ad.id, ad.title)} className="px-3 py-1 bg-red-500 text-white rounded text-xs font-bold hover:bg-red-600 transition-all">
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
                                     ) : (
-                                        <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 p-16">
+                                        <div className="depth-card flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 p-16">
                                             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shadow-inner">
                                                 <Package size={32} className="opacity-10" />
                                             </div>
                                             <div className="text-center">
-                                                <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-300">No Mission Data Found</h4>
-                                                <p className="text-[9px] font-bold text-gray-300 uppercase italic mt-1 font-cairo">ابدأ رحلتك بنشر إعلانك الأول الآن</p>
+                                                <h4 className="text-lg font-black uppercase tracking-wide text-gray-300">No Ads Found</h4>
+                                                <p className="text-sm font-bold text-gray-300 mt-1">Start your journey by posting your first ad</p>
                                             </div>
-                                            <Link href="/post-ad" className="mt-4 bg-primary text-white text-[9px] font-black px-6 py-2 rounded-xs shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all uppercase tracking-widest">Post Ad Now</Link>
+                                            <Link href="/post-ad" className="mt-4 bg-primary text-white text-sm font-black px-6 py-3 rounded-lg shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all uppercase tracking-wide">
+                                                Post Ad Now
+                                            </Link>
                                         </div>
                                     )}
                                 </div>
