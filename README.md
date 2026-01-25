@@ -468,6 +468,24 @@ npm test
 4. Push to branch: `git push origin feature/new-feature`
 5. Submit Pull Request
 
+## 🌐 Live Demo & Admin Access
+
+### الموقع المنشور:
+- **الرابط الرئيسي:** https://saha.pages.dev
+- **المدير:** https://saha.pages.dev/admin
+
+### إعداد المدير عبر الإنترنت:
+1. انتقل إلى: `https://saha.pages.dev/setup-admin`
+2. أدخل مفتاح الإعداد: `saha_admin_setup_secure_key_2025`
+3. أدخل بيانات المدير وأنشئ الحساب
+4. سجل الدخول من: `https://saha.pages.dev/admin`
+
+### مميزات المدير:
+- إدارة الإعلانات المدفوعة والعامة
+- مراقبة الإحصائيات والمستخدمين
+- الموافقة على طلبات الترقية
+- البحث والفلترة المتقدمة
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
