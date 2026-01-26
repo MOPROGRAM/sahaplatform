@@ -72,7 +72,7 @@ export default function Header() {
                 <div className="relative">
                     <button
                         onClick={() => setShowRegion(!showRegion)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-md hover:border-primary transition-all group"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg border border-border-color rounded-md hover:border-primary transition-all group"
                     >
                         <MapPin size={12} className="text-primary" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-text-main">{t(country as any)} | {t(currency as any)}</span>
@@ -91,7 +91,7 @@ export default function Header() {
                                                 <button
                                                     key={c}
                                                     onClick={() => handleRegionSelect(c)}
-                                                    className={`px-2 py-2 text-[10px] font-bold rounded border transition-all ${country === c ? 'border-primary text-primary bg-primary/5' : 'border-border-color text-text-main hover:bg-gray-50 dark:hover:bg-slate-800'}`}
+                                                    className={`px-2 py-2 text-[10px] font-bold rounded border transition-all ${country === c ? 'border-primary text-primary bg-primary/5' : 'border-border-color text-text-main hover:bg-primary/10'}`}
                                                 >
                                                     {t(c as any)}
                                                 </button>
@@ -112,7 +112,7 @@ export default function Header() {
 
                 {/* Micro Search Bar */}
                 <div className="flex-1 max-w-xl relative group">
-                    <div className="glass-input flex border border-border-color rounded-sm overflow-hidden bg-gray-50 focus-within:border-primary focus-within:bg-card-bg transition-all shadow-sm">
+                    <div className="glass-input flex border border-border-color rounded-sm overflow-hidden bg-gray-bg focus-within:border-primary focus-within:bg-card-bg transition-all shadow-sm">
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
@@ -148,7 +148,7 @@ export default function Header() {
                     <div className="hidden lg:flex items-center gap-2 border-r border-border-color pr-3 mr-1">
                         <button
                             onClick={toggleTheme}
-                            className="p-2 text-text-muted hover:text-primary transition-colors bg-gray-50 rounded-md border border-border-color"
+                            className="p-2 text-text-muted hover:text-primary transition-colors bg-gray-bg rounded-md border border-border-color"
                         >
                             {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
                         </button>
@@ -162,7 +162,7 @@ export default function Header() {
                             <div className="relative">
                                 <button
                                     onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded-md transition-all group border border-transparent hover:border-gray-200"
+                                    className="flex items-center gap-2 px-2 py-1 hover:bg-primary/10 rounded-md transition-all group border border-transparent hover:border-primary/20"
                                 >
                                     <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center text-[15px] font-[1000] text-primary border-2 border-primary/20 uppercase shrink-0">
                                         {user.name?.substring(0, 1)}
@@ -188,26 +188,26 @@ export default function Header() {
                                                         {language === 'ar' ? 'إدارة النظام' : 'System Management'}
                                                     </Link>
                                                 )}
-                                                <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <LayoutDashboard size={14} />
                                                     {t('dashboard')}
                                                 </Link>
-                                                <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <ShieldCheck size={14} />
                                                     {t('myAds')}
                                                 </Link>
-                                                <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors relative" onClick={() => setShowUserMenu(false)}>
+                                                <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative" onClick={() => setShowUserMenu(false)}>
                                                     <MessageSquare size={14} />
                                                     {t('messages')}
                                                     {unreadCount > 0 && (
                                                         <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">{unreadCount}</span>
                                                     )}
                                                 </Link>
-                                                <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <Bell size={14} />
                                                     {t('notifications')}
                                                 </Link>
-                                                <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <User size={14} />
                                                     {t('settings')}
                                                 </Link>

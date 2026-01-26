@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, MapPin, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 
 interface AdCardProps {
@@ -23,8 +23,6 @@ interface AdCardProps {
 }
 
 export default function AdCard({
-    // call hooks at top level to satisfy rules
-
     id,
     title,
     price,
@@ -32,7 +30,6 @@ export default function AdCard({
     location,
     images = [],
     createdAt,
-    authorName,
     category,
     className = "",
     language = 'ar',
@@ -62,155 +59,101 @@ export default function AdCard({
         setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
     };
 
-
-
     return (
         <>
             <Link href={`/ads/${id}`} className={`depth-card overflow-hidden group ${className}`}>
-            <div className="relative overflow-hidden flex">
-                {/* Vertical Date Strip */}
-                {createdAt && (
-                    (() => {
-                        const date = new Date(createdAt);
-                        const day = date.getDate();
-                        const month = date.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US', { month: 'short' }).toUpperCase();
-                        return (
-                            <div className="flex-shrink-0 w-14 flex flex-col items-center justify-center bg-card-bg border-r border-border-color">
-                                <div className="text-[22px] font-extrabold text-primary leading-none">{day}</div>
-                                <div className="w-6 h-[2px] bg-primary my-1"></div>
-                                <div className="text-[10px] font-black text-text-muted uppercase">{month}</div>
-                            </div>
-                        );
-                    })()
-                )}
-
-                <div className="flex-1">
-                    {/* Featured Badge */}
+                <div className="relative">
                     {isFeatured && (
-                        <div className="absolute top-3 left-16 z-20 bg-gradient-to-r from-orange-400 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg glow-active pulse-orange">
-                            {language === 'ar' ? 'مميز' : 'Featured'}
+                        <div className="absolute top-2 left-2 z-10 bg-primary text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">
+                            {t('featured')}
                         </div>
                     )}
 
-                    {/* Favorite Button */}
                     <button
                         onClick={handleFavoriteClick}
-                        className="absolute top-3 right-3 z-10 p-2 rounded-full bg-card text-gray-700 hover:text-red-500 transition-all shadow-sm"
+                        className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-card-bg/70 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-sm"
                     >
                         <Heart
-                            size={16}
+                            size={14}
                             className={isFavorite ? "fill-red-500 text-red-500" : ""}
                         />
                     </button>
 
-                    {/* Image */}
-                    {images.length > 0 ? (
-                        <div className={`relative ${isFeatured ? 'h-64' : 'h-48'} bg-gray-50 flex items-center justify-center overflow-hidden`}>
+                    <div className="relative h-40 bg-gray-bg flex items-center justify-center overflow-hidden">
+                        {images.length > 0 ? (
                             <Image
                                 src={images[0]}
                                 alt={title}
                                 fill
-                                className="object-contain card-animated-element transition-transform duration-700 ease-out z-10 cursor-pointer"
+                                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 ease-out"
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
                                 onClick={(e) => handleImageClick(e, 0)}
                             />
-                            {images.length > 1 && (
-                                <div className="absolute bottom-2 right-2 bg-black text-white px-2 py-0.5 rounded-sm text-[9px] font-black uppercase tracking-wider z-20">
-                                    +{images.length - 1} PHOTOS
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className={`${isFeatured ? 'h-64' : 'h-48'} bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden group-hover:bg-primary/5 transition-colors`}>
-                            <div className="text-gray-300 font-black text-4xl opacity-20 select-none scale-150 rotate-12">{t('siteName')}</div>
-                        </div>
+                        ) : (
+                            <div className="text-text-muted font-black text-3xl opacity-20 select-none">{t('siteName')}</div>
+                        )}
+                        {images.length > 1 && (
+                            <div className="absolute bottom-2 right-2 bg-black/50 text-white px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">
+                                +{images.length}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="p-3">
+                    <h3 className="text-sm font-bold text-text-main line-clamp-2 group-hover:text-primary transition-colors">{title}</h3>
+                    
+                    <p className="text-primary font-black text-lg mt-1">
+                        {price > 0 ? `${price.toLocaleString()} ${t(currency as any)}` : t('priceOnRequest')}
+                    </p>
+
+                    {location && (
+                        <p className="text-xs text-text-muted mt-1 truncate">{location}</p>
                     )}
-                </div>
-            </div>
 
-            {/* Content */}
-            <div className={`${isFeatured ? 'p-6' : 'p-4'} relative`}>
-                <div className="card-header relative z-10">
-                    <h3 className={`${isFeatured ? 'text-lg' : 'text-sm'} card-title line-clamp-1 group-hover:text-primary transition-colors duration-300`}>{title}</h3>
-                    <div className="card-price flex items-baseline gap-1">
-                        {price.toLocaleString()} <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">{currency}</span>
-                    </div>
-                </div>
-
-                {location && (
-                    <div className="card-location text-[10px] font-bold opacity-80 mb-3">
-                        {location}
-                    </div>
-                )}
-
-                {/* Modern Glass Footer */}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100/50">
-                    {createdAt && (
-                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-text-muted uppercase tracking-wider bg-card px-2 py-1 rounded-sm">
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-border-color">
+                        <div className="flex items-center gap-1 text-[10px] text-text-muted font-bold">
                             <Clock size={10} />
                             {formatRelativeTime(createdAt, language)}
                         </div>
-                    )}
-                    {category && (
-                        <span className="text-[9px] font-black bg-primary/5 text-primary border border-primary/10 px-2 py-1 rounded-sm uppercase tracking-widest group-hover:bg-primary group-hover:text-white transition-all">
-                            {category}
-                        </span>
-                    )}
+                        {category && (
+                            <span className="text-[9px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded uppercase">
+                                {t(category)}
+                            </span>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </Link>
+            </Link>
 
-        {/* Image Viewer Modal */}
-        {showImageViewer && images.length > 0 && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-solid-overlay">
-                <div className="relative max-w-4xl max-h-screen p-4">
-                    {/* Close Button */}
-                    <button
-                        onClick={() => setShowImageViewer(false)}
-                        className="absolute top-2 right-2 z-10 w-10 h-10 bg-card text-white rounded-full flex items-center justify-center hover:bg-primary/10 transition-colors"
-                    >
-                        <X size={20} />
-                    </button>
-
-                    {/* Navigation Buttons */}
-                    {images.length > 1 && (
-                        <>
-                            <button
-                                onClick={prevImage}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-card text-white rounded-full flex items-center justify-center hover:bg-primary/10 transition-colors"
-                            >
-                                <ChevronLeft size={20} />
-                            </button>
-                            <button
-                                onClick={nextImage}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-card text-white rounded-full flex items-center justify-center hover:bg-primary/10 transition-colors"
-                            >
-                                <ChevronRight size={20} />
-                            </button>
-                        </>
-                    )}
-
-                    {/* Main Image */}
-                    <div className="relative">
+            {showImageViewer && images.length > 0 && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowImageViewer(false)}>
+                    <div className="relative max-w-3xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
                         <Image
                             src={images[currentImageIndex]}
                             alt={title}
-                            width={800}
-                            height={600}
-                            className="max-w-full max-h-[80vh] object-contain rounded-lg"
-                            onClick={() => setShowImageViewer(false)}
+                            width={1200}
+                            height={800}
+                            className="w-full h-full object-contain rounded-lg"
                         />
+                        <button onClick={() => setShowImageViewer(false)} className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2">
+                            <X size={20} />
+                        </button>
+                        {images.length > 1 && (
+                            <>
+                                <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black/50 rounded-full p-2">
+                                    <ChevronLeft size={24} />
+                                </button>
+                                <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black/50 rounded-full p-2">
+                                    <ChevronRight size={24} />
+                                </button>
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 rounded-full px-3 py-1 text-sm">
+                                    {currentImageIndex + 1} / {images.length}
+                                </div>
+                            </>
+                        )}
                     </div>
-
-                    {/* Image Counter */}
-                    {images.length > 1 && (
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-card text-white px-3 py-1 rounded-full text-sm">
-                            {currentImageIndex + 1} / {images.length}
-                        </div>
-                    )}
                 </div>
-            </div>
-        )}
+            )}
         </>
     );
 }

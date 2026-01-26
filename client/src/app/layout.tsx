@@ -65,7 +65,24 @@ export default function RootLayout({
                             --primary-hover: #FF9E00;
                             --secondary: #0f172a;
                             --primary-light: rgba(255, 77, 0, 0.06);
+
+                            /* Light Theme */
+                            --gray-bg: #f8fafc;
+                            --card-bg: #ffffff;
+                            --text-main: #0f172a;
+                            --text-muted: #64748b;
+                            --border-color: #e2e8f0;
                         }
+
+                        .dark {
+                            /* Dark Theme */
+                            --gray-bg: #0B1120;
+                            --card-bg: #131A2A;
+                            --text-main: #f8fafc;
+                            --text-muted: #94a3b8;
+                            --border-color: #334155;
+                        }
+
                         body {
                             font-family: var(--font-cairo), -apple-system, "SF Pro Arabic", system-ui, sans-serif;
                             background: var(--gray-bg);

@@ -148,21 +148,18 @@ function AdsContent() {
     }, [fetchAds]);
 
     return (
-        <div className="min-h-screen bg-[#f0f2f5] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-gray-bg flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            {/* Simple Result Info */}
-            <main className="max-w-7xl mx-auto w-full p-3 flex-1">
-                {/* Result Info */}
-                <div className="flex items-center justify-between mb-6 px-1 border-b border-gray-200 pb-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-                        <h1 className="text-[18px] font-black uppercase text-secondary tracking-tight">
-                            {category ? `${category}` : 'Global Marketplace'}
-                            <span className="text-[12px] font-medium text-text-muted mr-4 bg-card px-3 py-1 rounded-full uppercase italic">
-                                {ads.length} listings identified
-                            </span>
+            <main className="max-w-7xl mx-auto w-full p-4 flex-1">
+                <div className="depth-card p-4 mb-6">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-xl font-bold text-text-main">
+                            {category ? t(category) : t('allAds')}
                         </h1>
+                        <span className="text-sm font-bold text-text-muted">
+                            {t('foundAds', { count: ads.length })}
+                        </span>
                     </div>
                 </div>
 
@@ -171,26 +168,27 @@ function AdsContent() {
                         <LoadingSpinner size={48} />
                     </div>
                 ) : ads.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         {ads.map((ad) => (
                             <AdCard
                                 key={ad.id}
                                 id={ad.id}
                                 title={ad.title}
-                                price={ad.price}
-                                currency="ريال"
+                                price={ad.price || 0}
+                                currency={ad.currency?.code || "ريال"}
                                 location={ad.location}
                                 images={ad.images ? JSON.parse(ad.images) : []}
                                 createdAt={ad.created_at}
                                 category={ad.category}
                                 language={language}
+                                isFeatured={false} 
                             />
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center p-20 bg-white border border-dashed border-gray-300 rounded-lg">
-                        <div className="text-text-muted font-black uppercase text-sm italic tracking-widest">No matching listings in the matrix</div>
-                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 text-primary font-bold hover:underline">Clear all filters</button>
+                    <div className="text-center p-20 depth-card">
+                        <p className="text-text-muted font-bold text-lg">{t('noResults')}</p>
+                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 text-primary font-bold hover:underline">{t('clearFilters')}</button>
                     </div>
                 )}
             </main>

@@ -101,7 +101,7 @@ export default function HomePage() {
                 {/* Left Sidebar */}
                 <aside className="lg:col-span-3 space-y-4">
                     <div className="depth-card overflow-hidden">
-                        <div className="bg-gray-800 px-4 py-3 text-sm font-black border-b border-gray-700 text-white uppercase tracking-tight">
+                        <div className="bg-card-bg px-4 py-3 text-sm font-black border-b border-border-color text-text-main uppercase tracking-tight">
                             {t('categories')}
                         </div>
                         <nav className="flex flex-col">
@@ -122,7 +122,7 @@ export default function HomePage() {
                     </div>
                 </aside>
 
-                {/* Central Bento Grid Feed */}
+                {/* Central Grid Feed */}
                 <section className="lg:col-span-9 flex flex-col gap-6">
                     <div className="depth-card flex items-center justify-between px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -141,7 +141,7 @@ export default function HomePage() {
                             <LoadingSpinner size={40} />
                         </div>
                     ) : (
-                        <div className="bento-grid">
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             {ads.map((ad, idx) => (
                                 <AdCard
                                     key={ad.id}
@@ -155,7 +155,6 @@ export default function HomePage() {
                                     category={ad.category}
                                     language={language}
                                     isFeatured={ad.is_boosted || false}
-                                    className={ad.is_boosted ? 'bento-large' : 'bento-small'}
                                 />
                             ))}
                         </div>
