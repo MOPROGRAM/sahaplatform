@@ -9,18 +9,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
-
-type Filters = {
-    limit?: number;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-    category?: string;
-    search?: string;
-    location?: string;
-    type?: string;
-    priceRange?: string;
-    hasMedia?: boolean;
-};
+import CategorySidebar from '@/components/CategorySidebar';
+import AdvancedFilter from '@/components/AdvancedFilter';
 
 interface Ad {
     id: string;
@@ -28,116 +18,55 @@ interface Ad {
     description: string;
     price: number | null;
     category: string;
+    sub_category?: string | null;
     location: string | null;
     images: string;
-    phone?: string;
-    email?: string;
-    latitude?: number;
-    longitude?: number;
-    author_id: string;
     created_at: string;
-    author?: {
-        id: string;
-        name?: string;
-        email: string;
-    };
-    city?: {
-        id: string;
-        name: string;
-        name_ar?: string;
-        name_en?: string;
-    };
-    currency?: {
-        id: string;
-        code: string;
-        symbol: string;
-        name: string;
-    };
+    views?: number;
+    author?: { name?: string };
 }
 
 function AdsContent() {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const searchParams = useSearchParams();
     const router = useRouter();
     const searchQueryParam = searchParams.get('search');
     const categoryParam = searchParams.get('category');
-    const { category, tags, setCategory, toggleTag, resetFilters } = useFilterStore();
+    const subCategoryParam = searchParams.get('subcategory');
+    const { category, subCategory, tags, setCategory, setSubCategory, toggleTag, resetFilters } = useFilterStore();
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
-    const [showAllAds, setShowAllAds] = useState(true); // Show ads without media
 
-    // Sync filters with URL on mount
+    // Sync filters with URL
     useEffect(() => {
-        if (categoryParam && categoryParam !== category) {
-            setCategory(categoryParam);
-        }
-    }, [categoryParam, category, setCategory]);
+        if (categoryParam !== category) setCategory(categoryParam);
+        if (subCategoryParam !== subCategory) setSubCategory(subCategoryParam);
+    }, [categoryParam, subCategoryParam]);
 
     const fetchAds = useCallback(async () => {
         setLoading(true);
         try {
-            const filters: Filters = {
-                limit: 50,
+            const filters: any = {
+                limit: 100,
                 sortBy: 'created_at',
-                sortOrder: 'desc'
+                sortOrder: 'desc',
+                category,
+                subCategory,
+                search: searchQuery,
+                tags
             };
-            // Filter by category if specified
-            if (category) {
-                filters.category = category;
-            }
-
-            // Search in title and description
-            if (searchQuery) {
-                filters.search = searchQuery;
-            }
-
-            // Location filter from tags
-            const regions = ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة'];
-            const selectedRegions = tags.filter(tag => regions.includes(tag));
-            if (selectedRegions.length > 0) {
-                filters.location = selectedRegions.join(',');
-            }
-
-            // Type filter from tags
-            const types = ['سكني', 'تجاري', 'إيجار', 'بيع', 'استثمار'];
-            const selectedTypes = tags.filter(tag => types.includes(tag));
-            if (selectedTypes.length > 0) {
-                filters.type = selectedTypes.join(',');
-            }
-
-            // Price filter from tags
-            const priceRanges = {
-                'أقل من 50k': { min: 0, max: 50000 },
-                '50k - 200k': { min: 50000, max: 200000 },
-                '200k - 500k': { min: 200000, max: 500000 },
-                '500k+': { min: 500000, max: Infinity }
-            };
-            const selectedPrices = tags.filter(tag => tag in priceRanges);
-            if (selectedPrices.length > 0) {
-                const priceFilters = selectedPrices.map(tag => {
-                    const range = priceRanges[tag as keyof typeof priceRanges];
-                    return `${range.min}-${range.max}`;
-                });
-                filters.priceRange = priceFilters.join(',');
-            }
-
-            // Filter ads based on media availability
-            if (!showAllAds) {
-                filters.hasMedia = true;
-            }
 
             const data = await adsService.getAds(filters);
-            // Ensure data is always an array
-            setAds(Array.isArray(data as any) ? (data as any) : []);
+            setAds(Array.isArray(data) ? (data as any) : []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
         } finally {
             setLoading(false);
         }
-    }, [category, tags, searchQuery, showAllAds]);
+    }, [category, subCategory, tags, searchQuery]);
 
     useEffect(() => {
         setSearchQuery(searchQueryParam || '');
@@ -148,49 +77,68 @@ function AdsContent() {
     }, [fetchAds]);
 
     return (
-        <div className="min-h-screen bg-gray-bg flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-[#f4f4f4] flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            <main className="max-w-7xl mx-auto w-full p-4 flex-1">
-                <div className="depth-card p-4 mb-6">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-xl font-bold text-text-main">
-                            {category ? t(category) : t('allAds')}
-                        </h1>
-                        <span className="text-sm font-bold text-text-muted">
-                            {t('foundAds', { count: ads.length })}
-                        </span>
-                    </div>
+            <main className="max-w-7xl mx-auto w-full p-2 flex-1 flex flex-col lg:flex-row gap-3">
+                {/* Left Sidebar */}
+                <div className="w-full lg:w-64 shrink-0 space-y-3 hidden lg:block">
+                    <CategorySidebar />
                 </div>
 
-                {loading ? (
-                    <div className="flex items-center justify-center p-20">
-                        <LoadingSpinner size={48} />
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col gap-3">
+                    <AdvancedFilter />
+
+                    <div className="bg-white border border-gray-200 rounded-sm p-3 shadow-sm flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-[14px] font-[1000] text-secondary uppercase tracking-tight">
+                                {category ? (t as any)[category] || category : t('allAds')}
+                                {subCategory && (
+                                    <>
+                                        <span className="text-gray-300 mx-2">/</span>
+                                        <span className="text-primary">{(t as any)[subCategory] || subCategory}</span>
+                                    </>
+                                )}
+                            </h1>
+                        </div>
+                        <span className="text-[10px] font-black text-gray-400 bg-gray-50 px-2 py-1 rounded-sm uppercase italic">
+                            {t('foundAds').replace('{{count}}', ads.length.toString())}
+                        </span>
                     </div>
-                ) : ads.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {ads.map((ad) => (
-                            <AdCard
-                                key={ad.id}
-                                id={ad.id}
-                                title={ad.title}
-                                price={ad.price || 0}
-                                currency={ad.currency?.code || "ريال"}
-                                location={ad.location}
-                                images={ad.images ? JSON.parse(ad.images) : []}
-                                createdAt={ad.created_at}
-                                category={ad.category}
-                                language={language}
-                                isFeatured={false} 
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center p-20 depth-card">
-                        <p className="text-text-muted font-bold text-lg">{t('noResults')}</p>
-                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 text-primary font-bold hover:underline">{t('clearFilters')}</button>
-                    </div>
-                )}
+
+                    {loading ? (
+                        <div className="bg-white border border-gray-200 h-64 flex items-center justify-center rounded-sm">
+                            <LoadingSpinner size={32} />
+                        </div>
+                    ) : ads.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-2">
+                            {ads.map((ad) => (
+                                <AdCard
+                                    key={ad.id}
+                                    id={ad.id}
+                                    title={ad.title}
+                                    price={ad.price || 0}
+                                    currency="SAR"
+                                    location={ad.location || ''}
+                                    images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
+                                    createdAt={ad.created_at}
+                                    category={ad.category}
+                                    language={language}
+                                    isFeatured={false}
+                                    views={ad.views || 0}
+                                    authorName={ad.author?.name}
+                                    description={ad.description}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-white border border-dashed border-gray-300 p-20 text-center rounded-sm">
+                            <p className="text-gray-400 font-black uppercase text-[11px] tracking-[0.2em]">{t('noResults')}</p>
+                            <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 btn-saha-outline !px-6">{t('clearFilters')}</button>
+                        </div>
+                    )}
+                </div>
             </main>
             <Footer />
         </div>
@@ -200,7 +148,7 @@ function AdsContent() {
 export default function AdsPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-gray-bg flex items-center justify-center">
+            <div className="min-h-screen bg-[#f4f4f4] flex items-center justify-center">
                 <LoadingSpinner size={48} />
             </div>
         }>

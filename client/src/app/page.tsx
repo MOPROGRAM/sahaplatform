@@ -16,6 +16,7 @@ interface Ad {
     price: number | null;
     location: string | null;
     category: string;
+    description?: string;
     created_at: string;
     images: string;
     is_boosted?: boolean;

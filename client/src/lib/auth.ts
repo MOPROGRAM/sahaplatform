@@ -68,8 +68,8 @@ export const authService = {
     async syncUserData(user: any, token?: string) {
         try {
             // محاولة إدراج أو تحديث بيانات المستخدم في جدول users
-            const { error } = await supabase
-                .from('User')
+            const { error } = await (supabase as any)
+                .from('users')
                 .upsert({
                     id: user.id,
                     email: user.email,

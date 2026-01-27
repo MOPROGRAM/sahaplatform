@@ -29,42 +29,32 @@ export const translations = {
         electronics: 'إلكترونيات',
         other: 'أخرى',
 
-        // Subcategories - Real Estate
+        // Subcategories
         apartments: 'شقق',
         villas: 'فلل',
         lands: 'أراضي',
         commercial: 'تجاري',
         rent: 'للإيجار',
-
-        // Subcategories - Cars
         toyota: 'تويوتا',
         hyundai: 'هيونداي',
         ford: 'فورد',
         mercedes: 'مرسيدس',
         bmw: 'بي إم دبليو',
         trucks: 'شاحنات والمعدات الثقيلة',
-
-        // Subcategories - Jobs
         it: 'تقنية معلومات',
         sales: 'مبيعات وتسويق',
         engineering: 'هندسة',
         medical: 'طب وصيدلة',
         education: 'تعليم',
-
-        // Subcategories - Electronics
         phones: 'جوالات',
         computers: 'أجهزة كمبيوتر',
         appliances: 'أجهزة منزلية',
         gaming: 'ألعاب فيديو',
-
-        // Subcategories - Services
         cleaning: 'نظافة',
         moving: 'نقل عفش',
         maintenance: 'صيانة',
         legal: 'محاماة واستشارات',
         design: 'تصميم وجرافيك',
-
-        // Subcategories - Goods
         furniture: 'أثاث',
         fashion: 'موضة وأزياء',
         sports: 'رياضة',
@@ -244,42 +234,32 @@ export const translations = {
         electronics: 'Electronics',
         other: 'Other',
 
-        // Subcategories - Real Estate
+        // Subcategories
         apartments: 'Apartments',
         villas: 'Villas',
         lands: 'Lands',
         commercial: 'Commercial',
         rent: 'Rent',
-
-        // Subcategories - Cars
         toyota: 'Toyota',
         hyundai: 'Hyundai',
         ford: 'Ford',
         mercedes: 'Mercedes',
         bmw: 'BMW',
         trucks: 'Trucks',
-
-        // Subcategories - Jobs
         it: 'IT',
         sales: 'Sales',
         engineering: 'Engineering',
         medical: 'Medical',
         education: 'Education',
-
-        // Subcategories - Electronics
         phones: 'Phones',
         computers: 'Computers',
         appliances: 'Appliances',
         gaming: 'Gaming',
-
-        // Subcategories - Services
         cleaning: 'Cleaning',
         moving: 'Moving',
         maintenance: 'Maintenance',
         legal: 'Legal',
         design: 'Design',
-
-        // Subcategories - Goods
         furniture: 'Furniture',
         fashion: 'Fashion',
         sports: 'Sports',
