@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, MapPin, ChevronDown, Settings, X } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import PromotedBanner from '@/components/PromotedBanner';
+import PromotedBanner from "@/components/PromotedBanner";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
@@ -71,7 +71,7 @@ export default function Header() {
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
                 {/* Brand */}
                 <Link href="/" className="group shrink-0">
-                    <span className="text-3xl font-[1000] tracking-tighter text-primary italic transition-transform group-hover:scale-105">Saha</span>
+                    <span className="text-3xl font-[1000] tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
                 </Link>
 
                 {/* Search Bar - Floating Effect Achieved via Sticky Header and Scroll Logic */}
@@ -136,7 +136,7 @@ export default function Header() {
                                             {user.role === "ADMIN" && (
                                                 <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <Settings size={14} />
-                                                    {language === "ar" ? "إدارة النظام" : "System Management"}
+                                                    {t("systemManagement")} {/* Using t() for System Management */}
                                                 </Link>
                                             )}
                                             <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>

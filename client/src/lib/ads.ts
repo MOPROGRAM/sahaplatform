@@ -59,10 +59,10 @@ export const adsService = {
         tags?: string[];
     } = {}) {
         let query = (supabase as any)
-            .from('ads')
+            .from('Ad')
             .select(`
                 *,
-                author:users(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -102,10 +102,10 @@ export const adsService = {
     // الحصول على إعلان واحد
     async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
         let query = (supabase as any)
-            .from('ads')
+            .from('Ad')
             .select(`
                 *,
-                author:users(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -134,10 +134,10 @@ export const adsService = {
         }
 
         const { data, error } = await (supabase as any)
-            .from('ads')
+            .from('Ad')
             .select(`
                 *,
-                author:users(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -161,7 +161,7 @@ export const adsService = {
         }
 
         const { data, error } = await (supabase as any)
-            .from('ads')
+            .from('Ad')
             .insert({
                 ...adData,
                 author_id: user.id,
@@ -169,7 +169,7 @@ export const adsService = {
             })
             .select(`
                 *,
-                author:users(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -192,13 +192,13 @@ export const adsService = {
         }
 
         const { data, error } = await (supabase as any)
-            .from('ads')
+            .from('Ad')
             .update(updates)
             .eq('id', id)
             .eq('author_id', user.id)
             .select(`
                 *,
-                author:users(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -221,7 +221,7 @@ export const adsService = {
         }
 
         const { error } = await (supabase as any)
-            .from('ads')
+            .from('Ad')
             .delete()
             .eq('id', id)
             .eq('author_id', user.id);

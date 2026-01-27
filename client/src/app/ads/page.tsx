@@ -53,12 +53,12 @@ function AdsContent() {
 
     // Temporary Subcategories Map (kept here for now, can be refactored later if needed)
     const subCategoriesMap: { [key: string]: string[] } = {
-        realestate: ["apartments", "villas", "lands"],
-        cars: ["toyota", "honda", "bmw", "mercedes"],
-        electronics: ["phones", "laptops", "tvs"],
-        goods: ["clothes", "furniture", "books"],
-        jobs: ["it", "engineering", "marketing"],
-        services: ["cleaning", "maintenance", "delivery"],
+        realestate: ["apartments", "villas", "lands", "commercial", "rent"],
+        cars: ["toyota", "honda", "bmw", "mercedes", "trucks"],
+        electronics: ["phones", "laptops", "tvs", "computers", "appliances", "gaming"],
+        goods: ["clothes", "furniture", "books", "fashion", "sports"],
+        jobs: ["it", "engineering", "marketing", "sales", "medical", "education"],
+        services: ["cleaning", "maintenance", "delivery", "legal", "design"],
         other: ["misc"],
     };
 

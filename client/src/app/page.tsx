@@ -24,7 +24,7 @@ interface Ad {
 }
 
 export default function HomePage() {
-    const { language, t } = useLanguage();
+    const { language, t, currency } = useLanguage(); // Destructure currency
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'featured' | 'new'>('all');
@@ -53,8 +53,8 @@ export default function HomePage() {
         try {
             setLoading(true);
             let query = (supabase as any)
-                .from('ads')
-                .select('*')
+                .from('Ad') // Changed from 'ads' to 'Ad'
+                .select('*, author:User(name)') // Fetch author name
                 .eq('is_active', true);
 
             if (filter === 'featured') {
@@ -82,7 +82,7 @@ export default function HomePage() {
         try {
             const updated = await Promise.all(categoriesList.map(async (cat) => {
                 const { count } = await (supabase as any)
-                    .from('ads')
+                    .from('Ad') // Changed from 'ads' to 'Ad'
                     .select('*', { count: 'exact', head: true })
                     .eq('is_active', true)
                     .eq('category', cat.key);
@@ -107,25 +107,25 @@ export default function HomePage() {
         <div className="min-h-screen bg-[#f4f4f4] flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
             <Header />
 
-            <main className="max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+            <main className="max-w-7xl mx-auto w-full p-2 grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1">
                 {/* Right Sidebar - Titled Categories */}
-                <aside className="lg:col-span-3 order-1 lg:order-2 space-y-4 hidden md:block">
-                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-                        <div className="bg-gray-50 px-4 py-3 text-sm font-black border-b border-gray-100 text-secondary uppercase tracking-widest text-center">
-                            {t('categories')}
+                <aside className="lg:col-span-3 order-1 lg:order-2 space-y-2 hidden md:block">
+                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                        <div className="bg-gray-50 px-3 py-2 text-xs font-black border-b border-gray-100 text-secondary uppercase tracking-widest text-center">
+                            {t("categories")}
                         </div>
                         <nav className="flex flex-col">
                             {categoriesList.map((cat, idx) => (
                                 <Link
                                     key={idx}
                                     href={`/ads?category=${cat.key}`}
-                                    className="flex items-center justify-between px-4 py-3 hover:bg-primary/5 text-sm font-bold text-gray-700 transition-colors group border-b border-gray-50 last:border-0"
+                                    className="flex items-center justify-between px-3 py-2 hover:bg-primary/5 text-sm font-bold text-gray-700 transition-colors group border-b border-gray-50 last:border-0"
                                 >
-                                    <span className="flex items-center gap-3 group-hover:text-primary transition-colors">
-                                        <cat.icon size={16} className="text-gray-400 group-hover:text-primary transition-colors" />
+                                    <span className="flex items-center gap-2 group-hover:text-primary transition-colors">
+                                        <cat.icon size={14} className="text-gray-400 group-hover:text-primary transition-colors" />
                                         {cat.name}
                                     </span>
-                                    <span className="text-sm text-gray-300 font-bold group-hover:text-primary/50">{cat.count}</span>
+                                    <span className="text-xs text-gray-300 font-bold group-hover:text-primary/50">{cat.count}</span>
                                 </Link>
                             ))}
                         </nav>
@@ -133,32 +133,32 @@ export default function HomePage() {
                 </aside>
 
                 {/* Central Grid Feed */}
-                <section className="lg:col-span-9 order-2 lg:order-1 flex flex-col gap-6">
-                    <div className="bg-white border border-gray-100 rounded-xl flex items-center justify-between px-6 py-4 shadow-sm">
-                        <div className="flex items-center gap-3">
-                            <Sparkles className="text-primary animate-pulse" size={20} />
-                            <h2 className="text-lg font-black uppercase tracking-tight text-secondary">{t('latestOffers')}</h2>
+                <section className="lg:col-span-9 order-2 lg:order-1 flex flex-col gap-3">
+                    <div className="bg-white border border-gray-100 rounded-lg flex items-center justify-between px-4 py-2 shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="text-primary animate-pulse" size={16} />
+                            <h2 className="text-base font-black uppercase tracking-tight text-secondary">{t("latestOffers")}</h2>
                         </div>
-                        <div className="flex gap-4 text-sm font-bold text-gray-400 uppercase tracking-widest">
-                            <button onClick={() => setFilter('all')} className={`pb-1 border-b-2 ${filter === 'all' ? 'text-primary border-primary' : 'border-transparent'}`}>{t('viewAll')}</button>
-                            <button onClick={() => setFilter('featured')} className={`pb-1 border-b-2 ${filter === 'featured' ? 'text-primary border-primary' : 'border-transparent'}`}>{t('featured')}</button>
-                            <button onClick={() => setFilter('new')} className={`pb-1 border-b-2 ${filter === 'new' ? 'text-primary border-primary' : 'border-transparent'}`}>{t('newAd')}</button>
+                        <div className="flex gap-3 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            <button onClick={() => setFilter("all")} className={`pb-1 border-b-2 ${filter === "all" ? "text-primary border-primary" : "border-transparent"}`}>{t("viewAll")}</button>
+                            <button onClick={() => setFilter("featured")} className={`pb-1 border-b-2 ${filter === "featured" ? "text-primary border-primary" : "border-transparent"}`}>{t("featured")}</button>
+                            <button onClick={() => setFilter("new")} className={`pb-1 border-b-2 ${filter === "new" ? "text-primary border-primary" : "border-transparent"}`}>{t("newAd")}</button>
                         </div>
                     </div>
 
                     {loading ? (
-                        <div className="bg-white h-64 flex items-center justify-center border border-gray-100 rounded-xl">
-                            <LoadingSpinner size={40} />
+                        <div className="bg-white h-64 flex items-center justify-center border border-gray-100 rounded-lg">
+                            <LoadingSpinner size={32} />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 pb-10">
                             {ads.map((ad) => (
                                 <AdCard
                                     key={ad.id}
                                     id={ad.id}
                                     title={ad.title}
                                     price={ad.price || 0}
-                                    currency="ريال"
+                                    currency={currency.toUpperCase()} // Use dynamic currency
                                     location={ad.location || ''}
                                     images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
                                     createdAt={ad.created_at}
@@ -168,7 +168,7 @@ export default function HomePage() {
                                 />
                             ))}
                             {ads.length === 0 && (
-                                <div className="col-span-full bg-white p-20 text-center border border-dashed border-gray-300 rounded-xl">
+                                <div className="col-span-full bg-white p-10 text-center border border-dashed border-gray-300 rounded-lg">
                                     <div className="text-gray-300 font-bold uppercase tracking-widest text-[11px]">{t('noResults')}</div>
                                 </div>
                             )}

@@ -52,7 +52,7 @@ export const conversationsService = {
 
         // استخدام أسماء الأعمدة الفعلية من قاعدة البيانات (snake_case)
         const { data: participantData, error: participantError } = await (supabase as any)
-            .from('_conversation_participants')
+            .from('_conversation_participants') // This table name is still lowercase in SQL setup
             .select('conversation_id')
             .eq('user_id', user.id);
 
@@ -69,12 +69,12 @@ export const conversationsService = {
 
         // الحصول على المحادثات مع المشاركين
         const { data: conversations, error: conversationsError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation') // Changed from 'conversations' to 'Conversation'
             .select(`
                 *,
-                ad:ads(id, title, images),
+                ad:Ad(id, title, images),
                 participants:_conversation_participants(
-                    user:users(id, name, email)
+                    user:User(id, name, email)
                 )
             `)
             .in('id', conversationIds)
@@ -101,10 +101,10 @@ export const conversationsService = {
 
         // الحصول على المحادثة مع الإعلان والمشاركين
         const { data: conversation, error: conversationError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation') // Changed from 'conversations' to 'Conversation'
             .select(`
                 *,
-                ad:ads(id, title, images)
+                ad:Ad(id, title, images)
             `)
             .eq('id', id)
             .single();
@@ -117,17 +117,17 @@ export const conversationsService = {
         // الحصول على المشاركين يدوياً لضمان الدقة
         const { data: participants, error: pError } = await (supabase as any)
             .from('_conversation_participants')
-            .select('user:users(id, name, email)')
+            .select('user:User(id, name, email)') // Changed from 'user:users' to 'user:User'
             .eq('conversation_id', id);
 
         const transformedParticipants = participants?.map((p: any) => p.user) || [];
 
         // الحصول على الرسائل
         const { data: messages, error: messagesError } = await (supabase as any)
-            .from('messages')
+            .from('messages') // This table name is lowercase in SQL setup
             .select(`
                 *,
-                sender:users!sender_id(id, name, email)
+                sender:User!sender_id(id, name, email)
             `)
             .eq('conversation_id', id)
             .order('created_at', { ascending: true });
@@ -163,7 +163,7 @@ export const conversationsService = {
 
         if (myConvIds.length > 0) {
             const { data: existingConv } = await (supabase as any)
-                .from('conversations')
+                .from('Conversation') // Changed from 'conversations' to 'Conversation'
                 .select('id')
                 .eq('ad_id', adId)
                 .in('id', myConvIds)
@@ -176,7 +176,7 @@ export const conversationsService = {
         }
 
         const { data: newConversation, error: createError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation') // Changed from 'conversations' to 'Conversation'
             .insert({ ad_id: adId })
             .select()
             .single();
@@ -223,14 +223,14 @@ export const conversationsService = {
             })
             .select(`
                 *,
-                sender:users!sender_id(id, name, email)
+                sender:User!sender_id(id, name, email)
             `)
             .single();
 
         if (messageError) throw new Error('Failed to send message');
 
         await (supabase as any)
-            .from('conversations')
+            .from('Conversation') // Changed from 'conversations' to 'Conversation'
             .update({
                 last_message: content,
                 last_message_time: new Date().toISOString(),

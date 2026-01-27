@@ -158,6 +158,7 @@ export const translations = {
         trustedMerchant: 'تاجر موثوق',
         merchantLabel: 'تاجر / معلن',
         adminLabel: 'مدير النظام',
+        systemManagement: 'إدارة النظام',
 
         // Dashboard
         overview: 'نظرة عامة',
@@ -370,6 +371,7 @@ export const translations = {
         trustedMerchant: 'Trusted Merchant',
         merchantLabel: 'Merchant / Seller',
         adminLabel: 'System Admin',
+        systemManagement: 'System Management',
 
         // Dashboard
         overview: 'Overview',
