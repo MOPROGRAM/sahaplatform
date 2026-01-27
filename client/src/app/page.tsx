@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
+import { adsService } from '@/lib/ads';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import AdCard from '@/components/AdCard';
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -15,6 +15,25 @@ import { twMerge } from "tailwind-merge";
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
+
+// Skeleton Loader Component
+const AdsSkeleton = () => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-10">
+        {[...Array(10)].map((_, i) => (
+            <div key={i} className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[320px] animate-pulse">
+                <div className="h-48 bg-gray-200 dark:bg-white/10 w-full" />
+                <div className="p-4 space-y-3">
+                    <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-1/2" />
+                    <div className="flex justify-between pt-2">
+                        <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
+                        <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+);
 
 interface Ad {
     id: string;
@@ -28,6 +47,9 @@ interface Ad {
     isBoosted?: boolean;
     userId: string;
     author?: {
+        name?: string;
+    };
+    city?: {
         name: string;
     };
 }
@@ -51,24 +73,18 @@ export default function HomePage() {
     const fetchAds = useCallback(async () => {
         try {
             setLoading(true);
-            let query = (supabase as any)
-                .from('Ad')
-                .select('*, author:User(name)')
-                .eq('isActive', true);
+            const filters: any = {
+                limit: 20,
+                sortOrder: 'desc',
+                sortBy: 'createdAt'
+            };
 
             if (filter === 'featured') {
-                query = query.eq('isBoosted', true);
+                filters.isBoosted = true;
             }
 
-            query = query.order('createdAt', { ascending: false }).limit(20);
-
-            const { data, error } = await query;
-            if (error) {
-                console.error('Failed to fetch ads:', error);
-                setAds([]);
-            } else {
-                setAds(data || []);
-            }
+            const data = await adsService.getAds(filters);
+            setAds(data as any || []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
@@ -100,7 +116,7 @@ export default function HomePage() {
     }, [fetchAds, fetchCategoryCounts]);
 
     return (
-        <div className="min-h-screen bg-gray-bg flex flex-col">
+        <div className="bg-gray-bg flex flex-col">
             <Header />
 
             <main className="max-w-[1400px] mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
@@ -151,10 +167,7 @@ export default function HomePage() {
                     </div>
 
                     {loading ? (
-                        <div className="bento-card h-96 flex flex-col items-center justify-center gap-4">
-                            <LoadingSpinner size={40} />
-                            <p className="text-sm font-bold text-text-muted animate-pulse">Loading best offers...</p>
-                        </div>
+                        <AdsSkeleton />
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-10">
                             {ads.map((ad, idx) => (
@@ -168,7 +181,7 @@ export default function HomePage() {
                                         title={ad.title}
                                         price={ad.price || 0}
                                         currency={currency.toUpperCase()}
-                                        location={ad.location || ''}
+                                        location={ad.city?.name || ad.location || ''}
                                         images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
                                         createdAt={ad.createdAt}
                                         category={ad.category}

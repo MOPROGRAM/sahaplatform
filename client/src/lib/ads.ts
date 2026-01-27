@@ -64,6 +64,7 @@ export const adsService = {
         tags?: string[];
         minArea?: number;
         maxArea?: number;
+        isBoosted?: boolean;
     } = {}) {
         let query = (supabase as any)
             .from('Ad')
@@ -74,6 +75,11 @@ export const adsService = {
                 currency:Currency(id, code, symbol, name)
             `)
             .eq('isActive', true);
+
+        // Filter by isBoosted
+        if (filters.isBoosted !== undefined) {
+            query = query.eq('isBoosted', filters.isBoosted);
+        }
 
         // Filter by category
         if (filters.category) {
