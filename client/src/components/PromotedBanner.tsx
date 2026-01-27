@@ -3,49 +3,77 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from 'next/image';
-import { supabase } from "@/lib/supabase";
+import { adsService } from "@/lib/ads";
 import { Zap } from "lucide-react";
 
 export default function PromotedBanner() {
     const [ads, setAds] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let mounted = true;
         const fetchPromoted = async () => {
-            const { data } = await supabase
-                .from('Ad')
-                .select('*')
-                .eq('is_boosted', true)
-                .eq('is_active', true)
-                .order('created_at', { ascending: false })
-                .limit(10);
-            if (mounted) setAds(data || []);
+            try {
+                const data = await adsService.getAds({ isBoosted: true, limit: 10 });
+                if (mounted) setAds(data || []);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                if (mounted) setLoading(false);
+            }
         };
         fetchPromoted();
         return () => { mounted = false; };
     }, []);
 
+    if (loading) {
+        return (
+            <div className="w-full bg-[#111] py-2 border-b border-border-color">
+                <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-3">
+                    <div className="w-20 h-4 bg-white/10 rounded animate-pulse shrink-0" />
+                    <div className="flex gap-3 overflow-hidden py-1 w-full">
+                        {[1,2,3,4,5].map(i => (
+                            <div key={i} className="flex-shrink-0 w-48 h-14 bg-[#1a1a1a] rounded border border-border-color animate-pulse" />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (!ads.length) return null;
 
     return (
-        <div className="w-full bg-gradient-to-r from-black to-[#111111] text-white py-6 pulse-orange shadow-[inset_0_-6px_24px_rgba(255,77,0,0.06)] border-b border-primary/10">
-            <div className="max-w-7xl mx-auto px-4 flex items-center gap-4">
-                <div className="flex items-center gap-3">
-                    <Zap className="text-primary" size={20} />
-                    <strong className="uppercase tracking-widest">Sponsored</strong>
+        <div className="w-full bg-[#111] text-white py-2 border-b border-border-color">
+            <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-3">
+                <div className="flex items-center gap-2 shrink-0">
+                    <Zap className="text-primary fill-primary" size={14} />
+                    <strong className="text-xs font-black uppercase tracking-wider text-primary">Featured</strong>
                 </div>
-                <div className="flex gap-4 overflow-x-auto scrollbar-hide">
-                    {ads.map(ad => (
-                        <Link key={ad.id} href={`/ads/${ad.id}`} className="flex-shrink-0 w-64 p-3 bg-[#0b0b0b] rounded-lg border border-primary/10 hover:scale-[1.01] transition-transform flex items-center gap-3 shadow-[0_8px_30px_rgba(255,77,0,0.06)]">
-                            {ad.images && JSON.parse(ad.images || '[]')[0] && (
-                                <Image src={JSON.parse(ad.images)[0]} alt={ad.title} width={64} height={48} className="rounded-md object-cover" />
-                            )}
-                            <div className="flex-1 text-sm">
-                                <div className="font-extrabold truncate">{ad.title}</div>
-                                <div className="text-[12px] text-gray-300">{ad.price ? `${ad.price} SAR` : 'Free'}</div>
-                            </div>
-                        </Link>
-                    ))}
+                <div className="flex gap-3 overflow-x-auto scrollbar-hide py-1">
+                    {ads.map(ad => {
+                        let imageUrl = null;
+                        try {
+                            const images = typeof ad.images === 'string' ? JSON.parse(ad.images) : (ad.images || []);
+                            imageUrl = Array.isArray(images) ? images[0] : null;
+                        } catch (e) {
+                            // ignore error
+                        }
+
+                        return (
+                            <Link key={ad.id} href={`/ads/${ad.id}`} className="flex-shrink-0 w-48 p-2 bg-[#1a1a1a] rounded border border-border-color hover:border-primary/50 transition-colors flex items-center gap-2">
+                                {imageUrl && (
+                                    <div className="relative w-10 h-10 shrink-0 rounded overflow-hidden bg-gray-800">
+                                        <Image src={imageUrl} alt={ad.title} fill className="object-cover" sizes="40px" />
+                                    </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-xs font-bold truncate text-gray-100">{ad.title}</div>
+                                    <div className="text-[10px] text-primary font-medium">{ad.price ? `${ad.price.toLocaleString()} SAR` : 'Contact'}</div>
+                                </div>
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </div>

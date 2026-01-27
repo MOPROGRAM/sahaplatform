@@ -100,7 +100,7 @@ export default function HomePage() {
                 const { count } = await (supabase as any)
                     .from('Ad')
                     .select('*', { count: 'exact', head: true })
-                    .eq('isActive', true)
+                    .eq('is_active', true)
                     .eq('category', cat.key);
                 counts[cat.key] = count || 0;
             }));
@@ -116,30 +116,31 @@ export default function HomePage() {
     }, [fetchAds, fetchCategoryCounts]);
 
     return (
-        <div className="bg-gray-bg flex flex-col">
+        <div className="bg-gray-bg flex flex-col min-h-screen">
             <Header />
+            <PromotedBanner />
 
-            <main className="max-w-[1400px] mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+            <main className="w-full max-w-[1920px] mx-auto p-1 grid grid-cols-12 gap-1 flex-1">
                 {/* Bento Grid Sidebar - Categories */}
-                <aside className={`lg:col-span-3 space-y-4 hidden md:block`}>
-                    <div className="bento-card p-0 flex flex-col sticky top-24">
-                        <div className="p-4 border-b border-border-color bg-primary/5">
-                            <h3 className="bento-title text-sm uppercase tracking-wider">{t("categories")}</h3>
+                <aside className={`col-span-2 hidden xl:block space-y-1`}>
+                    <div className="bento-card p-0 flex flex-col sticky top-20 bg-white dark:bg-[#1a1a1a]">
+                        <div className="p-3 border-b border-border-color bg-gray-50 dark:bg-white/5">
+                            <h3 className="bento-title text-xs uppercase tracking-wider font-black">{t("categories")}</h3>
                         </div>
-                        <nav className="flex flex-col p-2 space-y-1">
+                        <nav className="flex flex-col p-1 space-y-0.5">
                             {categoriesList.map((cat, idx) => (
                                 <Link
                                     key={idx}
                                     href={`/ads?category=${cat.key}`}
-                                    className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group"
+                                    className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-all group"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-gray-100 dark:bg-white/5 rounded-lg text-gray-500 group-hover:text-primary group-hover:bg-primary/10 transition-colors">
-                                            <cat.icon size={18} />
+                                    <div className="flex items-center gap-2">
+                                        <div className="text-gray-400 group-hover:text-primary transition-colors">
+                                            <cat.icon size={14} />
                                         </div>
-                                        <span className="font-bold text-sm text-text-main group-hover:text-primary transition-colors">{(t as any)[cat.key] || cat.key}</span>
+                                        <span className="font-bold text-xs text-text-main group-hover:text-primary transition-colors line-clamp-1">{(t as any)[cat.key] || cat.key}</span>
                                     </div>
-                                    <span className="text-xs font-bold text-text-muted bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md">{categoryCounts[cat.key] || 0}</span>
+                                    <span className="text-[10px] font-bold text-text-muted bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">{categoryCounts[cat.key] || 0}</span>
                                 </Link>
                             ))}
                         </nav>
@@ -147,34 +148,31 @@ export default function HomePage() {
                 </aside>
 
                 {/* Central Grid Feed */}
-                <section className={`lg:col-span-9 flex flex-col gap-6`}>
+                <section className={`col-span-12 xl:col-span-10 flex flex-col gap-2`}>
                     {/* Bento Filter Bar */}
-                    <div className="bento-card p-1 flex items-center justify-between">
-                        <div className="flex items-center gap-3 px-4 py-3">
-                            <div className="p-2 bg-primary/10 rounded-full text-primary animate-pulse">
-                                <Sparkles size={18} />
+                    <div className="bento-card p-1 flex items-center justify-between bg-white dark:bg-[#1a1a1a]">
+                        <div className="flex items-center gap-2 px-3 py-2">
+                            <div className="p-1.5 bg-primary/10 rounded-full text-primary">
+                                <Sparkles size={14} />
                             </div>
                             <div>
-                                <h2 className="text-base font-black uppercase tracking-tight text-text-main leading-none">{t("latestOffers")}</h2>
-                                <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Fresh from the market</span>
+                                <h2 className="text-sm font-black uppercase tracking-tight text-text-main leading-none">{t("latestOffers")}</h2>
                             </div>
                         </div>
-                        <div className="flex p-1 bg-gray-100 dark:bg-black/20 rounded-2xl mx-2">
-                            <button onClick={() => setFilter("all")} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filter === "all" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("viewAll")}</button>
-                            <button onClick={() => setFilter("featured")} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filter === "featured" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("featured")}</button>
-                            <button onClick={() => setFilter("new")} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filter === "new" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("newAd")}</button>
+                        <div className="flex p-0.5 bg-gray-100 dark:bg-black/20 rounded-lg mx-2">
+                            <button onClick={() => setFilter("all")} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${filter === "all" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("viewAll")}</button>
+                            <button onClick={() => setFilter("featured")} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${filter === "featured" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("featured")}</button>
+                            <button onClick={() => setFilter("new")} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${filter === "new" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("newAd")}</button>
                         </div>
                     </div>
 
                     {loading ? (
                         <AdsSkeleton />
                     ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-10">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 pb-10">
                             {ads.map((ad, idx) => (
                                 <div key={ad.id} className={clsx(
                                     "transition-all duration-300",
-                                    // Make first 2 featured ads span 2 cols if possible for bento feel
-                                    // idx === 0 && ad.isBoosted ? "md:col-span-2 md:row-span-2" : ""
                                 )}>
                                     <AdCard
                                         id={ad.id}

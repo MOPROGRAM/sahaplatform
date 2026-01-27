@@ -91,12 +91,26 @@ body {
 
 /* Fluid Typography & Higher Contrast */
 body {
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 [dir="rtl"] body {
   font-family: var(--font-cairo), 'Tajawal', sans-serif;
+}
+
+@layer components {
+  .bento-card {
+    @apply bg-card-bg rounded-xl border border-border-color overflow-hidden transition-all duration-300;
+  }
+  
+  .bento-card-hover {
+    @apply hover:border-primary/20 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .bento-title {
+    @apply font-black text-text-main tracking-tight;
+  }
 }
 
 [dir="ltr"] body {

@@ -31,8 +31,6 @@ const readex = Readex_Pro({
     weight: ['300', '400', '600', '700']
 });
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
     title: "ساحة - مساحة واسعة من الفرص",
     description: "مساحة واسعة من الفرص - منصة شاملة للإعلانات والخدمات في الشرق الأوسط",

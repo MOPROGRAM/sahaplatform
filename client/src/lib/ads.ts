@@ -70,15 +70,15 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User!author_id(id, name, email, phone),
-                city:City!city_id(id, name, nameAr, nameEn),
-                currency:Currency!currency_id(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, nameAr, nameEn),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
-            .eq('isActive', true);
+            .eq('is_active', true);
 
         // Filter by isBoosted
         if (filters.isBoosted !== undefined) {
-            query = query.eq('isBoosted', filters.isBoosted);
+            query = query.eq('is_boosted', filters.isBoosted);
         }
 
         // Filter by category
@@ -130,14 +130,17 @@ export const adsService = {
 
         // City/Location Filter
         if (filters.cityId) {
-            query = query.eq('cityId', filters.cityId);
+            query = query.eq('city_id', filters.cityId);
         }
 
         // Sort
         if (filters.sortBy) {
-            query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
+            // Map camelCase sortBy to snake_case column
+            const sortColumn = filters.sortBy === 'createdAt' ? 'created_at' : 
+                               filters.sortBy === 'price' ? 'price' : 'created_at';
+            query = query.order(sortColumn, { ascending: filters.sortOrder === 'asc' });
         } else {
-            query = query.order('createdAt', { ascending: false });
+            query = query.order('created_at', { ascending: false });
         }
 
         const limit = filters.limit || 50;
@@ -150,7 +153,19 @@ export const adsService = {
             return [];
         }
 
-        return data || [];
+        // Map snake_case to camelCase
+        return (data || []).map((ad: any) => ({
+            ...ad,
+            userId: ad.author_id,
+            cityId: ad.city_id,
+            currencyId: ad.currency_id,
+            isActive: ad.is_active,
+            isBoosted: ad.is_boosted,
+            createdAt: ad.created_at,
+            updatedAt: ad.updated_at,
+            paymentMethod: ad.payment_method,
+            subCategory: ad.sub_category // Map sub_category to subCategory
+        }));
     },
 
     // Get single ad
@@ -166,7 +181,7 @@ export const adsService = {
             .eq('id', id);
 
         if (!searchAll) {
-            query = query.eq('isActive', true);
+            query = query.eq('is_active', true);
         }
 
         const { data, error } = await query.single();
@@ -176,7 +191,19 @@ export const adsService = {
             return null;
         }
 
-        return data as Ad;
+        // Map snake_case to camelCase
+        const ad = data as any;
+        return {
+            ...ad,
+            userId: ad.author_id,
+            cityId: ad.city_id,
+            currencyId: ad.currency_id,
+            isActive: ad.is_active,
+            isBoosted: ad.is_boosted,
+            createdAt: ad.created_at,
+            updatedAt: ad.updated_at,
+            paymentMethod: ad.payment_method
+        } as Ad;
     },
 
     // Get user's ads
@@ -195,15 +222,27 @@ export const adsService = {
                 city:City!city_id(id, name, nameAr, nameEn),
                 currency:Currency!currency_id(id, code, symbol, name)
             `)
-            .eq('userId', user.id)
-            .order('createdAt', { ascending: false });
+            .eq('author_id', user.id)
+            .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching my ads:', error);
             throw new Error('Failed to fetch your ads');
         }
 
-        return (data as Ad[]) || [];
+        // Map snake_case to camelCase
+        return (data || []).map((ad: any) => ({
+            ...ad,
+            userId: ad.author_id,
+            cityId: ad.city_id,
+            currencyId: ad.currency_id,
+            isActive: ad.is_active,
+            isBoosted: ad.is_boosted,
+            createdAt: ad.created_at,
+            updatedAt: ad.updated_at,
+            paymentMethod: ad.payment_method,
+            subCategory: ad.sub_category
+        }));
     },
 
     // Create new ad
@@ -214,18 +253,36 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
+        // Convert camelCase to snake_case for DB
+        const dbData = {
+            title: adData.title,
+            description: adData.description,
+            price: adData.price,
+            category: adData.category,
+            sub_category: adData.subCategory, // Assuming sub_category exists, if not, it might be ignored or fail
+            location: adData.location,
+            images: adData.images,
+            video: adData.video,
+            author_id: user.id,
+            city_id: adData.cityId,
+            currency_id: adData.currencyId || 'sar', // Default to SAR if not provided
+            is_boosted: adData.isBoosted || false,
+            is_active: true, // Default active
+            payment_method: adData.paymentMethod,
+            phone: adData.phone,
+            email: adData.email,
+            latitude: adData.latitude,
+            longitude: adData.longitude
+        };
+
         const { data, error } = await (supabase as any)
             .from('Ad')
-            .insert({
-                ...adData,
-                userId: user.id,
-                currencyId: adData.currencyId || 'sar',
-            })
+            .insert(dbData)
             .select(`
                 *,
-                author:User!userId(id, name, email, phone),
-                city:City(id, name, nameAr, nameEn),
-                currency:Currency(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, nameAr, nameEn),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
             .single();
 
@@ -234,7 +291,19 @@ export const adsService = {
             throw new Error('Failed to create ad');
         }
 
-        return data as Ad;
+        // Map back to camelCase
+        const ad = data as any;
+        return {
+            ...ad,
+            userId: ad.author_id,
+            cityId: ad.city_id,
+            currencyId: ad.currency_id,
+            isActive: ad.is_active,
+            isBoosted: ad.is_boosted,
+            createdAt: ad.created_at,
+            updatedAt: ad.updated_at,
+            paymentMethod: ad.payment_method
+        } as Ad;
     },
 
     // Update ad
@@ -245,16 +314,37 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
+        // Map camelCase updates to snake_case
+        const dbUpdates: any = {};
+        if (updates.title) dbUpdates.title = updates.title;
+        if (updates.description) dbUpdates.description = updates.description;
+        if (updates.price) dbUpdates.price = updates.price;
+        if (updates.category) dbUpdates.category = updates.category;
+        if (updates.subCategory) dbUpdates.sub_category = updates.subCategory;
+        if (updates.location) dbUpdates.location = updates.location;
+        if (updates.images) dbUpdates.images = updates.images;
+        if (updates.video) dbUpdates.video = updates.video;
+        if (updates.cityId) dbUpdates.city_id = updates.cityId;
+        if (updates.currencyId) dbUpdates.currency_id = updates.currencyId;
+        if (updates.isBoosted !== undefined) dbUpdates.is_boosted = updates.isBoosted;
+        if (updates.isActive !== undefined) dbUpdates.is_active = updates.isActive;
+        if (updates.paymentMethod) dbUpdates.payment_method = updates.paymentMethod;
+        if (updates.phone) dbUpdates.phone = updates.phone;
+        if (updates.email) dbUpdates.email = updates.email;
+        if (updates.latitude) dbUpdates.latitude = updates.latitude;
+        if (updates.longitude) dbUpdates.longitude = updates.longitude;
+
+
         const { data, error } = await (supabase as any)
             .from('Ad')
-            .update(updates)
+            .update(dbUpdates)
             .eq('id', id)
-            .eq('userId', user.id)
+            .eq('author_id', user.id) // Security check
             .select(`
                 *,
-                author:User!userId(id, name, email, phone),
-                city:City(id, name, nameAr, nameEn),
-                currency:Currency(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, nameAr, nameEn),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
             .single();
 
@@ -263,7 +353,19 @@ export const adsService = {
             throw new Error('Failed to update ad');
         }
 
-        return data as Ad;
+        // Map back to camelCase
+        const ad = data as any;
+        return {
+            ...ad,
+            userId: ad.author_id,
+            cityId: ad.city_id,
+            currencyId: ad.currency_id,
+            isActive: ad.is_active,
+            isBoosted: ad.is_boosted,
+            createdAt: ad.created_at,
+            updatedAt: ad.updated_at,
+            paymentMethod: ad.payment_method
+        } as Ad;
     },
 
     // Delete ad
@@ -278,7 +380,7 @@ export const adsService = {
             .from('Ad')
             .delete()
             .eq('id', id)
-            .eq('userId', user.id);
+            .eq('author_id', user.id); // Security check
 
         if (error) {
             console.error('Error deleting ad:', error);

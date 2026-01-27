@@ -78,19 +78,19 @@ export default function AdCard({
         >
 
             {/* Image Area */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? "w-full h-48" : "w-[30%]"}`}>
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? "w-full h-36" : "w-[30%]"}`}>
                 {isFeatured && (
-                    <div className="absolute top-2 left-2 z-10 bg-primary text-white px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider shadow-md">
+                    <div className="absolute top-1 left-1 z-10 bg-primary text-white px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-md">
                         {t('featured')}
                     </div>
                 )}
 
                 <button
                     onClick={handleFavoriteClick}
-                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
+                    className="absolute top-1 right-1 z-10 p-1 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
                 >
                     <Heart
-                        size={16}
+                        size={14}
                         className={isFavorite ? "fill-red-500 text-red-500" : ""}
                     />
                 </button>
@@ -104,49 +104,37 @@ export default function AdCard({
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-text-muted font-black text-3xl opacity-10 select-none uppercase bg-gray-50 dark:bg-white/5">{t('siteName')}</div>
+                    <div className="w-full h-full flex items-center justify-center text-text-muted font-black text-2xl opacity-10 select-none uppercase bg-gray-50 dark:bg-white/5">{t('siteName')}</div>
                 )}
             </div>
 
             {/* Content Area */}
-            <div className={`flex-1 flex flex-col p-4 ${isVertical ? "gap-2" : ""}`}>
+            <div className={`flex-1 flex flex-col p-2 ${isVertical ? "gap-0.5" : ""}`}>
                 {/* Title */}
-                <h3 className="text-base font-bold text-text-main line-clamp-2 leading-snug">
+                <h3 className="text-xs font-bold text-text-main line-clamp-2 leading-tight min-h-[2.5em]">
                     {title}
                 </h3>
 
                 {/* Specs Grid */}
-                <div className={`grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-text-muted ${isVertical ? "mt-auto mb-3" : "mt-1 mb-3"}`}>
-                    <div className="flex items-center gap-1 font-normal">
-                        <MapPin size={12} className="text-gray-400" />
+                <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 text-[9px] text-text-muted ${isVertical ? "mt-auto mb-1" : "mt-1 mb-2"}`}>
+                    <div className="flex items-center gap-0.5 font-normal">
+                        <MapPin size={9} className="text-gray-400" />
                         <span className="truncate">{location?.split(',')[0].trim()}</span>
                     </div>
-                    {description && (
-                        <div className="flex items-center gap-1 font-normal col-span-2">
-                            <Info size={12} className="text-gray-400" />
-                            <span className="line-clamp-2">{description}</span>
-                        </div>
-                    )}
-                    <div className="flex items-center gap-1 font-normal">
-                        <Clock size={12} className="text-gray-400" />
+                    <div className="flex items-center gap-0.5 font-normal">
+                        <Clock size={9} className="text-gray-400" />
                         <span>{formatRelativeTime(createdAt, language)}</span>
                     </div>
-                    {authorName && (
-                        <div className="flex items-center gap-1 font-normal">
-                            <User size={12} className="text-gray-400" />
-                            <span>{authorName}</span>
-                        </div>
-                    )}
                 </div>
 
                 {/* Price & Category Footer */}
-                <div className="mt-auto flex justify-between items-end pt-3 border-t border-border-color">
-                    <div className="flex items-baseline gap-1 text-text-main">
-                        <span className="text-xl font-bold">{price?.toLocaleString()}</span>
-                        <span className="text-xs font-normal text-text-muted uppercase">{currency}</span>
+                <div className="mt-auto flex justify-between items-end pt-1 border-t border-border-color/50">
+                    <div className="flex items-baseline gap-0.5 text-text-main">
+                        <span className="text-sm font-black">{price?.toLocaleString()}</span>
+                        <span className="text-[8px] font-normal text-text-muted uppercase">{currency}</span>
                     </div>
                     {category && (
-                        <span className="text-[10px] font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
+                        <span className="text-[8px] font-bold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 px-1 py-0.5 rounded-sm uppercase flex items-center gap-0.5">
                             {getCategoryIcon(category)}
                             {(t as any)[category] || category}
                         </span>
