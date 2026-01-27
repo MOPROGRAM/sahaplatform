@@ -94,12 +94,19 @@ body {
 }
 
 [dir="rtl"] body {
-  font-family: 'Cairo', 'Tajawal', sans-serif;
+  font-family: var(--font-cairo), 'Tajawal', sans-serif;
 }
 
 [dir="ltr"] body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), -apple-system, "SF Pro", system-ui, sans-serif;
 }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-hover); }
+::-webkit-scrollbar-track { background: transparent; }
+.card-hover { transition: all 0.24s cubic-bezier(0.4,0,0.2,1); }
+.card-hover:hover { transform: translateY(-4px); box-shadow: var(--glow-orange); }
 
 h1,
 h2,

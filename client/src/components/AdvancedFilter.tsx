@@ -6,6 +6,8 @@ import { ChevronDown, MapPin, Search, X } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useLanguage } from "@/lib/language-context";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -14,18 +16,44 @@ function cn(...inputs: ClassValue[]) {
 export default function AdvancedFilter() {
     const router = useRouter();
     const { language, t } = useLanguage();
-    const { category, subCategory, searchQuery, setSearchQuery, tags, setCategory, setSubCategory, toggleTag, resetFilters } = useFilterStore();
+    const { 
+        category, subCategory, searchQuery, setSearchQuery, tags, 
+        setCategory, setSubCategory, toggleTag, resetFilters,
+        minPrice, maxPrice, setPriceRange,
+        minArea, maxArea, setAreaRange,
+        cityId, setCityId,
+        sortBy, sortOrder, setSort
+    } = useFilterStore();
 
-    const handleTagToggle = (tag: string) => {
-        toggleTag(tag);
-        // Tags don't affect URL directly, they work through the store
-    };
+    const [cities, setCities] = useState<any[]>([]);
+    const [localMinPrice, setLocalMinPrice] = useState(minPrice);
+    const [localMaxPrice, setLocalMaxPrice] = useState(maxPrice);
+    const [localMinArea, setLocalMinArea] = useState(minArea);
+    const [localMaxArea, setLocalMaxArea] = useState(maxArea);
 
-    const subFilters = [
-        { label: t('Area') || 'Area', items: ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة'] },
-        { label: t('Type') || 'Type', items: ['سكني', 'تجاري', 'إيجار', 'بيع', 'استثمار'] },
-        { label: t('Price') || 'Price', items: ['أقل من 50k', '50k - 200k', '200k - 500k', '500k+'] },
-    ];
+    useEffect(() => {
+        const fetchCities = async () => {
+            const { data } = await supabase.from('City').select('*').eq('isActive', true);
+            if (data) setCities(data);
+        };
+        fetchCities();
+    }, []);
+
+    // Debounce price update
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setPriceRange(localMinPrice, localMaxPrice);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [localMinPrice, localMaxPrice, setPriceRange]);
+
+    // Debounce area update
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setAreaRange(localMinArea, localMaxArea);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [localMinArea, localMaxArea, setAreaRange]);
 
     const handleSearch = (value: string) => {
         setSearchQuery(value);
@@ -35,61 +63,119 @@ export default function AdvancedFilter() {
         setSearchQuery("");
     };
 
-    return (
-        <div className="depth-card p-0 rounded-lg overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    const getPriceLabel = () => {
+        if (category === 'jobs') return t('salaryRange');
+        return t('priceRange');
+    };
 
-            {/* Tag Filters (Location/Type/Price) - Retaining this filtering logic here */}
-            <div className="flex flex-col border-b border-border-color">
-                <div className="p-3 bg-gray-50 border-b border-border-color">
-                    <h3 className="text-sm font-bold text-text-main uppercase tracking-wider">{t('filter')}</h3>
+    return (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                    <h3 className="text-sm font-black text-secondary uppercase tracking-wider flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary"></span>
+                        {t('advancedFilter')}
+                    </h3>
+                    {(minPrice || maxPrice || cityId || tags.length > 0) && (
+                        <button 
+                            onClick={resetFilters}
+                            className="text-xs text-red-500 hover:text-red-700 font-bold underline"
+                        >
+                            {t('clearFilters')}
+                        </button>
+                    )}
                 </div>
 
-                <div className="p-3 space-y-2">
-                    {subFilters.map((row, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-text-muted shrink-0 w-16">{row.label}:</span>
-                            <div className="flex flex-wrap gap-2 flex-1 overflow-x-auto no-scrollbar">
-                                {row.items.map((item) => (
-                                    <button
-                                        key={item}
-                                        onClick={() => handleTagToggle(item)}
-                                        className={cn(
-                                            "px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap",
-                                            tags.includes(item) ? 'bg-primary text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-primary/10 hover:text-primary'
-                                        )}
-                                    >
-                                        {item}
-                                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* Location Filter */}
+                    <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{t('location')}</label>
+                        <div className="relative">
+                            <MapPin size={14} className="absolute top-3 left-3 text-gray-400" />
+                            <select 
+                                value={cityId || ''} 
+                                onChange={(e) => setCityId(e.target.value || null)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-md py-2 pl-9 pr-4 text-sm font-bold focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none"
+                            >
+                                <option value="">{t('allCities')}</option>
+                                {cities.map(city => (
+                                    <option key={city.id} value={city.id}>
+                                        {language === 'ar' ? city.nameAr : city.nameEn}
+                                    </option>
                                 ))}
-                            </div>
+                            </select>
+                            <ChevronDown size={14} className="absolute top-3 right-3 text-gray-400 pointer-events-none" />
                         </div>
-                    ))}
+                    </div>
+
+                    {/* Price Range */}
+                    <div className="space-y-1 md:col-span-2">
+                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{getPriceLabel()}</label>
+                        <div className="flex items-center gap-2">
+                            <input 
+                                type="number" 
+                                placeholder={t('min')} 
+                                value={localMinPrice}
+                                onChange={(e) => setLocalMinPrice(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-md py-2 px-3 text-sm font-bold focus:border-primary outline-none"
+                            />
+                            <span className="text-gray-400">-</span>
+                            <input 
+                                type="number" 
+                                placeholder={t('max')} 
+                                value={localMaxPrice}
+                                onChange={(e) => setLocalMaxPrice(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-md py-2 px-3 text-sm font-bold focus:border-primary outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Sort Filter */}
+                    <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{t('sortBy')}</label>
+                        <div className="relative">
+                            <select 
+                                value={`${sortBy}-${sortOrder}`} 
+                                onChange={(e) => {
+                                    const [newSortBy, newSortOrder] = e.target.value.split('-');
+                                    setSort(newSortBy, newSortOrder as 'asc' | 'desc');
+                                }}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-md py-2 px-3 text-sm font-bold focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none"
+                            >
+                                <option value="createdAt-desc">{t('newest')}</option>
+                                <option value="createdAt-asc">{t('oldest')}</option>
+                                <option value="price-asc">{category === 'jobs' ? t('lowestSalary') : t('lowestPrice')}</option>
+                                <option value="price-desc">{category === 'jobs' ? t('highestSalary') : t('highestPrice')}</option>
+                            </select>
+                            <ChevronDown size={14} className="absolute top-3 right-3 text-gray-400 pointer-events-none" />
+                        </div>
+                    </div>
+
+                    {/* Real Estate Specific Filters */}
+                    {category === 'realestate' && (
+                        <>
+                            {/* Listing Type */}
+                            <div className="space-y-1 md:col-span-3">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{t('listingType')}</label>
+                                <div className="flex gap-2 h-[38px] items-center">
+                                    <button
+                                        onClick={() => toggleTag('rent')}
+                                        className={cn("px-3 py-1.5 rounded-md text-xs font-bold border transition-all h-full flex items-center justify-center flex-1", tags.includes('rent') ? "bg-primary text-white border-primary" : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100")}
+                                    >
+                                        {t('forRent')}
+                                    </button>
+                                    <button
+                                        onClick={() => toggleTag('sale')}
+                                        className={cn("px-3 py-1.5 rounded-md text-xs font-bold border transition-all h-full flex items-center justify-center flex-1", tags.includes('sale') ? "bg-primary text-white border-primary" : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100")}
+                                    >
+                                        {t('forSale')}
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
-
-            {/* Selected Tags Summary */}
-            {tags.length > 0 && (
-                <div className="bg-primary/5 p-3 px-4 flex gap-2 items-center flex-wrap border-t border-border-color">
-                    <span className="text-xs text-text-muted font-bold uppercase tracking-wider mr-2">{t('activeFilters')}:</span>
-                    {tags.map(tag => (
-                        <span key={tag} className="bg-white border border-primary/20 text-primary px-2 py-0.5 rounded-full flex items-center gap-1 text-xs">
-                            {tag}
-                            <button
-                                onClick={() => toggleTag(tag)}
-                                className="hover:text-red-500 font-bold"
-                            >
-                                ×
-                            </button>
-                        </span>
-                    ))}
-                    <button
-                        onClick={() => { resetFilters(); handleClearSearch(); }}
-                        className="text-xs text-text-muted hover:text-red-500 underline underline-offset-2 ml-auto font-bold"
-                    >
-                        {t('clearFilters')}
-                    </button>
-                </div>
-            )}
         </div>
     );
 }

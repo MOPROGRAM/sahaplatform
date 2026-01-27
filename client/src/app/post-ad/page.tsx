@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase } from "@/lib/supabase";
+import { apiService } from "@/lib/api";
 import Header from "@/components/Header";
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
@@ -35,6 +36,8 @@ export default function PostAdPage() {
         email: "",
         isBoosted: false,
         enableLocation: true,
+        area: "",
+        listingType: "sale", // 'rent' or 'sale'
     });
     const [images, setImages] = useState<File[]>([]);
     const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
@@ -114,25 +117,33 @@ export default function PostAdPage() {
             }
 
             // Create ad
+            let finalDescription = formData.description;
+            if (formData.category === 'realestate') {
+                if (formData.area) finalDescription += `\n\n${language === 'ar' ? 'المساحة' : 'Area'}: ${formData.area} m²`;
+                if (formData.listingType) finalDescription += `\n${language === 'ar' ? 'النوع' : 'Type'}: ${formData.listingType === 'rent' ? (language === 'ar' ? 'للإيجار' : 'For Rent') : (language === 'ar' ? 'للبيع' : 'For Sale')}`;
+            }
+            if (formData.subCategory) {
+                finalDescription += `\n\n${language === 'ar' ? 'التصنيف الفرعي' : 'Subcategory'}: ${formData.subCategory}`;
+            }
+
             const adData: any = {
                 title: formData.title,
-                description: formData.description,
+                description: finalDescription,
                 price: parseFloat(formData.price),
                 category: formData.category,
-                sub_category: formData.subCategory || null,
+                // subCategory: formData.subCategory, // Removed as column doesn't exist
                 location: formData.enableLocation ? formData.location : null,
                 latitude: coordinates?.lat || null,
                 longitude: coordinates?.lng || null,
                 images: JSON.stringify(imageUrls),
-                author_id: currentUser.id,
-                is_active: true,
-                phone: formData.phone || null,
-                email: formData.email || null,
-                currency_id: 'sar'
+                userId: currentUser.id,
+                isActive: true,
+                currencyId: 'sar',
+                // area: formData.area ? parseFloat(formData.area) : null, // Removed as column doesn't exist
             };
 
             const { data, error: insertError } = await (supabase as any)
-                .from('ads')
+                .from('Ad')
                 .insert(adData)
                 .select()
                 .single();
@@ -244,8 +255,37 @@ export default function PostAdPage() {
                                     </div>
                                 </div>
 
-                                {formData.category === 'realestate' && (
-                                    <div className="space-y-2">
+                                    {formData.category === 'realestate' && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                            <div>
+                                                <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{language === 'ar' ? 'المساحة (م²)' : 'Area (m²)'} *</label>
+                                                <input
+                                                    name="area"
+                                                    type="number"
+                                                    value={formData.area}
+                                                    onChange={handleInputChange}
+                                                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all font-bold"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{language === 'ar' ? 'نوع العرض' : 'Listing Type'} *</label>
+                                                <select
+                                                    name="listingType"
+                                                    value={formData.listingType}
+                                                    onChange={handleInputChange}
+                                                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all cursor-pointer font-bold"
+                                                    required
+                                                >
+                                                    <option value="sale">{language === 'ar' ? 'للبيع' : 'For Sale'}</option>
+                                                    <option value="rent">{language === 'ar' ? 'للإيجار' : 'For Rent'}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {formData.category === 'realestate' && (
+                                        <div className="space-y-2">
                                         <label className="text-[11px] font-black uppercase tracking-widest block"><MapPin size={12} className="inline" /> {t('location')}</label>
                                         <MapSelector onLocationSelect={handleLocationSelect} height="250px" />
                                     </div>

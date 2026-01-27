@@ -23,10 +23,13 @@ interface Ad {
     location: string | null;
     category: string;
     description?: string;
-    created_at: string;
+    createdAt: string;
     images: string;
-    is_boosted?: boolean;
-    author_id: string;
+    isBoosted?: boolean;
+    userId: string;
+    author?: {
+        name: string;
+    };
 }
 
 export default function HomePage() {
@@ -61,13 +64,13 @@ export default function HomePage() {
             let query = (supabase as any)
                 .from('Ad') // Changed from 'ads' to 'Ad'
                 .select('*, author:User(name)') // Fetch author name
-                .eq('is_active', true);
+                .eq('isActive', true);
 
             if (filter === 'featured') {
-                query = query.eq('is_boosted', true);
+                query = query.eq('isBoosted', true);
             }
 
-            query = query.order('created_at', { ascending: false }).limit(20);
+            query = query.order('createdAt', { ascending: false }).limit(20);
 
             const { data, error } = await query;
             if (error) {
@@ -90,7 +93,7 @@ export default function HomePage() {
                 const { count } = await (supabase as any)
                     .from('Ad') // Changed from 'ads' to 'Ad'
                     .select('*', { count: 'exact', head: true })
-                    .eq('is_active', true)
+                    .eq('isActive', true)
                     .eq('category', cat.key);
                 return { key: cat.key, count: count || 0 };
             }));
@@ -113,9 +116,9 @@ export default function HomePage() {
         <div className="min-h-screen bg-[#f4f4f4] flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
             <Header />
 
-            <main className={cn("max-w-7xl mx-auto w-full p-2 grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1", language === "ar" ? "lg:flex-row-reverse" : "lg:flex-row")}>
-                {/* Right/Left Sidebar - Titled Categories (Conditional Order) */}
-                <aside className={`lg:col-span-3 space-y-2 hidden md:block ${language === "ar" ? "order-2" : "order-1"}`}>
+            <main className="max-w-7xl mx-auto w-full p-2 grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1">
+                {/* Right/Left Sidebar - Titled Categories */}
+                <aside className="lg:col-span-3 space-y-2 hidden md:block">
                     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                         <div className="bg-gray-50 px-3 py-2 text-xs font-black border-b border-gray-100 text-secondary uppercase tracking-widest text-center">
                             {t("categories")}
@@ -167,10 +170,10 @@ export default function HomePage() {
                                     currency={currency.toUpperCase()} // Use dynamic currency
                                     location={ad.location || ''}
                                     images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
-                                    createdAt={ad.created_at}
+                                    createdAt={ad.createdAt}
                                     category={ad.category}
                                     language={language}
-                                    isFeatured={ad.is_boosted || false}
+                                    isFeatured={ad.isBoosted || false}
                                 />
                             ))}
                             {ads.length === 0 && (

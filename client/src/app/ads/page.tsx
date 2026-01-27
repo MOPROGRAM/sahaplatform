@@ -26,15 +26,15 @@ interface Ad {
     description?: string;
     price: number | null;
     category: string;
-    sub_category?: string | null;
+    subCategory?: string | null;
     location: string | null;
     latitude?: number | null;
     longitude?: number | null;
     images: string;
-    created_at: string;
+    createdAt: string;
     views?: number;
     author?: { name?: string };
-    is_boosted?: boolean;
+    isBoosted?: boolean;
 }
 
 function AdsContent() {
@@ -44,7 +44,7 @@ function AdsContent() {
     const searchQueryParam = searchParams.get('search');
     const categoryParam = searchParams.get('category');
     const subCategoryParam = searchParams.get('subcategory');
-    const { category, subCategory, tags, setCategory, setSubCategory, toggleTag, resetFilters } = useFilterStore();
+    const { category, subCategory, tags, setCategory, setSubCategory, toggleTag, resetFilters, minPrice, maxPrice, minArea, maxArea, cityId, sortBy, sortOrder } = useFilterStore();
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
@@ -94,12 +94,17 @@ function AdsContent() {
         try {
             const filters: any = {
                 limit: 100,
-                sortBy: 'created_at',
-                sortOrder: 'desc',
+                sortBy: sortBy || 'createdAt',
+                sortOrder: sortOrder || 'desc',
                 category,
                 subCategory,
                 search: searchQuery,
-                tags
+                tags,
+                minPrice: minPrice ? parseFloat(minPrice) : undefined,
+                maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+                minArea: minArea ? parseFloat(minArea) : undefined,
+                maxArea: maxArea ? parseFloat(maxArea) : undefined,
+                cityId
             };
 
             const data = await adsService.getAds(filters);
@@ -110,7 +115,7 @@ function AdsContent() {
         } finally {
             setLoading(false);
         }
-    }, [category, subCategory, tags, searchQuery]);
+    }, [category, subCategory, tags, searchQuery, minPrice, maxPrice, minArea, maxArea, cityId, sortBy, sortOrder]);
 
     // Sync URL params to store state on initial load/URL change
     useEffect(() => {
@@ -209,11 +214,10 @@ function AdsContent() {
                                 currency="SAR"
                                 location={ad.location || ''}
                                 images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
-                                createdAt={ad.created_at}
+                                createdAt={ad.createdAt}
                                 category={ad.category}
                                 language={language}
-                                isFeatured={ad.is_boosted || false}
-                                views={ad.views || 0}
+                                isFeatured={ad.isBoosted || false}
                                 authorName={ad.author?.name}
                                 description={ad.description}
                             // Removed onMapHighlight and isHighlighted props as map is removed

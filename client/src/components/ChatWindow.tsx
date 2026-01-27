@@ -49,24 +49,44 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
             // Subscribe to new messages
             channel = conversationsService.subscribeToConversation(conversationId, (payload) => {
-                console.log('[CHAT-REALTIME] Payload received:', payload);
-                if (payload.eventType === 'INSERT') {
-                    const newMessage = payload.new;
+                // Handle both snake_case (Postgres standard) and camelCase (Prisma) payload keys
+                const newItem = payload.new;
+                const newItemConversationId = newItem.conversationId || newItem.conversation_id;
+
+                if (payload.eventType === 'INSERT' && newItemConversationId === conversationId) {
+                    const newMessage = newItem;
 
                     // Transform raw DB fields to UI interface
                     const processedMessage: Message = {
                         id: newMessage.id,
-                        senderId: newMessage.sender_id,
+                        senderId: newMessage.senderId || newMessage.sender_id,
                         content: newMessage.content,
-                        messageType: newMessage.message_type,
-                        createdAt: newMessage.created_at || new Date().toISOString(),
-                        sender: { name: 'User' } // Default name since joins don't come in realtime
+                        messageType: newMessage.messageType || newMessage.message_type || 'text',
+                        createdAt: newMessage.createdAt || newMessage.created_at || new Date().toISOString(),
+                        sender: { name: '...' } // Temporary placeholder
                     };
 
+                    // Optimistically add message
                     setMessages(prev => {
                         if (prev.find(m => m.id === processedMessage.id)) return prev;
                         return [...prev, processedMessage];
                     });
+
+                    // Fetch sender name immediately
+                    supabase
+                        .from('User')
+                        .select('name')
+                        .eq('id', processedMessage.senderId)
+                        .single()
+                        .then(({ data: userData }) => {
+                            if (userData) {
+                                setMessages(prev => prev.map(m => 
+                                    m.id === processedMessage.id 
+                                        ? { ...m, sender: { name: userData.name } }
+                                        : m
+                                ));
+                            }
+                        });
                 }
             });
         }

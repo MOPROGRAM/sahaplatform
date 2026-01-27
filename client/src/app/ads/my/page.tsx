@@ -144,13 +144,13 @@ export default function MyAdsPage() {
                                     price={ad.price}
                                     location={ad.location}
                                     images={JSON.parse(ad.images || '[]')}
-                                    createdAt={ad.created_at}
+                                    createdAt={ad.createdAt}
                                     category={ad.category}
                                     language={language}
                                 />
                                 <div className="p-4 border-t border-gray-100 flex justify-between items-center">
                                     <div className="text-xs text-gray-500">
-                                        {formatRelativeTime(ad.created_at, language)}
+                                        {formatRelativeTime(ad.createdAt, language)}
                                     </div>
                                     <div className="flex gap-2">
                                         <button

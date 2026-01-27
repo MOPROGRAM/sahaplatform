@@ -7,7 +7,7 @@ const getAllAds = async (filters) => {
     try {
         const where = {};
         if (userId) {
-            where.userId = userId;
+            where.authorId = userId;
         } else {
             where.isActive = true;
         }
@@ -94,7 +94,7 @@ const getAllAds = async (filters) => {
         const queryOptions = {
             where,
             include: {
-                user: {
+                author: {
                     select: { id: true, name: true, verified: true, phone: true }
                 },
                 city: {
@@ -127,8 +127,8 @@ const getAllAds = async (filters) => {
 
 const createAd = async (adData, userId) => {
     try {
-        // Remove userId from adData if it exists to avoid duplication with userId param
-        const { userId, ...data } = adData;
+        // Remove authorId/userId from adData if it exists to avoid duplication
+        const { authorId, userId: uid, ...data } = adData;
         // Normalize currencyId to lowercase
         if (data.currencyId) data.currencyId = data.currencyId.toLowerCase();
         return await prisma.ad.create({
@@ -199,7 +199,7 @@ const deleteAd = async (id, userId) => {
     try {
         const ad = await prisma.ad.findUnique({ where: { id } });
         if (!ad) throw new Error('Ad not found');
-        if (ad.userId !== userId) throw new Error('Unauthorized');
+        if (ad.authorId !== userId) throw new Error('Unauthorized');
 
         // Soft delete
         return await prisma.ad.update({

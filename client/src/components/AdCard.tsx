@@ -21,7 +21,6 @@ interface AdCardProps {
     className?: string;
     language?: 'ar' | 'en';
     isFeatured?: boolean;
-    views?: number;
     description?: string;
     onMapHighlight?: (adId: string | null) => void;
     isHighlighted?: boolean;
@@ -41,7 +40,6 @@ export default function AdCard({
     className = "",
     language = 'ar',
     isFeatured = false,
-    views = 0,
     description = "",
     onMapHighlight,
     isHighlighted = false
@@ -75,10 +73,10 @@ export default function AdCard({
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
 
-            {/* Image Area (Left, ~40% width) */}
-            <div className="relative w-2/5 shrink-0 overflow-hidden">
+            {/* Image Area (Left, Small ~30% width) */}
+            <div className="relative w-[30%] shrink-0 overflow-hidden">
                 {isFeatured && (
-                    <div className="absolute top-2 left-2 z-10 bg-primary text-white px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider shadow-md">
+                    <div className="absolute top-1 left-1 z-10 bg-primary text-white px-1.5 py-0.5 rounded-sm text-[8px] font-black uppercase tracking-wider shadow-md">
                         {t('featured')}
                     </div>
                 )}

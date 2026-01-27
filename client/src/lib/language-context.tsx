@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Language, getCurrentLanguage, setLanguage as setLangUtil, getTranslation, TranslationKey } from './i18n';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useTheme } from 'next-themes';
 
 interface LanguageContextType {
     language: Language;
@@ -20,21 +21,20 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [language, setLanguageState] = useState<Language>('ar');
-    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const { theme: nextTheme, setTheme: setNextTheme, resolvedTheme } = useTheme();
     const [country, setCountryState] = useState<string>('sa');
     const [currency, setCurrencyState] = useState<string>('sar');
     const { initialize } = useAuthStore();
+
+    const theme = (resolvedTheme || 'light') as 'light' | 'dark';
 
     useEffect(() => {
         // Init Language
         const savedLang = getCurrentLanguage();
         setLanguageState(savedLang);
-
-        // Init Theme
-        const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
-        setTheme(savedTheme);
-        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-        document.documentElement.setAttribute('data-theme', savedTheme);
+        setLangUtil(savedLang);
+        document.documentElement.lang = savedLang;
+        document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
 
         // Init Regional
         const savedCountry = localStorage.getItem('country') || 'sa';
@@ -48,6 +48,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
         setLangUtil(lang);
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     };
 
     const setCountry = (c: string) => {
@@ -61,11 +63,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-        document.documentElement.classList.toggle('dark', newTheme === 'dark');
-        document.documentElement.setAttribute('data-theme', newTheme);
+        setNextTheme(theme === 'light' ? 'dark' : 'light');
     };
 
     const t = (key: TranslationKey) => getTranslation(key, language);

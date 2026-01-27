@@ -8,26 +8,26 @@ export type Ad = {
     title: string;
     description: string;
     price: number | null;
-    currency_id: string;
+    currencyId: string;
     category: string;
-    sub_category?: string | null;
+    subCategory?: string | null;
     location: string | null;
     address?: string | null;
-    payment_method?: string | null;
-    city_id?: string | null;
+    paymentMethod?: string | null;
+    cityId?: string | null;
     latitude?: number | null;
     longitude?: number | null;
     images: string;
     video?: string | null;
-    is_boosted: boolean;
-    is_active: boolean;
+    isBoosted: boolean;
+    isActive: boolean;
     views: number;
-    author_id: string;
-    created_at: string;
-    updated_at: string;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
     phone?: string;
     email?: string;
-    // علاقات
+    // Relations
     author?: {
         id: string;
         name?: string;
@@ -37,8 +37,8 @@ export type Ad = {
     city?: {
         id: string;
         name: string;
-        name_ar?: string;
-        name_en?: string;
+        nameAr?: string;
+        nameEn?: string;
     };
     currency?: {
         id: string;
@@ -48,43 +48,91 @@ export type Ad = {
     };
 }
 
-// خدمة إدارة الإعلانات باستخدام Supabase مباشرة
+// Service to manage ads using Supabase directly
 export const adsService = {
-    // الحصول على جميع الإعلانات مع الفلاتر
+    // Get all ads with filters
     async getAds(filters: {
         category?: string;
         subCategory?: string;
         search?: string;
         limit?: number;
+        minPrice?: number;
+        maxPrice?: number;
+        cityId?: string;
+        sortBy?: string;
+        sortOrder?: 'asc' | 'desc';
         tags?: string[];
+        minArea?: number;
+        maxArea?: number;
     } = {}) {
         let query = (supabase as any)
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
+                author:User!userId(id, name, email, phone),
+                city:City(id, name, nameAr, nameEn),
+                currency:Currency(id, code, symbol, name)
             `)
-            .eq('is_active', true);
+            .eq('isActive', true);
 
-        // فلترة بالقسم
+        // Filter by category
         if (filters.category) {
-            query = query.ilike('category', filters.category);
+            query = query.eq('category', filters.category);
         }
 
-        // فلترة بالتصنيف الفرعي
+        // Filter by subcategory
         if (filters.subCategory) {
-            query = query.ilike('sub_category', filters.subCategory);
+            // Since subCategory column might not exist, we search in description/title
+            query = query.or(`title.ilike.%${filters.subCategory}%,description.ilike.%${filters.subCategory}%`);
         }
 
-        // بحث بسيط بالاسم والوصف
+        // Simple search by title and description
         if (filters.search) {
             query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
         }
 
-        // ترتيب ثابت ومضمون
-        query = query.order('created_at', { ascending: false });
+        // Price Filter
+        if (filters.minPrice) {
+            query = query.gte('price', filters.minPrice);
+        }
+        if (filters.maxPrice) {
+            query = query.lte('price', filters.maxPrice);
+        }
+
+        // Area Filter - disabled as column doesn't exist in schema
+        /*
+        if (filters.minArea) {
+            query = query.gte('area', filters.minArea);
+        }
+        if (filters.maxArea) {
+            query = query.lte('area', filters.maxArea);
+        }
+        */
+
+        // Tags Filter (Rent/Sale etc)
+        if (filters.tags && filters.tags.length > 0) {
+            filters.tags.forEach(tag => {
+                // If tag is rent or sale, we might check a specific column if it exists, 
+                // or just search in text if that's how it's implemented. 
+                // Assuming text search based on previous implementation:
+                let tagConditions = `subCategory.ilike.%${tag}%,title.ilike.%${tag}%,description.ilike.%${tag}%`;
+                if (tag === 'rent') tagConditions += `,title.ilike.%إيجار%,description.ilike.%إيجار%`;
+                if (tag === 'sale') tagConditions += `,title.ilike.%بيع%,description.ilike.%بيع%`;
+                query = query.or(tagConditions);
+            });
+        }
+
+        // City/Location Filter
+        if (filters.cityId) {
+            query = query.eq('cityId', filters.cityId);
+        }
+
+        // Sort
+        if (filters.sortBy) {
+            query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
+        } else {
+            query = query.order('createdAt', { ascending: false });
+        }
 
         const limit = filters.limit || 50;
         query = query.limit(limit);
@@ -99,20 +147,20 @@ export const adsService = {
         return data || [];
     },
 
-    // الحصول على إعلان واحد
+    // Get single ad
     async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
         let query = (supabase as any)
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
+                author:User!userId(id, name, email, phone),
+                city:City(id, name, nameAr, nameEn),
+                currency:Currency(id, code, symbol, name)
             `)
             .eq('id', id);
 
         if (!searchAll) {
-            query = query.eq('is_active', true);
+            query = query.eq('isActive', true);
         }
 
         const { data, error } = await query.single();
@@ -125,7 +173,7 @@ export const adsService = {
         return data as Ad;
     },
 
-    // الحصول على إعلانات المستخدم
+    // Get user's ads
     async getMyAds(): Promise<Ad[]> {
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -137,12 +185,12 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
+                author:User!userId(id, name, email, phone),
+                city:City(id, name, nameAr, nameEn),
+                currency:Currency(id, code, symbol, name)
             `)
-            .eq('author_id', user.id)
-            .order('created_at', { ascending: false });
+            .eq('userId', user.id)
+            .order('createdAt', { ascending: false });
 
         if (error) {
             console.error('Error fetching my ads:', error);
@@ -152,7 +200,7 @@ export const adsService = {
         return (data as Ad[]) || [];
     },
 
-    // إنشاء إعلان جديد
+    // Create new ad
     async createAd(adData: any): Promise<Ad> {
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -164,14 +212,14 @@ export const adsService = {
             .from('Ad')
             .insert({
                 ...adData,
-                author_id: user.id,
-                currency_id: adData.currency_id || 'sar',
+                userId: user.id,
+                currencyId: adData.currencyId || 'sar',
             })
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
+                author:User!userId(id, name, email, phone),
+                city:City(id, name, nameAr, nameEn),
+                currency:Currency(id, code, symbol, name)
             `)
             .single();
 
@@ -183,7 +231,7 @@ export const adsService = {
         return data as Ad;
     },
 
-    // تحديث إعلان
+    // Update ad
     async updateAd(id: string, updates: any): Promise<Ad> {
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -195,12 +243,12 @@ export const adsService = {
             .from('Ad')
             .update(updates)
             .eq('id', id)
-            .eq('author_id', user.id)
+            .eq('userId', user.id)
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:cities(id, name, name_ar, name_en),
-                currency:currencies(id, code, symbol, name)
+                author:User!userId(id, name, email, phone),
+                city:City(id, name, nameAr, nameEn),
+                currency:Currency(id, code, symbol, name)
             `)
             .single();
 
@@ -212,7 +260,7 @@ export const adsService = {
         return data as Ad;
     },
 
-    // حذف إعلان
+    // Delete ad
     async deleteAd(id: string): Promise<void> {
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -224,7 +272,7 @@ export const adsService = {
             .from('Ad')
             .delete()
             .eq('id', id)
-            .eq('author_id', user.id);
+            .eq('userId', user.id);
 
         if (error) {
             console.error('Error deleting ad:', error);
@@ -232,7 +280,7 @@ export const adsService = {
         }
     },
 
-    // زيادة عدد المشاهدات
+    // Increment views
     async incrementViews(id: string): Promise<void> {
         const { error } = await supabase.rpc('increment_ad_views', { adId: id });
         if (error) {

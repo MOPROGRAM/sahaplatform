@@ -67,7 +67,7 @@ export default function Header() {
     };
 
     return (
-        <header className={`sticky top-0 z-[100] transition-all duration-300 bg-white/95 backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
+        <header className={`sticky top-0 z-[100] transition-all duration-300 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
                 {/* Brand */}
                 <Link href="/" className="group shrink-0">
@@ -76,12 +76,12 @@ export default function Header() {
 
                 {/* Search Bar - Floating Effect Achieved via Sticky Header and Scroll Logic */}
                 <div className="flex-1 max-w-xl relative group">
-                    <div className="glow-input flex border border-border-color rounded-full bg-gray-100 focus-within:border-primary transition-all shadow-sm hover:shadow-md">
+                    <div className="glow-input flex border border-border-color rounded-full bg-gray-100 dark:bg-gray-900 focus-within:border-primary transition-all shadow-sm hover:shadow-md">
                         <Search size={18} className="text-text-muted ml-4 shrink-0" />
                         <input
                             type="text"
                             placeholder={t("searchPlaceholder")}
-                            className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm font-medium text-gray-700 placeholder-gray-400"
+                            className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm font-medium text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
@@ -100,14 +100,14 @@ export default function Header() {
 
                 {/* Navigation & Actions */}
                 <nav className="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
-                    <Link href="/ads" className={`transition-colors ${pathname?.startsWith("/ads") ? "text-primary border-b-2 border-primary pb-1" : "text-secondary hover:text-primary"}`}>{t("ads")}</Link>
-                    <Link href="/advertise" className={`transition-colors ${pathname === "/advertise" ? "text-primary border-b-2 border-primary" : "text-secondary hover:text-primary"}`}>{t("advertise")}</Link>
+                    <Link href="/ads" className={`transition-colors ${pathname?.startsWith("/ads") ? "text-primary border-b-2 border-primary pb-1" : "text-text-main hover:text-primary"}`}>{t("ads")}</Link>
+                    <Link href="/advertise" className={`transition-colors ${pathname === "/advertise" ? "text-primary border-b-2 border-primary" : "text-text-main hover:text-primary"}`}>{t("advertise")}</Link>
                 </nav>
 
                 {/* Action Grid */}
                 <div className="flex items-center gap-3 shrink-0">
 
-                    <div className="hidden lg:flex items-center gap-2 text-gray-500">
+                    <div className="hidden lg:flex items-center gap-2 text-gray-500 dark:text-gray-400">
                         <button onClick={toggleTheme} className="p-2 hover:text-primary transition-colors">
                             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
                         </button>

@@ -58,60 +58,11 @@ export default function RootLayout({
         <html className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`}>
             <head>
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
-                <style dangerouslySetInnerHTML={{
-                    __html: `
-                        :root {
-                            --primary: #FF4D00;
-                            --primary-hover: #FF9E00;
-                            --secondary: #0f172a;
-                            --primary-light: rgba(255, 77, 0, 0.06);
-
-                            /* Light Theme */
-                            --gray-bg: #f8fafc;
-                            --card-bg: #ffffff;
-                            --text-main: #0f172a;
-                            --text-muted: #64748b;
-                            --border-color: #e2e8f0;
-                        }
-
-                        .dark {
-                            /* Dark Theme */
-                            --gray-bg: #0B1120;
-                            --card-bg: #131A2A;
-                            --text-main: #f8fafc;
-                            --text-muted: #94a3b8;
-                            --border-color: #334155;
-                        }
-
-                        body {
-                            font-family: var(--font-cairo), -apple-system, "SF Pro Arabic", system-ui, sans-serif;
-                            background: var(--gray-bg);
-                            color: var(--text-main);
-                            -webkit-font-smoothing: antialiased;
-                            -moz-osx-font-smoothing: grayscale;
-                            font-size: 14px;
-                            font-weight: 500; /* body weight per spec */
-                            margin: 0;
-                            padding: 0;
-                            transition: background-color 0.22s ease, color 0.22s ease;
-                        }
-                        [dir="ltr"] body {
-                            font-family: var(--font-inter), -apple-system, "SF Pro", system-ui, sans-serif;
-                        }
-                        h1,h2,h3,h4 { font-family: var(--font-readex), var(--font-inter), system-ui, sans-serif; font-weight: 700; }
-                        ::-webkit-scrollbar { width: 6px; height: 6px; }
-                        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); border-radius: 10px; }
-                        ::-webkit-scrollbar-thumb:hover { background: var(--primary-hover); }
-                        ::-webkit-scrollbar-track { background: transparent; }
-                        .card-hover { transition: all 0.24s cubic-bezier(0.4,0,0.2,1); }
-                        .card-hover:hover { transform: translateY(-4px); box-shadow: var(--glow-orange); }
-                    `
-                }} />
             </head>
             <body>
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                     <LanguageProvider>
-                        <div className="flex min-h-screen bg-aurora-subtle transition-colors duration-500">
+                        <div className="flex min-h-screen bg-gray-bg transition-colors duration-500">
                             <CategorySidebar />
                             <main className="flex-1 overflow-x-hidden">
                                 {children}
