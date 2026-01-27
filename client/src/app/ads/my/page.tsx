@@ -137,7 +137,7 @@ export default function MyAdsPage() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {ads.map((ad) => (
-                            <div key={ad.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                            <div key={ad.id} className="h-full">
                                 <AdCard
                                     id={ad.id}
                                     title={ad.title}
@@ -148,26 +148,21 @@ export default function MyAdsPage() {
                                     category={ad.category}
                                     language={language}
                                 />
-                                <div className="p-4 border-t border-gray-100 flex justify-between items-center">
-                                    <div className="text-xs text-gray-500">
-                                        {formatRelativeTime(ad.createdAt, language)}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => router.push(`/ads/${ad.id}/edit`)}
-                                            className="text-blue-600 hover:text-blue-800 p-1"
-                                            title={language === 'ar' ? 'تعديل' : 'Edit'}
-                                        >
-                                            <Edit size={16} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteAd(ad.id)}
-                                            className="text-red-600 hover:text-red-800 p-1"
-                                            title={t('delete')}
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
+                                <div className="mt-2 flex justify-end gap-2 px-2">
+                                    <button
+                                        onClick={() => router.push(`/ads/${ad.id}/edit`)}
+                                        className="text-blue-600 hover:text-blue-800 p-2 bg-blue-50 rounded-full transition-colors"
+                                        title={language === 'ar' ? 'تعديل' : 'Edit'}
+                                    >
+                                        <Edit size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteAd(ad.id)}
+                                        className="text-red-600 hover:text-red-800 p-2 bg-red-50 rounded-full transition-colors"
+                                        title={t('delete')}
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
                                 </div>
                             </div>
                         ))}
