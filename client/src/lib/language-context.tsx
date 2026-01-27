@@ -43,7 +43,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         setCurrencyState(savedCurrency);
 
         initialize();
-    }, []);
+    }, [initialize]);
 
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);

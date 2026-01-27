@@ -78,12 +78,7 @@ export default function HomePage() {
         }
     }, [filter]);
 
-    useEffect(() => {
-        fetchAds();
-        fetchCategoryCounts();
-    }, [fetchAds]);
-
-    const fetchCategoryCounts = async () => {
+    const fetchCategoryCounts = useCallback(async () => {
         try {
             const updated = await Promise.all(categoriesList.map(async (cat) => {
                 const { count } = await (supabase as any)
@@ -101,7 +96,12 @@ export default function HomePage() {
         } catch (error) {
             console.warn('Failed to fetch category counts:', error);
         }
-    };
+    }, [categoriesList]);
+
+    useEffect(() => {
+        fetchAds();
+        fetchCategoryCounts();
+    }, [fetchAds, fetchCategoryCounts]);
 
     return (
         <div className="min-h-screen bg-[#f4f4f4] flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, Save, X, Camera, MapPin } from "lucide-react";
+import { Loader2, Save, MapPin } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import { adsService } from "@/lib/ads";
@@ -143,7 +143,7 @@ export default function EditAdPage() {
             if (!currentUser) throw new Error("Not authenticated");
 
             // Upload new images if any
-            let imageUrls = [...existingImages];
+            const imageUrls = [...existingImages];
             if (newImages.length > 0) {
                 for (const image of newImages) {
                     const fileExt = image.name.split('.').pop();

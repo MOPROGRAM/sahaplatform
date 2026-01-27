@@ -193,6 +193,24 @@ export const translations = {
         foundAds: 'تم العثور على {{count}} إعلان',
         clearFilters: 'مسح التصفية',
         priceOnRequest: 'السعر عند التواصل',
+        activeFilters: 'الفلاتر النشطة',
+
+        // Filter Labels
+        Area: 'المنطقة',
+        Type: 'النوع',
+        Price: 'السعر',
+
+        // Auth Pages
+        activeFilters: 'الفلاتر النشطة',
+
+        // Auth Pages
+        activeFilters: 'الفلاتر النشطة',
+
+        // Auth Pages
+        activeFilters: 'الفلاتر النشطة',
+
+        // Auth Pages
+        activeFilters: 'الفلاتر النشطة',
 
         // Auth Pages
         loginTitle: 'تسجيل الدخول للنظام',
@@ -398,6 +416,7 @@ export const translations = {
         foundAds: 'Found {{count}} ads',
         clearFilters: 'Clear Filters',
         priceOnRequest: 'Price on request',
+        activeFilters: 'Active Filters',
 
         // Auth Pages
         loginTitle: 'System Login',
@@ -411,6 +430,12 @@ export const translations = {
         alreadyHaveAccount: 'Already have an account?',
         noAccount: 'Don\'t have an account?',
         processing: 'Processing...',
+        activeFilters: 'Active Filters',
+
+        // Filter Labels
+        Area: 'Area',
+        Type: 'Type',
+        Price: 'Price',
     }
 };
 
