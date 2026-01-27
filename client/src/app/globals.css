@@ -171,7 +171,10 @@ body {
   }
 
   .bento-input {
-    @apply w-full bg-gray-50/50 border border-gray-200 p-4 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all font-bold text-text-main;
+    @apply w-full bg-gray-50/50 border border-gray-200 p-4 rounded-2xl outline-none focus:border-primary focus:ring-4 transition-all font-bold text-text-main;
+  }
+  .bento-input:focus {
+    --tw-ring-color: rgb(var(--primary-rgb) / 0.05);
   }
 }
 
