@@ -59,6 +59,7 @@ export const translations = {
         fashion: 'موضة وأزياء',
         sports: 'رياضة',
         books: 'كتب',
+        noImage: 'لا توجد صورة',
 
         // Regional
         country: 'الدولة',
@@ -201,18 +202,6 @@ export const translations = {
         Price: 'السعر',
 
         // Auth Pages
-        activeFilters: 'الفلاتر النشطة',
-
-        // Auth Pages
-        activeFilters: 'الفلاتر النشطة',
-
-        // Auth Pages
-        activeFilters: 'الفلاتر النشطة',
-
-        // Auth Pages
-        activeFilters: 'الفلاتر النشطة',
-
-        // Auth Pages
         loginTitle: 'تسجيل الدخول للنظام',
         registerTitle: 'إنشاء حساب جديد',
         placeholderEmail: 'أدخل البريد الإلكتروني...',
@@ -282,6 +271,7 @@ export const translations = {
         fashion: 'Fashion',
         sports: 'Sports',
         books: 'Books',
+        noImage: 'No Image',
 
         // Regional
         country: 'Country',
@@ -430,8 +420,6 @@ export const translations = {
         alreadyHaveAccount: 'Already have an account?',
         noAccount: 'Don\'t have an account?',
         processing: 'Processing...',
-        activeFilters: 'Active Filters',
-
         // Filter Labels
         Area: 'Area',
         Type: 'Type',
@@ -440,10 +428,10 @@ export const translations = {
 };
 
 export type Language = 'ar' | 'en';
-export type TranslationKey = keyof typeof translations.ar;
+export type TranslationKey = keyof typeof translations.ar | 'noImage';
 
 export const getTranslation = (key: TranslationKey, lang: Language = 'ar'): string => {
-    return translations[lang][key] || translations.ar[key] || key;
+    return (translations[lang][key as keyof typeof translations.ar] || translations.ar[key as keyof typeof translations.ar] || key);
 };
 
 export const getCurrentLanguage = (): Language => {

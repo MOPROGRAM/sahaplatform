@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Clock, MapPin, Eye, User, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon } from "lucide-react";
+import { Heart, Clock, MapPin, Eye, User, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench } from "lucide-react"; // Added more icons for subcategories
 import { formatRelativeTime } from "@/lib/utils";
 
 interface AdCardProps {
@@ -17,28 +17,34 @@ interface AdCardProps {
     createdAt: string;
     authorName?: string;
     category?: string;
+    subCategory?: string; // Added subCategory
     className?: string;
     language?: 'ar' | 'en';
     isFeatured?: boolean;
     views?: number;
     description?: string;
+    onMapHighlight?: (adId: string | null) => void; // New prop for map interaction
+    isHighlighted?: boolean; // New prop to indicate if the card is highlighted
 }
 
 export default function AdCard({
     id,
     title,
     price,
-    currency = "ريال",
+    currency = "SAR", // Changed default currency to SAR
     location,
     images = [],
     createdAt,
     authorName,
     category,
+    subCategory, // Destructure subCategory
     className = "",
     language = 'ar',
     isFeatured = false,
     views = 0,
-    description = ""
+    description = "",
+    onMapHighlight, // Destructure new prop
+    isHighlighted = false // Destructure new prop
 }: AdCardProps) {
     const { t } = useLanguage();
     const [isFavorite, setIsFavorite] = useState(false);
@@ -52,25 +58,34 @@ export default function AdCard({
         switch (catKey) {
             case 'realestate': return <HomeIcon size={12} className="text-gray-400" />;
             case 'cars': return <CarIcon size={12} className="text-gray-400" />;
+            case 'electronics': return <SmartphoneIcon size={12} className="text-gray-400" />;
+            case 'goods': return <TagIcon size={12} className="text-gray-400" />;
             case 'jobs': return <BriefcaseIcon size={12} className="text-gray-400" />;
+            case 'services': return <Wrench size={12} className="text-gray-400" />;
+            case 'other': return <BuildingIcon size={12} className="text-gray-400" />;
             default: return null;
         }
     }
 
     return (
-        <Link href={`/ads/${id}`} className={`bg-white border border-gray-100 rounded-xl overflow-hidden group flex transition-all duration-300 hover:shadow-xl hover:border-primary/30 ${className}`}>
+        <Link
+            href={`/ads/${id}`}
+            className={`bg-white border rounded-lg overflow-hidden group flex transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-border-color"} ${className}`}
+            onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
+            onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
+        >
 
             {/* Image Area (Left, ~40% width) */}
             <div className="relative w-2/5 shrink-0 overflow-hidden">
                 {isFeatured && (
-                    <div className="absolute top-2 left-2 z-10 bg-primary text-white px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest shadow-lg">
+                    <div className="absolute top-2 left-2 z-10 bg-primary text-white px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider shadow-md">
                         {t('featured')}
                     </div>
                 )}
 
                 <button
                     onClick={handleFavoriteClick}
-                    className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm text-gray-400 hover:text-red-500 transition-all shadow-sm"
+                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
                 >
                     <Heart
                         size={14}
@@ -84,38 +99,38 @@ export default function AdCard({
                         alt={title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
+                        sizes="(max-width: 640px) 40vw, (max-width: 1024px) 40vw, 40vw"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-200 font-black text-4xl opacity-20 select-none italic uppercase">{t('siteName')}</div>
+                    <div className="w-full h-full flex items-center justify-center text-text-muted font-black text-3xl opacity-10 select-none uppercase">{t('siteName')}</div>
                 )}
             </div>
 
             {/* Content Area (Right, flex-1) */}
             <div className="flex-1 flex flex-col p-4">
-                {/* Title */}
-                <h3 className="text-base font-semibold text-text-main line-clamp-2 mb-2 leading-snug">
+                {/* Title - Airbnb Style */}
+                <h3 className="text-base font-bold text-text-main line-clamp-2 mb-2 leading-snug">
                     {title}
                 </h3>
 
-                {/* Specs Grid - Airbnb Style */}
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-text-muted mt-1 mb-3">
-                    <div className="flex items-center gap-1">
+                {/* Specs Grid - Airbnb Style (using light/regular font weight) */}
+                <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-text-muted mt-1 mb-3">
+                    <div className="flex items-center gap-1 font-normal">
                         <MapPin size={12} className="text-gray-400" />
-                        <span className="font-normal">{location?.split(",")[0].trim()}</span>
+                        <span className="truncate">{location?.split(',')[0].trim()}</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 font-normal">
                         <Eye size={12} className="text-gray-400" />
-                        <span className="font-normal">{views} {t('views')}</span>
+                        <span>{views} {t('views')}</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 font-normal">
                         <Clock size={12} className="text-gray-400" />
-                        <span className="font-normal">{formatRelativeTime(createdAt, language)}</span>
+                        <span>{formatRelativeTime(createdAt, language)}</span>
                     </div>
                     {authorName && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 font-normal">
                             <User size={12} className="text-gray-400" />
-                            <span className="font-normal">{authorName}</span>
+                            <span>{authorName}</span>
                         </div>
                     )}
                 </div>
@@ -124,7 +139,7 @@ export default function AdCard({
                 <div className="mt-auto flex justify-between items-end pt-3 border-t border-border-color">
                     <div className="flex items-baseline gap-1 text-text-main">
                         <span className="text-xl font-bold">{price?.toLocaleString()}</span>
-                        <span className="text-xs font-medium text-text-muted uppercase">{currency}</span>
+                        <span className="text-xs font-normal text-text-muted uppercase">{currency}</span>
                     </div>
                     {category && (
                         <span className="text-[10px] font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
