@@ -3,7 +3,28 @@ import { supabase } from './supabase';
 // أنواع البيانات للإعلانات
 import { Database } from '@/types/database.types'
 
-export type Ad = Database['public']['Tables']['Ad']['Row'] & {
+export type Ad = {
+    id: string;
+    title: string;
+    description: string;
+    price: number | null;
+    currency_id: string;
+    category: string;
+    sub_category?: string | null;
+    location: string | null;
+    address?: string | null;
+    payment_method?: string | null;
+    city_id?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    images: string;
+    video?: string | null;
+    is_boosted: boolean;
+    is_active: boolean;
+    views: number;
+    author_id: string;
+    created_at: string;
+    updated_at: string;
     phone?: string;
     email?: string;
     // علاقات
@@ -32,27 +53,34 @@ export const adsService = {
     // الحصول على جميع الإعلانات مع الفلاتر
     async getAds(filters: {
         category?: string;
+        subCategory?: string;
         search?: string;
         limit?: number;
+        tags?: string[];
     } = {}) {
-        let query = supabase
-            .from('Ad')
+        let query = (supabase as any)
+            .from('ads')
             .select(`
                 *,
-                author:User(id, name, email, phone),
+                author:users(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
             .eq('is_active', true);
 
-        // فلترة بالقسم (I-LIKE للتوافق مع حالات الأحرف)
+        // فلترة بالقسم
         if (filters.category) {
             query = query.ilike('category', filters.category);
         }
 
-        // بحث بسيط بالاسم
+        // فلترة بالتصنيف الفرعي
+        if (filters.subCategory) {
+            query = query.ilike('sub_category', filters.subCategory);
+        }
+
+        // بحث بسيط بالاسم والوصف
         if (filters.search) {
-            query = query.ilike('title', `%${filters.search}%`);
+            query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
         }
 
         // ترتيب ثابت ومضمون
@@ -65,7 +93,7 @@ export const adsService = {
 
         if (error) {
             console.error('Error fetching ads:', error);
-            return []; // إرجاع مصفوفة فارغة بدلاً من رمي خطأ لضمان استقرار الموقع
+            return [];
         }
 
         return data || [];
@@ -73,17 +101,16 @@ export const adsService = {
 
     // الحصول على إعلان واحد
     async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
-        let query = supabase
-            .from('Ad')
+        let query = (supabase as any)
+            .from('ads')
             .select(`
                 *,
-                author:User(id, name, email, phone),
+                author:users(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
             .eq('id', id);
 
-        // إذا لم نكن نبحث عن الكل، نكتفي بالنشط فقط
         if (!searchAll) {
             query = query.eq('is_active', true);
         }
@@ -95,7 +122,7 @@ export const adsService = {
             return null;
         }
 
-        return data;
+        return data as Ad;
     },
 
     // الحصول على إعلانات المستخدم
@@ -106,11 +133,11 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await supabase
-            .from('Ad')
+        const { data, error } = await (supabase as any)
+            .from('ads')
             .select(`
                 *,
-                author:User(id, name, email, phone),
+                author:users(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -122,40 +149,27 @@ export const adsService = {
             throw new Error('Failed to fetch your ads');
         }
 
-        return data || [];
+        return (data as Ad[]) || [];
     },
 
     // إنشاء إعلان جديد
-    async createAd(adData: {
-        title: string;
-        description: string;
-        price?: number;
-        category: string;
-        location?: string;
-        images: string;
-        city_id?: string;
-        latitude?: number;
-        longitude?: number;
-        payment_method?: string;
-        phone?: string;
-        email?: string;
-    }): Promise<Ad> {
+    async createAd(adData: any): Promise<Ad> {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await supabase
-            .from('Ad')
+        const { data, error } = await (supabase as any)
+            .from('ads')
             .insert({
                 ...adData,
                 author_id: user.id,
-                currency_id: 'sar', // العملة الافتراضية
+                currency_id: adData.currency_id || 'sar',
             })
             .select(`
                 *,
-                author:User(id, name, email, phone),
+                author:users(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -166,25 +180,25 @@ export const adsService = {
             throw new Error('Failed to create ad');
         }
 
-        return data;
+        return data as Ad;
     },
 
     // تحديث إعلان
-    async updateAd(id: string, updates: Partial<Ad>): Promise<Ad> {
+    async updateAd(id: string, updates: any): Promise<Ad> {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             throw new Error('User not authenticated');
         }
 
-        const { data, error } = await supabase
-            .from('Ad')
+        const { data, error } = await (supabase as any)
+            .from('ads')
             .update(updates)
             .eq('id', id)
             .eq('author_id', user.id)
             .select(`
                 *,
-                author:User(id, name, email, phone),
+                author:users(id, name, email, phone),
                 city:cities(id, name, name_ar, name_en),
                 currency:currencies(id, code, symbol, name)
             `)
@@ -195,7 +209,7 @@ export const adsService = {
             throw new Error('Failed to update ad');
         }
 
-        return data;
+        return data as Ad;
     },
 
     // حذف إعلان
@@ -206,8 +220,8 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
-        const { error } = await supabase
-            .from('Ad')
+        const { error } = await (supabase as any)
+            .from('ads')
             .delete()
             .eq('id', id)
             .eq('author_id', user.id);
@@ -221,7 +235,6 @@ export const adsService = {
     // زيادة عدد المشاهدات
     async incrementViews(id: string): Promise<void> {
         const { error } = await supabase.rpc('increment_ad_views', { adId: id });
-
         if (error) {
             console.warn('Failed to increment views:', error);
         }

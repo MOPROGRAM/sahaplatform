@@ -1,14 +1,12 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
-import { useAuthStore } from '@/store/useAuthStore';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import SearchBar from '@/components/SearchBar';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import AdCard from '@/components/AdCard';
 
@@ -22,36 +20,73 @@ interface Ad {
     images: string;
     is_boosted?: boolean;
     author_id: string;
-    currency?: {
-        code: string;
-        symbol: string;
-    };
 }
 
 export default function HomePage() {
     const { language, t } = useLanguage();
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState<'all' | 'featured' | 'new'>('all');
 
     const [categoriesList, setCategoriesList] = useState([
-        { name: t('jobs'), icon: Briefcase, key: 'jobs', count: 0 },
-        { name: t('realEstate'), icon: Building2, key: 'realEstate', count: 0 },
-        { name: t('cars'), icon: Car, key: 'cars', count: 0 },
-        { name: t('goods'), icon: ShoppingBag, key: 'goods', count: 0 },
-        { name: t('services'), icon: Wrench, key: 'services', count: 0 },
-        { name: t('other'), icon: Layers, key: 'other', count: 0 }
+        { name: '...', icon: Briefcase, key: 'jobs', count: 0 },
+        { name: '...', icon: Building2, key: 'realestate', count: 0 },
+        { name: '...', icon: Car, key: 'cars', count: 0 },
+        { name: '...', icon: ShoppingBag, key: 'goods', count: 0 },
+        { name: '...', icon: Wrench, key: 'services', count: 0 },
+        { name: '...', icon: Layers, key: 'other', count: 0 }
     ]);
+
+    useEffect(() => {
+        setCategoriesList([
+            { name: t('jobs'), icon: Briefcase, key: 'jobs', count: 0 },
+            { name: t('realestate'), icon: Building2, key: 'realestate', count: 0 },
+            { name: t('cars'), icon: Car, key: 'cars', count: 0 },
+            { name: t('goods'), icon: ShoppingBag, key: 'goods', count: 0 },
+            { name: t('services'), icon: Wrench, key: 'services', count: 0 },
+            { name: t('other'), icon: Layers, key: 'other', count: 0 }
+        ]);
+    }, [t]);
+
+    const fetchAds = useCallback(async () => {
+        try {
+            setLoading(true);
+            let query = (supabase as any)
+                .from('ads')
+                .select('*')
+                .eq('is_active', true);
+
+            if (filter === 'featured') {
+                query = query.eq('is_boosted', true);
+            }
+
+            query = query.order('created_at', { ascending: false }).limit(20);
+
+            const { data, error } = await query;
+            if (error) {
+                console.error('Failed to fetch ads:', error);
+                setAds([]);
+            } else {
+                setAds(data || []);
+            }
+        } catch (error) {
+            console.error('Failed to fetch ads:', error);
+            setAds([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [filter]);
 
     useEffect(() => {
         fetchAds();
         fetchCategoryCounts();
-    }, []);
+    }, [fetchAds]);
 
     const fetchCategoryCounts = async () => {
         try {
             const updated = await Promise.all(categoriesList.map(async (cat) => {
-                const { count, error } = await supabase
-                    .from('Ad')
+                const { count } = await (supabase as any)
+                    .from('ads')
                     .select('*', { count: 'exact', head: true })
                     .eq('is_active', true)
                     .eq('category', cat.key);
@@ -63,45 +98,19 @@ export default function HomePage() {
                 count: updated.find(u => u.key === cat.key)?.count || 0
             })));
         } catch (error) {
-            console.error('Failed to fetch category counts:', error);
-        }
-    };
-
-    const fetchAds = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('Ad')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(20);
-
-            if (error) {
-                console.error('Failed to fetch ads:', error);
-                setAds([]);
-            } else {
-                setAds(Array.isArray(data) ? data : []);
-            }
-        } catch (error) {
-            console.error('Failed to fetch ads:', error);
-            setAds([]);
-        } finally {
-            setLoading(false);
+            console.warn('Failed to fetch category counts:', error);
         }
     };
 
     return (
-        <div className="min-h-screen flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
+        <div className="min-h-screen bg-[#f4f4f4] flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
             <Header />
 
-            {/* Paid Ads Sticky Slider (replaced by PromotedBanner) */}
-            {/* Replaced with site-wide PromotedBanner via Header for consistent UX */}
-            
-
-            <main className="max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Left Sidebar */}
-                <aside className="lg:col-span-3 space-y-4">
-                    <div className="depth-card overflow-hidden">
-                        <div className="bg-card-bg px-4 py-3 text-sm font-black border-b border-border-color text-text-main uppercase tracking-tight">
+            <main className="max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+                {/* Right Sidebar - Titled Categories */}
+                <aside className="lg:col-span-3 order-1 lg:order-2 space-y-4 hidden md:block">
+                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                        <div className="bg-gray-50 px-4 py-3 text-sm font-black border-b border-gray-100 text-secondary uppercase tracking-widest text-center">
                             {t('categories')}
                         </div>
                         <nav className="flex flex-col">
@@ -109,13 +118,13 @@ export default function HomePage() {
                                 <Link
                                     key={idx}
                                     href={`/ads?category=${cat.key}`}
-                                    className="flex items-center justify-between px-4 py-3 hover:bg-primary/10 text-sm font-bold text-text-muted hover:text-text-main transition-colors group border-b border-border-color last:border-0"
+                                    className="flex items-center justify-between px-4 py-3 hover:bg-primary/5 text-sm font-bold text-gray-700 transition-colors group border-b border-gray-50 last:border-0"
                                 >
                                     <span className="flex items-center gap-3 group-hover:text-primary transition-colors">
-                                        <cat.icon size={16} className="text-text-muted group-hover:text-primary transition-colors" />
+                                        <cat.icon size={16} className="text-gray-400 group-hover:text-primary transition-colors" />
                                         {cat.name}
                                     </span>
-                                    <span className="text-sm text-text-muted font-bold group-hover:text-primary/50">{cat.count}</span>
+                                    <span className="text-sm text-gray-300 font-bold group-hover:text-primary/50">{cat.count}</span>
                                 </Link>
                             ))}
                         </nav>
@@ -123,26 +132,26 @@ export default function HomePage() {
                 </aside>
 
                 {/* Central Grid Feed */}
-                <section className="lg:col-span-9 flex flex-col gap-6">
-                    <div className="depth-card flex items-center justify-between px-6 py-4">
+                <section className="lg:col-span-9 order-2 lg:order-1 flex flex-col gap-6">
+                    <div className="bg-white border border-gray-100 rounded-xl flex items-center justify-between px-6 py-4 shadow-sm">
                         <div className="flex items-center gap-3">
-                            <Sparkles className="text-primary" size={20} />
-                            <h2 className="text-lg font-black uppercase tracking-tight text-text-main">{t('latestOffers')}</h2>
+                            <Sparkles className="text-primary animate-pulse" size={20} />
+                            <h2 className="text-lg font-black uppercase tracking-tight text-secondary">{t('latestOffers')}</h2>
                         </div>
-                        <div className="flex gap-4 text-sm font-bold text-text-muted">
-                            <span className="text-primary border-b-2 border-primary pb-1 cursor-pointer">{t('viewAll')}</span>
-                            <span className="hover:text-text-main cursor-pointer transition-colors uppercase">{t('featured')}</span>
-                            <span className="hover:text-text-main cursor-pointer transition-colors uppercase">{t('newAd')}</span>
+                        <div className="flex gap-4 text-sm font-bold text-gray-400 uppercase tracking-widest">
+                            <button onClick={() => setFilter('all')} className={`pb-1 border-b-2 ${filter === 'all' ? 'text-primary border-primary' : 'border-transparent'}`}>{t('viewAll')}</button>
+                            <button onClick={() => setFilter('featured')} className={`pb-1 border-b-2 ${filter === 'featured' ? 'text-primary border-primary' : 'border-transparent'}`}>{t('featured')}</button>
+                            <button onClick={() => setFilter('new')} className={`pb-1 border-b-2 ${filter === 'new' ? 'text-primary border-primary' : 'border-transparent'}`}>{t('newAd')}</button>
                         </div>
                     </div>
 
                     {loading ? (
-                        <div className="depth-card h-64 flex items-center justify-center">
+                        <div className="bg-white h-64 flex items-center justify-center border border-gray-100 rounded-xl">
                             <LoadingSpinner size={40} />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                            {ads.map((ad, idx) => (
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
+                            {ads.map((ad) => (
                                 <AdCard
                                     key={ad.id}
                                     id={ad.id}
@@ -150,19 +159,23 @@ export default function HomePage() {
                                     price={ad.price || 0}
                                     currency="ريال"
                                     location={ad.location || ''}
-                                    images={ad.images ? JSON.parse(ad.images) : []}
+                                    images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
                                     createdAt={ad.created_at}
                                     category={ad.category}
                                     language={language}
                                     isFeatured={ad.is_boosted || false}
                                 />
                             ))}
+                            {ads.length === 0 && (
+                                <div className="col-span-full bg-white p-20 text-center border border-dashed border-gray-300 rounded-xl">
+                                    <div className="text-gray-300 font-bold uppercase tracking-widest text-[11px]">{t('noResults')}</div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </section>
             </main>
 
-            {/* Localized Footer */}
             <Footer />
         </div>
     );

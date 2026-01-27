@@ -22,11 +22,53 @@ export const translations = {
 
         // Categories
         jobs: 'وظائف',
-        realEstate: 'عقارات',
+        realestate: 'عقارات',
         cars: 'سيارات',
         goods: 'سلع',
         services: 'خدمات',
+        electronics: 'إلكترونيات',
         other: 'أخرى',
+
+        // Subcategories - Real Estate
+        apartments: 'شقق',
+        villas: 'فلل',
+        lands: 'أراضي',
+        commercial: 'تجاري',
+        rent: 'للإيجار',
+
+        // Subcategories - Cars
+        toyota: 'تويوتا',
+        hyundai: 'هيونداي',
+        ford: 'فورد',
+        mercedes: 'مرسيدس',
+        bmw: 'بي إم دبليو',
+        trucks: 'شاحنات والمعدات الثقيلة',
+
+        // Subcategories - Jobs
+        it: 'تقنية معلومات',
+        sales: 'مبيعات وتسويق',
+        engineering: 'هندسة',
+        medical: 'طب وصيدلة',
+        education: 'تعليم',
+
+        // Subcategories - Electronics
+        phones: 'جوالات',
+        computers: 'أجهزة كمبيوتر',
+        appliances: 'أجهزة منزلية',
+        gaming: 'ألعاب فيديو',
+
+        // Subcategories - Services
+        cleaning: 'نظافة',
+        moving: 'نقل عفش',
+        maintenance: 'صيانة',
+        legal: 'محاماة واستشارات',
+        design: 'تصميم وجرافيك',
+
+        // Subcategories - Goods
+        furniture: 'أثاث',
+        fashion: 'موضة وأزياء',
+        sports: 'رياضة',
+        books: 'كتب',
 
         // Regional
         country: 'الدولة',
@@ -74,6 +116,8 @@ export const translations = {
         description: 'وصف الإعلان',
         price: 'السعر',
         category: 'التصنيف',
+        subCategory: 'التصنيف الفرعي',
+        chooseSubCategory: 'اختر التصنيف الفرعي',
         professionalTitle: 'عنوان الإعلان الإحترافي',
         detailedBriefing: 'تفاصيل الإعلان / الوصف الدقيق',
         askingPrice: 'السعر المطلوب',
@@ -155,6 +199,10 @@ export const translations = {
         deleteWarning: 'هل أنت متأكد من حذف هذا الإعلان؟',
         thisActionCannotBeUndone: 'لا يمكن التراجع عن هذا الإجراء',
         delete: 'حذف',
+        allAds: 'جميع الإعلانات',
+        foundAds: 'تم العثور على {{count}} إعلان',
+        clearFilters: 'مسح التصفية',
+        priceOnRequest: 'السعر عند التواصل',
 
         // Auth Pages
         loginTitle: 'تسجيل الدخول للنظام',
@@ -189,11 +237,53 @@ export const translations = {
 
         // Categories
         jobs: 'Jobs',
-        realEstate: 'Real Estate',
+        realestate: 'Real Estate',
         cars: 'Cars',
         goods: 'Goods',
         services: 'Services',
+        electronics: 'Electronics',
         other: 'Other',
+
+        // Subcategories - Real Estate
+        apartments: 'Apartments',
+        villas: 'Villas',
+        lands: 'Lands',
+        commercial: 'Commercial',
+        rent: 'Rent',
+
+        // Subcategories - Cars
+        toyota: 'Toyota',
+        hyundai: 'Hyundai',
+        ford: 'Ford',
+        mercedes: 'Mercedes',
+        bmw: 'BMW',
+        trucks: 'Trucks',
+
+        // Subcategories - Jobs
+        it: 'IT',
+        sales: 'Sales',
+        engineering: 'Engineering',
+        medical: 'Medical',
+        education: 'Education',
+
+        // Subcategories - Electronics
+        phones: 'Phones',
+        computers: 'Computers',
+        appliances: 'Appliances',
+        gaming: 'Gaming',
+
+        // Subcategories - Services
+        cleaning: 'Cleaning',
+        moving: 'Moving',
+        maintenance: 'Maintenance',
+        legal: 'Legal',
+        design: 'Design',
+
+        // Subcategories - Goods
+        furniture: 'Furniture',
+        fashion: 'Fashion',
+        sports: 'Sports',
+        books: 'Books',
 
         // Regional
         country: 'Country',
@@ -241,6 +331,8 @@ export const translations = {
         description: 'Description',
         price: 'Price',
         category: 'Category',
+        subCategory: 'Subcategory',
+        chooseSubCategory: 'Choose Subcategory',
         professionalTitle: 'Professional Ad Title',
         askingPrice: 'Asking Price',
         deploymentLocation: 'Deployment Location / City',
@@ -322,6 +414,10 @@ export const translations = {
         deleteWarning: 'Are you sure you want to delete this ad?',
         thisActionCannotBeUndone: 'This action cannot be undone',
         delete: 'Delete',
+        allAds: 'All Ads',
+        foundAds: 'Found {{count}} ads',
+        clearFilters: 'Clear Filters',
+        priceOnRequest: 'Price on request',
 
         // Auth Pages
         loginTitle: 'System Login',

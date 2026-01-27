@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,25 +8,24 @@ import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
-import Footer from '@/components/Footer';import Image from 'next/image';import dynamic from 'next/dynamic';
-import DepthInput from '@/components/ui/DepthInput';
-import DepthSelect from '@/components/ui/DepthSelect';
-import DepthTextarea from '@/components/ui/DepthTextarea';
+import Footer from '@/components/Footer';
+import dynamic from 'next/dynamic';
 
 const MapSelector = dynamic(() => import('@/components/MapSelector'), {
     ssr: false,
-    loading: () => <div className="h-64 bg-card rounded-lg flex items-center justify-center">Loading map...</div>
+    loading: () => <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">Loading map...</div>
 });
 
 export default function PostAdPage() {
-    const { language, t, currency } = useLanguage();
-    const { user, token, loading: authLoading } = useAuthStore();
+    const { language, t } = useLanguage();
+    const { user, loading: authLoading } = useAuthStore();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [formData, setFormData] = useState({
         title: "",
         category: "",
+        subCategory: "",
         price: "",
         location: "",
         address: "",
@@ -38,8 +37,16 @@ export default function PostAdPage() {
         enableLocation: true,
     });
     const [images, setImages] = useState<File[]>([]);
-    const [video, setVideo] = useState<File | null>(null);
     const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
+
+    const subCategoriesMap: Record<string, string[]> = {
+        realestate: ['apartments', 'villas', 'lands', 'commercial', 'rent'],
+        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'trucks'],
+        jobs: ['it', 'sales', 'engineering', 'medical', 'education'],
+        electronics: ['phones', 'computers', 'appliances', 'gaming'],
+        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design'],
+        goods: ['furniture', 'fashion', 'sports', 'books', 'other'],
+    };
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -48,24 +55,9 @@ export default function PostAdPage() {
         }
     }, [user, authLoading, router]);
 
-    // Recover session on page load
-    useEffect(() => {
-        const recoverSession = async () => {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            if (error) {
-                console.error('Session recovery error:', error);
-            }
-        };
-        recoverSession();
-    }, []);
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type, checked } = e.target as any;
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-    };
-
-    const handleLocationToggle = (checked: boolean) => {
-        setFormData(prev => ({ ...prev, enableLocation: checked }));
     };
 
     const handleLocationSelect = (lat: number, lng: number, address?: string) => {
@@ -77,25 +69,15 @@ export default function PostAdPage() {
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        // Validate file types and sizes
         const validFiles = files.filter(file =>
             file.type.startsWith('image/') &&
-            file.size <= 5 * 1024 * 1024 // 5MB max
+            file.size <= 5 * 1024 * 1024
         );
         if (validFiles.length !== files.length) {
-            setError(language === 'ar' ? "بعض الصور غير صالحة (يجب أن تكون صور وأقل من 5MB)" : "Some images are invalid (must be images under 5MB)");
+            setError(language === 'ar' ? "بعض الصور غير صالحة" : "Some images are invalid");
             return;
         }
         setImages(validFiles);
-    };
-
-    const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file && file.type.startsWith('video/') && file.size <= 50 * 1024 * 1024) { // 50MB max
-            setVideo(file);
-        } else if (file) {
-            setError(language === 'ar' ? "الفيديو غير صالح (يجب أن يكون فيديو وأقل من 50MB)" : "Invalid video (must be video under 50MB)");
-        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -106,399 +88,189 @@ export default function PostAdPage() {
             setError(language === 'ar' ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
             return;
         }
-        if (formData.enableLocation && !formData.location) {
-            setError(language === 'ar' ? "يرجى تحديد الموقع" : "Please specify the location");
-            return;
-        }
-        if (formData.category === 'realEstate' && !formData.enableLocation) {
-            setError(language === 'ar' ? "يجب تحديد الموقع للعقارات" : "Location is required for real estate ads");
-            return;
-        }
 
         setLoading(true);
         try {
-            // Check current user authentication
-            const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-            if (userError || !currentUser) {
-                console.error('Auth check failed:', userError);
-                setError(language === 'ar' ? "يرجى تسجيل الدخول أولاً" : "Please log in first");
-                setLoading(false);
-                return;
-            }
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            if (!currentUser) throw new Error("Not authenticated");
 
             // Upload images
             const imageUrls: string[] = [];
-            console.log('[POST-AD] Starting upload of', images.length, 'images');
             for (const image of images) {
-                // Create unique filename
                 const fileExt = image.name.split('.').pop();
                 const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
                 const filePath = `ads/${fileName}`;
 
-                const { data, error } = await supabase.storage
+                const { error: uploadError } = await supabase.storage
                     .from('images')
-                    .upload(filePath, image, {
-                        cacheControl: '3600',
-                        upsert: false
-                    });
+                    .upload(filePath, image);
 
-                if (error) {
-                    console.error('[POST-AD] Error uploading image:', error);
-                    throw new Error('Failed to upload image');
-                } else {
-                    // Get public URL
+                if (!uploadError) {
                     const { data: { publicUrl } } = supabase.storage
                         .from('images')
                         .getPublicUrl(filePath);
-                    console.log('[POST-AD] Upload successful, URL:', publicUrl);
                     imageUrls.push(publicUrl);
                 }
             }
-            console.log('[POST-AD] Final imageUrls array:', imageUrls);
 
             // Create ad
-            const adData = {
+            const adData: any = {
                 title: formData.title,
                 description: formData.description,
                 price: parseFloat(formData.price),
                 category: formData.category,
+                sub_category: formData.subCategory || null,
                 location: formData.enableLocation ? formData.location : null,
-                address: null,
                 latitude: coordinates?.lat || null,
                 longitude: coordinates?.lng || null,
                 images: JSON.stringify(imageUrls),
                 author_id: currentUser.id,
                 is_active: true,
-                is_boosted: formData.isBoosted,
-                views: 0,
                 phone: formData.phone || null,
                 email: formData.email || null,
+                currency_id: 'sar'
             };
 
-            console.log('Inserting ad data:', adData);
-
-            const { data, error } = await supabase
-                .from('Ad')
+            const { data, error: insertError } = await (supabase as any)
+                .from('ads')
                 .insert(adData)
                 .select()
                 .single();
 
-            if (error) {
-                console.error('Error inserting ad:', error);
-                setError(error.message || (language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad."));
-            } else {
-                console.log('Ad created:', data);
-                router.push(`/ads/view?id=${data.id}`);
-            }
+            if (insertError) throw insertError;
+            router.push(`/ads/view?id=${data.id}`);
         } catch (err: any) {
-            console.error("Failed to post ad:", err);
-            setError(err.message || (language === 'ar' ? "حدث خطأ أثناء نشر الإعلان." : "Error posting ad."));
+            setError(err.message || "Error posting ad");
         } finally {
             setLoading(false);
         }
     };
 
-    // Show loading while checking auth
-    if (authLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="animate-spin text-primary" size={40} />
-            </div>
-        );
-    }
-
-    // Don't render if not authenticated (will redirect)
-    if (!user) {
-        return null;
-    }
+    if (authLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={40} /></div>;
+    if (!user) return null;
 
     return (
-        <div className="min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
             <main className="max-w-5xl mx-auto w-full p-2 md:p-4 flex-1">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Left Info Column */}
                     <div className="md:col-span-1 space-y-4">
-                        <div className="depth-card p-5 text-text-main shadow-xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-card rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+                        <div className="bg-primary p-5 rounded-md text-white shadow-xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform"></div>
                             <h2 className="text-xl font-[1000] italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
                             <p className="text-[10px] font-bold opacity-90 mt-2 leading-tight relative z-10">{t('joinThousands')}</p>
-
-                            <div className="mt-5 flex flex-col gap-2 relative z-10">
-                                <div className="flex items-center gap-3 bg-card p-2 rounded-md border border-[#2a2d3a]">
-                                    <CheckCircle2 size={16} />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">{t('verified')}</span>
-                                </div>
-                                <div className="flex items-center gap-3 bg-card p-2 rounded-md border border-[#2a2d3a]">
-                                    <Tag size={16} />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">{t('featured')}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="depth-card p-4 flex gap-3">
-                            <i className="text-secondary shrink-0">
-                                <Info size={18} className="text-primary" />
-                            </i>
-                            <div className="flex flex-col">
-                                <span className="text-[11px] font-black uppercase text-text-main tracking-widest leading-none">{t('marketRules')}</span>
-                                <p className="text-[10px] text-text-muted font-bold mt-2 leading-relaxed">{t('marketRulesDesc')}</p>
-                            </div>
                         </div>
                     </div>
 
                     {/* Form Column */}
                     <div className="md:col-span-2">
-                        <form onSubmit={handleSubmit} className="depth-card shadow-xl shadow-black/[0.01] overflow-hidden flex flex-col bg-card">
-                            <div className="p-5 space-y-5">
-                                {error && (
-                                    <div className="bg-red-50 text-red-600 p-3 text-[12px] font-black border-r-4 border-red-500 rounded-md uppercase tracking-tight flex items-center gap-3">
-                                        <Info size={16} />
-                                        {error}
-                                    </div>
-                                )}
+                        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-md shadow-xl p-5 space-y-5">
+                            {error && <div className="bg-red-50 text-red-600 p-3 text-xs font-black rounded-md">{error}</div>}
 
-                                <div className="space-y-5">
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                                            <div className="w-1 h-3 bg-primary rounded-full"></div>
-                                            {t('professionalTitle')} *
-                                        </label>
-                                        <DepthInput
-                                            name="title"
-                                            value={formData.title}
+                            <div className="space-y-5">
+                                <div>
+                                    <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('professionalTitle')} *</label>
+                                    <input
+                                        name="title"
+                                        value={formData.title}
+                                        onChange={handleInputChange}
+                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all shadow-inner font-bold"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('category')} *</label>
+                                        <select
+                                            name="category"
+                                            value={formData.category}
                                             onChange={handleInputChange}
-                                            placeholder={t('adTitlePlaceholder')}
-                                            label={t('professionalTitle')}
+                                            className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all cursor-pointer font-bold"
+                                            required
+                                        >
+                                            <option value="">{t('chooseCategory')}</option>
+                                            <option value="realestate">{t('realestate')}</option>
+                                            <option value="jobs">{t('jobs')}</option>
+                                            <option value="cars">{t('cars')}</option>
+                                            <option value="electronics">{t('electronics')}</option>
+                                            <option value="services">{t('services')}</option>
+                                            <option value="goods">{t('goods')}</option>
+                                        </select>
+                                    </div>
+
+                                    {formData.category && subCategoriesMap[formData.category] && (
+                                        <div>
+                                            <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('subCategory')} *</label>
+                                            <select
+                                                name="subCategory"
+                                                value={formData.subCategory}
+                                                onChange={handleInputChange}
+                                                className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all cursor-pointer font-bold"
+                                                required
+                                            >
+                                                <option value="">{t('chooseSubCategory')}</option>
+                                                {subCategoriesMap[formData.category].map(sub => (
+                                                    <option key={sub} value={sub}>{(t as any)[sub] || sub}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('askingPrice')} *</label>
+                                        <input
+                                            name="price"
+                                            type="number"
+                                            value={formData.price}
+                                            onChange={handleInputChange}
+                                            className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all font-bold"
                                             required
                                         />
                                     </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                                                <div className="w-1 h-3 bg-navy rounded-full"></div>
-                                                {t('category')} *
-                                            </label>
-                                            <select
-                                                name="category"
-                                                value={formData.category}
-                                                onChange={handleInputChange}
-                                                className="depth-input p-3 text-[13px] font-black rounded-md outline-none focus:border-primary bg-card cursor-pointer transition-all shadow-inner text-text-main"
-                                                required
-                                            >
-                                                <option value="">{t('chooseCategory')}</option>
-                                                <option value="realEstate">{t('realEstate')}</option>
-                                                <option value="jobs">{t('jobs')}</option>
-                                                <option value="cars">{t('cars')}</option>
-                                                <option value="goods">{t('goods')}</option>
-                                                <option value="services">{t('services')}</option>
-                                                <option value="other">{t('other')}</option>
-                                            </select>
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                                                <div className="w-1 h-3 bg-emerald rounded-full"></div>
-                                                {t('askingPrice')} *
-                                            </label>
-                                            <DepthInput
-                                                name="price"
-                                                type="number"
-                                                value={formData.price}
-                                                onChange={handleInputChange}
-                                                placeholder="0.00"
-                                                label={t('askingPrice')}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                                            <div className="w-1 h-3 bg-amber rounded-full"></div>
-                                            {t('deploymentLocation')} *
-                                        </label>
-                                        <div className="relative">
-                                            <DepthInput
-                                                name="location"
-                                                value={formData.location}
-                                                onChange={handleInputChange}
-                                                placeholder={t('locationPlaceholder')}
-                                                label={t('deploymentLocation')}
-                                                required
-                                            />
-                                            <MapPin size={18} className="absolute right-3 top-3 text-primary opacity-30" />
-                                        </div>
-                                    </div>
-
-                                    {/* Map Selector - Required for Real Estate */}
-                                    {formData.category === 'realEstate' && (
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                                                <MapPin size={12} />
-                                                {language === 'ar' ? 'تحديد الموقع على الخريطة' : 'Select Location on Map'}
-                                            </label>
-                                            <div className="bg-card border border-border-color rounded-md p-4">
-                                                <MapSelector
-                                                    onLocationSelect={handleLocationSelect}
-                                                    height="250px"
-                                                />
-                                                {coordinates && (
-                                                    <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
-                                                        ✅ {language === 'ar' ? 'تم تحديد الموقع' : 'Location selected'}: {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                                            <div className="w-1 h-3 bg-black rounded-full"></div>
-                                            {t('detailedBriefing')}
-                                        </label>
-                                        <DepthTextarea
-                                            name="description"
-                                            value={formData.description}
+                                    <div>
+                                        <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('deploymentLocation')} *</label>
+                                        <input
+                                            name="location"
+                                            value={formData.location}
                                             onChange={handleInputChange}
-                                            rows={5}
-                                            placeholder={t('descriptionPlaceholder')}
-                                            label={t('detailedBriefing')}
+                                            className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all font-bold"
+                                            required
                                         />
                                     </div>
-
-                                    {/* Contact Information Section */}
-                                    <div className="bg-card p-4 rounded-md border border-border-color">
-                                        <h3 className="text-[12px] font-black text-text-main uppercase tracking-widest mb-3 flex items-center gap-2">
-                                            <div className="w-1 h-3 bg-green-500 rounded-full"></div>
-                                            {language === 'ar' ? 'معلومات الاتصال (اختياري)' : 'Contact Information (Optional)'}
-                                        </h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="flex flex-col gap-2">
-                                                <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
-                                                    {t('phone')}
-                                                </label>
-                                                <DepthInput
-                                                    name="phone"
-                                                    type="tel"
-                                                    value={formData.phone}
-                                                    onChange={handleInputChange}
-                                                    placeholder={language === 'ar' ? '+966 50 123 4567' : '+966 50 123 4567'}
-                                                    label={t('phone')}
-                                                />
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
-                                                    {t('email')}
-                                                </label>
-                                                <DepthInput
-                                                    name="email"
-                                                    type="email"
-                                                    value={formData.email}
-                                                    onChange={handleInputChange}
-                                                    placeholder="example@email.com"
-                                                    label={t('email')}
-                                                />
-                                            </div>
-                                        </div>
-                                        <p className="text-[9px] text-gray-500 mt-2 font-medium">
-                                            {language === 'ar'
-                                                ? 'سيتم عرض هذه المعلومات للمشترين المهتمين في صفحة الإعلان'
-                                                : 'This information will be displayed to interested buyers on the ad page'
-                                            }
-                                        </p>
-                                    </div>
-
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[11px] font-black text-black uppercase tracking-widest flex items-center gap-2">
-                                            <Camera className="w-3 h-3" />
-                                            {t('photos')} ({t('optional')})
-                                        </label>
-                                        <div className="relative">
-                                            <input
-                                                type="file"
-                                                multiple
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            />
-                                            <div className="bg-gray-50 border-2 border-dashed border-gray-300 p-6 rounded-md text-center hover:border-primary transition-colors group">
-                                                <Camera className="mx-auto text-text-muted group-hover:text-primary transition-colors mb-2" size={24} />
-                                                <p className="text-[12px] font-black text-gray-500 uppercase tracking-tight">
-                                                    {images.length > 0 ? `${images.length} ${t('imagesSelected')}` : t('clickToAddPhotos')}
-                                                </p>
-                                                <p className="text-[10px] text-text-muted mt-1 font-bold">
-                                                    {t('max5Images')} • 5MB {t('each')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        {typeof window !== 'undefined' && images.length > 0 && (
-                                            <div className="grid grid-cols-4 gap-2 mt-2">
-                                                {images.map((image, index) => (
-                                                    <div key={index} className="relative aspect-square bg-card rounded-md overflow-hidden">
-                                                        <Image
-                                                            src={URL.createObjectURL(image)}
-                                                            alt={`Preview ${index + 1}`}
-                                                            fill
-                                                            unoptimized
-                                                            className="object-cover"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setImages(images.filter((_, i) => i !== index))}
-                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
                                 </div>
 
-                                {/* Boost Options */}
-                                <div className="bg-gradient-to-r from-primary/5 to-primary/10 p-4 rounded-md border border-primary/20">
-                                    <h3 className="text-[12px] font-black text-black uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        <div className="w-1 h-3 bg-primary rounded-full"></div>
-                                        {language === 'ar' ? 'خيارات الترقية (اختياري)' : 'Boost Options (Optional)'}
-                                    </h3>
-                                    <div className="space-y-3">
-                                        <label className="flex items-center gap-3 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                name="isBoosted"
-                                                checked={formData.isBoosted}
-                                                onChange={handleInputChange}
-                                                className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
-                                            />
-                                            <div>
-                                                <span className="text-[12px] font-black text-black uppercase tracking-tight">
-                                                    {language === 'ar' ? 'إعلان مميز' : 'Featured Ad'}
-                                                </span>
-                                                <p className="text-[10px] text-gray-600">
-                                                    {language === 'ar' ? 'يظهر في الأعلى ويحصل على مشاهدات أكثر' : 'Appears at the top and gets more views'}
-                                                </p>
-                                            </div>
-                                            <span className="text-[12px] font-black text-primary ml-auto">50 SAR</span>
-                                        </label>
+                                {formData.category === 'realestate' && (
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-black uppercase tracking-widest block"><MapPin size={12} className="inline" /> {t('location')}</label>
+                                        <MapSelector onLocationSelect={handleLocationSelect} height="250px" />
                                     </div>
+                                )}
+
+                                <div>
+                                    <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('detailedBriefing')}</label>
+                                    <textarea
+                                        name="description"
+                                        value={formData.description}
+                                        onChange={handleInputChange}
+                                        rows={5}
+                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all resize-none font-medium"
+                                    />
                                 </div>
 
-                                <div className="pt-5 border-t border-gray-100 flex flex-col items-center">
+                                <div className="pt-5 border-t border-gray-100">
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="btn-saha-primary !w-full !py-4 !text-[16px] mb-4"
+                                        className="btn-saha-primary !w-full !py-4"
                                     >
-                                        {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} className="group-hover:rotate-90 transition-transform" />}
+                                        {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} />}
                                         {loading ? t('loading') : t('deployListing')}
                                     </button>
-                                    <div className="flex items-center gap-2 bg-card px-3 py-1 rounded-full border border-border-color">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                        <span className="text-[9px] font-black text-text-muted uppercase tracking-widest">{t('secureProtocol')}</span>
-                                    </div>
                                 </div>
                             </div>
                         </form>
