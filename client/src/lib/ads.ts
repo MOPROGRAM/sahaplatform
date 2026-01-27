@@ -70,9 +70,9 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:City(id, name, nameAr, nameEn),
-                currency:Currency(id, code, symbol, name)
+                author:users(id, name, email, phone),
+                city:cities(id, name, nameAr, nameEn),
+                currency:currencies(id, code, symbol, name)
             `)
             .eq('isActive', true);
 
@@ -159,9 +159,9 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:City(id, name, nameAr, nameEn),
-                currency:Currency(id, code, symbol, name)
+                author:users(id, name, email, phone),
+                city:cities(id, name, nameAr, nameEn),
+                currency:currencies(id, code, symbol, name)
             `)
             .eq('id', id);
 
@@ -191,9 +191,9 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User(id, name, email, phone),
-                city:City(id, name, nameAr, nameEn),
-                currency:Currency(id, code, symbol, name)
+                author:users(id, name, email, phone),
+                city:cities(id, name, nameAr, nameEn),
+                currency:currencies(id, code, symbol, name)
             `)
             .eq('userId', user.id)
             .order('createdAt', { ascending: false });

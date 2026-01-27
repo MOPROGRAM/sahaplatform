@@ -122,7 +122,7 @@ export default function HomePage() {
             <main className="max-w-[1400px] mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
                 {/* Bento Grid Sidebar - Categories */}
                 <aside className={`lg:col-span-3 space-y-4 hidden md:block`}>
-                    <div className="bento-card p-0 flex flex-col h-full sticky top-24">
+                    <div className="bento-card p-0 flex flex-col sticky top-24">
                         <div className="p-4 border-b border-border-color bg-primary/5">
                             <h3 className="bento-title text-sm uppercase tracking-wider">{t("categories")}</h3>
                         </div>

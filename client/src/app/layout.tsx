@@ -44,7 +44,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning>
+        <html dir="rtl" lang="ar" className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning>
             <head>
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>
@@ -52,7 +52,7 @@ export default function RootLayout({
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                     <LanguageProvider>
                         <div className="flex min-h-screen bg-gray-bg">
-                            <main className="flex-1 overflow-x-hidden">
+                            <main className="flex-1 w-full">
                                 {children}
                             </main>
                         </div>

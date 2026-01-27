@@ -37,6 +37,24 @@ interface Ad {
     isBoosted?: boolean;
 }
 
+const AdsSkeleton = () => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3">
+        {[...Array(15)].map((_, i) => (
+            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[320px] animate-pulse">
+                <div className="h-48 bg-gray-200 dark:bg-white/10 w-full" />
+                <div className="p-3 space-y-3">
+                    <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/2" />
+                    <div className="flex justify-between pt-2">
+                        <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
+                        <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
 function AdsContent() {
     const { language, t } = useLanguage();
     const searchParams = useSearchParams();
@@ -200,9 +218,7 @@ function AdsContent() {
                 </div>
 
                 {loading ? (
-                    <div className="bg-white border border-gray-200 h-64 flex items-center justify-center rounded-sm">
-                        <LoadingSpinner size={32} />
-                    </div>
+                    <AdsSkeleton />
                 ) : ads.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3">
                         {ads.map((ad) => (
