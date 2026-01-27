@@ -33,37 +33,27 @@ interface Ad {
 }
 
 export default function HomePage() {
-    const { language, t, currency } = useLanguage(); // Destructure currency
+    const { language, t, currency } = useLanguage();
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'featured' | 'new'>('all');
+    const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
-    const [categoriesList, setCategoriesList] = useState([
-        { name: '...', icon: Briefcase, key: 'jobs', count: 0 },
-        { name: '...', icon: Building2, key: 'realestate', count: 0 },
-        { name: '...', icon: Car, key: 'cars', count: 0 },
-        { name: '...', icon: ShoppingBag, key: 'goods', count: 0 },
-        { name: '...', icon: Wrench, key: 'services', count: 0 },
-        { name: '...', icon: Layers, key: 'other', count: 0 }
-    ]);
-
-    useEffect(() => {
-        setCategoriesList([
-            { name: t('jobs'), icon: Briefcase, key: 'jobs', count: 0 },
-            { name: t('realestate'), icon: Building2, key: 'realestate', count: 0 },
-            { name: t('cars'), icon: Car, key: 'cars', count: 0 },
-            { name: t('goods'), icon: ShoppingBag, key: 'goods', count: 0 },
-            { name: t('services'), icon: Wrench, key: 'services', count: 0 },
-            { name: t('other'), icon: Layers, key: 'other', count: 0 }
-        ]);
-    }, [t]);
+    const categoriesList = [
+        { icon: Briefcase, key: 'jobs' },
+        { icon: Building2, key: 'realestate' },
+        { icon: Car, key: 'cars' },
+        { icon: ShoppingBag, key: 'goods' },
+        { icon: Wrench, key: 'services' },
+        { icon: Layers, key: 'other' }
+    ];
 
     const fetchAds = useCallback(async () => {
         try {
             setLoading(true);
             let query = (supabase as any)
-                .from('Ad') // Changed from 'ads' to 'Ad'
-                .select('*, author:User(name)') // Fetch author name
+                .from('Ad')
+                .select('*, author:User(name)')
                 .eq('isActive', true);
 
             if (filter === 'featured') {
@@ -89,23 +79,20 @@ export default function HomePage() {
 
     const fetchCategoryCounts = useCallback(async () => {
         try {
-            const updated = await Promise.all(categoriesList.map(async (cat) => {
+            const counts: Record<string, number> = {};
+            await Promise.all(categoriesList.map(async (cat) => {
                 const { count } = await (supabase as any)
-                    .from('Ad') // Changed from 'ads' to 'Ad'
+                    .from('Ad')
                     .select('*', { count: 'exact', head: true })
                     .eq('isActive', true)
                     .eq('category', cat.key);
-                return { key: cat.key, count: count || 0 };
+                counts[cat.key] = count || 0;
             }));
-
-            setCategoriesList(prev => prev.map(cat => ({
-                ...cat,
-                count: updated.find(u => u.key === cat.key)?.count || 0
-            })));
+            setCategoryCounts(counts);
         } catch (error) {
             console.warn('Failed to fetch category counts:', error);
         }
-    }, [categoriesList]);
+    }, []);
 
     useEffect(() => {
         fetchAds();
@@ -113,13 +100,13 @@ export default function HomePage() {
     }, [fetchAds, fetchCategoryCounts]);
 
     return (
-        <div className="min-h-screen bg-gray-bg flex flex-col transition-colors duration-300" dir={language === "ar" ? "rtl" : "ltr"}>
+        <div className="min-h-screen bg-gray-bg flex flex-col">
             <Header />
 
             <main className="max-w-[1400px] mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
                 {/* Bento Grid Sidebar - Categories */}
-                <aside className={`lg:col-span-3 space-y-4 hidden md:block ${language === 'ar' ? 'lg:order-1' : 'lg:order-1'}`}>
-                    <div className="bento-card p-0 flex flex-col h-full">
+                <aside className={`lg:col-span-3 space-y-4 hidden md:block`}>
+                    <div className="bento-card p-0 flex flex-col h-full sticky top-24">
                         <div className="p-4 border-b border-border-color bg-primary/5">
                             <h3 className="bento-title text-sm uppercase tracking-wider">{t("categories")}</h3>
                         </div>
@@ -134,9 +121,9 @@ export default function HomePage() {
                                         <div className="p-2 bg-gray-100 dark:bg-white/5 rounded-lg text-gray-500 group-hover:text-primary group-hover:bg-primary/10 transition-colors">
                                             <cat.icon size={18} />
                                         </div>
-                                        <span className="font-bold text-sm text-text-main group-hover:text-primary transition-colors">{cat.name}</span>
+                                        <span className="font-bold text-sm text-text-main group-hover:text-primary transition-colors">{(t as any)[cat.key] || cat.key}</span>
                                     </div>
-                                    <span className="text-xs font-bold text-text-muted bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md">{cat.count}</span>
+                                    <span className="text-xs font-bold text-text-muted bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md">{categoryCounts[cat.key] || 0}</span>
                                 </Link>
                             ))}
                         </nav>
@@ -144,7 +131,7 @@ export default function HomePage() {
                 </aside>
 
                 {/* Central Grid Feed */}
-                <section className={`lg:col-span-9 flex flex-col gap-6 ${language === 'ar' ? 'lg:order-2' : 'lg:order-2'}`}>
+                <section className={`lg:col-span-9 flex flex-col gap-6`}>
                     {/* Bento Filter Bar */}
                     <div className="bento-card p-1 flex items-center justify-between">
                         <div className="flex items-center gap-3 px-4 py-3">

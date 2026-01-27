@@ -19,11 +19,6 @@ export default function CategorySidebar() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // Only show on ads pages
-    if (!pathname.startsWith('/ads')) {
-        return null;
-    }
-
     const categories = [
         { key: 'all', label: language === 'ar' ? 'جميع الفئات' : 'All Categories', icon: <Home size={16} />, path: '/ads' },
         { key: 'realestate', label: t('realEstate'), icon: <Building size={16} />, path: '/ads?category=realestate' },

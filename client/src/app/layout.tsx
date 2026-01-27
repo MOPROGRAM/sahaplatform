@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Cairo, Tajawal, Readex_Pro } from "next/font/google";
 import "./globals.css";
-import { Suspense } from "react";
 import { LanguageProvider } from "@/lib/language-context";
 import { ThemeProvider } from "next-themes";
-import CategorySidebar from "@/components/CategorySidebar";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -54,9 +52,6 @@ export default function RootLayout({
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                     <LanguageProvider>
                         <div className="flex min-h-screen bg-gray-bg">
-                            <Suspense fallback={<div className="hidden lg:block w-64 bg-white border-r border-gray-200 h-screen sticky top-0" />}>
-                                <CategorySidebar />
-                            </Suspense>
                             <main className="flex-1 overflow-x-hidden">
                                 {children}
                             </main>
