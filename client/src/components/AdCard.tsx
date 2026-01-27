@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Clock, MapPin, User, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, Info } from "lucide-react"; // Removed Eye, Added Info
+import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 
 interface AdCardProps {
@@ -35,13 +35,10 @@ export default function AdCard({
     location,
     images = [],
     createdAt,
-    authorName,
     category,
-    subCategory,
     className = "",
     language = 'ar',
     isFeatured = false,
-    description = "",
     onMapHighlight,
     isHighlighted = false,
     layout = 'vertical'

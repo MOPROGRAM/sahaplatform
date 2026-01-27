@@ -1,8 +1,7 @@
 "use client";
 
 import { useFilterStore } from "@/store/useFilterStore";
-import { useRouter } from "next/navigation";
-import { ChevronDown, MapPin, Search, X } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useLanguage } from "@/lib/language-context";
@@ -14,13 +13,11 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export default function AdvancedFilter() {
-    const router = useRouter();
     const { language, t } = useLanguage();
     const { 
-        category, subCategory, searchQuery, setSearchQuery, tags, 
-        setCategory, setSubCategory, toggleTag, resetFilters,
+        category, tags, 
+        toggleTag, resetFilters,
         minPrice, maxPrice, setPriceRange,
-        minArea, maxArea, setAreaRange,
         cityId, setCityId,
         sortBy, sortOrder, setSort
     } = useFilterStore();
@@ -28,8 +25,6 @@ export default function AdvancedFilter() {
     const [cities, setCities] = useState<any[]>([]);
     const [localMinPrice, setLocalMinPrice] = useState(minPrice);
     const [localMaxPrice, setLocalMaxPrice] = useState(maxPrice);
-    const [localMinArea, setLocalMinArea] = useState(minArea);
-    const [localMaxArea, setLocalMaxArea] = useState(maxArea);
 
     useEffect(() => {
         const fetchCities = async () => {
@@ -46,22 +41,6 @@ export default function AdvancedFilter() {
         }, 500);
         return () => clearTimeout(timer);
     }, [localMinPrice, localMaxPrice, setPriceRange]);
-
-    // Debounce area update
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setAreaRange(localMinArea, localMaxArea);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [localMinArea, localMaxArea, setAreaRange]);
-
-    const handleSearch = (value: string) => {
-        setSearchQuery(value);
-    };
-
-    const handleClearSearch = () => {
-        setSearchQuery("");
-    };
 
     const getPriceLabel = () => {
         if (category === 'jobs') return t('salaryRange');

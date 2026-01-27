@@ -481,10 +481,7 @@ export const translations = {
         sending: 'Sending...',
         sendRequest: 'Send Request',
         whyPremiumAds: 'Why Premium Ads?',
-        moreViews: 'More Views',
-        moreContacts: 'More Contacts',
-        betterSales: 'Better Sales',
-        messageOptional: 'Message (Optional)',
+
         basicPlan: 'Basic Plan',
         premiumPlan: 'Premium Plan',
         vipPlan: 'VIP Plan',

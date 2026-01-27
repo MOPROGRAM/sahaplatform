@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, User, ChevronRight, MoreVertical, Phone, ShieldCheck, Briefcase, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Mic } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -29,18 +29,15 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ conversationId, onClose }: ChatWindowProps) {
     const { user } = useAuthStore();
-    const { language, t } = useLanguage();
+    const { language } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [participants, setParticipants] = useState<any[]>([]);
     const [adInfo, setAdInfo] = useState<any>(null);
-    const [isRecording, setIsRecording] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     // const socketRef = useRef<any>(null);
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const audioChunksRef = useRef<Blob[]>([]);
 
     useEffect(() => {
         let channel: any;
@@ -188,7 +185,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const handleFileUpload = async (file: File, type: 'file' | 'image') => {
         const fileName = `${Date.now()}-${file.name}`;
         const bucket = type === 'image' ? 'chat-images' : 'chat-files';
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
             .from(bucket)
             .upload(fileName, file);
 
@@ -202,41 +199,6 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             .getPublicUrl(fileName);
 
         return { fileUrl: urlData.publicUrl, fileName: file.name, fileSize: file.size };
-    };
-
-    const startRecording = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mediaRecorder = new MediaRecorder(stream);
-            mediaRecorderRef.current = mediaRecorder;
-            audioChunksRef.current = [];
-
-            mediaRecorder.ondataavailable = (event) => {
-                audioChunksRef.current.push(event.data);
-            };
-
-            mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-                const file = new File([audioBlob], 'voice-message.wav', { type: 'audio/wav' });
-                const uploadData = await handleFileUpload(file, 'file');
-                if (uploadData) {
-                    handleSend('voice', 'Voice message', uploadData);
-                }
-            };
-
-            mediaRecorder.start();
-            setIsRecording(true);
-        } catch (error) {
-            console.error('Error starting recording:', error);
-        }
-    };
-
-    const stopRecording = () => {
-        if (mediaRecorderRef.current && isRecording) {
-            mediaRecorderRef.current.stop();
-            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-            setIsRecording(false);
-        }
     };
 
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };

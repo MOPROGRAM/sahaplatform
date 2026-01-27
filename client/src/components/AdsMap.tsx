@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
@@ -58,7 +58,6 @@ export default function AdsMap({
     mapCenter,
     mapZoom,
     t,
-    language,
 }: AdsMapProps) {
     const highlightedAd = ads.find((ad) => ad.id === highlightedAdId);
 

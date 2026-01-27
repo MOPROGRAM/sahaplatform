@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, MapPin, ChevronDown, Settings, X } from "lucide-react";
+import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, ChevronDown, Settings, X } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import PromotedBanner from "@/components/PromotedBanner";
 import { useRouter, usePathname } from "next/navigation";
@@ -11,24 +11,13 @@ import { conversationsService } from "@/lib/conversations";
 
 export default function Header() {
     const { user, logout } = useAuthStore();
-    const { language, setLanguage, t, theme, toggleTheme, country, setCountry, currency, setCurrency } = useLanguage();
+    const { language, setLanguage, t, theme, toggleTheme } = useLanguage();
     const router = useRouter();
     const pathname = usePathname();
     const [unreadCount, setUnreadCount] = useState(0);
     const [headerShrunk, setHeaderShrunk] = useState(false);
-    const [showRegion, setShowRegion] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-
-    const currencyMap: Record<string, string> = {
-        sa: "sar",
-        ae: "aed",
-        kw: "kwd",
-        qa: "qar",
-        bh: "bhd",
-        om: "omr",
-        eg: "egp"
-    };
 
     const fetchUnreadCount = useCallback(async () => {
         try {
@@ -37,7 +26,7 @@ export default function Header() {
         } catch (e) {
             console.error(e);
         }
-    }, [user]);
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -53,12 +42,6 @@ export default function Header() {
             clearInterval(interval);
         };
     }, [user, fetchUnreadCount]);
-
-    const handleRegionSelect = (c: string) => {
-        setCountry(c);
-        setCurrency(currencyMap[c] || "sar");
-        setShowRegion(false);
-    };
 
     const handleSearchSubmit = () => {
         if (searchQuery.trim()) {

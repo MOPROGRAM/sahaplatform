@@ -10,8 +10,6 @@ import {
     Briefcase,
     ShoppingBag,
     Wrench,
-    Heart,
-    MoreHorizontal
 } from "lucide-react";
 
 export default function CategorySidebar() {

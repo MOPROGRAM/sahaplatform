@@ -9,12 +9,8 @@ import { adsService } from '@/lib/ads';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+import PromotedBanner from '@/components/PromotedBanner';
+import { clsx } from "clsx";
 
 // Skeleton Loader Component
 const AdsSkeleton = () => (
@@ -54,21 +50,21 @@ interface Ad {
     };
 }
 
+const categoriesList = [
+    { icon: Briefcase, key: 'jobs' },
+    { icon: Building2, key: 'realestate' },
+    { icon: Car, key: 'cars' },
+    { icon: ShoppingBag, key: 'goods' },
+    { icon: Wrench, key: 'services' },
+    { icon: Layers, key: 'other' }
+];
+
 export default function HomePage() {
     const { language, t, currency } = useLanguage();
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'featured' | 'new'>('all');
     const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
-
-    const categoriesList = [
-        { icon: Briefcase, key: 'jobs' },
-        { icon: Building2, key: 'realestate' },
-        { icon: Car, key: 'cars' },
-        { icon: ShoppingBag, key: 'goods' },
-        { icon: Wrench, key: 'services' },
-        { icon: Layers, key: 'other' }
-    ];
 
     const fetchAds = useCallback(async () => {
         try {
@@ -170,7 +166,7 @@ export default function HomePage() {
                         <AdsSkeleton />
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 pb-10">
-                            {ads.map((ad, idx) => (
+                            {ads.map((ad) => (
                                 <div key={ad.id} className={clsx(
                                     "transition-all duration-300",
                                 )}>
