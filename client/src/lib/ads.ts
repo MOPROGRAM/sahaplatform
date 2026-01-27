@@ -70,7 +70,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User!userId(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:City(id, name, nameAr, nameEn),
                 currency:Currency(id, code, symbol, name)
             `)
@@ -159,7 +159,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User!userId(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:City(id, name, nameAr, nameEn),
                 currency:Currency(id, code, symbol, name)
             `)
@@ -191,7 +191,7 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User!userId(id, name, email, phone),
+                author:User(id, name, email, phone),
                 city:City(id, name, nameAr, nameEn),
                 currency:Currency(id, code, symbol, name)
             `)
