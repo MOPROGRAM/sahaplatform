@@ -131,8 +131,8 @@ export default function Header() {
                             {showUserMenu && (
                                 <>
                                     <div className="fixed inset-0 z-[105]" onClick={() => setShowUserMenu(false)}></div>
-                                    <div className="absolute top-full right-0 mt-2 w-48 bg-card-bg border-2 border-border-color shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-md py-2 z-[110] animate-in fade-in duration-200">
-                                        <div className="space-y-1">
+                                    <div className="absolute top-full right-0 mt-2 w-56 bento-card shadow-2xl py-2 z-[110] animate-in fade-in duration-200 rounded-2xl">
+                                        <div className="space-y-1 p-1">
                                             {user.role === "ADMIN" && (
                                                 <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <Settings size={14} />

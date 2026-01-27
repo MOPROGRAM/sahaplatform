@@ -49,64 +49,61 @@ export default function LoginPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="glass-card !p-8 shadow-2xl bg-card">
-                    <div className="mb-8">
-                        <h2 className="text-xl font-[1000] text-text-main uppercase tracking-tight">{isLogin ? t('loginTitle') : t('registerTitle')}</h2>
-                        <div className="h-0.5 w-10 bg-primary mt-2"></div>
+                <div className="bento-card !p-10 shadow-premium bg-white border-none">
+                    <div className="mb-8 text-center">
+                        <h2 className="text-2xl font-[1000] text-text-main uppercase tracking-tighter">{isLogin ? t('loginTitle') : t('registerTitle')}</h2>
+                        <div className="h-1 w-12 bg-primary mt-3 mx-auto rounded-full"></div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {!isLogin && (
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">{t('name')}</label>
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-black uppercase tracking-widest text-text-muted px-1">{t('name')}</label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-3 flex items-center text-text-muted group-focus-within:text-primary transition-colors">
-                                        <User size={16} />
+                                    <div className="absolute inset-y-0 left-4 flex items-center text-text-muted group-focus-within:text-primary transition-colors z-10">
+                                        <User size={18} />
                                     </div>
-                                    <DepthInput
+                                    <input
                                         type="text"
                                         placeholder={t('placeholderName')}
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="pl-10 pr-4 py-3"
-                                        label={undefined}
+                                        className="bento-input pl-12"
                                         required={!isLogin}
                                     />
                                 </div>
                             </div>
                         )}
 
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">{t('email')}</label>
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-black uppercase tracking-widest text-text-muted px-1">{t('email')}</label>
                             <div className="relative group">
-                                <div className="absolute inset-y-0 left-3 flex items-center text-text-muted group-focus-within:text-primary transition-colors">
-                                    <Mail size={16} />
+                                <div className="absolute inset-y-0 left-4 flex items-center text-text-muted group-focus-within:text-primary transition-colors z-10">
+                                    <Mail size={18} />
                                 </div>
-                                <DepthInput
+                                <input
                                     type="email"
                                     placeholder={t('placeholderEmail')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="pl-10 pr-4 py-3"
-                                    label={undefined}
+                                    className="bento-input pl-12"
                                     required
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">{t('password')}</label>
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-black uppercase tracking-widest text-text-muted px-1">{t('password')}</label>
                             <div className="relative group">
-                                <div className="absolute inset-y-0 left-3 flex items-center text-text-muted group-focus-within:text-primary transition-colors">
-                                    <Lock size={16} />
+                                <div className="absolute inset-y-0 left-4 flex items-center text-text-muted group-focus-within:text-primary transition-colors z-10">
+                                    <Lock size={18} />
                                 </div>
-                                <DepthInput
+                                <input
                                     type="password"
                                     placeholder={t('placeholderPassword')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="pl-10 pr-4 py-3"
-                                    label={undefined}
+                                    className="bento-input pl-12"
                                     required
                                 />
                             </div>
@@ -115,9 +112,9 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn-saha-primary !w-full !py-4 !text-[14px] mt-4"
+                            className="btn-saha-primary !w-full !py-4 !text-[15px] !rounded-2xl shadow-lg hover:shadow-xl mt-6 transition-all active:scale-[0.98]"
                         >
-                            <ShieldCheck size={18} />
+                            <ShieldCheck size={20} />
                             {loading ? t('processing') : isLogin ? t('btnSubmitLogin') : t('btnSubmitRegister')}
                         </button>
                     </form>

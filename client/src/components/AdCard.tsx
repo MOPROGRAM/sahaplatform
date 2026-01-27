@@ -68,7 +68,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bg-white border rounded-lg overflow-hidden group flex transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-border-color"} ${language === "ar" ? "flex-row-reverse" : "flex-row"} ${className}`}
+            className={`bento-card bento-card-hover group flex ${isHighlighted ? "border-primary ring-2 ring-primary/50" : ""} ${language === "ar" ? "flex-row-reverse" : "flex-row"} ${className}`}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >

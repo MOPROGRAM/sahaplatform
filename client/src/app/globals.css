@@ -143,6 +143,33 @@ body {
   box-shadow: var(--glow-shadow);
 }
 
+/* Bento Grid Utility Classes */
+@layer components {
+  .bento-grid {
+    @apply grid gap-4 p-4;
+  }
+  
+  .bento-card {
+    @apply bg-card-bg border border-border-color rounded-3xl overflow-hidden transition-all duration-300;
+  }
+  
+  .bento-card-hover {
+    @apply hover:shadow-lg hover:border-primary/20 hover:-translate-y-1;
+  }
+
+  .bento-title {
+    @apply font-bold text-lg tracking-tight text-text-main;
+  }
+  
+  .bento-subtitle {
+    @apply text-sm text-text-muted font-medium;
+  }
+
+  .bento-input {
+    @apply w-full bg-gray-50/50 border border-gray-200 p-4 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all font-bold text-text-main;
+  }
+}
+
 .shadow-premium {
   box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
 }

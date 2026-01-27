@@ -17,7 +17,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2.5 bg-gray-bg border border-border-color rounded-md px-3 py-1.5 shadow-inner">
+                    <div className="flex items-center gap-2.5 bento-card px-4 py-2 bg-gray-50 dark:bg-white/5 shadow-inner">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
                         <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">{t('secureProtocol')}</span>
                     </div>

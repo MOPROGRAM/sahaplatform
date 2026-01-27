@@ -164,30 +164,39 @@ export default function PostAdPage() {
         <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            <main className="max-w-5xl mx-auto w-full p-2 md:p-4 flex-1">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <main className="max-w-7xl mx-auto w-full p-4 flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Left Info Column */}
-                    <div className="md:col-span-1 space-y-4">
-                        <div className="bg-primary p-5 rounded-md text-white shadow-xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform"></div>
-                            <h2 className="text-xl font-[1000] italic tracking-tighter uppercase relative z-10">{t('postAd')}</h2>
-                            <p className="text-[10px] font-bold opacity-90 mt-2 leading-tight relative z-10">{t('joinThousands')}</p>
+                    <div className="md:col-span-1 space-y-6">
+                        <div className="bento-card bg-primary text-white p-8 relative overflow-hidden group min-h-[300px] border-none shadow-premium">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h2 className="text-3xl font-[1000] italic tracking-tighter uppercase mb-4">{t('postAd')}</h2>
+                                    <p className="text-sm font-bold opacity-90 leading-relaxed">{t('joinThousands')}</p>
+                                </div>
+                                <div className="mt-8 flex gap-2 opacity-50">
+                                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Form Column */}
                     <div className="md:col-span-2">
-                        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-md shadow-xl p-5 space-y-5">
-                            {error && <div className="bg-red-50 text-red-600 p-3 text-xs font-black rounded-md">{error}</div>}
+                        <form onSubmit={handleSubmit} className="bento-card p-8 space-y-8 bg-white shadow-premium">
+                            {error && <div className="bg-red-50 text-red-600 p-4 text-sm font-bold rounded-2xl flex items-center gap-2"><Info size={16}/>{error}</div>}
 
-                            <div className="space-y-5">
+                            <div className="space-y-6">
                                 <div>
                                     <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('professionalTitle')} *</label>
                                     <input
                                         name="title"
                                         value={formData.title}
                                         onChange={handleInputChange}
-                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all shadow-inner font-bold"
+                                        className="bento-input"
                                         required
                                     />
                                 </div>
@@ -199,7 +208,7 @@ export default function PostAdPage() {
                                             name="category"
                                             value={formData.category}
                                             onChange={handleInputChange}
-                                            className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all cursor-pointer font-bold"
+                                            className="bento-input appearance-none cursor-pointer"
                                             required
                                         >
                                             <option value="">{t('chooseCategory')}</option>
@@ -219,7 +228,7 @@ export default function PostAdPage() {
                                                 name="subCategory"
                                                 value={formData.subCategory}
                                                 onChange={handleInputChange}
-                                                className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all cursor-pointer font-bold"
+                                                className="bento-input cursor-pointer"
                                                 required
                                             >
                                                 <option value="">{t('chooseSubCategory')}</option>
@@ -239,7 +248,7 @@ export default function PostAdPage() {
                                             type="number"
                                             value={formData.price}
                                             onChange={handleInputChange}
-                                            className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all font-bold"
+                                            className="bento-input"
                                             required
                                         />
                                     </div>
@@ -249,7 +258,7 @@ export default function PostAdPage() {
                                             name="location"
                                             value={formData.location}
                                             onChange={handleInputChange}
-                                            className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all font-bold"
+                                            className="bento-input"
                                             required
                                         />
                                     </div>
@@ -264,7 +273,7 @@ export default function PostAdPage() {
                                                     type="number"
                                                     value={formData.area}
                                                     onChange={handleInputChange}
-                                                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all font-bold"
+                                                    className="bento-input"
                                                     required
                                                 />
                                             </div>
@@ -274,7 +283,7 @@ export default function PostAdPage() {
                                                     name="listingType"
                                                     value={formData.listingType}
                                                     onChange={handleInputChange}
-                                                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all cursor-pointer font-bold"
+                                                    className="bento-input cursor-pointer"
                                                     required
                                                 >
                                                     <option value="sale">{language === 'ar' ? 'للبيع' : 'For Sale'}</option>
@@ -298,7 +307,7 @@ export default function PostAdPage() {
                                         value={formData.description}
                                         onChange={handleInputChange}
                                         rows={5}
-                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-md outline-none focus:border-primary transition-all resize-none font-medium"
+                                        className="bento-input resize-none font-medium"
                                     />
                                 </div>
 
@@ -306,7 +315,7 @@ export default function PostAdPage() {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="btn-saha-primary !w-full !py-4"
+                                        className="btn-saha-primary !w-full !py-4 !rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
                                     >
                                         {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} />}
                                         {loading ? t('loading') : t('deployListing')}

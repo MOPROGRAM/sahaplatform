@@ -225,12 +225,11 @@ function AdsContent() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white border border-dashed border-gray-300 p-20 text-center rounded-sm">
+                    <div className="bento-card border-dashed p-20 text-center">
                         <p className="text-gray-400 font-black uppercase text-[11px] tracking-[0.2em]">{t('noResults')}</p>
-                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 btn-saha-outline !px-6">{t('clearFilters')}</button>
+                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 btn-saha-outline !px-6 !rounded-xl">{t('clearFilters')}</button>
                     </div>
                 )}
-        </div>
 
             {/* Removed Map Section */ }
             </main >
