@@ -9,6 +9,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import AdCard from '@/components/AdCard';
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 interface Ad {
     id: string;
@@ -107,9 +113,9 @@ export default function HomePage() {
         <div className="min-h-screen bg-[#f4f4f4] flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
             <Header />
 
-            <main className="max-w-7xl mx-auto w-full p-2 grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1">
-                {/* Right Sidebar - Titled Categories */}
-                <aside className="lg:col-span-3 order-1 lg:order-2 space-y-2 hidden md:block">
+            <main className={cn("max-w-7xl mx-auto w-full p-2 grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1", language === "ar" ? "lg:flex-row-reverse" : "lg:flex-row")}>
+                {/* Right/Left Sidebar - Titled Categories (Conditional Order) */}
+                <aside className={`lg:col-span-3 space-y-2 hidden md:block ${language === "ar" ? "order-2" : "order-1"}`}>
                     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                         <div className="bg-gray-50 px-3 py-2 text-xs font-black border-b border-gray-100 text-secondary uppercase tracking-widest text-center">
                             {t("categories")}
@@ -133,7 +139,7 @@ export default function HomePage() {
                 </aside>
 
                 {/* Central Grid Feed */}
-                <section className="lg:col-span-9 order-2 lg:order-1 flex flex-col gap-3">
+                <section className={`lg:col-span-9 flex flex-col gap-3 ${language === "ar" ? "order-1" : "order-2"}`}>
                     <div className="bg-white border border-gray-100 rounded-lg flex items-center justify-between px-4 py-2 shadow-sm">
                         <div className="flex items-center gap-2">
                             <Sparkles className="text-primary animate-pulse" size={16} />
@@ -151,7 +157,7 @@ export default function HomePage() {
                             <LoadingSpinner size={32} />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 pb-10">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pb-10"> {/* Changed to lg:grid-cols-5 */}
                             {ads.map((ad) => (
                                 <AdCard
                                     key={ad.id}
@@ -169,7 +175,7 @@ export default function HomePage() {
                             ))}
                             {ads.length === 0 && (
                                 <div className="col-span-full bg-white p-10 text-center border border-dashed border-gray-300 rounded-lg">
-                                    <div className="text-gray-300 font-bold uppercase tracking-widest text-[11px]">{t('noResults')}</div>
+                                    <div className="text-gray-300 font-bold uppercase tracking-widest text-[11px]">{t("noResults")}</div>
                                 </div>
                             )}
                         </div>

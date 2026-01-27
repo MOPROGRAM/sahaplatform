@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Clock, MapPin, Eye, User, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench } from "lucide-react"; // Added more icons for subcategories
+import { Heart, Clock, MapPin, User, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, Info } from "lucide-react"; // Removed Eye, Added Info
 import { formatRelativeTime } from "@/lib/utils";
 
 interface AdCardProps {
@@ -17,34 +17,34 @@ interface AdCardProps {
     createdAt: string;
     authorName?: string;
     category?: string;
-    subCategory?: string; // Added subCategory
+    subCategory?: string;
     className?: string;
     language?: 'ar' | 'en';
     isFeatured?: boolean;
     views?: number;
     description?: string;
-    onMapHighlight?: (adId: string | null) => void; // New prop for map interaction
-    isHighlighted?: boolean; // New prop to indicate if the card is highlighted
+    onMapHighlight?: (adId: string | null) => void;
+    isHighlighted?: boolean;
 }
 
 export default function AdCard({
     id,
     title,
     price,
-    currency = "SAR", // Changed default currency to SAR
+    currency = "SAR",
     location,
     images = [],
     createdAt,
     authorName,
     category,
-    subCategory, // Destructure subCategory
+    subCategory,
     className = "",
     language = 'ar',
     isFeatured = false,
     views = 0,
     description = "",
-    onMapHighlight, // Destructure new prop
-    isHighlighted = false // Destructure new prop
+    onMapHighlight,
+    isHighlighted = false
 }: AdCardProps) {
     const { t } = useLanguage();
     const [isFavorite, setIsFavorite] = useState(false);
@@ -70,7 +70,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bg-white border rounded-lg overflow-hidden group flex transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-border-color"} ${className}`}
+            className={`bg-white border rounded-lg overflow-hidden group flex transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-border-color"} ${language === "ar" ? "flex-row-reverse" : "flex-row"} ${className}`}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
@@ -113,16 +113,18 @@ export default function AdCard({
                     {title}
                 </h3>
 
-                {/* Specs Grid - Airbnb Style (using light/regular font weight) */}
+                {/* Specs Grid - Airbnb Style (no views, show description) */}
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-text-muted mt-1 mb-3">
                     <div className="flex items-center gap-1 font-normal">
                         <MapPin size={12} className="text-gray-400" />
                         <span className="truncate">{location?.split(',')[0].trim()}</span>
                     </div>
-                    <div className="flex items-center gap-1 font-normal">
-                        <Eye size={12} className="text-gray-400" />
-                        <span>{views} {t('views')}</span>
-                    </div>
+                    {description && (
+                        <div className="flex items-center gap-1 font-normal col-span-2">
+                            <Info size={12} className="text-gray-400" />
+                            <span className="line-clamp-2">{description}</span>
+                        </div>
+                    )}
                     <div className="flex items-center gap-1 font-normal">
                         <Clock size={12} className="text-gray-400" />
                         <span>{formatRelativeTime(createdAt, language)}</span>

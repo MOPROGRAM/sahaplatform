@@ -197,11 +197,6 @@ export const translations = {
         priceOnRequest: 'السعر عند التواصل',
         activeFilters: 'الفلاتر النشطة',
 
-        // Filter Labels
-        Area: 'المنطقة',
-        Type: 'النوع',
-        Price: 'السعر',
-
         // Auth Pages
         loginTitle: 'تسجيل الدخول للنظام',
         registerTitle: 'إنشاء حساب جديد',
@@ -214,12 +209,59 @@ export const translations = {
         alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
         noAccount: 'ليس لديك حساب؟',
         processing: 'جارٍ المعالجة...',
+
+        // Filter Labels
+        Area: 'المنطقة',
+        Type: 'النوع',
+        Price: 'السعر',
+
+        // Advertise Page Specific
+        basicPlan: 'الباقة الأساسية',
+        premiumPlan: 'الباقة المميزة',
+        vipPlan: 'الباقة الذهبية',
+        '100SAR': '100 ر.س',
+        '250SAR': '250 ر.س',
+        '500SAR': '500 ر.س',
+        featuredAd7Days: 'إعلان مميز لمدة 7 أيام',
+        topSearchResults: 'ظهور في أعلى النتائج',
+        highlightBadge: 'أيقونة تميز',
+        allBasicFeatures: 'جميع مميزات الباقة الأساسية',
+        featuredAd30Days: 'إعلان مميز لمدة 30 يوم',
+        homepagePlacement: 'ظهور في الصفحة الرئيسية',
+        detailedAnalytics: 'إحصائيات تفصيلية',
+        allPreviousFeatures: 'جميع مميزات الباقات السابقة',
+        unlimitedAds: 'إعلانات غير محدودة',
+        topPriorityInSearch: 'أولوية قصوى في البحث',
+        verifiedBadge: 'شهادة موثوق',
+        dedicatedSupport: 'دعم فني مخصص',
+        '7Days': '7 أيام',
+        '30Days': '30 يوم',
+        '90Days': '90 يوم',
+        whatsapp: 'واتساب',
+        call: 'اتصال',
+        contactUsToSubscribe: 'للاشتراك تواصل معنا',
+        premiumAdPackages: 'باقات الإعلانات المدفوعة',
+        mostPopular: 'الأكثر شعبية',
+        subscribeNow: 'اشترك الآن',
+        pleaseLoginFirst: 'يرجى تسجيل الدخول أولاً',
+        requestSentSuccessfully: 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً.',
+        failedToSendRequest: 'فشل في إرسال الطلب. يرجى المحاولة لاحقاً.',
+        sending: 'جارٍ الإرسال...',
+        sendRequest: 'إرسال الطلب',
+        whyPremiumAds: 'لماذا الإعلانات المدفوعة؟',
+        moreViews: 'زيادة في المشاهدات',
+        moreContacts: 'زيادة في التواصل',
+        betterSales: 'فرص بيع أكبر',
+        messageOptional: 'رسالة (اختياري)',
     },
     en: {
         // Brand
         siteName: 'saha',
         siteBrand: 'Saha Auctions & Real Estate',
         taglineFooter: 'GCC Real Estate & Career Portal',
+        contactEmail: 'motwasel@yahoo.com',
+        contactPhone: '+966582003887',
+        contactWhatsApp: '+966582003887',
 
         // Navigation
         home: 'Home',
@@ -422,6 +464,48 @@ export const translations = {
         alreadyHaveAccount: 'Already have an account?',
         noAccount: 'Don\'t have an account?',
         processing: 'Processing...',
+        pleaseLoginFirst: 'Please login first',
+        requestSentSuccessfully: 'Your request has been sent successfully! We will contact you soon.',
+        failedToSendRequest: 'Failed to send request. Please try again later.',
+        sending: 'Sending...',
+        sendRequest: 'Send Request',
+        whyPremiumAds: 'Why Premium Ads?',
+        moreViews: 'More Views',
+        moreContacts: 'More Contacts',
+        betterSales: 'Better Sales',
+        messageOptional: 'Message (Optional)',
+        basicPlan: 'Basic Plan',
+        premiumPlan: 'Premium Plan',
+        vipPlan: 'VIP Plan',
+        '100SAR': '100 SAR',
+        '250SAR': '250 SAR',
+        '500SAR': '500 SAR',
+        featuredAd7Days: 'Featured ad for 7 days',
+        topSearchResults: 'Top search results',
+        highlightBadge: 'Highlight badge',
+        allBasicFeatures: 'All Basic features',
+        featuredAd30Days: 'Featured ad for 30 days',
+        homepagePlacement: 'Homepage placement',
+        detailedAnalytics: 'Detailed analytics',
+        allPreviousFeatures: 'All previous features',
+        unlimitedAds: 'Unlimited ads',
+        topPriorityInSearch: 'Top priority in search',
+        verifiedBadge: 'Verified badge',
+        dedicatedSupport: 'Dedicated support',
+        '7Days': '7 Days',
+        '30Days': '30 Days',
+        '90Days': '90 Days',
+        whatsapp: 'WhatsApp',
+        call: 'Call',
+        contactUsToSubscribe: 'Contact Us to Subscribe',
+        premiumAdPackages: 'Premium Ad Packages',
+        mostPopular: 'Most Popular',
+        subscribeNow: 'Subscribe Now',
+        moreViews: 'More Views',
+        moreContacts: 'More Contacts',
+        betterSales: 'Better Sales',
+        messageOptional: 'Message (Optional)',
+
         // Filter Labels
         Area: 'Area',
         Type: 'Type',
@@ -433,7 +517,7 @@ export type Language = 'ar' | 'en';
 export type TranslationKey = keyof typeof translations.ar | 'noImage';
 
 export const getTranslation = (key: TranslationKey, lang: Language = 'ar'): string => {
-    return (translations[lang][key as keyof typeof translations.ar] || translations.ar[key as keyof typeof translations.ar] || key);
+    return translations[lang][key as keyof typeof translations.ar] || translations.ar[key as keyof typeof translations.ar] || key;
 };
 
 export const getCurrentLanguage = (): Language => {
