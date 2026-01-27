@@ -75,19 +75,19 @@ export default function AdCard({
         >
 
             {/* Image Area */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? "w-full h-36" : "w-[30%]"}`}>
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? "w-full h-28" : "w-[30%]"}`}>
                 {isFeatured && (
-                    <div className="absolute top-1 left-1 z-10 bg-primary text-white px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-md">
+                    <div className="absolute top-1 left-1 z-10 bg-primary text-white px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md">
                         {t('featured')}
                     </div>
                 )}
 
                 <button
                     onClick={handleFavoriteClick}
-                    className="absolute top-1 right-1 z-10 p-1 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
+                    className="absolute top-1 right-1 z-10 p-0.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
                 >
                     <Heart
-                        size={14}
+                        size={12}
                         className={isFavorite ? "fill-red-500 text-red-500" : ""}
                     />
                 </button>
@@ -106,20 +106,20 @@ export default function AdCard({
             </div>
 
             {/* Content Area */}
-            <div className={`flex-1 flex flex-col p-2 ${isVertical ? "gap-0.5" : ""}`}>
+            <div className={`flex-1 flex flex-col p-1.5 ${isVertical ? "gap-0.5" : ""}`}>
                 {/* Title */}
-                <h3 className="text-xs font-bold text-text-main line-clamp-2 leading-tight min-h-[2.5em]">
+                <h3 className="text-[11px] font-bold text-text-main line-clamp-2 leading-tight min-h-[2.5em]">
                     {title}
                 </h3>
 
                 {/* Specs Grid */}
-                <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 text-[9px] text-text-muted ${isVertical ? "mt-auto mb-1" : "mt-1 mb-2"}`}>
+                <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 text-[8px] text-text-muted ${isVertical ? "mt-auto mb-1" : "mt-1 mb-2"}`}>
                     <div className="flex items-center gap-0.5 font-normal">
-                        <MapPin size={9} className="text-gray-400" />
+                        <MapPin size={8} className="text-gray-400" />
                         <span className="truncate">{location?.split(',')[0].trim()}</span>
                     </div>
                     <div className="flex items-center gap-0.5 font-normal">
-                        <Clock size={9} className="text-gray-400" />
+                        <Clock size={8} className="text-gray-400" />
                         <span>{formatRelativeTime(createdAt, language)}</span>
                     </div>
                 </div>
@@ -127,7 +127,7 @@ export default function AdCard({
                 {/* Price & Category Footer */}
                 <div className="mt-auto flex justify-between items-end pt-1 border-t border-border-color/50">
                     <div className="flex items-baseline gap-0.5 text-text-main">
-                        <span className="text-sm font-black">{price?.toLocaleString()}</span>
+                        <span className="text-xs font-black">{price?.toLocaleString()}</span>
                         <span className="text-[8px] font-normal text-text-muted uppercase">{currency}</span>
                     </div>
                     {category && (

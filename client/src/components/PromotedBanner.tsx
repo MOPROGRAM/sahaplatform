@@ -28,7 +28,7 @@ export default function PromotedBanner() {
 
     if (loading) {
         return (
-            <div className="w-full bg-[#111] py-2 border-b border-border-color">
+            <div className="w-full bg-[#111] py-2 border-b border-border-color min-h-[60px]">
                 <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-3">
                     <div className="w-20 h-4 bg-white/10 rounded animate-pulse shrink-0" />
                     <div className="flex gap-3 overflow-hidden py-1 w-full">
@@ -41,10 +41,14 @@ export default function PromotedBanner() {
         );
     }
 
-    if (!ads.length) return null;
+    if (!ads.length) return (
+         <div className="w-full bg-[#111] py-2 border-b border-border-color min-h-[60px] flex items-center justify-center">
+            <div className="text-gray-500 text-xs font-medium">No featured ads available</div>
+         </div>
+    );
 
     return (
-        <div className="w-full bg-[#111] text-white py-2 border-b border-border-color">
+        <div className="w-full bg-[#111] text-white py-2 border-b border-border-color min-h-[60px]">
             <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-3">
                 <div className="flex items-center gap-2 shrink-0">
                     <Zap className="text-primary fill-primary" size={14} />
