@@ -84,9 +84,9 @@ body {
   overflow-x: hidden;
   background: var(--gray-bg);
   background-attachment: fixed;
+  scrollbar-gutter: stable;
   color: var(--text-main);
   text-rendering: optimizeLegibility;
-  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Fluid Typography & Higher Contrast */

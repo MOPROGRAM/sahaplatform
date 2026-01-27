@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Cairo, Tajawal, Readex_Pro } from "next/font/google";
 import "./globals.css";
-import dynamic from "next/dynamic";
-
-const LanguageProvider = dynamic(() => import("@/lib/language-context").then(mod => ({ default: mod.LanguageProvider })), {
-    ssr: false,
-});
-
-const ThemeProvider = dynamic(() => import("next-themes").then(mod => ({ default: mod.ThemeProvider })), {
-    ssr: false,
-});
-
-const CategorySidebar = dynamic(() => import("@/components/CategorySidebar"), {
-    ssr: false,
-});
+import { LanguageProvider } from "@/lib/language-context";
+import { ThemeProvider } from "next-themes";
+import CategorySidebar from "@/components/CategorySidebar";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -55,14 +45,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`}>
+        <html className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning>
             <head>
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>
             <body>
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                     <LanguageProvider>
-                        <div className="flex min-h-screen bg-gray-bg transition-colors duration-500">
+                        <div className="flex min-h-screen bg-gray-bg">
                             <CategorySidebar />
                             <main className="flex-1 overflow-x-hidden">
                                 {children}
