@@ -40,10 +40,10 @@ interface Ad {
     location: string | null;
     category: string;
     description?: string;
-    createdAt: string;
+    created_at: string;
     images: string;
-    isBoosted?: boolean;
-    userId: string;
+    is_boosted?: boolean;
+    author_id: string;
     author?: {
         name?: string;
     };
@@ -96,7 +96,7 @@ export default function HomePage() {
             const counts: Record<string, number> = {};
             await Promise.all(categoriesList.map(async (cat) => {
                 const { count } = await (supabase as any)
-                    .from('Ad')
+                    .from('ads')
                     .select('*', { count: 'exact', head: true })
                     .eq('is_active', true)
                     .eq('category', cat.key);
@@ -178,10 +178,10 @@ export default function HomePage() {
                                         currency={currency.toUpperCase()}
                                         location={ad.city?.name || ad.location || ''}
                                         images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
-                                        createdAt={ad.createdAt}
+                                        createdAt={ad.created_at}
                                         category={ad.category}
                                         language={language}
-                                        isFeatured={ad.isBoosted || false}
+                                        isFeatured={ad.is_boosted || false}
                                     />
                                 </div>
                             ))}

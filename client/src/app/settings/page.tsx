@@ -59,7 +59,7 @@ export default function SettingsPage() {
         setMessage("");
         try {
             const { error } = await supabase
-                .from('User')
+                .from('users')
                 .update({
                     name: profileData.name,
                     phone: profileData.phone || null,
@@ -125,13 +125,13 @@ export default function SettingsPage() {
         try {
             // Delete user's ads first
             await supabase
-                .from('Ad')
+                .from('ads')
                 .delete()
                 .eq('author_id', user?.id);
 
             // Delete user record
             await supabase
-                .from('User')
+                .from('users')
                 .delete()
                 .eq('id', user?.id);
 

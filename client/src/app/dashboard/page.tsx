@@ -58,7 +58,7 @@ export default function DashboardPage() {
     const fetchDashboardData = useCallback(async () => {
         try {
             const myAds = await adsService.getMyAds();
-            const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.isActive) : [];
+            const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.is_active) : [];
             setAds(activeAdsOnly as any);
 
             const totalViews = activeAdsOnly.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
@@ -189,7 +189,7 @@ export default function DashboardPage() {
                                         </div>
                                     ) : ads.length > 0 ? (
                                         ads.map(ad => (
-                                            <div key={ad.id} className={`depth-card p-4 ${ad.isBoosted ? 'bento-large' : 'bento-small'}`}>
+                                            <div key={ad.id} className={`depth-card p-4 ${ad.is_boosted ? 'bento-large' : 'bento-small'}`}>
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 bg-card border border-border-color rounded-lg flex items-center justify-center shrink-0">
@@ -205,8 +205,8 @@ export default function DashboardPage() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                        {ad.isActive ? 'Active' : 'Paused'}
+                                                    <div className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                        {ad.is_active ? 'Active' : 'Paused'}
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center justify-between">
@@ -217,7 +217,7 @@ export default function DashboardPage() {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <Clock size={12} />
-                                                            {getRelativeTime(ad.createdAt)}
+                                                            {getRelativeTime(ad.created_at)}
                                                         </span>
                                                     </div>
                                                     <div className="flex gap-2">

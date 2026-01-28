@@ -24,15 +24,15 @@ export interface Conversation {
 export interface Message {
     id: string;
     content: string;
-    messageType: string;
-    fileUrl?: string;
-    fileName?: string;
-    fileSize?: number;
-    senderId: string;
-    receiverId: string;
-    conversationId: string;
-    isRead: boolean;
-    createdAt: string;
+    message_type: string;
+    file_url?: string;
+    file_name?: string;
+    file_size?: number;
+    sender_id: string;
+    receiver_id: string;
+    conversation_id: string;
+    is_read: boolean;
+    created_at: string;
     sender?: {
         id: string;
         name?: string;

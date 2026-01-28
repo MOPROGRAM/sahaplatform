@@ -134,19 +134,21 @@ export default function PostAdPage() {
                 description: finalDescription,
                 price: parseFloat(formData.price),
                 category: formData.category,
-                // subCategory: formData.subCategory, // Removed as column doesn't exist
+                sub_category: formData.subCategory,
                 location: formData.enableLocation ? formData.location : null,
                 latitude: coordinates?.lat || null,
                 longitude: coordinates?.lng || null,
                 images: JSON.stringify(imageUrls),
-                userId: currentUser.id,
-                isActive: true,
-                currencyId: 'sar',
+                author_id: currentUser.id,
+                is_active: true,
+                currency_id: 'sar',
+                payment_method: formData.paymentMethod,
+                is_boosted: formData.isBoosted,
                 // area: formData.area ? parseFloat(formData.area) : null, // Removed as column doesn't exist
             };
 
             const { data, error: insertError } = await (supabase as any)
-                .from('Ad')
+                .from('ads')
                 .insert(adData)
                 .select()
                 .single();

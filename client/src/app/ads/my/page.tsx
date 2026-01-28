@@ -143,10 +143,10 @@ export default function MyAdsPage() {
                                 <AdCard
                                     id={ad.id}
                                     title={ad.title}
-                                    price={ad.price}
+                                    price={ad.price || 0}
                                     location={ad.location || ''}
                                     images={typeof ad.images === 'string' ? JSON.parse(ad.images || '[]') : ad.images}
-                                    createdAt={ad.createdAt}
+                                    createdAt={ad.created_at}
                                     category={ad.category}
                                     language={language}
                                 />

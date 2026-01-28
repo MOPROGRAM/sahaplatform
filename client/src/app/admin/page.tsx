@@ -52,8 +52,8 @@ export default function AdminDashboard() {
         try {
             if (view === 'overview') {
                 const [usersCount, adsCount, subsPending, subsActive] = await Promise.all([
-                    (supabase as any).from('User').select('*', { count: 'exact', head: true }),
-                    (supabase as any).from('Ad').select('*', { count: 'exact', head: true }),
+                    (supabase as any).from('users').select('*', { count: 'exact', head: true }),
+                    (supabase as any).from('ads').select('*', { count: 'exact', head: true }),
                     (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
                     (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'completed')
                 ]);
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
 
                 // Fetch recent ads for overview
                 const { data: recentAds } = await (supabase as any)
-                    .from('Ad')
+                    .from('ads')
                     .select('*')
                     .order('created_at', { ascending: false })
                     .limit(5);
@@ -75,13 +75,13 @@ export default function AdminDashboard() {
 
             } else if (view === 'users') {
                 const { data } = await (supabase as any)
-                    .from('User')
+                    .from('users')
                     .select('*')
                     .order('created_at', { ascending: false });
                 setDataList(data || []);
             } else if (view === 'ads') {
                 const { data } = await (supabase as any)
-                    .from('Ad')
+                    .from('ads')
                     .select('*')
                     .order('created_at', { ascending: false });
                 setDataList(data || []);
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
     const handleUpdateAdStatus = async (id: string, active: boolean) => {
         setActionLoading(id);
         try {
-            await (supabase as any).from('Ad').update({ is_active: active }).eq('id', id);
+            await (supabase as any).from('ads').update({ is_active: active }).eq('id', id);
             fetchDashboardData();
         } catch (err) {
             console.error(err);
@@ -136,7 +136,7 @@ export default function AdminDashboard() {
         if (!confirm('Are you sure you want to delete this ad?')) return;
         setActionLoading(id);
         try {
-            await (supabase as any).from('Ad').delete().eq('id', id);
+            await (supabase as any).from('ads').delete().eq('id', id);
             fetchDashboardData();
         } catch (err) {
             console.error(err);
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
     const handleToggleBoost = async (id: string, boost: boolean) => {
         setActionLoading(id);
         try {
-            await (supabase as any).from('Ad').update({ is_boosted: boost }).eq('id', id);
+            await (supabase as any).from('ads').update({ is_boosted: boost }).eq('id', id);
             fetchDashboardData();
         } catch (err) {
             console.error(err);

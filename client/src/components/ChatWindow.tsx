@@ -10,12 +10,12 @@ import { useLanguage } from "@/lib/language-context";
 
 interface Message {
     id: string;
-    senderId: string;
+    sender_id: string;
     content: string;
-    messageType: 'text' | 'image' | 'file' | 'voice' | 'location';
-    fileUrl?: string;
-    fileName?: string;
-    createdAt: string;
+    message_type: 'text' | 'image' | 'file' | 'voice' | 'location';
+    file_url?: string;
+    file_name?: string;
+    created_at: string;
     sender: {
         name: string;
         image?: string;
@@ -56,10 +56,10 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     // Transform raw DB fields to UI interface
                     const processedMessage: Message = {
                         id: newMessage.id,
-                        senderId: newMessage.senderId || newMessage.sender_id,
+                        sender_id: newMessage.senderId || newMessage.sender_id,
                         content: newMessage.content,
-                        messageType: newMessage.messageType || newMessage.message_type || 'text',
-                        createdAt: newMessage.createdAt || newMessage.created_at || new Date().toISOString(),
+                        message_type: (newMessage.messageType || newMessage.message_type || 'text') as any,
+                        created_at: newMessage.createdAt || newMessage.created_at || new Date().toISOString(),
                         sender: { name: '...' } // Temporary placeholder
                     };
 
@@ -71,9 +71,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
                     // Fetch sender name immediately
                     supabase
-                        .from('User')
+                        .from('users')
                         .select('name')
-                        .eq('id', processedMessage.senderId)
+                        .eq('id', processedMessage.sender_id)
                         .single()
                         .then(({ data: userData }) => {
                             if (userData) {
@@ -92,7 +92,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 conversationsService.unsubscribe(channel);
             }
         };
-    }, [conversationId, fetchChatData]);
+    }, [conversationId]); // Removed fetchChatData from deps to avoid loop if it changes
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -117,9 +117,10 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             if (data) {
                 const processedMessages = (data.messages || []).map((msg: any) => ({
                     ...msg,
-                    senderId: msg.senderid || msg.senderId,
-                    messageType: msg.messagetype || msg.messageType,
-                    createdAt: msg.createdat || msg.createdAt,
+                    // Ensure snake_case properties are present (service returns both)
+                    sender_id: msg.sender_id || msg.senderId,
+                    message_type: msg.message_type || msg.messageType,
+                    created_at: msg.created_at || msg.createdAt,
                     sender: msg.sender || { name: 'Unknown' }
                 }));
                 setMessages(processedMessages);
@@ -147,18 +148,19 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
 
             // Normalize returned fields (snake_case vs camelCase)
-            const id = sentMessage.id || sentMessage.ID || sentMessage.message_id;
-            const contentResp = sentMessage.content || sentMessage.body || '';
+            const id = sentMessage.id || (sentMessage as any).ID || (sentMessage as any).message_id;
+            const contentResp = sentMessage.content || (sentMessage as any).body || '';
             const messageType = (sentMessage.messageType as string) || (sentMessage.message_type as string) || type;
             const createdAt = sentMessage.createdAt || sentMessage.created_at || new Date().toISOString();
+            const senderId = sentMessage.senderId || sentMessage.sender_id || user?.id;
 
             // Add message locally immediately
             const newMessage: Message = {
                 id: id,
-                senderId: user?.id || '',
+                sender_id: senderId,
                 content: contentResp,
-                messageType: messageType as any,
-                createdAt: createdAt,
+                message_type: messageType as any,
+                created_at: createdAt,
                 sender: { name: user?.name || 'You' }
             };
             setMessages(prev => [...prev, newMessage]);
@@ -249,14 +251,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             {/* Messages Area - High Density */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar">
                 {messages.map((msg, idx) => (
-                    <div key={msg.id || idx} className={`flex flex-col ${msg.senderId === user?.id ? 'items-end' : 'items-start'}`}>
-                        <div className={`max-w-[75%] px-3 py-2 rounded-sm shadow-sm transition-all hover:shadow-md ${msg.senderId === user?.id
+                    <div key={msg.id || idx} className={`flex flex-col ${msg.sender_id === user?.id ? 'items-end' : 'items-start'}`}>
+                        <div className={`max-w-[75%] px-3 py-2 rounded-sm shadow-sm transition-all hover:shadow-md ${msg.sender_id === user?.id
                             ? 'bg-primary text-white rounded-br-none'
                             : 'bg-white border border-gray-100 text-secondary rounded-bl-none'}`}>
 
-                            {msg.messageType === 'text' && <p className="text-[11px] font-bold leading-relaxed">{msg.content}</p>}
+                            {msg.message_type === 'text' && <p className="text-[11px] font-bold leading-relaxed">{msg.content}</p>}
 
-                            {msg.messageType === 'location' && (
+                            {msg.message_type === 'location' && (
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-[10px] font-black border-b border-black/5 pb-1 mb-1">
                                         <MapPin size={12} /> SHARED LOCATION
@@ -271,19 +273,19 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 </div>
                             )}
 
-                            {msg.messageType === 'file' && (
+                            {msg.message_type === 'file' && (
                                 <div className="flex items-center gap-3 bg-card p-2 rounded-xs">
                                     <FileText size={20} className="text-primary" />
                                     <div className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-black truncate">{msg.fileName || 'Attached File'}</span>
-                                        <a href={msg.fileUrl} target="_blank" className="text-[9px] font-black text-primary hover:underline">DOWNLOAD NOW</a>
+                                        <span className="text-[10px] font-black truncate">{msg.file_name || 'Attached File'}</span>
+                                        <a href={msg.file_url} target="_blank" className="text-[9px] font-black text-primary hover:underline">DOWNLOAD NOW</a>
                                     </div>
                                 </div>
                             )}
 
-                            <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-text-muted'}`}>
+                            <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.sender_id === user?.id ? 'text-white/60' : 'text-text-muted'}`}>
                                 {(() => {
-                                    const date = new Date(msg.createdAt);
+                                    const date = new Date(msg.created_at);
                                     return isNaN(date.getTime()) ? '...' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                 })()}
                             </span>

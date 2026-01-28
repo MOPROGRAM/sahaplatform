@@ -68,7 +68,7 @@ export default function EditAdPage() {
                     return;
                 }
 
-                if (adData.userId !== user?.id) {
+                if (adData.author_id !== user?.id) {
                     setError(language === 'ar' ? "ليس لديك صلاحية لتعديل هذا الإعلان" : "You don't have permission to edit this ad");
                     return;
                 }
@@ -76,18 +76,18 @@ export default function EditAdPage() {
                 setFormData({
                     title: adData.title || "",
                     category: adData.category || "",
-                    subCategory: adData.subCategory || "",
+                    subCategory: adData.sub_category || "",
                     price: adData.price?.toString() || "",
                     location: adData.location || "",
                     address: adData.address || "",
-                    paymentMethod: adData.paymentMethod || "",
+                    paymentMethod: adData.payment_method || "",
                     description: adData.description || "",
                     phone: adData.phone || "",
                     email: adData.email || "",
-                    isBoosted: adData.isBoosted || false,
+                    isBoosted: adData.is_boosted || false,
                     enableLocation: !!(adData.latitude && adData.longitude),
-                    area: (adData as any).area?.toString() || "", // Assuming area might be on Ad type
-                    listingType: (adData as any).listingType || "sale", // Assuming listingType on Ad type
+                    area: (adData as any).area?.toString() || "",
+                    listingType: (adData as any).listingType || "sale",
                 });
                 setImages(typeof adData.images === 'string' ? JSON.parse(adData.images) : adData.images || []);
                 setCoordinates(adData.latitude && adData.longitude ? { lat: adData.latitude, lng: adData.longitude } : null);

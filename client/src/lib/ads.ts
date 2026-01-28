@@ -6,25 +6,29 @@ import { Database } from '@/types/database.types'
 export type Ad = {
     id: string;
     title: string;
+    title_ar?: string;
+    title_en?: string;
     description: string;
+    description_ar?: string;
+    description_en?: string;
     price: number | null;
-    currencyId: string;
+    currency_id: string;
     category: string;
-    subCategory?: string | null;
+    sub_category?: string | null;
     location: string | null;
     address?: string | null;
-    paymentMethod?: string | null;
-    cityId?: string | null;
+    payment_method?: string | null;
+    city_id?: string | null;
     latitude?: number | null;
     longitude?: number | null;
     images: string;
     video?: string | null;
-    isBoosted: boolean;
-    isActive: boolean;
+    is_boosted: boolean;
+    is_active: boolean;
     views: number;
-    userId: string;
-    createdAt: string;
-    updatedAt: string;
+    author_id: string;
+    created_at: string;
+    updated_at: string;
     phone?: string;
     email?: string;
     // Relations
@@ -37,8 +41,8 @@ export type Ad = {
     city?: {
         id: string;
         name: string;
-        nameAr?: string;
-        nameEn?: string;
+        name_ar?: string;
+        name_en?: string;
     };
     currency?: {
         id: string;
@@ -109,7 +113,7 @@ export const adsService = {
             // Tags Filter (Rent/Sale etc)
             if (filters.tags && filters.tags.length > 0) {
                 filters.tags.forEach(tag => {
-                    let tagConditions = `subCategory.ilike.%${tag}%,title.ilike.%${tag}%,description.ilike.%${tag}%`;
+                    let tagConditions = `sub_category.ilike.%${tag}%,title.ilike.%${tag}%,description.ilike.%${tag}%`;
                     if (tag === 'rent') tagConditions += `,title.ilike.%إيجار%,description.ilike.%إيجار%`;
                     if (tag === 'sale') tagConditions += `,title.ilike.%بيع%,description.ilike.%بيع%`;
                     query = query.or(tagConditions);
@@ -141,25 +145,8 @@ export const adsService = {
                 return [];
             }
 
-            // Map snake_case to camelCase
-            return (data || []).map((ad: any) => ({
-                ...ad,
-                userId: ad.author_id,
-                cityId: ad.city_id,
-                currencyId: ad.currency_id,
-                isActive: ad.is_active,
-                isBoosted: ad.is_boosted,
-                createdAt: ad.created_at,
-                updatedAt: ad.updated_at,
-                paymentMethod: ad.payment_method,
-                subCategory: ad.sub_category, // Map sub_category to subCategory
-                // Map nested objects with new column names
-                city: ad.city ? {
-                    ...ad.city,
-                    nameAr: ad.city.name_ar,
-                    nameEn: ad.city.name_en
-                } : undefined
-            }));
+            // Return data directly (already in snake_case)
+            return (data || []) as unknown as Ad[];
         } catch (error) {
             console.error('Unexpected error fetching ads:', error);
             return [];
@@ -190,25 +177,7 @@ export const adsService = {
                 return null;
             }
 
-            // Map snake_case to camelCase
-            const ad = data as any;
-            return {
-                ...ad,
-                userId: ad.author_id,
-                cityId: ad.city_id,
-                currencyId: ad.currency_id,
-                isActive: ad.is_active,
-                isBoosted: ad.is_boosted,
-                createdAt: ad.created_at,
-                updatedAt: ad.updated_at,
-                paymentMethod: ad.payment_method,
-                subCategory: ad.sub_category,
-                city: ad.city ? {
-                    ...ad.city,
-                    nameAr: ad.city.name_ar,
-                    nameEn: ad.city.name_en
-                } : undefined
-            };
+            return data as unknown as Ad;
         } catch (error) {
             console.error('Unexpected error fetching ad:', error);
             return null;
@@ -239,24 +208,7 @@ export const adsService = {
             throw new Error('Failed to fetch your ads');
         }
 
-        // Map snake_case to camelCase
-        return (data || []).map((ad: any) => ({
-            ...ad,
-            userId: ad.author_id,
-            cityId: ad.city_id,
-            currencyId: ad.currency_id,
-            isActive: ad.is_active,
-            isBoosted: ad.is_boosted,
-            createdAt: ad.created_at,
-            updatedAt: ad.updated_at,
-            paymentMethod: ad.payment_method,
-            subCategory: ad.sub_category,
-            city: ad.city ? {
-                ...ad.city,
-                nameAr: ad.city.name_ar,
-                nameEn: ad.city.name_en
-            } : undefined
-        }));
+        return (data || []) as Ad[];
     },
 
     // Create new ad
@@ -305,24 +257,7 @@ export const adsService = {
             throw new Error('Failed to create ad');
         }
 
-        // Map back to camelCase
-        const ad = data as any;
-        return {
-            ...ad,
-            userId: ad.author_id,
-            cityId: ad.city_id,
-            currencyId: ad.currency_id,
-            isActive: ad.is_active,
-            isBoosted: ad.is_boosted,
-            createdAt: ad.created_at,
-            updatedAt: ad.updated_at,
-            paymentMethod: ad.payment_method,
-            city: ad.city ? {
-                ...ad.city,
-                nameAr: ad.city.name_ar,
-                nameEn: ad.city.name_en
-            } : undefined
-        } as Ad;
+        return data as Ad;
     },
 
     // Update ad
@@ -372,24 +307,7 @@ export const adsService = {
             throw new Error('Failed to update ad');
         }
 
-        // Map back to camelCase
-        const ad = data as any;
-        return {
-            ...ad,
-            userId: ad.author_id,
-            cityId: ad.city_id,
-            currencyId: ad.currency_id,
-            isActive: ad.is_active,
-            isBoosted: ad.is_boosted,
-            createdAt: ad.created_at,
-            updatedAt: ad.updated_at,
-            paymentMethod: ad.payment_method,
-            city: ad.city ? {
-                ...ad.city,
-                nameAr: ad.city.name_ar,
-                nameEn: ad.city.name_en
-            } : undefined
-        } as Ad;
+        return data as Ad;
     },
 
     // Delete ad
@@ -414,7 +332,7 @@ export const adsService = {
 
     // Increment views
     async incrementViews(id: string): Promise<void> {
-        const { error } = await supabase.rpc('increment_ad_views', { adId: id });
+        const { error } = await supabase.rpc('increment_ad_views', { ad_id: id });
         if (error) {
             console.warn('Failed to increment views:', error);
         }

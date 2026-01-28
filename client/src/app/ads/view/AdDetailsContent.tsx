@@ -85,8 +85,8 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         phone: adData.phone ?? undefined,
                         email: adData.email ?? undefined,
                         views: adData.views || 0,
-                        user_id: adData.userId || '',
-                        created_at: adData.createdAt ?? null,
+                        user_id: adData.author_id || '',
+                        created_at: adData.created_at ?? null,
                         author: adData.author ? {
                             id: adData.author.id,
                             name: adData.author.name || '',

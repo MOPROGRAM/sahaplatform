@@ -33,10 +33,10 @@ interface Ad {
     latitude?: number | null;
     longitude?: number | null;
     images: string;
-    createdAt: string;
+    created_at: string;
     views?: number;
     author?: { name?: string };
-    isBoosted?: boolean;
+    is_boosted?: boolean;
 }
 
 const AdsSkeleton = () => (
@@ -242,10 +242,10 @@ function AdsContent() {
                                 currency="SAR"
                                 location={ad.location || ''}
                                 images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
-                                createdAt={ad.createdAt}
+                                createdAt={ad.created_at}
                                 category={ad.category}
                                 language={language}
-                                isFeatured={ad.isBoosted || false}
+                                isFeatured={ad.is_boosted || false}
                                 authorName={ad.author?.name}
                                 description={ad.description}
                             // Removed onMapHighlight and isHighlighted props as map is removed
