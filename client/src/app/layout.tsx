@@ -3,6 +3,7 @@ import { Inter, Cairo, Tajawal, Readex_Pro } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/language-context";
 import { ThemeProvider } from "next-themes";
+import { cookies } from "next/headers";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -41,8 +42,12 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const cookieStore = cookies();
+    const lang = cookieStore.get('language')?.value || 'ar';
+    const dir = lang === 'ar' ? 'rtl' : 'ltr';
+
     return (
-        <html dir="rtl" lang="ar" className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning style={{ colorScheme: 'dark' }}>
+        <html dir={dir} lang={lang} className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning style={{ colorScheme: 'dark' }}>
             <head>
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>

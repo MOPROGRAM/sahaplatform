@@ -553,5 +553,7 @@ export const getCurrentLanguage = (): Language => {
 export const setLanguage = (lang: Language): void => {
     if (typeof window === 'undefined') return;
     localStorage.setItem('language', lang);
+    // Set cookie for server-side detection
+    document.cookie = `language=${lang}; path=/; max-age=31536000; SameSite=Lax`;
     window.location.reload(); // Reload to apply RTL/LTR changes
 };

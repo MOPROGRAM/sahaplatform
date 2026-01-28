@@ -50,11 +50,11 @@ export default function Header() {
     };
 
     return (
-        <header className={`sticky top-0 z-[100] transition-all duration-300 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
-            <div className="max-w-7xl mx-auto px-4 flex items-center gap-6">
+        <header className={`sticky top-0 z-[100] bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
+            <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-6">
                 {/* Brand */}
                 <Link href="/" className="group shrink-0">
-                    <span className="text-3xl font-[1000] tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
+                    <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
                 </Link>
 
                 {/* Search Bar - Floating Effect Achieved via Sticky Header and Scroll Logic */}

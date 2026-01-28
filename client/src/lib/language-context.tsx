@@ -24,17 +24,35 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const { initialize } = useAuthStore();
     
     const [mounted, setMounted] = useState(false);
-    const [language, setLanguageState] = useState<Language>('ar');
+    
+    // Initialize language from cookie/localStorage if possible, otherwise default to 'ar'
+    const [language, setLanguageState] = useState<Language>(() => {
+        if (typeof window !== 'undefined') {
+            // Check cookie first (synced with server)
+            const cookieLang = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('language='))
+                ?.split('=')[1] as Language;
+            
+            if (cookieLang && (cookieLang === 'ar' || cookieLang === 'en')) return cookieLang;
+            
+            return (localStorage.getItem('language') as Language) || 'ar';
+        }
+        return 'ar';
+    });
+
     const [country, setCountryState] = useState<string>('sa');
     const [currency, setCurrencyState] = useState<string>('sar');
 
     const theme = (resolvedTheme || 'dark') as 'light' | 'dark';
 
     useEffect(() => {
-        // Init Language from localStorage
-        const savedLang = (localStorage.getItem('language') as Language) || 'ar';
+        // Synchronize on mount
+        const savedLang = (localStorage.getItem('language') as Language) || language;
         setLanguageState(savedLang);
         setLangUtil(savedLang);
+        
+        // Ensure document attributes match
         document.documentElement.lang = savedLang;
         document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
 
@@ -46,13 +64,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
         initialize();
         setMounted(true);
-    }, [initialize]);
+    }, [initialize, language]);
 
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
         setLangUtil(lang);
         document.documentElement.lang = lang;
         document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        // Cookie is already set in i18n.ts setLanguage helper which calls window.location.reload()
+        // but if we call this directly, we should ensure cookie is set.
+        document.cookie = `language=${lang}; path=/; max-age=31536000; SameSite=Lax`;
     };
 
     const setCountry = (c: string) => {
@@ -71,11 +92,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     const t = (key: TranslationKey) => getTranslation(key, language);
 
-    // To prevent flickering (shaking) and language flash:
-    // We return a matching shell during hydration until client-side state is synchronized.
+    // Hydration guard: while not mounted, we render a shell that matches the server-side language
+    // to avoid content mismatch during hydration.
     if (!mounted) {
         return (
-            <div className="min-h-screen bg-[#0a0a0a]" dir="rtl" lang="ar" />
+            <div className="min-h-screen bg-[#0a0a0a]">
+                <div style={{ visibility: 'hidden' }}>{children}</div>
+            </div>
         );
     }
 
