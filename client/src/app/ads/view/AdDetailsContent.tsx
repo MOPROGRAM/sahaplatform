@@ -119,14 +119,14 @@ export default function AdDetailsContent({ id }: { id: string }) {
             router.push('/login');
             return;
         }
-        if (user.id === ad?.author_id) {
+        if (user.id === ad?.author?.id) { // Changed from ad?.author_id
             alert(language === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
             return;
         }
 
         try {
             // Check or create conversation for this ad
-            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.author_id || '');
+            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.author?.id || ''); // Changed from ad?.author_id
             setConversationId(conversation.id);
             setShowChat(true);
         } catch (error) {
@@ -208,7 +208,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <h3 className="text-[14px] font-black uppercase text-text-main border-b-2 border-primary w-fit pb-1">{t('description')}</h3>
                                 <p className="text-[12px] font-medium leading-relaxed text-text-main bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-border-color italic">
                                     {ad.description}
-                                </p> 
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -221,7 +221,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <div
                                     className="absolute inset-0 bg-cover bg-center scale-110 opacity-25"
                                     style={{ backgroundImage: `url(${ad.images[0]})` }}
-                                ></div> 
+                                ></div>
 
                                 {(() => {
                                     const images = ad.images || [];
@@ -238,7 +238,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <div className="absolute bottom-3 right-3 flex gap-2">
                                     <button className="bg-black/50 text-white p-2 rounded-xl hover:scale-105 transition-all backdrop-blur-md"><Maximize2 size={16} /></button>
                                     <button className="bg-black/50 text-white p-2 rounded-xl hover:scale-105 transition-all backdrop-blur-md"><Share2 size={16} /></button>
-                                </div> 
+                                </div>
                             </div>
                             {(() => {
                                 const images = ad.images || [];
@@ -286,7 +286,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         <div className="flex items-center gap-3 mb-6 bg-primary/10 p-3 rounded-2xl border border-primary/10 transition-colors hover:bg-primary/20">
                             <div className="w-12 h-12 bg-white dark:bg-white/10 rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
                                 <span className="font-black text-primary text-sm italic">SE</span>
-                            </div> 
+                            </div>
                             <div className="flex flex-col min-w-0">
                                 <h4 className="text-[12px] font-black text-text-main truncate flex items-center gap-1">
                                     Seller
