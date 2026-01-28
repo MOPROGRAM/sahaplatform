@@ -2,6 +2,7 @@
 
 import { Search, X } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "@/lib/language-context";
 
 interface SearchBarProps {
     placeholder?: string;
@@ -12,12 +13,13 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-    placeholder = "البحث...",
+    placeholder,
     value = "",
     onChange,
     onSearch,
     className = ""
 }: SearchBarProps) {
+    const { t } = useLanguage();
     const [searchValue, setSearchValue] = useState(value);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +44,7 @@ export default function SearchBar({
             <input
                 type="text"
                 className="search-input w-full bg-transparent border-none outline-none px-3 text-sm font-medium text-gray-700 placeholder-gray-400"
-                placeholder={placeholder}
+                placeholder={placeholder || t('searchPlaceholder')}
                 value={searchValue}
                 onChange={handleChange}
             />

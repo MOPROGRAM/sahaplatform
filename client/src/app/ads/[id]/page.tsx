@@ -1,12 +1,10 @@
 import { Suspense } from "react";
 import { adsService } from '@/lib/ads';
-import nextDynamic from 'next/dynamic';
+import { AdDetailsClientWrapper } from './AdDetailsClientWrapper';
 
 // Force dynamic rendering where necessary
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
-
-const AdDetailsWrapperClient = nextDynamic(() => import('./AdDetailsClientWrapper').then(m => m.AdDetailsClientWrapper), { ssr: false });
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
     const id = params.id;
@@ -39,8 +37,11 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
 export default function Page() {
     return (
-        <Suspense fallback={<div className="p-10 text-center">جاري التحميل...</div>}>
-            <AdDetailsWrapperClient />
+        <Suspense fallback={<div className="p-10 text-center flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="font-bold text-text-muted">جاري التحميل...</div>
+        </div>}>
+            <AdDetailsClientWrapper />
         </Suspense>
     );
 }

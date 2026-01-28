@@ -3,16 +3,18 @@
 import { Home, Search, PlusSquare, MessageSquare, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "@/lib/language-context";
 
 export default function BottomNav() {
     const pathname = usePathname();
 
+    const { t } = useLanguage();
     const navItems = [
-        { label: "الرئيسية", icon: <Home size={22} />, path: "/" },
-        { label: "بحث", icon: <Search size={22} />, path: "/ads" },
-        { label: "أضف", icon: <PlusSquare size={26} />, path: "/post-ad", center: true },
-        { label: "رسائلي", icon: <MessageSquare size={22} />, path: "/messages" },
-        { label: "حسابي", icon: <UserCircle size={22} />, path: "/dashboard" },
+        { label: t('home'), icon: <Home size={22} />, path: "/" },
+        { label: t('search'), icon: <Search size={22} />, path: "/ads" },
+        { label: t('postAd'), icon: <PlusSquare size={26} />, path: "/post-ad", center: true },
+        { label: t('messages'), icon: <MessageSquare size={22} />, path: "/messages" },
+        { label: t('dashboard'), icon: <UserCircle size={22} />, path: "/dashboard" },
     ];
 
     return (

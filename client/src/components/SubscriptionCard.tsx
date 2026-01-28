@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/lib/language-context";
+
 interface SubscriptionCardProps {
     name: string;
     price: string;
@@ -13,17 +15,19 @@ interface SubscriptionCardProps {
 export default function SubscriptionCard({
     name,
     price,
-    currency = "ريال",
+    currency = "SAR",
     features,
     popular = false,
     onSubscribe,
     className = ""
 }: SubscriptionCardProps) {
+    const { language } = useLanguage();
+
     return (
         <div className={`subscription-card ${popular ? 'ring-2 ring-primary' : ''} ${className}`}>
             {popular && (
                 <div className="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    الأكثر شعبية
+                    {language === 'ar' ? 'الأكثر شعبية' : 'most popular'}
                 </div>
             )}
 
@@ -44,7 +48,7 @@ export default function SubscriptionCard({
 
             <div className="card-footer">
                 <button className="btn-subscribe" onClick={onSubscribe}>
-                    اشترك الآن
+                    {language === 'ar' ? 'اشترك الآن' : 'subscribe now'}
                 </button>
             </div>
         </div>

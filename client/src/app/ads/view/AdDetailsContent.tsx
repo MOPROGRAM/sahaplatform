@@ -85,8 +85,8 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         phone: adData.phone ?? undefined,
                         email: adData.email ?? undefined,
                         views: adData.views || 0,
-                        user_id: adData.author_id || adData.user_id || '',
-                        created_at: adData.created_at ?? null,
+                        user_id: adData.userId || '',
+                        created_at: adData.createdAt ?? null,
                         author: adData.author ? {
                             id: adData.author.id,
                             name: adData.author.name || '',
@@ -134,14 +134,30 @@ export default function AdDetailsContent({ id }: { id: string }) {
         }
     };
 
-    if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-primary" /></div>;
+    if (loading) return (
+        <div className="min-h-screen bg-gray-bg flex flex-col">
+            <Header />
+            <div className="max-w-7xl mx-auto w-full p-4 space-y-4 animate-pulse">
+                <div className="h-4 w-1/4 bg-gray-200 dark:bg-white/5 rounded"></div>
+                <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-12 lg:col-span-9 space-y-4">
+                        <div className="h-[400px] bg-gray-200 dark:bg-white/5 rounded-3xl"></div>
+                        <div className="h-32 bg-gray-200 dark:bg-white/5 rounded-3xl"></div>
+                    </div>
+                    <div className="col-span-12 lg:col-span-3 space-y-4">
+                        <div className="h-64 bg-gray-200 dark:bg-white/5 rounded-3xl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
     if (!ad) return <div className="text-center p-20 font-black uppercase">Ad not found</div>;
 
     const lat = ad.latitude;
     const lon = ad.longitude;
 
     return (
-        <div className="min-h-screen bg-[#f4f4f4] dark:bg-[#0a0a0a] text-text-main" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-gray-bg text-text-main">
             <Header />
 
             <div className="max-w-7xl mx-auto px-4 py-3 text-[10px] text-text-muted flex items-center gap-1">

@@ -161,14 +161,14 @@ export default function PostAdPage() {
     if (!user) return null;
 
     return (
-        <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="bg-gray-bg min-h-screen flex flex-col">
             <Header />
 
             <main className="max-w-7xl mx-auto w-full p-4 flex-1">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Left Info Column */}
                     <div className="md:col-span-1 space-y-6">
-                        <div className="bento-card bg-primary text-white p-8 relative overflow-hidden group min-h-[300px] border-none shadow-premium">
+                        <div className="bento-card bg-primary text-white p-8 relative overflow-hidden group min-h-[300px] border-none shadow-lg">
                             <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
                             <div className="relative z-10 flex flex-col h-full justify-between">
                                 <div>
@@ -186,7 +186,7 @@ export default function PostAdPage() {
 
                     {/* Form Column */}
                     <div className="md:col-span-2">
-                        <form onSubmit={handleSubmit} className="bento-card p-8 space-y-8 bg-white shadow-premium">
+                        <form onSubmit={handleSubmit} className="bento-card p-8 space-y-8 bg-white dark:bg-[#1a1a1a] shadow-premium border-none">
                             {error && <div className="bg-red-50 text-red-600 p-4 text-sm font-bold rounded-2xl flex items-center gap-2"><Info size={16}/>{error}</div>}
 
                             <div className="space-y-6">

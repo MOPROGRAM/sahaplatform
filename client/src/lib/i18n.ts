@@ -268,8 +268,8 @@ export const translations = {
     en: {
         // Brand
         siteName: 'saha',
-        siteBrand: 'Saha Auctions & Real Estate',
-        taglineFooter: 'GCC Real Estate & Career Portal',
+        siteBrand: 'saha auctions & real estate',
+        taglineFooter: 'gcc real estate & career portal',
         contactEmail: 'motwasel@yahoo.com',
         contactPhone: '+966582003887',
         contactWhatsApp: '+966582003887',
@@ -359,7 +359,7 @@ export const translations = {
         cancel: 'Cancel',
         choosePlan: 'Choose Plan',
         startToday: 'Start Today and See the Difference',
-        joinThousands: 'Join thousands of successful merchants who increased their sales with Saha',
+        joinThousands: 'Join thousands of successful merchants who increased their sales with saha',
         postYourFirst: 'Post Your First Ad',
         viewAll: 'View All',
 
@@ -402,9 +402,9 @@ export const translations = {
         immediate: 'Immediate',
         traffic: 'Traffic',
         views: 'Views',
-        tickerMessage1: 'Exclusive offers for Saha Business members - 50% OFF',
-        tickerMessage2: 'Best time to post Car ads: NOW!',
-        footerNotice: 'All rights reserved to Saha Platform 2026',
+        tickerMessage1: 'exclusive offers for saha business members - 50% off',
+        tickerMessage2: 'best time to post car ads: now!',
+        footerNotice: 'all rights reserved to saha platform 2026',
         discoverDeals: 'Discover the best deals in your area',
 
         // Placeholders
@@ -534,6 +534,7 @@ export const translations = {
         forRent: 'For Rent',
         area: 'Area',
         areaRange: 'Area Range',
+        listingTypePlaceholder: 'Select Type...',
     }
 };
 

@@ -75,7 +75,7 @@ export default function AdCard({
         >
 
             {/* Image Area */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? "w-full h-28" : "w-[30%]"}`}>
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? "w-full h-20" : "w-[25%]"}`}>
                 {isFeatured && (
                     <div className="absolute top-1 left-1 z-10 bg-primary text-white px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md">
                         {t('featured')}
@@ -108,7 +108,7 @@ export default function AdCard({
             {/* Content Area */}
             <div className={`flex-1 flex flex-col p-1.5 ${isVertical ? "gap-0.5" : ""}`}>
                 {/* Title */}
-                <h3 className="text-[11px] font-bold text-text-main line-clamp-2 leading-tight min-h-[2.5em]">
+                <h3 className="text-[12px] font-black text-text-main line-clamp-2 leading-tight min-h-[2.5em]">
                     {title}
                 </h3>
 

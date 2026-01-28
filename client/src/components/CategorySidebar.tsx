@@ -18,11 +18,11 @@ export default function CategorySidebar() {
     const searchParams = useSearchParams();
 
     const categories = [
-        { key: 'all', label: language === 'ar' ? 'جميع الفئات' : 'All Categories', icon: <Home size={16} />, path: '/ads' },
-        { key: 'realestate', label: t('realEstate'), icon: <Building size={16} />, path: '/ads?category=realestate' },
+        { key: 'all', label: t('allAds'), icon: <Home size={16} />, path: '/ads' },
+        { key: 'realestate', label: t('realestate'), icon: <Building size={16} />, path: '/ads?category=realestate' },
         { key: 'cars', label: t('cars'), icon: <Car size={16} />, path: '/ads?category=cars' },
         { key: 'jobs', label: t('jobs'), icon: <Briefcase size={16} />, path: '/ads?category=jobs' },
-        { key: 'electronics', label: 'Electronics', icon: <ShoppingBag size={16} />, path: '/ads?category=electronics' },
+        { key: 'electronics', label: t('electronics'), icon: <ShoppingBag size={16} />, path: '/ads?category=electronics' },
         { key: 'services', label: t('services'), icon: <Wrench size={16} />, path: '/ads?category=services' },
     ];
 
@@ -30,7 +30,7 @@ export default function CategorySidebar() {
         <aside className="hidden lg:block w-64 bg-white border-r border-gray-200 h-screen sticky top-0 overflow-y-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className="p-4 border-b border-gray-100">
                 <h2 className="text-lg font-black text-secondary uppercase tracking-tight">
-                    {language === 'ar' ? 'الفئات' : 'Categories'}
+                    {t('categories')}
                 </h2>
             </div>
             <nav className="p-2">

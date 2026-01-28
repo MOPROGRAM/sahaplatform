@@ -156,10 +156,10 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-[var(--gray-bg)] text-text-main" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen flex flex-col bg-gray-bg text-text-main">
             <Header />
 
-            <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
+            <div className="max-w-[1920px] mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
                 {/* Left Sidebar */}
                 <aside className="w-full md:w-56 space-y-3 shrink-0">
                     <div className="bg-card border border-border-color p-5 rounded-sm shadow-sm relative overflow-hidden group">
@@ -317,8 +317,8 @@ export default function ProfilePage() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
-                                                        <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                            {ad.is_active ? (language === 'ar' ? 'نشط' : 'Active') : (language === 'ar' ? 'معطل' : 'Inactive')}
+                                                        <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                            {ad.isActive ? (language === 'ar' ? 'نشط' : 'Active') : (language === 'ar' ? 'معطل' : 'Inactive')}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-center">

@@ -49,10 +49,10 @@ export default function AdminDashboard() {
         try {
             if (view === 'overview') {
                 const [usersCount, adsCount, subsPending, subsActive] = await Promise.all([
-                    supabase.from('User').select('*', { count: 'exact', head: true }),
-                    supabase.from('Ad').select('*', { count: 'exact', head: true }),
-                    supabase.from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-                    supabase.from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'completed')
+                    (supabase as any).from('User').select('*', { count: 'exact', head: true }),
+                    (supabase as any).from('Ad').select('*', { count: 'exact', head: true }),
+                    (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                    (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'completed')
                 ]);
 
                 setStats({
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
                 });
 
                 // Fetch recent ads for overview
-                const { data: recentAds } = await supabase
+                const { data: recentAds } = await (supabase as any)
                     .from('Ad')
                     .select('*')
                     .order('created_at', { ascending: false })
@@ -71,19 +71,19 @@ export default function AdminDashboard() {
                 setDataList(recentAds || []);
 
             } else if (view === 'users') {
-                const { data } = await supabase
+                const { data } = await (supabase as any)
                     .from('User')
                     .select('*')
                     .order('created_at', { ascending: false });
                 setDataList(data || []);
             } else if (view === 'ads') {
-                const { data } = await supabase
+                const { data } = await (supabase as any)
                     .from('Ad')
                     .select('*')
                     .order('created_at', { ascending: false });
                 setDataList(data || []);
             } else if (view === 'subscriptions') {
-                const { data } = await supabase
+                const { data } = await (supabase as any)
                     .from('subscription_requests')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
     const handleUpdateAdStatus = async (id: string, active: boolean) => {
         setActionLoading(id);
         try {
-            await supabase.from('Ad').update({ is_active: active }).eq('id', id);
+            await (supabase as any).from('Ad').update({ is_active: active }).eq('id', id);
             fetchDashboardData();
         } catch (err) {
             console.error(err);
@@ -120,7 +120,7 @@ export default function AdminDashboard() {
     const handleUpdateSubStatus = async (id: string, status: string) => {
         setActionLoading(id);
         try {
-            await supabase.from('subscription_requests').update({ status }).eq('id', id);
+            await (supabase as any).from('subscription_requests').update({ status }).eq('id', id);
             fetchDashboardData();
         } catch (err) {
             console.error(err);
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
         if (!confirm('Are you sure you want to delete this ad?')) return;
         setActionLoading(id);
         try {
-            await supabase.from('Ad').delete().eq('id', id);
+            await (supabase as any).from('Ad').delete().eq('id', id);
             fetchDashboardData();
         } catch (err) {
             console.error(err);
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
     const handleToggleBoost = async (id: string, boost: boolean) => {
         setActionLoading(id);
         try {
-            await supabase.from('Ad').update({ is_boosted: boost }).eq('id', id);
+            await (supabase as any).from('Ad').update({ is_boosted: boost }).eq('id', id);
             fetchDashboardData();
         } catch (err) {
             console.error(err);
@@ -157,9 +157,9 @@ export default function AdminDashboard() {
     if (!user || user.role !== 'ADMIN') return null;
 
     return (
-        <div className="min-h-screen bg-[#0a0c10] text-[#e1e1e1] flex flex-col font-sans" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-gray-bg text-[#e1e1e1] flex flex-col font-sans" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Minimal High-Tech Top Bar */}
-            <header className="bg-[#12141c] border-b border-[#2a2d3a] h-14 flex items-center justify-between px-6 sticky top-0 z-50">
+            <header className="bg-card border-b border-border-color h-14 flex items-center justify-between px-6 sticky top-0 z-50">
                 <div className="flex items-center gap-4">
                     <div className="w-9 h-9 bg-primary/20 border border-primary/50 text-primary flex items-center justify-center rounded-sm">
                         <ShieldCheck size={20} />
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="flex items-center gap-6">
-                    <div className="hidden md:flex items-center gap-4 border-l border-[#2a2d3a] pl-6 h-14">
+                    <div className="hidden md:flex items-center gap-4 border-l border-border-color pl-6 h-14">
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] font-black text-white leading-none uppercase">{user.name}</span>
                             <span className="text-[8px] font-bold text-primary uppercase mt-1">SUPER_ADMIN</span>
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Sleek Dark Sidebar */}
-                <aside className="w-64 bg-[#0a0c10] border-r border-[#1a1c23] p-4 flex flex-col gap-1.5">
+                <aside className="w-64 bg-gray-bg border-r border-border-color p-4 flex flex-col gap-1.5">
                     <div className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 mt-2 px-3">System Modules</div>
                     {[
                         { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'DASHBOARD OVERVIEW', icon: <BarChart3 size={18} /> },
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
                 </aside>
 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-y-auto bg-[#0a0c10] p-8 custom-scrollbar">
+                <main className="flex-1 overflow-y-auto bg-gray-bg p-8 custom-scrollbar">
                     {loading ? (
                         <div className="h-full flex flex-col items-center justify-center">
                             <div className="relative w-16 h-16">
@@ -263,7 +263,7 @@ export default function AdminDashboard() {
                                             placeholder="FILTER ARCHIVES..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="bg-card border border-[#2a2d3a] rounded-sm py-2 pl-9 pr-4 text-[11px] font-bold outline-none focus:border-primary/50 focus:ring-4 ring-primary/5 transition-all w-64 uppercase tracking-wider"
+                                            className="bg-card border border-border-color rounded-sm py-2 pl-9 pr-4 text-[11px] font-bold outline-none focus:border-primary/50 focus:ring-4 ring-primary/5 transition-all w-64 uppercase tracking-wider"
                                         />
                                     </div>
                                 )}
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
                                     {/* Action Feed */}
                                     <div className="bento-grid">
                                         <div className="depth-card flex flex-col min-h-[400px] bento-large">
-                                            <div className="p-4 border-b border-[#2a2d3a] flex justify-between items-center">
+                                            <div className="p-4 border-b border-border-color flex justify-between items-center">
                                                 <h3 className="text-[11px] font-black tracking-[0.2em] flex items-center gap-2">
                                                     <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
                                                     RECENT ASSETS
@@ -314,9 +314,9 @@ export default function AdminDashboard() {
                                                     </div>
                                                 ) : (
                                                     dataList.map((ad, i) => (
-                                                        <div key={ad.id} className="p-4 flex items-center justify-between border-b border-[#1a1a1a] hover:bg-card transition-all group">
+                                                        <div key={ad.id} className="p-4 flex items-center justify-between border-b border-border-color hover:bg-card transition-all group">
                                                             <div className="flex items-center gap-4">
-                                                                <div className="w-10 h-10 bg-card border border-[#1a1a1a] flex items-center justify-center text-[10px] font-black italic text-gray-600">ID.{i + 1}</div>
+                                                                <div className="w-10 h-10 bg-card border border-border-color flex items-center justify-center text-[10px] font-black italic text-gray-600">ID.{i + 1}</div>
                                                                 <div className="flex flex-col">
                                                                     <span className="text-[12px] font-black group-hover:text-primary transition-colors">{ad.title}</span>
                                                                     <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{ad.category} • {ad.location}</span>
@@ -332,7 +332,7 @@ export default function AdminDashboard() {
                                         </div>
 
                                         <div className="depth-card flex flex-col min-h-[400px] bento-small">
-                                            <div className="p-4 border-b border-[#2a2d3a] flex items-center gap-2">
+                                            <div className="p-4 border-b border-border-color flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                                                 <h3 className="text-[11px] font-black tracking-[0.2em]">SECURITY BROADCAST</h3>
                                             </div>
@@ -343,14 +343,14 @@ export default function AdminDashboard() {
                                                     { icon: <AlertTriangle size={16} />, title: "ASSET MODERATION", desc: "User reported a suspicious listing in Real Estate section.", time: "15:20:55" },
                                                     { icon: <CheckCircle2 size={16} />, title: "SYNC SUCCESSFUL", desc: "Full database backup committed to secondary server cluster.", time: "12:00:00" },
                                                 ].map((log, i) => (
-                                                    <div key={i} className={`flex gap-4 p-4 rounded-sm border ${log.highlight ? 'bg-primary/10 border-primary/30' : 'bg-card border-[#1a1a1a]'}`}>
+                                                    <div key={i} className={`flex gap-4 p-4 rounded-sm border ${log.highlight ? 'bg-primary/10 border-primary/30' : 'bg-card border-border-color'}`}>
                                                         <div className={log.highlight ? 'text-primary' : 'text-gray-500'}>{log.icon}</div>
                                                         <div className="flex flex-col">
                                                             <div className="flex items-center gap-2 mb-1">
                                                                 <span className={`text-[10px] font-black uppercase tracking-widest ${log.highlight ? 'text-primary' : 'text-white'}`}>{log.title}</span>
                                                                 <span className="text-[8px] font-bold text-gray-500">@{log.time}</span>
                                                             </div>
-                                                            <p className="text-[10px] font-bold text-text-muted italic">&quot;{log.desc}&quot;</p>
+                                                            <p className="text-[10px] font-bold text-text-muted italic">"{log.desc}"</p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -364,7 +364,7 @@ export default function AdminDashboard() {
                                 <div className="depth-card overflow-hidden shadow-2xl">
                                     <table className="w-full text-left">
                                         <thead>
-                                            <tr className="bg-card border-b border-[#2a2d3a]">
+                                            <tr className="bg-card border-b border-border-color">
                                                 <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Identification / Meta</th>
                                                 <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Current Status</th>
                                                 <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Operation / Action</th>
@@ -425,8 +425,8 @@ export default function AdminDashboard() {
                                                         {view === 'subscriptions' && (
                                                             <div className="flex items-center gap-2">
                                                                 <span className={`px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm border ${item.status === 'completed' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                                                        item.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                                                                            'bg-red-500/10 text-red-500 border-red-500/20'
+                                                                    item.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                                                                        'bg-red-500/10 text-red-500 border-red-500/20'
                                                                     }`}>
                                                                     {item.status}
                                                                 </span>

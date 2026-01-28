@@ -40,14 +40,14 @@ interface Ad {
 const AdsSkeleton = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3">
         {[...Array(15)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[320px] animate-pulse">
-                <div className="h-48 bg-gray-200 dark:bg-white/10 w-full" />
-                <div className="p-3 space-y-3">
-                    <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
+            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[240px] animate-pulse">
+                <div className="h-28 bg-gray-200 dark:bg-white/10 w-full" />
+                <div className="p-2 space-y-2">
+                    <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
                     <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/2" />
-                    <div className="flex justify-between pt-2">
-                        <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
-                        <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
+                    <div className="flex justify-between pt-1">
+                        <div className="h-2 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
+                        <div className="h-2 bg-gray-200 dark:bg-white/10 rounded w-1/4" />
                     </div>
                 </div>
             </div>
@@ -147,32 +147,42 @@ function AdsContent() {
     }, [fetchAds]);
 
     return (
-        <div className="min-h-screen bg-[#f4f4f4] flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
+        <div className="min-h-screen bg-gray-bg flex flex-col">
             <Header />
 
-            <main className="max-w-7xl mx-auto w-full p-2 flex-1 flex flex-col gap-3">
-
-                {/* Horizontal Category Filter Bar (Item 2.1) - NEW AIRBNB STYLE */}
-                <div className="bg-white border border-border-color rounded-lg shadow-md p-1 overflow-x-auto no-scrollbar">
-                    <div className="flex flex-nowrap gap-2 whitespace-nowrap">
-                        <button
-                            onClick={() => handleCategoryChange(null)}
-                            className={cn("px-3 py-1.5 rounded-full text-sm font-bold transition-all", !category ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-100')}
-                        >
-                            {t('allAds')}
-                        </button>
-                        {mainCategories.map((cat) => (
+            <main className="w-full max-w-[1920px] mx-auto p-1 grid grid-cols-12 gap-1 flex-1">
+                {/* Bento Grid Sidebar - Categories (Matching HomePage) */}
+                <aside className={`col-span-12 lg:col-span-2 hidden lg:block space-y-1`}>
+                    <div className="bento-card p-0 flex flex-col sticky top-20 bg-white dark:bg-[#1a1a1a]">
+                        <div className="p-3 border-b border-border-color bg-gray-50 dark:bg-white/5">
+                            <h3 className="bento-title text-xs uppercase tracking-wider font-black">{t("categories")}</h3>
+                        </div>
+                        <nav className="flex flex-col p-1 space-y-0.5">
                             <button
-                                key={cat.key}
-                                onClick={() => handleCategoryChange(cat.key)}
-                                className={cn("px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2", category === cat.key ? 'bg-primary text-white shadow-md' : 'text-gray-700 hover:bg-primary/10')}
+                                onClick={() => handleCategoryChange(null)}
+                                className={cn("flex items-center justify-between px-3 py-2 rounded-lg transition-all group w-full text-right", !category ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 dark:hover:bg-white/5')}
                             >
-                                <cat.icon size={16} />
-                                {cat.name}
+                                <span className="font-bold text-xs">{t('allAds')}</span>
                             </button>
-                        ))}
+                            {mainCategories.map((cat, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleCategoryChange(cat.key)}
+                                    className={cn("flex items-center justify-between px-3 py-2 rounded-lg transition-all group w-full text-right", category === cat.key ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 dark:hover:bg-white/5')}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <div className={cn("transition-colors", category === cat.key ? 'text-primary' : 'text-gray-400 group-hover:text-primary')}>
+                                            <cat.icon size={14} />
+                                        </div>
+                                        <span className={cn("font-bold text-xs transition-colors line-clamp-1", category === cat.key ? 'text-primary' : 'text-text-main group-hover:text-primary')}>{cat.name}</span>
+                                    </div>
+                                </button>
+                            ))}
+                        </nav>
                     </div>
-                </div>
+                </aside>
+
+                <section className="col-span-12 lg:col-span-10 flex flex-col gap-2">
 
                 {/* Subcategory Filter Row */}
                 {category && subCategoriesMap[category] && (
@@ -220,7 +230,7 @@ function AdsContent() {
                 {loading ? (
                     <AdsSkeleton />
                 ) : ads.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 pb-10">
                         {ads.map((ad) => (
                             <AdCard
                                 key={ad.id}
@@ -247,7 +257,7 @@ function AdsContent() {
                     </div>
                 )}
 
-            {/* Removed Map Section */ }
+            </section>
             </main >
         <Footer />
         </div >

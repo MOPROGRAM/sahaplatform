@@ -65,14 +65,6 @@ export default function DashboardPage() {
         return `${days}d ago`;
     };
 
-    useEffect(() => {
-        if (!user) {
-            router.push('/login');
-            return;
-        }
-        fetchDashboardData();
-    }, [user, router, activeTab, fetchDashboardData]);
-
     const fetchDashboardData = useCallback(async () => {
         try {
             const myAds = await adsService.getMyAds();
@@ -94,6 +86,14 @@ export default function DashboardPage() {
             setLoading(false);
         }
     }, [language]);
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+        fetchDashboardData();
+    }, [user, router, activeTab, fetchDashboardData]);
 
     const deleteAd = async (adId: string) => {
         try {
@@ -118,10 +118,10 @@ export default function DashboardPage() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen flex flex-col bg-gray-bg">
             <Header />
 
-            <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
+            <div className="max-w-[1920px] mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
                 {/* Left Mini Sidebar - Professional Tech Style */}
                 <aside className="w-full md:w-56 space-y-3 shrink-0">
                     <div className="depth-card p-5 relative overflow-hidden group">

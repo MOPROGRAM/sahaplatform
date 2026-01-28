@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Home, Tag, MessageSquare, User, Settings } from "lucide-react";
+import { useLanguage } from "@/lib/language-context";
 
 interface NavItem {
     href: string;
@@ -13,15 +14,15 @@ interface NavigationMenuProps {
     className?: string;
 }
 
-const navItems: NavItem[] = [
-    { href: "/", label: "الرئيسية", icon: <Home size={24} /> },
-    { href: "/ads", label: "الإعلانات", icon: <Tag size={24} /> },
-    { href: "/messages", label: "الرسائل", icon: <MessageSquare size={24} /> },
-    { href: "/profile", label: "الملف", icon: <User size={24} /> },
-    { href: "/settings", label: "الإعدادات", icon: <Settings size={24} /> },
-];
-
 export default function NavigationMenu({ className = "" }: NavigationMenuProps) {
+    const { t } = useLanguage();
+    const navItems: NavItem[] = [
+        { href: "/", label: t('home'), icon: <Home size={24} /> },
+        { href: "/ads", label: t('ads'), icon: <Tag size={24} /> },
+        { href: "/messages", label: t('messages'), icon: <MessageSquare size={24} /> },
+        { href: "/profile", label: t('settings'), icon: <User size={24} /> },
+        { href: "/settings", label: t('settings'), icon: <Settings size={24} /> },
+    ];
     return (
         <nav className={`nav-menu ${className}`}>
             {navItems.map((item) => (

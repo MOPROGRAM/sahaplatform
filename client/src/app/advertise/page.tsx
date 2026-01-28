@@ -137,25 +137,25 @@ export default function AdvertisePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-bg flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-gray-bg flex flex-col">
             <Header />
 
             {/* Hero Section */}
-            <section className="bg-gradient-to-r from-primary to-primary-hover text-white py-8">
+            <section className="bg-gradient-to-r from-primary to-primary-hover text-white py-8 shadow-lg">
                 <div className="max-w-6xl mx-auto px-4 text-center">
                     <Star className="w-12 h-12 mx-auto mb-3 animate-pulse" />
                     <h1 className="text-3xl md:text-4xl font-black mb-3 uppercase tracking-tight">
                         {t("advertiseWithUs")}
                     </h1>
                     <p className="text-lg opacity-90 mb-6 max-w-2xl mx-auto">
-                        {t("increaseSalesReach")}
+                        {language === 'ar' ? 'ضاعف مبيعاتك ووصولك للعملاء الجادين' : 'double your sales and reach serious customers'}
                     </p>
                 </div>
             </section>
 
             <main className="max-w-6xl mx-auto px-4 py-8 flex-1">
                 {/* Contact Info Banner */}
-                <div className="bg-card-bg border border-border-color rounded-lg p-4 mb-8 shadow-sm">
+                <div className="bento-card bg-white dark:bg-[#1a1a1a] p-6 mb-8 shadow-premium border-none">
                     <h2 className="text-xl font-black text-center mb-4 text-text-main">
                         {t("contactUsToSubscribe")}
                     </h2>
@@ -257,13 +257,13 @@ export default function AdvertisePage() {
                                 >
                                     <ArrowLeft size={20} className={language === 'ar' ? '' : 'rotate-180'} />
                                 </button>
-                                <h3 className="text-xl font-black">{t("subscriptionRequest")}</h3>
+                                <h3 className="text-xl font-black">{t("advertise")}</h3>
                                 <p className="opacity-90 text-sm">{selectedPlan?.name} - {selectedPlan?.price}</p>
                             </div>
 
                             <form onSubmit={handleFormSubmit} className="p-4 space-y-3">
                                 {message && (
-                                    <div className={`p-3 rounded-lg text-xs font-bold ${message.includes('نجاح') || message.includes('successfully') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                                    <div className={`p-3 rounded-lg text-xs font-bold ${message.includes('نجاح') || message.includes('successfully') ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
                                         {message}
                                     </div>
                                 )}

@@ -43,15 +43,15 @@ export default function LoginPage() {
                 {/* Branding Accent */}
                 <div className="flex flex-col items-center mb-8">
                     <Link href="/" className="flex flex-col group items-center">
-                        <span className="text-4xl font-[1000] tracking-tighter text-text-main leading-none uppercase -mb-0.5">{t('siteName')}</span>
-                        <div className="h-1.5 w-16 bg-primary mt-2 shadow-md group-hover:w-24 transition-all"></div>
+                        <span className="text-4xl font-[1000] tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t('siteName')}</span>
+                        <div className="h-1 w-12 bg-primary mt-2 shadow-md group-hover:w-20 transition-all"></div>
                     </Link>
                 </div>
 
                 {/* Main Card */}
                 <div className="bento-card !p-10 shadow-premium bg-white border-none">
                     <div className="mb-8 text-center">
-                        <h2 className="text-2xl font-[1000] text-text-main uppercase tracking-tighter">{isLogin ? t('loginTitle') : t('registerTitle')}</h2>
+                        <h2 className="text-2xl font-[1000] text-text-main uppercase tracking-tighter">{isLogin ? (language === 'ar' ? 'تسجيل الدخول' : 'Login') : (language === 'ar' ? 'تسجيل حساب' : 'Register')}</h2>
                         <div className="h-1 w-12 bg-primary mt-3 mx-auto rounded-full"></div>
                     </div>
 
@@ -136,7 +136,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="text-center opacity-30 select-none">
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em]">{t('siteName')} SYNC 2026</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">{t('siteName')} SYNC 2026</p>
                 </div>
             </div>
         </div>

@@ -114,7 +114,6 @@ export default function HomePage() {
     return (
         <div className="bg-gray-bg flex flex-col min-h-screen">
             <Header />
-            <PromotedBanner />
 
             <main className="w-full max-w-[1920px] mx-auto p-1 grid grid-cols-12 gap-1 flex-1">
                 {/* Bento Grid Sidebar - Categories */}
