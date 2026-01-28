@@ -252,7 +252,7 @@ export default function AdminDashboard() {
                                         {view === 'ads' && (language === 'ar' ? 'الرقابة على الإعلانات' : 'CONTENT MODERATION')}
                                         {view === 'users' && (language === 'ar' ? 'قاعدة البيانات' : 'USER INFRASTRUCTURE')}
                                     </h2>
-                                    <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Real-time synchronization active • No latency detected</p>
+                                    <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Real-time synchronization active &bull; No latency detected</p>
                                 </div>
 
                                 {view !== 'overview' && (
