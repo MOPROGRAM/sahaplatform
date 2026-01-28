@@ -32,6 +32,8 @@ const readex = Readex_Pro({
     weight: ['300', '400', '600', '700']
 });
 
+export const runtime = "edge";
+
 export const metadata: Metadata = {
     title: "ساحة - مساحة واسعة من الفرص",
     description: "مساحة واسعة من الفرص - منصة شاملة للإعلانات والخدمات في الشرق الأوسط",
@@ -52,15 +54,15 @@ export default function RootLayout({
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>
             <body>
-                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-                    <LanguageProvider>
+                <LanguageProvider>
+                    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                         <div className="flex min-h-screen bg-gray-bg">
                             <main className="flex-1 w-full">
                                 {children}
                             </main>
                         </div>
-                    </LanguageProvider>
-                </ThemeProvider>
+                    </ThemeProvider>
+                </LanguageProvider>
             </body>
         </html>
     );
