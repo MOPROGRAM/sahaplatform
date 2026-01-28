@@ -73,6 +73,8 @@ export default function AdCard({
     const isVertical = layout === 'vertical';
     const currentDescription = language === 'ar' ? description_ar : description_en; // Helper variable
 
+    const currencyCode = (currency && typeof currency === 'object') ? currency.code : (currency || 'SAR');
+    
     return (
         <Link
             href={`/ads/${id}`}

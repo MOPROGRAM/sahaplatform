@@ -85,7 +85,7 @@ export default function PromotedBanner() {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="promoted-temperature">{ad.price ? `${ad.price.toLocaleString()}` : ''}</span>
-                                        <span className="text-sm font-medium">{typeof ad.currency === 'object' ? ad.currency.code : (ad.currency || 'SAR')}</span>
+                                        <span className="text-sm font-medium">{(ad.currency && typeof ad.currency === 'object') ? ad.currency.code : (ad.currency || 'SAR')}</span>
                                     </div>
                                 </div>
                                 <div className="promoted-right-side">
