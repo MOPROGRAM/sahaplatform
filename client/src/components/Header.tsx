@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, ChevronDown, Settings, X } from "lucide-react";
+import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, ChevronDown, Settings, X, MapPin } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import PromotedBanner from "@/components/PromotedBanner";
 import { useRouter, usePathname } from "next/navigation";
