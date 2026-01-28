@@ -31,7 +31,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [currency, setCurrencyState] = useState<string>('sar');
     const { initialize } = useAuthStore();
 
-    const theme = (resolvedTheme || 'light') as 'light' | 'dark';
+    const theme = (resolvedTheme || 'dark') as 'light' | 'dark';
 
     useEffect(() => {
         // Init Language

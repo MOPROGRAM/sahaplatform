@@ -16,8 +16,8 @@ import { clsx } from "clsx";
 const AdsSkeleton = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-1.5 pb-10">
         {[...Array(12)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[240px] animate-pulse">
-                <div className="h-28 bg-gray-200 dark:bg-white/10 w-full" />
+            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[200px] animate-pulse">
+                <div className="h-20 bg-gray-200 dark:bg-white/10 w-full" />
                 <div className="p-2 space-y-2">
                     <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
                     <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/2" />
