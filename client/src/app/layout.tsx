@@ -45,7 +45,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     const cookieStore = cookies();
-    const lang = cookieStore.get('language')?.value || 'ar';
+    const lang = (cookieStore.get('language')?.value || 'ar') as 'ar' | 'en';
     const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
     return (
@@ -54,7 +54,7 @@ export default function RootLayout({
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>
             <body>
-                <LanguageProvider>
+                <LanguageProvider initialLanguage={lang}>
                     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                         <div className="flex min-h-screen bg-gray-bg">
                             <main className="flex-1 w-full">

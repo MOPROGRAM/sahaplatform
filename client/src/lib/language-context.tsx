@@ -92,22 +92,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     const t = (key: TranslationKey) => getTranslation(key, language);
 
-    // Hydration guard: while not mounted, we render a shell that matches the server-side language
-    // to avoid content mismatch during hydration.
-    if (!mounted) {
-        return (
-            <div className="min-h-screen bg-[#0a0a0a]">
-                <div style={{ visibility: 'hidden' }}>{children}</div>
-            </div>
-        );
-    }
+    // Hydration guard removed to prevent white flash. 
+    // Initial state is now synced with server via initialLanguage prop.
 
     return (
         <LanguageContext.Provider value={{
             language, setLanguage, t, theme, toggleTheme,
             country, setCountry, currency, setCurrency
         }}>
-            <div dir={language === 'ar' ? 'rtl' : 'ltr'} lang={language} className="min-h-screen">
+             {/* Removed nested dir/lang attributes to avoid conflict with html tag */}
+            <div className="min-h-screen">
                 {children}
             </div>
         </LanguageContext.Provider>
