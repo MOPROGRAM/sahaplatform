@@ -57,7 +57,7 @@ export default function PromotedBanner() {
                     <div className="absolute bottom-[-50%] left-[-10%] w-[50%] h-[200%] bg-yellow-400/20 rounded-full blur-[100px] animate-pulse" />
                 </div>
                 
-                <div className="relative max-w-[1920px] mx-auto px-4 z-10">
+                <div className="relative max-w-4xl mx-auto px-4 z-10">
                     <div className="w-full h-[100px] bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-sm rounded-xl border border-white/10 shadow-lg animate-pulse" />
                 </div>
             </div>
@@ -86,8 +86,8 @@ export default function PromotedBanner() {
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5 mix-blend-overlay" /> {/* Optional texture */}
             </div>
 
-            {/* 2. THE INNER CONTENT (The Ad Card) */}
-            <div className="relative max-w-[1920px] mx-auto px-4 z-10">
+            {/* 2. THE INNER CONTENT (The Ad Card) - Now smaller (max-w-4xl) */}
+            <div className="relative max-w-4xl mx-auto px-4 z-10">
                 <div className="relative w-full bg-white dark:bg-[#151515] rounded-xl shadow-2xl border border-white/5 overflow-hidden transition-all duration-500 hover:shadow-primary/10">
                     
                     {/* Inner Card Content */}
