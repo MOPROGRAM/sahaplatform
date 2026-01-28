@@ -48,6 +48,7 @@ export default function AdCard({
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         setIsFavorite(!isFavorite);
     };
 

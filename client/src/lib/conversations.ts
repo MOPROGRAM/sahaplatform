@@ -44,55 +44,60 @@ export interface Message {
 export const conversationsService = {
     // الحصول على جميع محادثات المستخدم
     async getConversations(): Promise<Conversation[]> {
-        const { data: { user } } = await supabase.auth.getUser();
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
 
-        if (!user) {
-            throw new Error('User not authenticated');
-        }
+            if (!user) {
+                throw new Error('User not authenticated');
+            }
 
-        // استخدام أسماء الأعمدة الفعلية من قاعدة البيانات (Prisma uses A/B for implicit M-N)
-        const { data: participantData, error: participantError } = await (supabase as any)
-            .from('_ConversationParticipants') 
-            .select('A')
-            .eq('B', user.id);
+            // استخدام أسماء الأعمدة الفعلية من قاعدة البيانات (Prisma uses A/B for implicit M-N)
+            const { data: participantData, error: participantError } = await (supabase as any)
+                .from('_ConversationParticipants') 
+                .select('A')
+                .eq('B', user.id);
 
-        if (participantError) {
-            console.error('Error fetching conversation participants:', participantError);
-            throw new Error('Failed to fetch conversations');
-        }
+            if (participantError) {
+                console.error('Error fetching conversation participants:', participantError);
+                return [];
+            }
 
-        if (!participantData?.length) {
+            if (!participantData?.length) {
+                return [];
+            }
+
+            const conversationIds = participantData.map((p: any) => p.A);
+
+            // الحصول على المحادثات مع المشاركين
+            const { data: conversations, error: conversationsError } = await (supabase as any)
+                .from('Conversation')
+                .select(`
+                    *,
+                    ad:Ad(id, title, images),
+                    participants:_ConversationParticipants(
+                        user:User(id, name, email)
+                    )
+                `)
+                .in('id', conversationIds)
+                .order('lastMessageTime', { ascending: false });
+
+            if (conversationsError) {
+                console.error('Error fetching conversations:', conversationsError);
+                return [];
+            }
+
+            return (conversations || []).map(conv => ({
+                ...conv,
+                last_message: conv.last_message, // Corrected property name from database
+                last_message_time: conv.last_message_time, // Corrected property name from database
+                created_at: conv.created_at,
+                updated_at: conv.updated_at,
+                participants: conv.participants?.map((p: any) => p.user) || []
+            }));
+        } catch (error) {
+            console.error('Unexpected error fetching conversations:', error);
             return [];
         }
-
-        const conversationIds = participantData.map((p: any) => p.A);
-
-        // الحصول على المحادثات مع المشاركين
-        const { data: conversations, error: conversationsError } = await (supabase as any)
-            .from('Conversation')
-            .select(`
-                *,
-                ad:Ad(id, title, images),
-                participants:_ConversationParticipants(
-                    user:User(id, name, email)
-                )
-            `)
-            .in('id', conversationIds)
-            .order('lastMessageTime', { ascending: false });
-
-        if (conversationsError) {
-            console.error('Error fetching conversations:', conversationsError);
-            throw new Error('Failed to fetch conversations');
-        }
-
-        return (conversations || []).map(conv => ({
-            ...conv,
-            last_message: conv.last_message, // Corrected property name from database
-            last_message_time: conv.last_message_time, // Corrected property name from database
-            created_at: conv.created_at,
-            updated_at: conv.updated_at,
-            participants: conv.participants?.map((p: any) => p.user) || []
-        }));
     },
 
     // الحصول على محادثة واحدة مع الرسائل

@@ -23,6 +23,7 @@ export default function BottomNav() {
                 <Link
                     key={i}
                     href={item.path}
+                    prefetch={false}
                     className={`flex flex-col items-center gap-1 ${item.center ? '-mt-10' : ''}`}
                 >
                     <div className={`p-2 rounded-full transition-all ${item.center

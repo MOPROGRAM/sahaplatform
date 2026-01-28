@@ -66,144 +66,155 @@ export const adsService = {
         maxArea?: number;
         isBoosted?: boolean;
     } = {}) {
-        let query = (supabase as any)
-            .from('ads')
-            .select(`
-                *,
-                author:users!author_id(id, name, email),
-                city:cities!city_id(id, name, name_ar, name_en),
-                currency:currencies!currency_id(id, code, symbol, name)
-            `)
-            .eq('is_active', true);
+        try {
+            let query = (supabase as any)
+                .from('ads')
+                .select(`
+                    *,
+                    author:users!author_id(id, name, email),
+                    city:cities!city_id(id, name, name_ar, name_en),
+                    currency:currencies!currency_id(id, code, symbol, name)
+                `)
+                .eq('is_active', true);
 
-        // Filter by isBoosted
-        if (filters.isBoosted !== undefined) {
-            query = query.eq('is_boosted', filters.isBoosted);
-        }
+            // Filter by isBoosted
+            if (filters.isBoosted !== undefined) {
+                query = query.eq('is_boosted', filters.isBoosted);
+            }
 
-        // Filter by category
-        if (filters.category) {
-            query = query.eq('category', filters.category);
-        }
+            // Filter by category
+            if (filters.category) {
+                query = query.eq('category', filters.category);
+            }
 
-        // Filter by subcategory
-        if (filters.subCategory) {
-            // Since subCategory column might not exist, we search in description/title
-            query = query.or(`title.ilike.%${filters.subCategory}%,description.ilike.%${filters.subCategory}%`);
-        }
+            // Filter by subcategory
+            if (filters.subCategory) {
+                // Since subCategory column might not exist, we search in description/title
+                query = query.or(`title.ilike.%${filters.subCategory}%,description.ilike.%${filters.subCategory}%`);
+            }
 
-        // Simple search by title and description
-        if (filters.search) {
-            query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
-        }
+            // Simple search by title and description
+            if (filters.search) {
+                query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+            }
 
-        // Price Filter
-        if (filters.minPrice) {
-            query = query.gte('price', filters.minPrice);
-        }
-        if (filters.maxPrice) {
-            query = query.lte('price', filters.maxPrice);
-        }
+            // Price Filter
+            if (filters.minPrice) {
+                query = query.gte('price', filters.minPrice);
+            }
+            if (filters.maxPrice) {
+                query = query.lte('price', filters.maxPrice);
+            }
 
-        // Area Filter - disabled as column doesn't exist in schema
-        /*
-        if (filters.minArea) {
-            query = query.gte('area', filters.minArea);
-        }
-        if (filters.maxArea) {
-            query = query.lte('area', filters.maxArea);
-        }
-        */
+            // Area Filter - disabled as column doesn't exist in schema
+            /*
+            if (filters.minArea) {
+                query = query.gte('area', filters.minArea);
+            }
+            if (filters.maxArea) {
+                query = query.lte('area', filters.maxArea);
+            }
+            */
 
-        // Tags Filter (Rent/Sale etc)
-        if (filters.tags && filters.tags.length > 0) {
-            filters.tags.forEach(tag => {
-                // If tag is rent or sale, we might check a specific column if it exists, 
-                // or just search in text if that's how it's implemented. 
-                // Assuming text search based on previous implementation:
-                let tagConditions = `subCategory.ilike.%${tag}%,title.ilike.%${tag}%,description.ilike.%${tag}%`;
-                if (tag === 'rent') tagConditions += `,title.ilike.%إيجار%,description.ilike.%إيجار%`;
-                if (tag === 'sale') tagConditions += `,title.ilike.%بيع%,description.ilike.%بيع%`;
-                query = query.or(tagConditions);
-            });
-        }
+            // Tags Filter (Rent/Sale etc)
+            if (filters.tags && filters.tags.length > 0) {
+                filters.tags.forEach(tag => {
+                    // If tag is rent or sale, we might check a specific column if it exists, 
+                    // or just search in text if that's how it's implemented. 
+                    // Assuming text search based on previous implementation:
+                    let tagConditions = `subCategory.ilike.%${tag}%,title.ilike.%${tag}%,description.ilike.%${tag}%`;
+                    if (tag === 'rent') tagConditions += `,title.ilike.%إيجار%,description.ilike.%إيجار%`;
+                    if (tag === 'sale') tagConditions += `,title.ilike.%بيع%,description.ilike.%بيع%`;
+                    query = query.or(tagConditions);
+                });
+            }
 
-        // City/Location Filter
-        if (filters.cityId) {
-            query = query.eq('city_id', filters.cityId);
-        }
+            // City/Location Filter
+            if (filters.cityId) {
+                query = query.eq('city_id', filters.cityId);
+            }
 
-        // Sort
-        if (filters.sortBy) {
-            // Map camelCase sortBy to snake_case column
-            const sortColumn = filters.sortBy === 'createdAt' ? 'created_at' : 
-                               filters.sortBy === 'price' ? 'price' : 'created_at';
-            query = query.order(sortColumn, { ascending: filters.sortOrder === 'asc' });
-        } else {
-            query = query.order('created_at', { ascending: false });
-        }
+            // Sort
+            if (filters.sortBy) {
+                // Map camelCase sortBy to snake_case column
+                const sortColumn = filters.sortBy === 'createdAt' ? 'created_at' : 
+                                   filters.sortBy === 'price' ? 'price' : 'created_at';
+                query = query.order(sortColumn, { ascending: filters.sortOrder === 'asc' });
+            } else {
+                query = query.order('created_at', { ascending: false });
+            }
 
-        const limit = filters.limit || 50;
-        query = query.limit(limit);
+            const limit = filters.limit || 50;
+            query = query.limit(limit);
 
-        const { data, error } = await query;
+            const { data, error } = await query;
 
-        if (error) {
-            console.error('Error fetching ads:', error);
+            if (error) {
+                console.error('Error fetching ads:', error);
+                return [];
+            }
+
+            // Map snake_case to camelCase
+            return (data || []).map((ad: any) => ({
+                ...ad,
+                userId: ad.author_id,
+                cityId: ad.city_id,
+                currencyId: ad.currency_id,
+                isActive: ad.is_active,
+                isBoosted: ad.is_boosted,
+                createdAt: ad.created_at,
+                updatedAt: ad.updated_at,
+                paymentMethod: ad.payment_method,
+                subCategory: ad.sub_category // Map sub_category to subCategory
+            }));
+        } catch (error) {
+            console.error('Unexpected error fetching ads:', error);
             return [];
         }
-
-        // Map snake_case to camelCase
-        return (data || []).map((ad: any) => ({
-            ...ad,
-            userId: ad.author_id,
-            cityId: ad.city_id,
-            currencyId: ad.currency_id,
-            isActive: ad.is_active,
-            isBoosted: ad.is_boosted,
-            createdAt: ad.created_at,
-            updatedAt: ad.updated_at,
-            paymentMethod: ad.payment_method,
-            subCategory: ad.sub_category // Map sub_category to subCategory
-        }));
     },
 
     // Get single ad
     async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
-        let query = (supabase as any)
-            .from('ads')
-            .select(`
-                *,
-                author:User!author_id(id, name, email, phone),
-                city:cities!city_id(id, name, name_ar, name_en),
-                currency:currencies!currency_id(id, code, symbol, name)
-            `)
-            .eq('id', id);
+        try {
+            let query = (supabase as any)
+                .from('ads')
+                .select(`
+                    *,
+                    author:users!author_id(id, name, email),
+                    city:cities!city_id(id, name, name_ar, name_en),
+                    currency:currencies!currency_id(id, code, symbol, name)
+                `)
+                .eq('id', id);
 
-        if (!searchAll) {
-            query = query.eq('is_active', true);
-        }
+            if (!searchAll) {
+                query = query.eq('is_active', true);
+            }
 
-        const { data, error } = await query.single();
+            const { data, error } = await query.single();
 
-        if (error) {
-            console.error('Error fetching ad:', error);
+            if (error) {
+                console.error('Error fetching ad:', error);
+                return null;
+            }
+
+            // Map snake_case to camelCase
+            const ad = data as any;
+            return {
+                ...ad,
+                userId: ad.author_id,
+                cityId: ad.city_id,
+                currencyId: ad.currency_id,
+                isActive: ad.is_active,
+                isBoosted: ad.is_boosted,
+                createdAt: ad.created_at,
+                updatedAt: ad.updated_at,
+                paymentMethod: ad.payment_method,
+                subCategory: ad.sub_category
+            };
+        } catch (error) {
+            console.error('Unexpected error fetching ad:', error);
             return null;
         }
-
-        // Map snake_case to camelCase
-        const ad = data as any;
-        return {
-            ...ad,
-            userId: ad.author_id,
-            cityId: ad.city_id,
-            currencyId: ad.currency_id,
-            isActive: ad.is_active,
-            isBoosted: ad.is_boosted,
-            createdAt: ad.created_at,
-            updatedAt: ad.updated_at,
-            paymentMethod: ad.payment_method
-        } as Ad;
     },
 
     // Get user's ads

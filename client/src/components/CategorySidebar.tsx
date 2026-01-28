@@ -43,6 +43,7 @@ export default function CategorySidebar() {
                         <Link
                             key={category.key}
                             href={category.path}
+                            prefetch={false}
                             className={`flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-all ${isActive
                                 ? 'bg-primary text-white shadow-md'
                                 : 'text-gray-700 hover:bg-gray-100 hover:text-primary'
