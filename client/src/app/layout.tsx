@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/lib/language-context";
 import { ThemeProvider } from "next-themes";
 import { cookies } from "next/headers";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -56,11 +57,13 @@ export default function RootLayout({
             <body>
                 <LanguageProvider initialLanguage={lang}>
                     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-                        <div className="flex min-h-screen bg-gray-bg">
-                            <main className="flex-1 w-full">
-                                {children}
-                            </main>
-                        </div>
+                        <ErrorBoundary>
+                            <div className="flex min-h-screen bg-gray-bg">
+                                <main className="flex-1 w-full">
+                                    {children}
+                                </main>
+                            </div>
+                        </ErrorBoundary>
                     </ThemeProvider>
                 </LanguageProvider>
             </body>

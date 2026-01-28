@@ -19,14 +19,17 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+export function LanguageProvider({ children, initialLanguage }: { children: React.ReactNode, initialLanguage?: Language }) {
     const { resolvedTheme, setTheme: setNextTheme } = useTheme();
-    const { initialize } = useAuthStore();
+    // Optimize selector to prevent re-renders when other auth state changes
+    const initialize = useAuthStore(state => state.initialize);
     
     const [mounted, setMounted] = useState(false);
     
-    // Initialize language from cookie/localStorage if possible, otherwise default to 'ar'
+    // Initialize language from prop (server-side) or cookie/localStorage (client-side fallback)
     const [language, setLanguageState] = useState<Language>(() => {
+        if (initialLanguage) return initialLanguage;
+        
         if (typeof window !== 'undefined') {
             // Check cookie first (synced with server)
             const cookieLang = document.cookie
@@ -49,7 +52,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         // Synchronize on mount
         const savedLang = (localStorage.getItem('language') as Language) || language;
-        setLanguageState(savedLang);
+        // Only update state if different to avoid re-render
+        if (savedLang !== language) {
+            setLanguageState(savedLang);
+        }
         setLangUtil(savedLang);
         
         // Ensure document attributes match
