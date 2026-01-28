@@ -20,22 +20,19 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-    const [language, setLanguageState] = useState<Language>(() => {
-        if (typeof window !== 'undefined') {
-            return (localStorage.getItem('language') as Language) || 'ar';
-        }
-        return 'ar';
-    });
-    const { theme: nextTheme, setTheme: setNextTheme, resolvedTheme } = useTheme();
+    const { resolvedTheme, setTheme: setNextTheme } = useTheme();
+    const { initialize } = useAuthStore();
+    
+    const [mounted, setMounted] = useState(false);
+    const [language, setLanguageState] = useState<Language>('ar');
     const [country, setCountryState] = useState<string>('sa');
     const [currency, setCurrencyState] = useState<string>('sar');
-    const { initialize } = useAuthStore();
 
     const theme = (resolvedTheme || 'dark') as 'light' | 'dark';
 
     useEffect(() => {
-        // Init Language
-        const savedLang = getCurrentLanguage();
+        // Init Language from localStorage
+        const savedLang = (localStorage.getItem('language') as Language) || 'ar';
         setLanguageState(savedLang);
         setLangUtil(savedLang);
         document.documentElement.lang = savedLang;
@@ -48,6 +45,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         setCurrencyState(savedCurrency);
 
         initialize();
+        setMounted(true);
     }, [initialize]);
 
     const setLanguage = (lang: Language) => {
@@ -72,6 +70,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     const t = (key: TranslationKey) => getTranslation(key, language);
+
+    // To prevent flickering (shaking) and language flash:
+    // We return a matching shell during hydration until client-side state is synchronized.
+    if (!mounted) {
+        return (
+            <div className="min-h-screen bg-[#0a0a0a]" dir="rtl" lang="ar" />
+        );
+    }
 
     return (
         <LanguageContext.Provider value={{

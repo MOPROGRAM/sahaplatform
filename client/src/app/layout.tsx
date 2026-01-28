@@ -42,7 +42,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html dir="rtl" lang="ar" className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning>
+        <html dir="rtl" lang="ar" className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning style={{ colorScheme: 'dark' }}>
             <head>
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>
