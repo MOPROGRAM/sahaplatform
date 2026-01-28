@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     try {
         const body = await request.json();
-        const { userName, userEmail, userPhone, packageName, packagePrice, message, userId } = body;
+        const { userName, userEmail, userPhone, packageName, packagePrice, message, userId, requestType, pointsAmount } = body;
 
         // Validate required fields
         if (!userName || !userEmail || !packageName || !packagePrice) {
@@ -31,7 +31,25 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Validate points request
+        if (requestType === 'buy_points') {
+            if (!pointsAmount || isNaN(parseInt(pointsAmount))) {
+                return NextResponse.json(
+                    { error: 'Invalid points amount for points purchase' },
+                    { status: 400 }
+                );
+            }
+            if (!userId) {
+                return NextResponse.json(
+                    { error: 'User ID is required for points purchase' },
+                    { status: 400 }
+                );
+            }
+        }
+
         // 1. Save to Supabase as backup
+        const dbMessage = (message || '') + (pointsAmount ? `\n[System] Points: ${pointsAmount}` : '') + (requestType ? `\n[System] Type: ${requestType}` : '');
+        
         const { data: subscriptionData, error: dbError } = await supabase
             .from('subscription_requests')
             .insert({
@@ -41,7 +59,7 @@ export async function POST(request: NextRequest) {
                 user_phone: userPhone || null,
                 package_name: packageName,
                 package_price: packagePrice,
-                message: message || '',
+                message: dbMessage,
                 status: 'pending'
             })
             .select()
@@ -53,6 +71,34 @@ export async function POST(request: NextRequest) {
                 { error: 'Failed to save subscription request' },
                 { status: 500 }
             );
+        }
+
+        // Auto-add points for verified payments
+        if (userId && message && message.includes('[System] Payment Verified') && requestType === 'buy_points' && pointsAmount) {
+            const pointsToAdd = parseInt(pointsAmount);
+            if (!isNaN(pointsToAdd)) {
+                // Fetch current points
+                const { data: userProfile } = await supabase
+                    .from('users')
+                    .select('points')
+                    .eq('id', userId)
+                    .single();
+                
+                const currentPoints = userProfile?.points || 0;
+                const newPoints = currentPoints + pointsToAdd;
+
+                // Update points
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update({ points: newPoints })
+                    .eq('id', userId);
+
+                if (updateError) {
+                    console.error('Failed to auto-add points:', updateError);
+                } else {
+                    console.log(`Auto-added ${pointsToAdd} points to user ${userId}. New balance: ${newPoints}`);
+                }
+            }
         }
 
         // 2. Send email via Resend
@@ -116,7 +162,7 @@ export async function POST(request: NextRequest) {
             
             <div class="info-row">
                 <div class="label">🕐 وقت الطلب:</div>
-                <div class="value">${new Date().toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh' })}</div>
+                <div class="value">{new Date().toLocaleString('ar-SA')}</div>
             </div>
         </div>
         <div class="footer">

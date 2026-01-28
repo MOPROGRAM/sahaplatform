@@ -138,6 +138,36 @@ export default function AdminDashboard() {
     const handleUpdateSubStatus = async (id: string, status: string) => {
         setActionLoading(id);
         try {
+            if (status === 'completed') {
+                const { data: request } = await (supabase as any)
+                    .from('subscription_requests')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (request && request.message && request.user_id) {
+                    const pointsMatch = request.message.match(/\[System\] Points: (\d+)/);
+                    if (pointsMatch && pointsMatch[1]) {
+                        const pointsToAdd = parseInt(pointsMatch[1]);
+                        if (pointsToAdd > 0) {
+                            const { data: userData } = await (supabase as any)
+                                .from('users')
+                                .select('points')
+                                .eq('id', request.user_id)
+                                .single();
+
+                            const currentPoints = userData?.points || 0;
+                            const newPoints = currentPoints + pointsToAdd;
+
+                            await (supabase as any)
+                                .from('users')
+                                .update({ points: newPoints })
+                                .eq('id', request.user_id);
+                        }
+                    }
+                }
+            }
+
             await (supabase as any).from('subscription_requests').update({ status }).eq('id', id);
             fetchDashboardData();
         } catch (err) {

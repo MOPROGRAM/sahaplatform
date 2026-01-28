@@ -337,5 +337,23 @@ export const adsService = {
         if (error) {
             console.warn('Failed to increment views:', error);
         }
+    },
+
+    // Promote ad
+    async promoteAd(adId: string, days: number): Promise<any> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        const response = await fetch('/api/ads/promote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adId, days, userId: user.id })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to promote ad');
+        }
+        return data;
     }
 };

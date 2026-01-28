@@ -57,6 +57,13 @@ export const useAuthStore = create<AuthState>((set) => ({
         try {
             const session = await authService.getCurrentSession();
             if (session?.user) {
+                // Fetch points
+                const { data: userProfile } = await (supabase as any)
+                     .from('users')
+                     .select('points')
+                     .eq('id', session.user.id)
+                     .single();
+
                 set({
                     user: {
                         id: session.user.id,
@@ -65,6 +72,8 @@ export const useAuthStore = create<AuthState>((set) => ({
                         role: session.user.user_metadata?.role || 'USER',
                         userType: session.user.user_metadata?.userType || 'SEEKER',
                         verified: !!session.user.email_confirmed_at,
+                        points: userProfile?.points || 0,
+                        created_at: session.user.created_at,
                     },
                     token: session.access_token
                 });

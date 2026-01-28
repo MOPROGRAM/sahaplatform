@@ -17,6 +17,13 @@ export const authService = {
             await this.syncUserData(data.user, data.session?.access_token);
         }
 
+        // Fetch user points and other details from DB
+        const { data: userProfile } = await (supabase as any)
+            .from('users')
+            .select('points')
+            .eq('id', data.user?.id)
+            .single();
+
         return {
             token: data.session?.access_token || '',
             user: {
@@ -26,6 +33,8 @@ export const authService = {
                 role: data.user?.user_metadata?.role || 'USER',
                 userType: data.user?.user_metadata?.userType || 'SEEKER',
                 verified: data.user?.email_confirmed_at ? true : false,
+                points: userProfile?.points || 0,
+                created_at: data.user?.created_at,
             },
         };
     },
@@ -52,6 +61,7 @@ export const authService = {
             await this.syncUserData(data.user, data.session?.access_token);
         }
 
+        // For new registration, points should be 10 (handled in syncUserData)
         return {
             token: data.session?.access_token || '',
             user: {
@@ -61,23 +71,39 @@ export const authService = {
                 role: data.user?.user_metadata?.role || 'USER',
                 userType: data.user?.user_metadata?.userType || 'SEEKER',
                 verified: data.user?.email_confirmed_at ? true : false,
+                points: 10, // Default for new user
+                created_at: data.user?.created_at,
             },
         };
     },
 
     async syncUserData(user: any, token?: string) {
         try {
+            // Check if user exists first to decide on points allocation
+            const { data: existingUser } = await (supabase as any)
+                .from('users')
+                .select('id, points')
+                .eq('id', user.id)
+                .single();
+
+            const userData: any = {
+                id: user.id,
+                email: user.email,
+                name: user.user_metadata?.name || '',
+                role: user.user_metadata?.role || 'USER',
+                user_type: user.user_metadata?.userType || 'SEEKER',
+                verified: !!user.email_confirmed_at,
+            };
+
+            // Only set default points for new users
+            if (!existingUser) {
+                userData.points = 10;
+            }
+
             // محاولة إدراج أو تحديث بيانات المستخدم في جدول users
             const { error } = await (supabase as any)
                 .from('users')
-                .upsert({
-                    id: user.id,
-                    email: user.email,
-                    name: user.user_metadata?.name || '',
-                    role: user.user_metadata?.role || 'USER',
-                    user_type: user.user_metadata?.userType || 'SEEKER',
-                    verified: !!user.email_confirmed_at,
-                }, {
+                .upsert(userData, {
                     onConflict: 'id'
                 });
 
@@ -123,4 +149,6 @@ export type AuthUser = {
     userType?: string;
     verified?: boolean;
     image?: string;
+    points?: number;
+    created_at?: string;
 };

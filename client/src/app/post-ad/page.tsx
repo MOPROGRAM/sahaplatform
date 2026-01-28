@@ -46,12 +46,12 @@ export default function PostAdPage() {
     const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
 
     const subCategoriesMap: Record<string, string[]> = {
-        realestate: ['apartments', 'villas', 'lands', 'commercial', 'rent'],
-        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'trucks'],
-        jobs: ['it', 'sales', 'engineering', 'medical', 'education'],
-        electronics: ['phones', 'computers', 'appliances', 'gaming'],
-        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design'],
-        goods: ['furniture', 'fashion', 'sports', 'books', 'other'],
+        realestate: ['apartments', 'villas', 'lands', 'commercial', 'rent', 'offices', 'chalets', 'compounds', 'stores'],
+        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'trucks', 'honda', 'nissan', 'chevrolet', 'kia', 'lexus', 'mazda', 'jeep', 'landrover'],
+        jobs: ['it', 'sales', 'engineering', 'medical', 'education', 'marketing', 'accounting', 'management', 'technicians', 'drivers', 'security', 'customer_service'],
+        electronics: ['phones', 'computers', 'appliances', 'gaming', 'laptops', 'tvs', 'cameras', 'tablets', 'smartwatches', 'accessories'],
+        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design', 'delivery', 'events', 'transport', 'teaching', 'contracting'],
+        goods: ['furniture', 'fashion', 'sports', 'books', 'clothes', 'watches', 'perfumes', 'antiques', 'camping', 'other'],
     };
 
     // Redirect to login if not authenticated

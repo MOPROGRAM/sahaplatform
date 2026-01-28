@@ -145,7 +145,6 @@ export default function Header() {
                 {/* Navigation & Actions */}
                 <nav className="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
                     <Link href="/ads" className={`transition-colors ${pathname?.startsWith("/ads") ? "text-primary border-b-2 border-primary pb-1" : "text-text-main hover:text-primary"}`}>{t("categories")}</Link>
-                    <Link href="/advertise" className={`transition-colors ${pathname === "/advertise" ? "text-primary border-b-2 border-primary" : "text-text-main hover:text-primary"}`}>{t("advertise")}</Link>
                 </nav>
 
                 {/* Action Grid */}

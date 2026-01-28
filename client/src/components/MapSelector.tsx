@@ -97,7 +97,7 @@ export default function MapSelector({ onLocationSelect, initialLocation = [24.71
                 </label>
                 <input
                     type="text"
-                    placeholder="مثال: الرياض، حي العليا"
+                    placeholder="مثال: جدة، حي الروضة"
                     value={selectedLocation}
                     onChange={(e) => handleLocationInput(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"

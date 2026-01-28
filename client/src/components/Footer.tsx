@@ -17,7 +17,6 @@ export default function Footer() {
                     </div>
                     <div className="flex gap-4">
                         <Link href="/help" className="hover:text-primary cursor-pointer transition-colors uppercase tracking-widest text-[10px]">{t('help')}</Link>
-                        <Link href="/advertise" className="hover:text-primary cursor-pointer transition-colors uppercase tracking-widest text-[10px]">{t('advertiseWithUs')}</Link>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">

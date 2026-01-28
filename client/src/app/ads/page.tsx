@@ -73,12 +73,12 @@ function AdsContent() {
     // Removed highlightedAdId state and related map logic
 
     const subCategoriesMap: { [key: string]: string[] } = {
-        realestate: ["apartments", "villas", "lands", "commercial", "rent"],
-        cars: ["toyota", "honda", "bmw", "mercedes", "trucks"],
-        electronics: ["phones", "laptops", "tvs", "computers", "appliances", "gaming"],
-        goods: ["clothes", "furniture", "books", "fashion", "sports"],
-        jobs: ["it", "engineering", "marketing", "sales", "medical", "education"],
-        services: ["cleaning", "maintenance", "delivery", "legal", "design"],
+        realestate: ['apartments', 'villas', 'lands', 'commercial', 'rent', 'offices', 'chalets', 'compounds', 'stores'],
+        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'trucks', 'honda', 'nissan', 'chevrolet', 'kia', 'lexus', 'mazda', 'jeep', 'landrover'],
+        jobs: ['it', 'sales', 'engineering', 'medical', 'education', 'marketing', 'accounting', 'management', 'technicians', 'drivers', 'security', 'customer_service'],
+        electronics: ['phones', 'computers', 'appliances', 'gaming', 'laptops', 'tvs', 'cameras', 'tablets', 'smartwatches', 'accessories'],
+        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design', 'delivery', 'events', 'transport', 'teaching', 'contracting'],
+        goods: ['furniture', 'fashion', 'sports', 'books', 'clothes', 'watches', 'perfumes', 'antiques', 'camping', 'other'],
         other: ["misc"],
     };
 

@@ -17,7 +17,11 @@ import {
     PlusCircle,
     ShieldCheck,
     Edit,
-    Trash2
+    Trash2,
+    Zap,
+    Calendar,
+    DollarSign,
+    Bell
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -40,6 +44,131 @@ export default function DashboardPage() {
         { label: "Growth", value: "0%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
     ]);
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; adId: string | null; adTitle: string }>({ open: false, adId: null, adTitle: '' });
+    const [promoteModal, setPromoteModal] = useState<{ open: boolean; adId: string | null; adTitle: string; days: number }>({ open: false, adId: null, adTitle: '', days: 1 });
+    const [processing, setProcessing] = useState(false);
+
+    // Buy Points State
+    const [showBuyPoints, setShowBuyPoints] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+    const [paymentStep, setPaymentStep] = useState(false);
+    const [buyPointsFormData, setBuyPointsFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        message: '',
+        cardNumber: '',
+        expiry: '',
+        cvc: ''
+    });
+
+    const plans = [
+        {
+            name: t('pointsPack1'),
+            points: 10,
+            price: '7.5 SAR',
+            description: t('pointsPack1Desc'),
+            features: [`10 ${t('points')}`, t('promoteAdDesc'), t('verifiedBadge')],
+            color: 'bg-blue-500'
+        },
+        {
+            name: t('pointsPack2'),
+            points: 100,
+            price: '70 SAR',
+            description: t('pointsPack2Desc'),
+            features: [`100 ${t('points')}`, language === 'ar' ? 'خصم 7%' : '7% Discount', t('detailedAnalytics')],
+            popular: true,
+            color: 'bg-purple-600'
+        },
+        {
+            name: t('pointsPack3'),
+            points: 500,
+            price: '300 SAR',
+            description: t('pointsPack3Desc'),
+            features: [`500 ${t('points')}`, language === 'ar' ? 'خصم 20%' : '20% Discount', t('dedicatedSupport')],
+            color: 'bg-amber-500'
+        }
+    ];
+
+    const openBuyPoints = () => {
+        setBuyPointsFormData({
+            ...buyPointsFormData,
+            name: user?.name || '',
+            email: user?.email || '',
+            phone: (user as any).phone || '',
+        });
+        setShowBuyPoints(true);
+        setPaymentStep(false);
+        setSelectedPlan(null);
+    };
+
+    const handleBuyPointsNext = (e: React.FormEvent) => {
+        e.preventDefault();
+        setPaymentStep(true);
+    };
+
+    const handleBuyPointsSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedPlan) return;
+        setProcessing(true);
+
+        try {
+            let finalMessage = buyPointsFormData.message;
+            let requestType = 'buy_points';
+            
+            if (selectedPlan.manual) {
+                requestType = 'manual_request';
+            } else {
+                // Simulate Payment
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const transactionId = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                finalMessage = `${buyPointsFormData.message}\n\n[System] Payment Verified via Visa\nTransaction ID: ${transactionId}\nCard: **** **** **** ${buyPointsFormData.cardNumber.slice(-4) || '0000'}`;
+            }
+
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userName: buyPointsFormData.name,
+                    userEmail: buyPointsFormData.email,
+                    userPhone: buyPointsFormData.phone,
+                    packageName: selectedPlan.name,
+                    packagePrice: selectedPlan.price,
+                    pointsAmount: selectedPlan.points,
+                    requestType: requestType,
+                    message: finalMessage,
+                    userId: user?.id
+                }),
+            });
+
+            if (response.ok) {
+                alert(t('requestSentSuccessfully'));
+                setShowBuyPoints(false);
+                // Refresh points
+                const { checkUser } = useAuthStore.getState();
+                if (checkUser) await checkUser();
+            } else {
+                const result = await response.json();
+                alert(`${t('error')}: ${result.error}`);
+            }
+        } catch (error) {
+            alert(t('failedToSendRequest'));
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleManualRequest = () => {
+        setSelectedPlan({
+            name: language === 'ar' ? 'طلب شراء نقاط يدوياً' : 'Manual Points Purchase',
+            price: language === 'ar' ? 'حسب الاتفاق' : 'TBD',
+            points: 0,
+            description: language === 'ar' ? 'تواصل معنا لتحديد الباقة المناسبة' : 'Contact us to determine the suitable package',
+            features: [],
+            manual: true
+        });
+        setPaymentStep(true);
+    };
+
 
     const getRelativeTime = (date: string) => {
         const now = Date.now();
@@ -65,8 +194,8 @@ export default function DashboardPage() {
             const activeAds = activeAdsOnly.length;
 
             setStats([
+                { label: language === 'ar' ? "رصيد النقاط" : "Points Balance", value: (user?.points || 0).toString(), icon: <Zap size={12} />, color: "text-yellow-500" },
                 { label: language === 'ar' ? "المشاهدات" : "Views", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
-                { label: language === 'ar' ? "الرسائل" : "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
                 { label: language === 'ar' ? "الإعلانات" : "Listings", value: activeAds.toString(), icon: <Package size={12} />, color: "text-orange-500" },
                 { label: language === 'ar' ? "النمو" : "Growth", value: "+12%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
             ]);
@@ -93,6 +222,25 @@ export default function DashboardPage() {
         } catch (error) {
             console.error("Failed to delete ad:", error);
             alert(language === 'ar' ? 'فشل في حذف الإعلان' : 'Failed to delete ad');
+        }
+    };
+
+    const handlePromote = async () => {
+        if (!promoteModal.adId) return;
+        setProcessing(true);
+        try {
+            await adsService.promoteAd(promoteModal.adId, promoteModal.days);
+            await fetchDashboardData();
+            // Refresh user points
+            const { checkUser } = useAuthStore.getState();
+            if (checkUser) await checkUser();
+            
+            setPromoteModal({ open: false, adId: null, adTitle: '', days: 1 });
+            alert(language === 'ar' ? 'تم ترويج الإعلان بنجاح' : 'Ad promoted successfully');
+        } catch (error: any) {
+            alert(error.message);
+        } finally {
+            setProcessing(false);
         }
     };
 
@@ -138,6 +286,7 @@ export default function DashboardPage() {
                             { label: t('overview'), icon: <LayoutDashboard size={14} />, id: 'overview' },
                             { label: t('myListings'), icon: <Package size={14} />, id: 'listings' },
                             { label: t('messages'), icon: <MessageSquare size={14} />, id: 'messages' },
+                            { label: t('notifications'), icon: <Bell size={14} />, id: 'notifications' },
                             { label: t('settings'), icon: <Settings size={14} />, id: 'settings' },
                         ].map((item, i) => (
                             <button key={i} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-border-color last:border-0 transition-all ${activeTab === item.id ? 'text-primary bg-primary/[0.03] border-r-2 border-r-primary' : 'text-text-muted hover:bg-card/60 hover:text-secondary'}`}>
@@ -157,7 +306,7 @@ export default function DashboardPage() {
                     {activeTab === 'overview' && (
                         <>
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                                {stats.map((stat, i) => (
+                                    {stats.map((stat, i) => (
                                     <div key={i} className="glass-card p-4 flex flex-col gap-2 relative overflow-hidden group">
                                         <div className={`absolute bottom-0 right-0 w-12 h-12 ${stat.color} opacity-[0.03] -mr-4 -mb-4 group-hover:scale-150 transition-transform`}>{stat.icon}</div>
                                         <span className={`w-8 h-8 flex items-center justify-center rounded-xs bg-card ${stat.color} p-1 border border-black/5 shadow-inner`}>
@@ -350,6 +499,59 @@ export default function DashboardPage() {
                         </div>
                     )}
 
+                    {activeTab === 'notifications' && (
+                        <div className="bg-white dark:bg-[#1a1a1a] border border-border-color p-6 rounded-sm shadow-sm">
+                            <h3 className="text-lg font-black text-text-main uppercase tracking-tight mb-4">
+                                {t('notifications')}
+                            </h3>
+                            <div className="space-y-3">
+                                {/* Welcome Gift Notification */}
+                                <div className="flex items-start gap-4 p-4 bg-primary/5 border border-primary/10 rounded-lg">
+                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                        <Zap size={20} className="text-primary" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h4 className="font-bold text-text-main text-sm">
+                                                {language === 'ar' ? 'هدية الترحيب' : 'Welcome Gift'}
+                                            </h4>
+                                            <span className="text-[10px] text-text-muted">
+                                                {user.created_at ? getRelativeTime(user.created_at) : ''}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-text-muted leading-relaxed">
+                                            {language === 'ar' 
+                                                ? 'مبروك! لقد حصلت على 10 نقاط مجانية بمناسبة تسجيلك معنا. استمتع بترويج إعلاناتك!' 
+                                                : 'Congratulations! You have received 10 free points for registering with us. Enjoy promoting your ads!'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Current Balance Notification */}
+                                <div className="flex items-start gap-4 p-4 bg-card border border-border-color rounded-lg">
+                                    <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center shrink-0">
+                                        <DollarSign size={20} className="text-yellow-500" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h4 className="font-bold text-text-main text-sm">
+                                                {language === 'ar' ? 'رصيد النقاط الحالي' : 'Current Points Balance'}
+                                            </h4>
+                                            <span className="text-[10px] text-text-muted">
+                                                {language === 'ar' ? 'الآن' : 'Just now'}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-text-muted leading-relaxed">
+                                            {language === 'ar'
+                                                ? `لديك حالياً ${user.points || 0} نقطة في رصيدك. يمكنك استخدامها لترويج إعلاناتك.`
+                                                : `You currently have ${user.points || 0} points in your balance. You can use them to promote your ads.`}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {activeTab === 'settings' && (
                         <div className="space-y-4">
                             <div className="bg-white dark:bg-[#1a1a1a] border border-border-color p-6 rounded-sm shadow-sm">
@@ -394,6 +596,155 @@ export default function DashboardPage() {
             </div>
             <Footer />
 
+            {showBuyPoints && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-border-color">
+                        <div className="bg-primary/5 p-6 border-b border-border-color flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-black text-text-main uppercase tracking-tight">{t('buyPoints')}</h3>
+                                {selectedPlan && <p className="text-sm text-text-muted mt-1">{selectedPlan.name} - {selectedPlan.price}</p>}
+                            </div>
+                            <button onClick={() => setShowBuyPoints(false)} className="text-text-muted hover:text-text-main transition-colors">
+                                <ArrowLeft className={language === 'ar' ? 'rotate-180' : ''} />
+                            </button>
+                        </div>
+                        
+                        <div className="p-6">
+                            {!selectedPlan ? (
+                                <div className="space-y-4">
+                                    {plans.map((plan, index) => (
+                                        <div key={index} onClick={() => setSelectedPlan(plan)} className={`p-4 rounded-xl border cursor-pointer transition-all hover:border-primary hover:bg-primary/5 ${plan.popular ? 'border-primary ring-1 ring-primary/20' : 'border-border-color'}`}>
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-bold text-text-main">{plan.name}</h4>
+                                                <span className="font-black text-primary">{plan.price}</span>
+                                            </div>
+                                            <div className="text-xs text-text-muted">{plan.description}</div>
+                                            <div className="mt-3 flex flex-wrap gap-2">
+                                                {plan.features.map((feature, i) => (
+                                                    <span key={i} className="text-[10px] bg-card px-2 py-1 rounded-full border border-border-color text-text-muted">{feature}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div className="mt-6 pt-4 border-t border-border-color">
+                                        <button 
+                                            onClick={handleManualRequest}
+                                            className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-text-main rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all text-sm"
+                                        >
+                                            {language === 'ar' ? 'طلب شراء نقاط يدوياً' : 'Request Manual Points Purchase'}
+                                        </button>
+                                        <p className="text-[10px] text-center text-text-muted mt-2">
+                                            {language === 'ar' ? 'سيقوم فريقنا بالتواصل معك لإتمام العملية' : 'Our team will contact you to complete the process'}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : !paymentStep ? (
+                                <form onSubmit={handleBuyPointsNext} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">{t('name')}</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={buyPointsFormData.name}
+                                            onChange={(e) => setBuyPointsFormData({...buyPointsFormData, name: e.target.value})}
+                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">{t('email')}</label>
+                                        <input
+                                            type="email"
+                                            required
+                                            value={buyPointsFormData.email}
+                                            onChange={(e) => setBuyPointsFormData({...buyPointsFormData, email: e.target.value})}
+                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">{t('phone')}</label>
+                                        <input
+                                            type="tel"
+                                            required
+                                            value={buyPointsFormData.phone}
+                                            onChange={(e) => setBuyPointsFormData({...buyPointsFormData, phone: e.target.value})}
+                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div className="flex gap-3 mt-6">
+                                        <button type="button" onClick={() => setSelectedPlan(null)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-text-main rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+                                            {t('back')}
+                                        </button>
+                                        <button type="submit" className="flex-1 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all">
+                                            {language === 'ar' ? 'متابعة للدفع' : 'Proceed to Payment'}
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <form onSubmit={handleBuyPointsSubmit} className="space-y-4">
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl flex items-center gap-3 mb-6">
+                                        <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                        <p className="text-xs text-blue-800 dark:text-blue-200 font-medium">
+                                            {language === 'ar' ? 'بيانات الدفع مشفرة وآمنة 100%' : 'Payment data is 100% encrypted and secure'}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">Card Number</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                required
+                                                placeholder="0000 0000 0000 0000"
+                                                maxLength={19}
+                                                value={buyPointsFormData.cardNumber}
+                                                onChange={(e) => setBuyPointsFormData({...buyPointsFormData, cardNumber: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim()})}
+                                                className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono"
+                                            />
+                                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">Expiry</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                placeholder="MM/YY"
+                                                maxLength={5}
+                                                value={buyPointsFormData.expiry}
+                                                onChange={(e) => setBuyPointsFormData({...buyPointsFormData, expiry: e.target.value})}
+                                                className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono text-center"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">CVC</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                placeholder="123"
+                                                maxLength={3}
+                                                value={buyPointsFormData.cvc}
+                                                onChange={(e) => setBuyPointsFormData({...buyPointsFormData, cvc: e.target.value.replace(/\D/g, '')})}
+                                                className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono text-center"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3 mt-6">
+                                        <button type="button" onClick={() => setPaymentStep(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-text-main rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+                                            {t('back')}
+                                        </button>
+                                        <button type="submit" disabled={processing} className="flex-1 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all flex items-center justify-center gap-2">
+                                            {processing && <Loader2 className="animate-spin" size={16} />}
+                                            {language === 'ar' ? `دفع ${selectedPlan.price}` : `Pay ${selectedPlan.price}`}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
             {deleteModal.open && (
                 <>
                     <div className="fixed inset-0 bg-solid-overlay z-[50] flex items-center justify-center p-4">
