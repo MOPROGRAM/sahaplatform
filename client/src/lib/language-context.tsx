@@ -56,7 +56,10 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
         if (savedLang !== language) {
             setLanguageState(savedLang);
         }
-        setLangUtil(savedLang);
+        
+        // Update storage without reloading
+        localStorage.setItem('language', savedLang);
+        document.cookie = `language=${savedLang}; path=/; max-age=31536000; SameSite=Lax`;
         
         // Ensure document attributes match
         document.documentElement.lang = savedLang;

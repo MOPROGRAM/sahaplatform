@@ -46,7 +46,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     const cookieStore = cookies();
-    const lang = (cookieStore.get('language')?.value || 'ar') as 'ar' | 'en';
+    let lang: 'ar' | 'en' = 'ar';
+    try {
+        lang = (cookieStore.get('language')?.value || 'ar') as 'ar' | 'en';
+    } catch (error) {
+        console.error('Failed to read language cookie:', error);
+    }
     const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
     return (
