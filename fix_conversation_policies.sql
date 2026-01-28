@@ -6,20 +6,20 @@
 -- ========================================
 
 -- 1. Add INSERT policy for Conversation
-DROP POLICY IF EXISTS "Users can create conversations" ON "Conversation";
-CREATE POLICY "Users can create conversations" ON "Conversation"
+DROP POLICY IF EXISTS "Users can create conversations" ON "conversations";
+CREATE POLICY "Users can create conversations" ON "conversations"
     FOR INSERT 
     WITH CHECK (true);  -- Any authenticated user can create a conversation
 
 -- 2. Add UPDATE policy for Conversation
-DROP POLICY IF EXISTS "Users can update their conversations" ON "Conversation";
-CREATE POLICY "Users can update their conversations" ON "Conversation"
+DROP POLICY IF EXISTS "Users can update their conversations" ON "conversations";
+CREATE POLICY "Users can update their conversations" ON "conversations"
     FOR UPDATE 
     USING (
         EXISTS (
             SELECT 1 FROM "_conversation_participants" 
-            WHERE "_conversation_participants"."conversation_id" = "Conversation"."id" 
-            AND "_conversation_participants"."user_id" = auth.uid()
+            WHERE "_conversation_participants"."a" = "conversations"."id" 
+            AND "_conversation_participants"."b" = auth.uid()
         )
     );
 
@@ -36,24 +36,24 @@ DROP POLICY IF EXISTS "Users can view participants" ON "_conversation_participan
 CREATE POLICY "Users can view participants" ON "_conversation_participants"
     FOR SELECT 
     USING (
-        "user_id" = auth.uid() OR
+        "b" = auth.uid() OR
         EXISTS (
             SELECT 1 FROM "_conversation_participants" cp
-            WHERE cp."conversation_id" = "_conversation_participants"."conversation_id"
-            AND cp."user_id" = auth.uid()
+            WHERE cp."a" = "_conversation_participants"."a"
+            AND cp."b" = auth.uid()
         )
     );
 
 -- 5. Add UPDATE policy for Message (mark as read)
-DROP POLICY IF EXISTS "Users can update messages" ON "Message";
-CREATE POLICY "Users can update messages" ON "Message"
+DROP POLICY IF EXISTS "Users can update messages" ON "messages";
+CREATE POLICY "Users can update messages" ON "messages"
     FOR UPDATE 
     USING (
         "receiver_id" = auth.uid() OR
         EXISTS (
             SELECT 1 FROM "_conversation_participants" 
-            WHERE "_conversation_participants"."conversation_id" = "Message"."conversation_id" 
-            AND "_conversation_participants"."user_id" = auth.uid()
+            WHERE "_conversation_participants"."a" = "messages"."conversation_id" 
+            AND "_conversation_participants"."b" = auth.uid()
         )
     );
 
