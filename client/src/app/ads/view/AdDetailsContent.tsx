@@ -119,14 +119,14 @@ export default function AdDetailsContent({ id }: { id: string }) {
             router.push('/login');
             return;
         }
-        if (user.id === ad?.user_id) {
+        if (user.id === ad?.author_id) {
             alert(language === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
             return;
         }
 
         try {
             // Check or create conversation for this ad
-            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.user_id || '');
+            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.author_id || '');
             setConversationId(conversation.id);
             setShowChat(true);
         } catch (error) {
