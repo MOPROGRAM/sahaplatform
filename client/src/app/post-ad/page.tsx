@@ -4,13 +4,13 @@ export const runtime = "edge";
 
 
 import { useState, useEffect, useCallback } from "react";
-import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
+import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase } from "@/lib/supabase";
-import { apiService } from "@/lib/api";
+import { adsService } from "@/lib/ads";
 import Header from "@/components/Header";
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
@@ -79,11 +79,17 @@ export default function PostAdPage() {
             file.type.startsWith('image/') &&
             file.size <= 5 * 1024 * 1024
         );
+
         if (validFiles.length !== files.length) {
-            setError(language === 'ar' ? "بعض الصور غير صالحة" : "Some images are invalid");
-            return;
+            setError(language === 'ar' ? "بعض الصور غير صالحة (الحد الأقصى 5 ميجابايت)" : "Some images are invalid (Max 5MB)");
         }
-        setImages(validFiles);
+
+        if (images.length + validFiles.length > 5) {
+             setError(language === 'ar' ? "الحد الأقصى 5 صور" : "Maximum 5 images");
+             return;
+        }
+
+        setImages(prev => [...prev, ...validFiles]);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -129,33 +135,28 @@ export default function PostAdPage() {
                 finalDescription += `\n\n${language === 'ar' ? 'التصنيف الفرعي' : 'Subcategory'}: ${formData.subCategory}`;
             }
 
-            const adData: any = {
+            const adData = {
                 title: formData.title,
                 description: finalDescription,
                 price: parseFloat(formData.price),
                 category: formData.category,
-                sub_category: formData.subCategory,
-                location: formData.enableLocation ? formData.location : null,
+                subCategory: formData.subCategory || null,
+                location: formData.enableLocation && formData.location ? formData.location : null,
                 latitude: coordinates?.lat || null,
                 longitude: coordinates?.lng || null,
                 images: JSON.stringify(imageUrls),
-                author_id: currentUser.id,
-                is_active: true,
-                currency_id: 'sar',
-                payment_method: formData.paymentMethod,
-                is_boosted: formData.isBoosted,
-                // area: formData.area ? parseFloat(formData.area) : null, // Removed as column doesn't exist
+                currencyId: 'sar',
+                paymentMethod: formData.paymentMethod || null,
+                isBoosted: formData.isBoosted,
+                phone: formData.phone || null,
+                email: formData.email || null,
+                cityId: null
             };
 
-            const { data, error: insertError } = await (supabase as any)
-                .from('ads')
-                .insert(adData)
-                .select()
-                .single();
-
-            if (insertError) throw insertError;
-            router.push(`/ads/view?id=${data.id}`);
+            const createdAd = await adsService.createAd(adData);
+            router.push(`/ads/view?id=${createdAd.id}`);
         } catch (err: any) {
+            console.error("Error creating ad:", err);
             setError(err.message || "Error posting ad");
         } finally {
             setLoading(false);
@@ -304,6 +305,50 @@ export default function PostAdPage() {
                                         <MapSelector onLocationSelect={handleLocationSelect} height="250px" />
                                     </div>
                                 )}
+
+                                {/* Images Section */}
+                                <div>
+                                    <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('photos')} ({t('optional')})</label>
+                                    <div 
+                                        className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-primary transition-colors cursor-pointer relative bg-gray-50 dark:bg-black/20"
+                                        onClick={() => document.getElementById('images-input')?.click()}
+                                    >
+                                        <input 
+                                            id="images-input"
+                                            type="file" 
+                                            multiple 
+                                            accept="image/*" 
+                                            className="hidden" 
+                                            onChange={handleImageChange}
+                                        />
+                                        <div className="flex flex-col items-center gap-3 text-gray-400">
+                                            <Camera size={32} className="text-primary/50" />
+                                            <span className="text-sm font-bold">{t('clickToAddPhotos')}</span>
+                                            <span className="text-xs opacity-70">{t('max5Images')}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Image Previews */}
+                                    {images.length > 0 && (
+                                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mt-4">
+                                            {images.map((file, idx) => (
+                                                <div key={idx} className="aspect-square relative rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shadow-sm group">
+                                                    <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
+                                                    <button 
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setImages(prev => prev.filter((_, i) => i !== idx));
+                                                        }}
+                                                        className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full hover:bg-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
 
                                 <div>
                                     <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('detailedBriefing')}</label>

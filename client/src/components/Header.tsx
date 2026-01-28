@@ -1,5 +1,6 @@
 "use client";
 
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, ChevronDown, Settings, X, MapPin } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -70,8 +71,9 @@ export default function Header() {
         <header className={`sticky top-0 z-[100] bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
             <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-6">
                 {/* Brand */}
-                <Link href="/" className="group shrink-0" prefetch={false}>
-                    <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
+                <Link href="/" className="group shrink-0 flex items-center gap-2" prefetch={false}>
+                    <Logo className="h-9 w-auto text-primary transition-transform group-hover:scale-110" />
+                    <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105 hidden sm:block">{t("siteName")}</span>
                 </Link>
 
                 {/* Region & Currency Selector */}

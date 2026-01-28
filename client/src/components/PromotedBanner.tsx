@@ -42,18 +42,19 @@ export default function PromotedBanner() {
 
     return (
         <div className="w-full my-6 px-4">
-            <div className="relative w-full bg-gradient-to-r from-[#FF4D00] via-[#FF7500] to-[#FF4D00] rounded-[2rem] shadow-xl overflow-hidden border border-white/10">
+            <div className="relative w-full bg-gradient-to-br from-[#FF4D00] via-[#ff6a00] to-white rounded-[2rem] shadow-xl overflow-hidden border-4 border-white/20">
                 
-                {/* Wavy Pattern / Texture Effect */}
-                <div className="absolute inset-0 opacity-20">
+                {/* Wavy Pattern / Texture Effect - Enhanced & More Wavy */}
+                <div className="absolute inset-0 z-0">
                      <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <path d="M0 50 Q 25 60 50 50 T 100 50 V 100 H 0 Z" fill="rgba(255,255,255,0.1)" />
-                        <path d="M0 30 Q 25 40 50 30 T 100 30 V 100 H 0 Z" fill="rgba(255,255,255,0.05)" />
+                        <path d="M0 60 Q 20 40 40 60 T 80 60 T 120 40 V 100 H 0 Z" fill="rgba(255,255,255,0.15)" />
+                        <path d="M0 40 Q 25 70 50 40 T 100 50 V 100 H 0 Z" fill="rgba(255,255,255,0.1)" />
+                        <path d="M0 80 Q 30 50 60 80 T 120 70 V 100 H 0 Z" fill="rgba(255,255,255,0.2)" />
                      </svg>
                 </div>
                 
                 {/* Content Container - Horizontal Scroll */}
-                <div className="relative flex items-center gap-3 p-4 overflow-x-auto no-scrollbar snap-x touch-pan-x">
+                <div className="relative flex items-center gap-4 p-5 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
                     {ads.map((ad) => {
                         let imageUrl = null;
                         try {
@@ -67,10 +68,10 @@ export default function PromotedBanner() {
                             <Link 
                                 key={ad.id}
                                 href={`/ads/${ad.id}`} 
-                                className="snap-start shrink-0 w-[200px] sm:w-[240px] md:w-[14.28%] flex flex-col bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 group"
+                                className="snap-start shrink-0 w-[250px] sm:w-[300px] md:w-[18%] flex flex-col bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 group"
                             >
-                                {/* Image Area */}
-                                <div className="relative h-32 w-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
+                                {/* Image Area - Reduced Height (75% of previous h-32) */}
+                                <div className="relative h-24 w-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
                                     {imageUrl ? (
                                         <Image
                                             src={imageUrl}
@@ -88,10 +89,10 @@ export default function PromotedBanner() {
                                     </div>
                                 </div>
 
-                                {/* Content Area */}
-                                <div className="p-3 flex flex-col gap-1.5 flex-1 justify-between">
+                                {/* Content Area - Compacted */}
+                                <div className="p-2.5 flex flex-col gap-1 flex-1 justify-between">
                                     <div>
-                                        <h3 className="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight mb-1">
+                                        <h3 className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1 leading-tight mb-0.5">
                                             {ad.title}
                                         </h3>
                                         <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
@@ -100,12 +101,12 @@ export default function PromotedBanner() {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between mt-1 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                    <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-gray-100 dark:border-gray-800">
                                         <div className="flex items-baseline gap-1 text-primary font-black">
-                                            <span className="text-lg">
+                                            <span className="text-base">
                                                 {ad.price ? new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price) : ''}
                                             </span>
-                                            <span className="text-[10px] uppercase">{currencyCode}</span>
+                                            <span className="text-[9px] uppercase">{currencyCode}</span>
                                         </div>
                                     </div>
                                 </div>
