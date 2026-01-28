@@ -106,7 +106,7 @@ export default function AdvertisePage() {
         setMessage('');
 
         try {
-            const response = await fetch('/api/subscribe', {
+            const response = await fetch(`${window.location.origin}/api/subscribe`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

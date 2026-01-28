@@ -75,7 +75,7 @@ export const adsService = {
                 .from('ads')
                 .select(`
                     *,
-                    author:users!author_id(id, name, email),
+                    author:users!ads_author_id_fkey(id, name, email),
                     city:cities!city_id(id, name, name_ar, name_en),
                     currency:currencies!currency_id(id, code, symbol, name)
                 `)
@@ -161,7 +161,7 @@ export const adsService = {
                 .from('ads')
                 .select(`
                     *,
-                    author:users!author_id(id, name, email),
+                    author:users!ads_author_id_fkey(id, name, email),
                     city:cities!city_id(id, name, name_ar, name_en),
                     currency:currencies!currency_id(id, code, symbol, name)
                 `)
@@ -197,7 +197,7 @@ export const adsService = {
             .from('ads')
             .select(`
                 *,
-                author:users!author_id(id, name, email, phone),
+                author:users!ads_author_id_fkey(id, name, email, phone),
                 city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
@@ -247,7 +247,7 @@ export const adsService = {
             .insert(dbData)
             .select(`
                 *,
-                author:users!author_id(id, name, email, phone),
+                author:users!ads_author_id_fkey(id, name, email, phone),
                 city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
@@ -297,7 +297,7 @@ export const adsService = {
             .eq('author_id', user.id) // Security check
             .select(`
                 *,
-                author:users!author_id(id, name, email, phone),
+                author:users!ads_author_id_fkey(id, name, email, phone),
                 city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
