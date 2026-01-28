@@ -68,12 +68,12 @@ export const adsService = {
     } = {}) {
         try {
             let query = (supabase as any)
-                .from('Ad')
+                .from('ads')
                 .select(`
                     *,
-                    author:User!author_id(id, name, email),
-                    city:City!city_id(id, name, nameAr, nameEn),
-                    currency:Currency!currency_id(id, code, symbol, name)
+                    author:users!author_id(id, name, email),
+                    city:cities!city_id(id, name, name_ar, name_en),
+                    currency:currencies!currency_id(id, code, symbol, name)
                 `)
                 .eq('is_active', true);
 
@@ -106,22 +106,9 @@ export const adsService = {
                 query = query.lte('price', filters.maxPrice);
             }
 
-            // Area Filter - disabled as column doesn't exist in schema
-            /*
-            if (filters.minArea) {
-                query = query.gte('area', filters.minArea);
-            }
-            if (filters.maxArea) {
-                query = query.lte('area', filters.maxArea);
-            }
-            */
-
             // Tags Filter (Rent/Sale etc)
             if (filters.tags && filters.tags.length > 0) {
                 filters.tags.forEach(tag => {
-                    // If tag is rent or sale, we might check a specific column if it exists, 
-                    // or just search in text if that's how it's implemented. 
-                    // Assuming text search based on previous implementation:
                     let tagConditions = `subCategory.ilike.%${tag}%,title.ilike.%${tag}%,description.ilike.%${tag}%`;
                     if (tag === 'rent') tagConditions += `,title.ilike.%إيجار%,description.ilike.%إيجار%`;
                     if (tag === 'sale') tagConditions += `,title.ilike.%بيع%,description.ilike.%بيع%`;
@@ -165,7 +152,13 @@ export const adsService = {
                 createdAt: ad.created_at,
                 updatedAt: ad.updated_at,
                 paymentMethod: ad.payment_method,
-                subCategory: ad.sub_category // Map sub_category to subCategory
+                subCategory: ad.sub_category, // Map sub_category to subCategory
+                // Map nested objects with new column names
+                city: ad.city ? {
+                    ...ad.city,
+                    nameAr: ad.city.name_ar,
+                    nameEn: ad.city.name_en
+                } : undefined
             }));
         } catch (error) {
             console.error('Unexpected error fetching ads:', error);
@@ -177,12 +170,12 @@ export const adsService = {
     async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
         try {
             let query = (supabase as any)
-                .from('Ad')
+                .from('ads')
                 .select(`
                     *,
-                    author:User!author_id(id, name, email),
-                    city:City!city_id(id, name, nameAr, nameEn),
-                    currency:Currency!currency_id(id, code, symbol, name)
+                    author:users!author_id(id, name, email),
+                    city:cities!city_id(id, name, name_ar, name_en),
+                    currency:currencies!currency_id(id, code, symbol, name)
                 `)
                 .eq('id', id);
 
@@ -209,7 +202,12 @@ export const adsService = {
                 createdAt: ad.created_at,
                 updatedAt: ad.updated_at,
                 paymentMethod: ad.payment_method,
-                subCategory: ad.sub_category
+                subCategory: ad.sub_category,
+                city: ad.city ? {
+                    ...ad.city,
+                    nameAr: ad.city.name_ar,
+                    nameEn: ad.city.name_en
+                } : undefined
             };
         } catch (error) {
             console.error('Unexpected error fetching ad:', error);
@@ -226,12 +224,12 @@ export const adsService = {
         }
 
         const { data, error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .select(`
                 *,
-                author:User!author_id(id, name, email, phone),
-                city:City!city_id(id, name, nameAr, nameEn),
-                currency:Currency!currency_id(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, name_ar, name_en),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
             .eq('author_id', user.id)
             .order('created_at', { ascending: false });
@@ -252,7 +250,12 @@ export const adsService = {
             createdAt: ad.created_at,
             updatedAt: ad.updated_at,
             paymentMethod: ad.payment_method,
-            subCategory: ad.sub_category
+            subCategory: ad.sub_category,
+            city: ad.city ? {
+                ...ad.city,
+                nameAr: ad.city.name_ar,
+                nameEn: ad.city.name_en
+            } : undefined
         }));
     },
 
@@ -270,7 +273,7 @@ export const adsService = {
             description: adData.description,
             price: adData.price,
             category: adData.category,
-            sub_category: adData.subCategory, // Assuming sub_category exists, if not, it might be ignored or fail
+            sub_category: adData.subCategory, 
             location: adData.location,
             images: adData.images,
             video: adData.video,
@@ -287,13 +290,13 @@ export const adsService = {
         };
 
         const { data, error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .insert(dbData)
             .select(`
                 *,
-                author:User!author_id(id, name, email, phone),
-                city:City!city_id(id, name, nameAr, nameEn),
-                currency:Currency!currency_id(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, name_ar, name_en),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
             .single();
 
@@ -313,7 +316,12 @@ export const adsService = {
             isBoosted: ad.is_boosted,
             createdAt: ad.created_at,
             updatedAt: ad.updated_at,
-            paymentMethod: ad.payment_method
+            paymentMethod: ad.payment_method,
+            city: ad.city ? {
+                ...ad.city,
+                nameAr: ad.city.name_ar,
+                nameEn: ad.city.name_en
+            } : undefined
         } as Ad;
     },
 
@@ -347,15 +355,15 @@ export const adsService = {
 
 
         const { data, error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .update(dbUpdates)
             .eq('id', id)
             .eq('author_id', user.id) // Security check
             .select(`
                 *,
-                author:User!author_id(id, name, email, phone),
-                city:City!city_id(id, name, nameAr, nameEn),
-                currency:Currency!currency_id(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, name_ar, name_en),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
             .single();
 
@@ -375,7 +383,12 @@ export const adsService = {
             isBoosted: ad.is_boosted,
             createdAt: ad.created_at,
             updatedAt: ad.updated_at,
-            paymentMethod: ad.payment_method
+            paymentMethod: ad.payment_method,
+            city: ad.city ? {
+                ...ad.city,
+                nameAr: ad.city.name_ar,
+                nameEn: ad.city.name_en
+            } : undefined
         } as Ad;
     },
 
@@ -388,7 +401,7 @@ export const adsService = {
         }
 
         const { error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .delete()
             .eq('id', id)
             .eq('author_id', user.id); // Security check
