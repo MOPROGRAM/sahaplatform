@@ -264,6 +264,24 @@ export const translations = {
         moreContacts: 'زيادة في التواصل',
         betterSales: 'فرص بيع أكبر',
         messageOptional: 'رسالة (اختياري)',
+
+        // Notifications Page Specific
+        notificationCenter: 'مركز التنبيهات',
+        sahaAlerts: 'تنبيهات نظام saha في الوقت الفعلي',
+        noNotifications: 'لا توجد تنبيهات',
+        systemIdling: 'النظام في وضع الخمول. ستظهر الأحداث الجديدة هنا.',
+
+        // Edit Ad Page Specific
+        back: 'رجوع',
+        editAd: 'تعديل الإعلان',
+        updateAdDetails: 'قم بتحديث تفاصيل إعلانك',
+        generalInfo: 'المعلومات الأساسية',
+        detailedDescription: 'الوصف التفصيلي',
+        locationAndMedia: 'الموقع والصور',
+        enableLocation: 'تفعيل تحديد الموقع',
+        addPhoto: 'أضف صورة',
+        saveChanges: 'حفظ التعديلات',
+
     },
     en: {
         // Brand
@@ -312,8 +330,6 @@ export const translations = {
         engineering: 'Engineering',
         medical: 'Medical',
         education: 'Education',
-        phones: 'Phones',
-        computers: 'Computers',
         appliances: 'Appliances',
         gaming: 'Gaming',
         cleaning: 'Cleaning',
@@ -514,6 +530,23 @@ export const translations = {
         betterSales: 'Better Sales',
         messageOptional: 'Message (Optional)',
 
+        // Notifications Page Specific
+        notificationCenter: 'Notification Center',
+        sahaAlerts: 'saha real-time system alerts',
+        noNotifications: 'No Notifications',
+        systemIdling: 'System is idling. New events will appear here.',
+
+        // Edit Ad Page Specific
+        back: 'Go Back',
+        editAd: 'Edit Ad',
+        updateAdDetails: 'Update your ad details and media',
+        generalInfo: 'General Information',
+        detailedDescription: 'Detailed Description',
+        locationAndMedia: 'Location and Media',
+        enableLocation: 'Enable Location Services',
+        addPhoto: 'Add Photo',
+        saveChanges: 'Save Changes',
+
         // Filter Labels
         Area: 'Area',
         Type: 'Type',
@@ -539,10 +572,15 @@ export const translations = {
 };
 
 export type Language = 'ar' | 'en';
-export type TranslationKey = keyof typeof translations.ar | 'noImage';
+export type TranslationKey = keyof typeof translations.ar | 'noImage' | 'notificationCenter' | 'sahaAlerts' | 'noNotifications' | 'systemIdling' | 'back' | 'editAd' | 'updateAdDetails' | 'generalInfo' | 'detailedDescription' | 'locationAndMedia' | 'enableLocation' | 'addPhoto' | 'saveChanges';
 
 export const getTranslation = (key: TranslationKey, lang: Language = 'ar'): string => {
-    return translations[lang][key as keyof typeof translations.ar] || translations.ar[key as keyof typeof translations.ar] || key;
+    // Cast to keyof typeof translations.ar for index signature check
+    const arKey = key as keyof typeof translations.ar;
+    if (translations[lang] && (translations[lang] as any)[arKey] !== undefined) {
+        return (translations[lang] as any)[arKey];
+    }
+    return translations.ar[arKey] || key;
 };
 
 export const getCurrentLanguage = (): Language => {

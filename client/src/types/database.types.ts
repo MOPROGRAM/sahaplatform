@@ -9,7 +9,7 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
-            Ad: {
+            ads: {
                 Row: {
                     id: string
                     title: string
@@ -31,84 +31,87 @@ export interface Database {
                     author_id: string
                     created_at: string
                     updated_at: string
+                    sub_category: string | null
                 }
                 Insert: {
                     id?: string
                     title: string
-                    titleAr?: string | null
-                    titleEn?: string | null
+                    title_ar?: string | null
+                    title_en?: string | null
                     description: string
-                    descriptionAr?: string | null
-                    descriptionEn?: string | null
+                    description_ar?: string | null
+                    description_en?: string | null
                     price?: number | null
-                    currencyId?: string
+                    currency_id?: string
                     category: string
                     location?: string | null
                     address?: string | null
-                    paymentMethod?: string | null
-                    cityId?: string | null
+                    payment_method?: string | null
+                    city_id?: string | null
                     latitude?: number | null
                     longitude?: number | null
                     images?: string
                     video?: string | null
-                    isBoosted?: boolean
-                    isActive?: boolean
+                    is_boosted?: boolean
+                    is_active?: boolean
                     views?: number
-                    userId: string
-                    createdAt?: string
-                    updatedAt?: string
+                    author_id: string
+                    created_at?: string
+                    updated_at?: string
+                    sub_category?: string | null
                 }
                 Update: {
                     id?: string
                     title?: string
-                    titleAr?: string | null
-                    titleEn?: string | null
+                    title_ar?: string | null
+                    title_en?: string | null
                     description?: string
-                    descriptionAr?: string | null
-                    descriptionEn?: string | null
+                    description_ar?: string | null
+                    description_en?: string | null
                     price?: number | null
-                    currencyId?: string
+                    currency_id?: string
                     category?: string
                     location?: string | null
                     address?: string | null
-                    paymentMethod?: string | null
-                    cityId?: string | null
+                    payment_method?: string | null
+                    city_id?: string | null
                     latitude?: number | null
                     longitude?: number | null
                     images?: string
                     video?: string | null
-                    isBoosted?: boolean
-                    isActive?: boolean
+                    is_boosted?: boolean
+                    is_active?: boolean
                     views?: number
-                    userId?: string
-                    createdAt?: string
-                    updatedAt?: string
+                    author_id?: string
+                    created_at?: string
+                    updated_at?: string
+                    sub_category?: string | null
                 }
                 Relationships: [
                     {
-                        foreignKeyName: "ads_user_id_fkey"
-                        columns: ["userId"]
+                        foreignKeyName: "ads_author_id_fkey"
+                        columns: ["author_id"]
                         isOneToOne: false
-                        referencedRelation: "User"
+                        referencedRelation: "users"
                         referencedColumns: ["id"]
                     },
                     {
                         foreignKeyName: "ads_city_id_fkey"
-                        columns: ["cityId"]
+                        columns: ["city_id"]
                         isOneToOne: false
-                        referencedRelation: "City"
+                        referencedRelation: "cities"
                         referencedColumns: ["id"]
                     },
                     {
                         foreignKeyName: "ads_currency_id_fkey"
-                        columns: ["currencyId"]
+                        columns: ["currency_id"]
                         isOneToOne: false
-                        referencedRelation: "Currency"
+                        referencedRelation: "currencies"
                         referencedColumns: ["id"]
                     }
                 ]
             }
-            User: {
+            users: {
                 Row: {
                     id: string
                     name: string | null
@@ -120,156 +123,205 @@ export interface Database {
                     updated_at: string | null
                 }
                 Insert: {
-                    id: string
+                    id?: string
                     name?: string | null
                     email: string
-                    createdAt?: string
+                    created_at?: string
+                    updated_at?: string | null
+                    role?: string | null
+                    user_type?: string | null
+                    verified?: boolean | null
                 }
                 Update: {
                     id?: string
                     name?: string | null
                     email?: string
-                    createdAt?: string
+                    created_at?: string
+                    updated_at?: string | null
+                    role?: string | null
+                    user_type?: string | null
+                    verified?: boolean | null
                 }
                 Relationships: []
             }
-            City: {
+            cities: {
                 Row: {
                     id: string
                     name: string
-                    nameAr: string | null
-                    nameEn: string | null
+                    name_ar: string | null
+                    name_en: string | null
+                    country_id: string
+                    latitude: number | null
+                    longitude: number | null
+                    is_active: boolean
+                    created_at: string
+                    updated_at: string
                 }
                 Insert: {
-                    id: string
+                    id?: string
                     name: string
-                    nameAr?: string | null
-                    nameEn?: string | null
+                    name_ar?: string | null
+                    name_en?: string | null
+                    country_id: string
+                    latitude?: number | null
+                    longitude?: number | null
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
                 }
                 Update: {
                     id?: string
                     name?: string
-                    nameAr?: string | null
-                    nameEn?: string | null
+                    name_ar?: string | null
+                    name_en?: string | null
+                    country_id?: string
+                    latitude?: number | null
+                    longitude?: number | null
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
                 }
-                Relationships: []
+                Relationships: [
+                    {
+                        foreignKeyName: "cities_country_id_fkey"
+                        columns: ["country_id"]
+                        isOneToOne: false
+                        referencedRelation: "countries"
+                        referencedColumns: ["id"]
+                    }
+                ]
             }
-            Currency: {
+            currencies: {
                 Row: {
                     id: string
                     code: string
                     symbol: string
                     name: string
+                    name_ar: string
+                    name_en: string
+                    is_active: boolean
+                    created_at: string
+                    updated_at: string
                 }
                 Insert: {
-                    id: string
+                    id?: string
                     code: string
                     symbol: string
                     name: string
+                    name_ar: string
+                    name_en: string
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
                 }
                 Update: {
                     id?: string
                     code?: string
                     symbol?: string
                     name?: string
+                    name_ar?: string
+                    name_en?: string
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
                 }
                 Relationships: []
             }
-            Conversation: {
+            conversations: {
                 Row: {
                     id: string
-                    lastMessage: string | null
-                    lastMessageTime: string
-                    adId: string | null
-                    createdAt: string
-                    updatedAt: string
+                    last_message: string | null
+                    last_message_time: string
+                    ad_id: string | null
+                    created_at: string
+                    updated_at: string
                 }
                 Insert: {
                     id?: string
-                    lastMessage?: string | null
-                    lastMessageTime?: string
-                    adId?: string | null
-                    createdAt?: string
-                    updatedAt?: string
+                    last_message?: string | null
+                    last_message_time?: string
+                    ad_id?: string | null
+                    created_at?: string
+                    updated_at?: string
                 }
                 Update: {
                     id?: string
-                    lastMessage?: string | null
-                    lastMessageTime?: string
-                    adId?: string | null
-                    createdAt?: string
-                    updatedAt?: string
+                    last_message?: string | null
+                    last_message_time?: string
+                    ad_id?: string | null
+                    created_at?: string
+                    updated_at?: string
                 }
                 Relationships: [
                     {
                         foreignKeyName: "conversations_ad_id_fkey"
-                        columns: ["adId"]
+                        columns: ["ad_id"]
                         isOneToOne: false
-                        referencedRelation: "Ad"
+                        referencedRelation: "ads"
                         referencedColumns: ["id"]
                     }
                 ]
             }
-            Message: {
+            messages: {
                 Row: {
                     id: string
                     content: string
-                    messageType: string
-                    senderId: string
-                    receiverId: string
-                    conversationId: string
-                    isRead: boolean
-                    createdAt: string
-                    fileUrl: string | null
-                    fileName: string | null
-                    fileSize: number | null
+                    message_type: string
+                    sender_id: string
+                    receiver_id: string
+                    conversation_id: string
+                    is_read: boolean
+                    created_at: string
+                    file_url: string | null
+                    file_name: string | null
+                    file_size: number | null
                 }
                 Insert: {
                     id?: string
                     content: string
-                    messageType: string
-                    senderId: string
-                    receiverId: string
-                    conversationId: string
-                    isRead?: boolean
-                    createdAt?: string
-                    fileUrl?: string | null
-                    fileName?: string | null
-                    fileSize?: number | null
+                    message_type?: string
+                    sender_id: string
+                    receiver_id: string
+                    conversation_id: string
+                    is_read?: boolean
+                    created_at?: string
+                    file_url?: string | null
+                    file_name?: string | null
+                    file_size?: number | null
                 }
                 Update: {
                     id?: string
                     content?: string
-                    messageType?: string
-                    senderId?: string
-                    receiverId?: string
-                    conversationId?: string
-                    isRead?: boolean
-                    createdAt?: string
-                    fileUrl?: string | null
-                    fileName?: string | null
-                    fileSize?: number | null
+                    message_type?: string
+                    sender_id?: string
+                    receiver_id?: string
+                    conversation_id?: string
+                    is_read?: boolean
+                    created_at?: string
+                    file_url?: string | null
+                    file_name?: string | null
+                    file_size?: number | null
                 }
                 Relationships: [
                     {
-                        foreignKeyName: "messages_sender_id_fkey"
-                        columns: ["senderId"]
+                        foreignKeyName: "messages_conversation_id_fkey"
+                        columns: ["conversation_id"]
                         isOneToOne: false
-                        referencedRelation: "User"
+                        referencedRelation: "conversations"
                         referencedColumns: ["id"]
                     },
                     {
                         foreignKeyName: "messages_receiver_id_fkey"
-                        columns: ["receiverId"]
+                        columns: ["receiver_id"]
                         isOneToOne: false
-                        referencedRelation: "User"
+                        referencedRelation: "users"
                         referencedColumns: ["id"]
                     },
                     {
-                        foreignKeyName: "messages_conversation_id_fkey"
-                        columns: ["conversationId"]
+                        foreignKeyName: "messages_sender_id_fkey"
+                        columns: ["sender_id"]
                         isOneToOne: false
-                        referencedRelation: "Conversation"
+                        referencedRelation: "users"
                         referencedColumns: ["id"]
                     }
                 ]
@@ -289,20 +341,265 @@ export interface Database {
                 }
                 Relationships: [
                     {
-                        foreignKeyName: "_conversation_participants_a_fkey"
+                        foreignKeyName: "_ConversationParticipants_A_fkey"
                         columns: ["A"]
                         isOneToOne: false
-                        referencedRelation: "Conversation"
+                        referencedRelation: "conversations"
                         referencedColumns: ["id"]
                     },
                     {
-                        foreignKeyName: "_conversation_participants_b_fkey"
+                        foreignKeyName: "_ConversationParticipants_B_fkey"
                         columns: ["B"]
                         isOneToOne: false
-                        referencedRelation: "User"
+                        referencedRelation: "users"
                         referencedColumns: ["id"]
                     }
                 ]
+            }
+            countries: {
+                Row: {
+                    id: string
+                    name: string
+                    name_ar: string | null
+                    name_en: string | null
+                    code: string
+                    phone_code: string
+                    currency_id: string
+                    flag: string | null
+                    is_active: boolean
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    name_ar?: string | null
+                    name_en?: string | null
+                    code: string
+                    phone_code: string
+                    currency_id: string
+                    flag?: string | null
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    name_ar?: string | null
+                    name_en?: string | null
+                    code?: string
+                    phone_code?: string
+                    currency_id?: string
+                    flag?: string | null
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "countries_currency_id_fkey"
+                        columns: ["currency_id"]
+                        isOneToOne: false
+                        referencedRelation: "currencies"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            payments: {
+                Row: {
+                    id: string
+                    user_id: string
+                    amount: number
+                    currency_id: string
+                    status: string
+                    payment_method: string
+                    transaction_id: string
+                    description: string
+                    subscription_id: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    amount: number
+                    currency_id: string
+                    status?: string
+                    payment_method: string
+                    transaction_id: string
+                    description: string
+                    subscription_id?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    amount?: number
+                    currency_id?: string
+                    status?: string
+                    payment_method?: string
+                    transaction_id?: string
+                    description?: string
+                    subscription_id?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "payments_currency_id_fkey"
+                        columns: ["currency_id"]
+                        isOneToOne: false
+                        referencedRelation: "currencies"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "payments_subscription_id_fkey"
+                        columns: ["subscription_id"]
+                        isOneToOne: false
+                        referencedRelation: "subscriptions"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "payments_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            subscription_requests: {
+                Row: {
+                    id: string
+                    user_id: string | null
+                    user_name: string | null
+                    user_email: string | null
+                    user_phone: string | null
+                    package_name: string | null
+                    package_price: string | null
+                    message: string | null
+                    status: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id?: string | null
+                    user_name?: string | null
+                    user_email?: string | null
+                    user_phone?: string | null
+                    package_name?: string | null
+                    package_price?: string | null
+                    message?: string | null
+                    status?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string | null
+                    user_name?: string | null
+                    user_email?: string | null
+                    user_phone?: string | null
+                    package_name?: string | null
+                    package_price?: string | null
+                    message?: string | null
+                    status?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "subscription_requests_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            subscriptions: {
+                Row: {
+                    id: string
+                    user_id: string
+                    plan_name: string
+                    plan_type: string
+                    price: number
+                    currency_id: string
+                    status: string
+                    start_date: string
+                    end_date: string
+                    auto_renew: boolean
+                    payment_id: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    plan_name: string
+                    plan_type: string
+                    price: number
+                    currency_id?: string
+                    status?: string
+                    start_date?: string
+                    end_date: string
+                    auto_renew?: boolean
+                    payment_id?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    plan_name?: string
+                    plan_type?: string
+                    price?: number
+                    currency_id?: string
+                    status?: string
+                    start_date?: string
+                    end_date?: string
+                    auto_renew?: boolean
+                    payment_id?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "subscriptions_currency_id_fkey"
+                        columns: ["currency_id"]
+                        isOneToOne: false
+                        referencedRelation: "currencies"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "subscriptions_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            verification_tokens: {
+                Row: {
+                    identifier: string
+                    token: string
+                    expires: string
+                }
+                Insert: {
+                    identifier: string
+                    token: string
+                    expires: string
+                }
+                Update: {
+                    identifier?: string
+                    token?: string
+                    expires?: string
+                }
+                Relationships: []
             }
         }
         Views: {
@@ -310,7 +607,11 @@ export interface Database {
         }
         Functions: {
             increment_ad_views: {
-                Args: { adId: string }
+                Args: { ad_id: string }
+                Returns: undefined
+            }
+            update_ad_view_count: {
+                Args: { ad_id: string }
                 Returns: undefined
             }
         }

@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { ArrowLeft, Star, MessageCircle, Mail, Phone, Zap, CheckCircle2, Loader2, Send } from 'lucide-react';
 import { useLanguage } from '@/lib/language-context';
 import { useAuthStore } from "@/store/useAuthStore";

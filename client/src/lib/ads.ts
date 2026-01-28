@@ -67,7 +67,7 @@ export const adsService = {
         isBoosted?: boolean;
     } = {}) {
         let query = (supabase as any)
-            .from('Ad')
+            .from('ads')
             .select(`
                 *,
                 author:User!author_id(id, name, email, phone),
@@ -171,7 +171,7 @@ export const adsService = {
     // Get single ad
     async getAd(id: string, searchAll: boolean = false): Promise<Ad | null> {
         let query = (supabase as any)
-            .from('Ad')
+            .from('ads')
             .select(`
                 *,
                 author:User!author_id(id, name, email, phone),
@@ -215,7 +215,7 @@ export const adsService = {
         }
 
         const { data, error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .select(`
                 *,
                 author:User!author_id(id, name, email, phone),
@@ -276,7 +276,7 @@ export const adsService = {
         };
 
         const { data, error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .insert(dbData)
             .select(`
                 *,
@@ -336,7 +336,7 @@ export const adsService = {
 
 
         const { data, error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .update(dbUpdates)
             .eq('id', id)
             .eq('author_id', user.id) // Security check
@@ -377,7 +377,7 @@ export const adsService = {
         }
 
         const { error } = await (supabase as any)
-            .from('Ad')
+            .from('ads')
             .delete()
             .eq('id', id)
             .eq('author_id', user.id); // Security check

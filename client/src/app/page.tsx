@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';

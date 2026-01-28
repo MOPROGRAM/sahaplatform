@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { adsService, Ad } from "@/lib/ads";
@@ -64,7 +66,7 @@ export default function MyAdsPage() {
     // Show loading while checking auth
     if (authLoading) {
         return (
-            <div className="bg-[#f8fafc] min-h-screen flex items-center justify-center">
+            <div className="bg-gray-bg min-h-screen flex items-center justify-center">
                 <LoadingSpinner />
             </div>
         );
@@ -76,28 +78,28 @@ export default function MyAdsPage() {
     }
 
     return (
-        <div className="bg-[#f8fafc] min-h-screen flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="bg-gray-bg min-h-screen flex flex-col">
             <Header />
 
-            <main className="max-w-6xl mx-auto w-full p-4 flex-1">
+            <main className="max-w-[1920px] mx-auto w-full p-4 flex-1">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-black text-black uppercase tracking-tight mb-2">
+                    <h1 className="text-2xl font-black text-text-main uppercase tracking-tight mb-2">
                         {t('myAds')}
                     </h1>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-text-muted text-sm">
                         {t('manageAds')}
                     </p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 text-red-600 p-4 text-sm font-bold border-r-4 border-red-500 rounded-md mb-6 flex items-center gap-3">
+                    <div className="bg-red-500/10 text-red-500 p-4 text-sm font-bold border-r-4 border-red-500 rounded-md mb-6 flex items-center gap-3">
                         <AlertCircle size={20} />
                         {error}
                     </div>
                 )}
 
                 <div className="flex justify-between items-center mb-6">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-text-muted">
                         {language === 'ar'
                             ? `${ads.length} إعلان${ads.length !== 1 ? '' : ''} ${ads.length !== 1 ? t('published') : t('publishedSingular')}`
                             : `${ads.length} ad${ads.length !== 1 ? 's' : ''} ${t('published')}`
@@ -117,14 +119,14 @@ export default function MyAdsPage() {
                         <LoadingSpinner />
                     </div>
                 ) : ads.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bento-card border-dashed p-12 text-center">
                         <div className="text-text-muted mb-4">
                             <Plus size={48} className="mx-auto" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        <h3 className="text-lg font-bold text-text-main mb-2">
                             {t('noAds')}
                         </h3>
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-text-muted mb-6">
                             {t('startPosting')}
                         </p>
                         <button
@@ -135,15 +137,15 @@ export default function MyAdsPage() {
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
                         {ads.map((ad) => (
                             <div key={ad.id} className="h-full">
                                 <AdCard
                                     id={ad.id}
                                     title={ad.title}
                                     price={ad.price}
-                                    location={ad.location}
-                                    images={JSON.parse(ad.images || '[]')}
+                                    location={ad.location || ''}
+                                    images={typeof ad.images === 'string' ? JSON.parse(ad.images || '[]') : ad.images}
                                     createdAt={ad.createdAt}
                                     category={ad.category}
                                     language={language}
@@ -151,14 +153,14 @@ export default function MyAdsPage() {
                                 <div className="mt-2 flex justify-end gap-2 px-2">
                                     <button
                                         onClick={() => router.push(`/ads/${ad.id}/edit`)}
-                                        className="text-blue-600 hover:text-blue-800 p-2 bg-blue-50 rounded-full transition-colors"
+                                        className="text-blue-500 hover:text-blue-700 p-2 bg-blue-500/10 rounded-full transition-colors"
                                         title={language === 'ar' ? 'تعديل' : 'Edit'}
                                     >
                                         <Edit size={16} />
                                     </button>
                                     <button
                                         onClick={() => handleDeleteAd(ad.id)}
-                                        className="text-red-600 hover:text-red-800 p-2 bg-red-50 rounded-full transition-colors"
+                                        className="text-red-500 hover:text-red-700 p-2 bg-red-500/10 rounded-full transition-colors"
                                         title={t('delete')}
                                     >
                                         <Trash2 size={16} />

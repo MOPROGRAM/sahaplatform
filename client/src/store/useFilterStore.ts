@@ -9,7 +9,6 @@ interface FilterState {
     maxPrice: string;
     minArea: string;
     maxArea: string;
-    cityId: string | null;
     sortBy: string;
     sortOrder: 'asc' | 'desc';
     tags: string[];
@@ -17,10 +16,14 @@ interface FilterState {
     setSubCategory: (sub: string | null) => void;
     setSearchQuery: (query: string) => void;
     setCityId: (cityId: string | null) => void;
-    setPriceRange: (min: string, max: string) => void;
-    setAreaRange: (min: string, max: string) => void;
-    setSort: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
-    toggleTag: (tag: string) => void;
+    setMinPrice: (min: string) => void;
+    setMaxPrice: (max: string) => void;
+    setMinArea: (min: string) => void;
+    setMaxArea: (max: string) => void;
+    setSortBy: (sortBy: string) => void;
+    setSortOrder: (sortOrder: 'asc' | 'desc') => void;
+    addTag: (tag: string) => void;
+    removeTag: (tag: string) => void;
     resetFilters: () => void;
 }
 
@@ -46,14 +49,14 @@ export const useFilterStore = create<FilterState>((set) => ({
     setSubCategory: (subCategory) => set({ subCategory }),
     setSearchQuery: (searchQuery) => set({ searchQuery }),
     setCityId: (cityId) => set({ cityId }),
-    setPriceRange: (minPrice, maxPrice) => set({ minPrice, maxPrice }),
-    setAreaRange: (minArea, maxArea) => set({ minArea, maxArea }),
-    setSort: (sortBy, sortOrder) => set({ sortBy, sortOrder }),
-    toggleTag: (tag) => set((state) => ({
-        tags: state.tags.includes(tag)
-            ? state.tags.filter(t => t !== tag)
-            : [...state.tags, tag]
-    })),
+    setMinPrice: (minPrice) => set({ minPrice }),
+    setMaxPrice: (maxPrice) => set({ maxPrice }),
+    setMinArea: (minArea) => set({ minArea }),
+    setMaxArea: (maxArea) => set({ maxArea }),
+    setSortBy: (sortBy) => set({ sortBy }),
+    setSortOrder: (sortOrder) => set({ sortOrder }),
+    addTag: (tag) => set((state) => ({ tags: [...state.tags, tag] })),
+    removeTag: (tag) => set((state) => ({ tags: state.tags.filter(t => t !== tag) })),
     resetFilters: () => set({
         category: null,
         subCategory: null,

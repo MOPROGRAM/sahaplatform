@@ -11,13 +11,30 @@ import { conversationsService } from "@/lib/conversations";
 
 export default function Header() {
     const { user, logout } = useAuthStore();
-    const { language, setLanguage, t, theme, toggleTheme } = useLanguage();
+    const { language, setLanguage, t, theme, toggleTheme, country, setCountry, currency, setCurrency } = useLanguage();
     const router = useRouter();
     const pathname = usePathname();
     const [unreadCount, setUnreadCount] = useState(0);
     const [headerShrunk, setHeaderShrunk] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showRegion, setShowRegion] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+
+    const currencyMap: Record<string, string> = {
+        sa: 'sar',
+        ae: 'aed',
+        kw: 'kwd',
+        qa: 'qar',
+        bh: 'bhd',
+        om: 'omr',
+        eg: 'egp'
+    };
+
+    const handleRegionSelect = (c: string) => {
+        setCountry(c);
+        setCurrency(currencyMap[c] || 'sar');
+        setShowRegion(false);
+    };
 
     const fetchUnreadCount = useCallback(async () => {
         try {
@@ -56,6 +73,48 @@ export default function Header() {
                 <Link href="/" className="group shrink-0">
                     <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
                 </Link>
+
+                {/* Region & Currency Selector */}
+                <div className="relative">
+                    <button
+                        onClick={() => setShowRegion(!showRegion)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-slate-900 border border-border-color rounded-md hover:border-primary transition-all group"
+                    >
+                        <MapPin size={12} className="text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-text-main">{t(country as any)} | {t(currency as any)}</span>
+                        <ChevronDown size={10} className="text-gray-400 group-hover:text-primary transition-colors" />
+                    </button>
+
+                    {showRegion && (
+                        <>
+                            <div className="fixed inset-0 z-[105]" onClick={() => setShowRegion(false)}></div>
+                            <div className="absolute top-full mt-2 left-0 w-64 bento-card shadow-2xl p-4 z-[110] animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="space-y-4">
+                                    <div>
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">{t('country')}</h4>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {['sa', 'ae', 'kw', 'qa', 'bh', 'om', 'eg'].map(c => (
+                                                <button
+                                                    key={c}
+                                                    onClick={() => handleRegionSelect(c)}
+                                                    className={`px-2 py-2 text-[10px] font-bold rounded border transition-all ${country === c ? 'border-primary text-primary bg-primary/5' : 'border-border-color text-text-main hover:bg-gray-50 dark:hover:bg-slate-800'}`}
+                                                >
+                                                    {t(c as any)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="pt-3 border-t border-border-color">
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">{t('currency')}</h4>
+                                        <button className="w-full px-2 py-2 text-[10px] font-black text-primary border-2 border-primary bg-primary/5 rounded uppercase tracking-widest">
+                                            {t(currency as any)}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
 
                 {/* Search Bar - Floating Effect Achieved via Sticky Header and Scroll Logic */}
                 <div className="flex-1 max-w-xl relative group">

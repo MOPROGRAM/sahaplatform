@@ -39,29 +39,6 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const scrollRef = useRef<HTMLDivElement>(null);
     // const socketRef = useRef<any>(null);
 
-    const fetchChatData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const data = await conversationsService.getConversation(conversationId);
-            if (data) {
-                const processedMessages = (data.messages || []).map((msg: any) => ({
-                    ...msg,
-                    senderId: msg.senderid || msg.senderId,
-                    messageType: msg.messagetype || msg.messageType,
-                    createdAt: msg.createdat || msg.createdAt,
-                    sender: msg.sender || { name: 'Unknown' }
-                }));
-                setMessages(processedMessages);
-                setParticipants(data.conversation.participants || []);
-                setAdInfo(data.conversation.ad);
-            }
-        } catch (error) {
-            console.error("Failed to fetch chat:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [conversationId]);
-
     useEffect(() => {
         let channel: any;
         if (conversationId) {
@@ -121,6 +98,41 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
+    // Socket functionality disabled for now
+    // const setupSocket = () => {
+    //     const socketUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    //     socketRef.current = io(socketUrl);
+
+    //     socketRef.current.on('receive_message', (message: Message) => {
+    //         if (message.id && !messages.find(m => m.id === message.id)) {
+    //             setMessages(prev => [...prev, message]);
+    //         }
+    //     });
+    // };
+
+    const fetchChatData = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await conversationsService.getConversation(conversationId);
+            if (data) {
+                const processedMessages = (data.messages || []).map((msg: any) => ({
+                    ...msg,
+                    senderId: msg.senderid || msg.senderId,
+                    messageType: msg.messagetype || msg.messageType,
+                    createdAt: msg.createdat || msg.createdAt,
+                    sender: msg.sender || { name: 'Unknown' }
+                }));
+                setMessages(processedMessages);
+                setParticipants(data.conversation.participants || []);
+                setAdInfo(data.conversation.ad);
+            }
+        } catch (error) {
+            console.error("Failed to fetch chat:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [conversationId]);
+
     const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' = 'text', content?: string, fileData?: any) => {
         const messageContent = content || input;
         if (!messageContent.trim() && type === 'text') return;
@@ -134,13 +146,19 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             };
             const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
 
+            // Normalize returned fields (snake_case vs camelCase)
+            const id = sentMessage.id || sentMessage.ID || sentMessage.message_id;
+            const contentResp = sentMessage.content || sentMessage.body || '';
+            const messageType = (sentMessage.messageType as string) || (sentMessage.message_type as string) || type;
+            const createdAt = sentMessage.createdAt || sentMessage.created_at || new Date().toISOString();
+
             // Add message locally immediately
             const newMessage: Message = {
-                id: sentMessage.id,
+                id: id,
                 senderId: user?.id || '',
-                content: sentMessage.content,
-                messageType: (sentMessage.messageType as any) || type,
-                createdAt: sentMessage.createdAt,
+                content: contentResp,
+                messageType: messageType as any,
+                createdAt: createdAt,
                 sender: { name: user?.name || 'You' }
             };
             setMessages(prev => [...prev, newMessage]);
@@ -188,7 +206,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     if (loading) return (
         <div className="flex flex-col h-[500px] bg-white border border-gray-200 rounded-sm items-center justify-center">
             <Loader2 className="animate-spin text-primary" size={32} />
-            <span className="text-[10px] font-black uppercase tracking-widest mt-4 opacity-40">connecting to saha link...</span>
+            <span className="text-[10px] font-black uppercase tracking-widest mt-4 opacity-40">Connecting to Saha Link...</span>
         </div>
     );
 
@@ -225,9 +243,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             {/* Safety Bar */}
             <div className="bg-orange-50 py-1.5 px-3 border-b border-orange-100 flex items-center gap-2">
                 <div className="text-orange-600"><ShieldCheck size={12} /></div>
-                <p className="text-[9px] font-black text-orange-800 uppercase italic tracking-tight">
-                    {language === 'ar' ? 'تنبيه أمني: حافظ دائماً على معاملاتك داخل منصة ساحة.' : 'security alert: always keep transactions within saha platform.'}
-                </p>
+                <p className="text-[9px] font-black text-orange-800 uppercase italic tracking-tight">Security Alert: Always keep transactions within Saha platform.</p>
             </div>
 
             {/* Messages Area - High Density */}
@@ -243,7 +259,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             {msg.messageType === 'location' && (
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-[10px] font-black border-b border-black/5 pb-1 mb-1">
-                                        <MapPin size={12} /> {language === 'ar' ? 'الموقع المشارك' : 'shared location'}
+                                        <MapPin size={12} /> SHARED LOCATION
                                     </div>
                                     <iframe
                                         width="200"
@@ -251,7 +267,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                         className="rounded-xs border-0"
                                         src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) + 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) + 0.01}&layer=mapnik&marker=${msg.content.split('mlat=')[1].split('&')[0]}%2C${msg.content.split('mlon=')[1].split('#')[0]}`}
                                     ></iframe>
-                                    <a href={msg.content} target="_blank" className="text-[9px] underline block mt-1 opacity-70">{language === 'ar' ? 'عرض الخريطة الكاملة' : 'view on full map'}</a>
+                                    <a href={msg.content} target="_blank" className="text-[9px] underline block mt-1 opacity-70">VIEW ON FULL MAP</a>
                                 </div>
                             )}
 
@@ -259,8 +275,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 <div className="flex items-center gap-3 bg-card p-2 rounded-xs">
                                     <FileText size={20} className="text-primary" />
                                     <div className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-black truncate">{msg.fileName || (language === 'ar' ? 'ملف مرفق' : 'attached file')}</span>
-                                        <a href={msg.fileUrl} target="_blank" className="text-[9px] font-black text-primary hover:underline">{language === 'ar' ? 'تحميل الآن' : 'download now'}</a>
+                                        <span className="text-[10px] font-black truncate">{msg.fileName || 'Attached File'}</span>
+                                        <a href={msg.fileUrl} target="_blank" className="text-[9px] font-black text-primary hover:underline">DOWNLOAD NOW</a>
                                     </div>
                                 </div>
                             )}
@@ -278,12 +294,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             </div>
 
             {/* Input Tools - Compressed */}
-            <div className="p-2 bg-card border-t border-border-color flex gap-2 overflow-x-auto no-scrollbar">
-                <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
-                    <MapPin size={12} /> {language === 'ar' ? 'مشاركة الموقع' : 'share location'}
+            <div className="p-2 bg-card border-t border-[#2a2d3a] flex gap-2 overflow-x-auto no-scrollbar">
+                <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
+                    <MapPin size={12} /> SHARE LOCATION
                 </button>
-                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
-                    <Paperclip size={12} /> {language === 'ar' ? 'إرفاق مستند' : 'attach document'}
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                    <Paperclip size={12} /> ATTACH DOCUMENT
                     <input type="file" className="hidden" onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {

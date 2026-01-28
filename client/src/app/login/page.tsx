@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -43,7 +45,7 @@ export default function LoginPage() {
                 {/* Branding Accent */}
                 <div className="flex flex-col items-center mb-8">
                     <Link href="/" className="flex flex-col group items-center">
-                        <span className="text-4xl font-[1000] tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t('siteName')}</span>
+                        <span className="text-4xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t('siteName')}</span>
                         <div className="h-1 w-12 bg-primary mt-2 shadow-md group-hover:w-20 transition-all"></div>
                     </Link>
                 </div>
@@ -51,7 +53,7 @@ export default function LoginPage() {
                 {/* Main Card */}
                 <div className="bento-card !p-10 shadow-premium bg-white border-none">
                     <div className="mb-8 text-center">
-                        <h2 className="text-2xl font-[1000] text-text-main uppercase tracking-tighter">{isLogin ? (language === 'ar' ? 'تسجيل الدخول' : 'Login') : (language === 'ar' ? 'تسجيل حساب' : 'Register')}</h2>
+                        <h2 className="text-2xl font-black text-text-main uppercase tracking-tighter">{isLogin ? (language === 'ar' ? 'تسجيل الدخول' : 'Login') : (language === 'ar' ? 'تسجيل حساب' : 'Register')}</h2>
                         <div className="h-1 w-12 bg-primary mt-3 mx-auto rounded-full"></div>
                     </div>
 
@@ -122,7 +124,7 @@ export default function LoginPage() {
                     <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center gap-4">
                         <button
                             onClick={() => setIsLogin(!isLogin)}
-                            className="text-[11px] font-[1000] text-text-muted hover:text-primary uppercase tracking-widest transition-colors flex items-center gap-2"
+                            className="text-[11px] font-black text-text-muted hover:text-primary uppercase tracking-widest transition-colors flex items-center gap-2"
                         >
                             {isLogin ? t('noAccount') : t('alreadyHaveAccount')}
                             <ChevronRight size={14} className={language === 'ar' ? 'rotate-180' : ''} />

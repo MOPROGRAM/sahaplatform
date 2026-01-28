@@ -35,7 +35,7 @@ export interface City {
 export const countriesService = {
     // الحصول على جميع الدول
     async getCountries(): Promise<Country[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('countries')
             .select(`
                 *,
@@ -54,7 +54,7 @@ export const countriesService = {
 
     // الحصول على دولة واحدة
     async getCountry(id: string): Promise<Country | null> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('countries')
             .select(`
                 *,
@@ -74,7 +74,7 @@ export const countriesService = {
 
     // الحصول على مدن دولة معينة
     async getCitiesByCountry(countryId: string): Promise<City[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('cities')
             .select(`
                 *,
@@ -94,7 +94,7 @@ export const countriesService = {
 
     // الحصول على جميع المدن
     async getCities(): Promise<City[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('cities')
             .select(`
                 *,
@@ -113,7 +113,7 @@ export const countriesService = {
 
     // الحصول على مدينة واحدة
     async getCity(id: string): Promise<City | null> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('cities')
             .select(`
                 *,

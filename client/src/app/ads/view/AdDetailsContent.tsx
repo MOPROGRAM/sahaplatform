@@ -157,7 +157,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
     const lon = ad.longitude;
 
     return (
-        <div className="min-h-screen bg-gray-bg text-text-main">
+        <div className="min-h-screen bg-[#f4f4f4] dark:bg-[#0a0a0a] text-text-main" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
             <div className="max-w-7xl mx-auto px-4 py-3 text-[10px] text-text-muted flex items-center gap-1">
