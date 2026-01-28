@@ -62,8 +62,8 @@ export default function RootLayout({
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>
             <body>
-                <LanguageProvider initialLanguage={lang}>
-                    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+                <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+                    <LanguageProvider initialLanguage={lang}>
                         <ErrorBoundary>
                             <div className="flex min-h-screen bg-gray-bg">
                                 <main className="flex-1 w-full">
@@ -77,8 +77,8 @@ export default function RootLayout({
                                 </main>
                             </div>
                         </ErrorBoundary>
-                    </ThemeProvider>
-                </LanguageProvider>
+                    </LanguageProvider>
+                </ThemeProvider>
             </body>
         </html>
     );
