@@ -101,7 +101,7 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
 
     const t = (key: TranslationKey) => getTranslation(key, language);
 
-    // Hydration guard removed to prevent white flash. 
+    // Hydration guard removed to prevent white flash.
     // Initial state is now synced with server via initialLanguage prop.
 
     return (
@@ -135,3 +135,4 @@ export function useLanguage() {
     }
     return context;
 }
+

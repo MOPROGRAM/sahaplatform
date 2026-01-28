@@ -572,7 +572,7 @@ export const translations = {
 };
 
 export type Language = 'ar' | 'en';
-export type TranslationKey = keyof typeof translations.ar | 'noImage' | 'notificationCenter' | 'sahaAlerts' | 'noNotifications' | 'systemIdling' | 'back' | 'editAd' | 'updateAdDetails' | 'generalInfo' | 'detailedDescription' | 'locationAndMedia' | 'enableLocation' | 'addPhoto' | 'saveChanges';
+export type TranslationKey = keyof typeof translations.ar;
 
 export const getTranslation = (key: TranslationKey, lang: Language = 'ar'): string => {
     // Cast to keyof typeof translations.ar for index signature check

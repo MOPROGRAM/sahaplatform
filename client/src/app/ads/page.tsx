@@ -37,6 +37,7 @@ interface Ad {
     views?: number;
     author?: { name?: string };
     is_boosted?: boolean;
+    currency?: string | { code: string; symbol: string; };
 }
 
 const AdsSkeleton = () => (
@@ -239,7 +240,7 @@ function AdsContent() {
                                 id={ad.id}
                                 title={ad.title}
                                 price={ad.price || 0}
-                                currency="SAR"
+                                currency={ad.currency}
                                 location={ad.location || ''}
                                 images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
                                 createdAt={ad.created_at}

@@ -120,19 +120,19 @@ export default function AdCard({
                 </h3>
 
                 {subCategory && (
-                    <p className="text-[10px] sm:text-xs text-text-muted font-medium mb-1 line-clamp-1"> {/* Adjusted font size */}
+                    <p className="text-[10px] text-text-muted font-medium mb-1 line-clamp-1">
                         {(t as any)[subCategory] || subCategory}
                     </p>
                 )}
 
                 {currentDescription && (
-                    <p className="text-[10px] sm:text-xs text-text-muted line-clamp-2 leading-tight mb-1"> {/* Adjusted font size */}
+                    <p className="text-[10px] text-text-muted line-clamp-2 leading-tight mb-1">
                         {currentDescription.length > 100 ? currentDescription.substring(0, 100) + "..." : currentDescription}
                     </p>
                 )}
 
                 {/* Specs Grid */}
-                <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 text-[8px] sm:text-[10px] text-text-muted ${isVertical ? "mt-auto mb-1" : "mt-1 mb-2"}`}> {/* Adjusted font size */}
+                <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 text-[8px] text-text-muted ${isVertical ? "mt-auto mb-1" : "mt-1 mb-2"}`}>
                     <div className="flex items-center gap-0.5 font-normal">
                         <MapPin size={8} className="text-gray-400" />
                         <span className="truncate">{location?.split(",")[0].trim()}</span>
@@ -146,11 +146,13 @@ export default function AdCard({
                 {/* Price & Category Footer */}
                 <div className="mt-auto flex justify-between items-end pt-1 border-t border-border-color/50">
                     <div className="flex items-baseline gap-0.5 text-text-main">
-                        <span className="text-xs font-black">{price?.toLocaleString()}</span>
-                        <span className="text-[8px] font-normal text-text-muted uppercase">{currency}</span>
+                        <span className="text-xs font-black">
+                            {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
+                        </span>
+                        <span className="text-[8px] font-normal text-text-muted uppercase">{currencyCode}</span>
                     </div>
                     {category && (
-                        <span className="text-[8px] sm:text-[10px] font-bold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 px-1 py-0.5 rounded-sm uppercase flex items-center gap-0.5"> {/* Adjusted font size */}
+                        <span className="text-[8px] font-bold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 px-1 py-0.5 rounded-sm uppercase flex items-center gap-0.5">
                             {getCategoryIcon(category)}
                             {(t as any)[category] || category}
                         </span>

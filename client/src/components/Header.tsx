@@ -71,7 +71,7 @@ export default function Header() {
             <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-6">
                 {/* Brand */}
                 <Link href="/" className="group shrink-0" prefetch={false}>
-                    <span className="text-2xl sm:text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
+                    <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
                 </Link>
 
                 {/* Region & Currency Selector */}

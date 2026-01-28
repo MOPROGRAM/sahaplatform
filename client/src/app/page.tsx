@@ -175,7 +175,7 @@ export default function HomePage() {
                                         id={ad.id}
                                         title={ad.title}
                                         price={ad.price || 0}
-                                        currency={currency.toUpperCase()}
+                                        currency={ad.currency || currency.toUpperCase()}
                                         location={ad.city?.name || ad.location || ''}
                                         images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
                                         createdAt={ad.created_at}

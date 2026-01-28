@@ -77,6 +77,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         title: adData.title || '',
                         description: adData.description || '',
                         price: adData.price || 0,
+                        currency: adData.currency,
                         category: adData.category || '',
                         location: adData.location || '',
                         latitude: adData.latitude ?? undefined,
@@ -182,7 +183,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                     <div className="flex items-baseline gap-1 text-primary">
                                         <span className="text-3xl font-black italic tracking-tighter">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)}</span>
                                         <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                                            SAR
+                                            {typeof ad.currency === 'object' ? ad.currency.code : (ad.currency || 'SAR')}
                                         </span>
                                     </div>
                                     {ad.created_at && <span className="text-[9px] font-black text-text-muted mt-1 uppercase italic tracking-tighter">{language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}</span>}
