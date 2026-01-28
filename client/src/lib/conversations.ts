@@ -87,10 +87,10 @@ export const conversationsService = {
 
         return (conversations || []).map(conv => ({
             ...conv,
-            last_message: conv.lastMessage, // Map camelCase to expected interface
-            last_message_time: conv.lastMessageTime,
-            created_at: conv.createdAt,
-            updated_at: conv.updatedAt,
+            last_message: conv.last_message, // Corrected property name from database
+            last_message_time: conv.last_message_time, // Corrected property name from database
+            created_at: conv.created_at,
+            updated_at: conv.updated_at,
             participants: conv.participants?.map((p: any) => p.user) || []
         }));
     },

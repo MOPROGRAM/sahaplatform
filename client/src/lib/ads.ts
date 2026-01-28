@@ -70,7 +70,7 @@ export const adsService = {
             .from('ads')
             .select(`
                 *,
-                author:User!author_id(id, name, email, phone),
+                author:users!author_id(id, name, email),
                 city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
