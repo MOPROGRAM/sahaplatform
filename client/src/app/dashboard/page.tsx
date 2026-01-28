@@ -24,20 +24,8 @@ import { useLanguage } from "@/lib/language-context";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-interface Ad {
-    id: string;
-    title: string;
-    price: number;
-    category: string;
-    is_active: boolean;
-    views: number;
-    currency?: {
-        code: string;
-    };
-}
-
 export default function DashboardPage() {
-    const { language, t, currency } = useLanguage();
+    const { language, t } = useLanguage();
     const { user, logout } = useAuthStore();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('overview');
@@ -68,7 +56,7 @@ export default function DashboardPage() {
     const fetchDashboardData = useCallback(async () => {
         try {
             const myAds = await adsService.getMyAds();
-            const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.is_active) : [];
+            const activeAdsOnly = Array.isArray(myAds) ? myAds.filter((ad: any) => ad.isActive) : [];
             setAds(activeAdsOnly as any);
 
             const totalViews = activeAdsOnly.reduce((acc: number, ad: any) => acc + (ad.views || 0), 0);
@@ -98,7 +86,6 @@ export default function DashboardPage() {
     const deleteAd = async (adId: string) => {
         try {
             await adsService.deleteAd(adId);
-            // Refresh the list
             fetchDashboardData();
             setDeleteModal({ open: false, adId: null, adTitle: '' });
         } catch (error) {
@@ -122,7 +109,6 @@ export default function DashboardPage() {
             <Header />
 
             <div className="max-w-[1920px] mx-auto w-full flex-1 flex flex-col md:flex-row gap-4 p-4">
-                {/* Left Mini Sidebar - Professional Tech Style */}
                 <aside className="w-full md:w-56 space-y-3 shrink-0">
                     <div className="depth-card p-5 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform"></div>
@@ -130,7 +116,7 @@ export default function DashboardPage() {
                             <div className="w-14 h-14 bg-white border border-primary/20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
                                 <span className="text-lg font-black text-primary italic">{user.name?.substring(0, 2).toUpperCase()}</span>
                             </div>
-                            <h4 className="text-[12px] font-black text-secondary uppercase tracking-tight truncate">{user.name}</h4>
+                            <h4 className="text-[12px] font-black text-text-main uppercase tracking-tight truncate">{user.name}</h4>
                             <div className="flex items-center justify-center gap-1 mt-1 text-primary">
                                 <ShieldCheck size={12} className="fill-primary/10" />
                                 <span className="text-[8px] font-black uppercase tracking-widest">{user.role} MERCHANT</span>
@@ -161,16 +147,13 @@ export default function DashboardPage() {
 
                     <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-card hover:bg-red-50 transition-all border border-red-100 rounded-sm">
                         <LogOut size={14} />
-                        <span>Sign Out System</span>
+                        <span>{t('logout')}</span>
                     </button>
                 </aside>
 
-                {/* Main Content Area */}
                 <main className="flex-1 flex flex-col gap-4">
-                    {/* Overview Tab */}
                     {activeTab === 'overview' && (
                         <>
-                            {/* Compact Stats Grid */}
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                                 {stats.map((stat, i) => (
                                     <div key={i} className="glass-card p-4 flex flex-col gap-2 relative overflow-hidden group">
@@ -179,19 +162,18 @@ export default function DashboardPage() {
                                             {stat.icon}
                                         </span>
                                         <div className="flex flex-col">
-                                            <span className="text-2xl font-black italic tracking-tighter text-secondary leading-none">{stat.value}</span>
+                                            <span className="text-2xl font-black italic tracking-tighter text-text-main leading-none">{stat.value}</span>
                                             <span className="text-[9px] font-black text-text-muted uppercase tracking-widest mt-1 opacity-60">{stat.label} Matrix</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Listings Table - High Density Professional */}
                             <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
                                 <div className="px-4 py-3 bg-card border-b border-border-color flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <Package size={14} className="text-primary" />
-                                        <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-secondary">Operational Fleet / Listings</h3>
+                                        <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">Operational Fleet / Listings</h3>
                                     </div>
                                     <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
                                         <PlusCircle size={12} /> ADD UNIT
@@ -205,14 +187,14 @@ export default function DashboardPage() {
                                         </div>
                                     ) : ads.length > 0 ? (
                                         ads.map(ad => (
-                                            <div key={ad.id} className={`depth-card p-4 ${ad.is_boosted ? 'bento-large' : 'bento-small'}`}>
+                                            <div key={ad.id} className={`depth-card p-4 ${ad.isBoosted ? 'bento-large' : 'bento-small'}`}>
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 bg-card border border-border-color rounded-lg flex items-center justify-center shrink-0">
                                                             <Package size={18} className="text-text-muted" />
                                                         </div>
                                                         <div className="min-w-0 flex-1">
-                                                            <h4 className="font-black text-white block truncate text-sm">{ad.title}</h4>
+                                                            <h4 className="font-black text-text-main block truncate text-sm">{ad.title}</h4>
                                                             <div className="flex items-center gap-2 mt-1">
                                                                 <span className="text-primary font-bold text-sm">
                                                                     {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}
@@ -221,8 +203,8 @@ export default function DashboardPage() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                        {ad.is_active ? 'Active' : 'Paused'}
+                                                    <div className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                        {ad.isActive ? 'Active' : 'Paused'}
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center justify-between">
@@ -233,11 +215,11 @@ export default function DashboardPage() {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <Clock size={12} />
-                                                            {getRelativeTime(ad.created_at)}
+                                                            {getRelativeTime(ad.createdAt)}
                                                         </span>
                                                     </div>
                                                     <div className="flex gap-2">
-                                                        <Link href={`/ads/view?id=${ad.id}`} className="px-3 py-1 bg-secondary text-white rounded text-xs font-bold hover:bg-black transition-all">
+                                                        <Link href={`/ads/${ad.id}`} className="px-3 py-1 bg-secondary text-white rounded text-xs font-bold hover:bg-black transition-all">
                                                             View
                                                         </Link>
                                                         <Link href={`/ads/${ad.id}/edit`} className="px-3 py-1 bg-blue-500 text-white rounded text-xs font-bold hover:bg-blue-600 transition-all">
@@ -269,13 +251,12 @@ export default function DashboardPage() {
                         </>
                     )}
 
-                    {/* Listings Tab */}
                     {activeTab === 'listings' && (
                         <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
                             <div className="px-4 py-3 bg-card/60 border-b border-border-color flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Package size={14} className="text-primary" />
-                                    <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-secondary">My Listings</h3>
+                                    <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">My Listings</h3>
                                 </div>
                                 <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
                                     <PlusCircle size={12} /> ADD UNIT
@@ -304,7 +285,7 @@ export default function DashboardPage() {
                                                                 <Package size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
                                                             </div>
                                                             <div className="min-w-0">
-                                                                <span className="font-black text-secondary block truncate group-hover:text-primary transition-colors uppercase tracking-tight">{ad.title}</span>
+                                                                <span className="font-black text-text-main block truncate group-hover:text-primary transition-colors uppercase tracking-tight">{ad.title}</span>
                                                                 <div className="flex items-center gap-2 mt-0.5">
                                                                     <span className="text-primary font-black italic">{new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price)} {ad.currency?.code || 'SAR'}</span>
                                                                     <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
@@ -315,14 +296,14 @@ export default function DashboardPage() {
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
                                                         <div className="flex flex-col items-center gap-1">
-                                                            <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.is_active ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                                {ad.is_active ? 'Operation: Active' : 'Operation: Pause'}
+                                                            <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm ${ad.isActive ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                                {ad.isActive ? 'Operation: Active' : 'Operation: Pause'}
                                                             </span>
                                                             <span className="text-[7px] font-black text-gray-300 uppercase italic">Code: {ad.id?.substring(0, 8)}</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
-                                                        <span className="text-[13px] font-black text-secondary">{ad.views || 0}</span>
+                                                        <span className="text-[13px] font-black text-text-main">{ad.views || 0}</span>
                                                     </td>
                                                     <td className="px-6 py-4 text-right">
                                                         <div className="flex items-center gap-1">
@@ -355,34 +336,32 @@ export default function DashboardPage() {
                         </div>
                     )}
 
-                    {/* Messages Tab */}
                     {activeTab === 'messages' && (
-                        <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm text-center">
+                        <div className="bg-white dark:bg-[#1a1a1a] border border-border-color p-6 rounded-sm shadow-sm text-center">
                             <MessageSquare size={48} className="text-gray-300 mx-auto mb-4" />
                             <h3 className="text-lg font-black text-text-muted uppercase tracking-tight">
-                                {language === 'ar' ? 'الرسائل' : 'Messages'}
+                                {t('messages')}
                             </h3>
                             <p className="text-[12px] text-gray-500 mt-2">
-                                {language === 'ar' ? 'لا توجد رسائل جديدة' : 'No new messages'}
+                                {language === 'ar' ? 'لا توجد رسائل جديدة' : 'no new messages'}
                             </p>
                         </div>
                     )}
 
-                    {/* Settings Tab */}
                     {activeTab === 'settings' && (
                         <div className="space-y-4">
-                            <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
-                                <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">
-                                    {language === 'ar' ? 'إعدادات الحساب' : 'Account Settings'}
+                            <div className="bg-white dark:bg-[#1a1a1a] border border-border-color p-6 rounded-sm shadow-sm">
+                                <h3 className="text-lg font-black text-text-main uppercase tracking-tight mb-4">
+                                    {t('settings')}
                                 </h3>
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-sm">
+                                    <div className="flex items-center justify-between p-4 border border-border-color rounded-sm">
                                         <div>
-                                            <h4 className="font-black text-secondary text-[14px]">
-                                                {language === 'ar' ? 'الإشعارات' : 'Notifications'}
+                                            <h4 className="font-black text-text-main text-[14px]">
+                                                {t('notifications')}
                                             </h4>
                                             <p className="text-[10px] text-gray-500">
-                                                {language === 'ar' ? 'تلقي إشعارات حول الإعلانات والرسائل' : 'Receive notifications about ads and messages'}
+                                                {language === 'ar' ? 'تلقي إشعارات حول الإعلانات والرسائل' : 'receive notifications about ads and messages'}
                                             </p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -391,13 +370,13 @@ export default function DashboardPage() {
                                         </label>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-sm">
+                                    <div className="flex items-center justify-between p-4 border border-border-color rounded-sm">
                                         <div>
-                                            <h4 className="font-black text-secondary text-[14px]">
-                                                {language === 'ar' ? 'الخصوصية' : 'Privacy'}
+                                            <h4 className="font-black text-text-main text-[14px]">
+                                                {language === 'ar' ? 'الخصوصية' : 'privacy'}
                                             </h4>
                                             <p className="text-[10px] text-gray-500">
-                                                {language === 'ar' ? 'إظهار معلومات الاتصال للجميع' : 'Show contact information to everyone'}
+                                                {language === 'ar' ? 'إظهار معلومات الاتصال للجميع' : 'show contact information to everyone'}
                                             </p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -413,24 +392,23 @@ export default function DashboardPage() {
             </div>
             <Footer />
 
-            {/* Delete Confirmation Modal */}
             {deleteModal.open && (
                 <>
                     <div className="fixed inset-0 bg-solid-overlay z-[50] flex items-center justify-center p-4">
-                        <div className="bg-white border-2 border-gray-200 rounded-md shadow-2xl max-w-md w-full p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                        <div className="bg-white dark:bg-[#1a1a1a] border-2 border-border-color rounded-md shadow-2xl max-w-md w-full p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                                     <Trash2 size={20} className="text-red-500" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-black text-secondary uppercase tracking-tight">{language === 'ar' ? 'تأكيد الحذف' : 'Confirm Delete'}</h3>
-                                    <p className="text-sm text-gray-600">{language === 'ar' ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this ad?'}</p>
+                                    <h3 className="text-lg font-black text-text-main uppercase tracking-tight">{t('confirmDelete')}</h3>
+                                    <p className="text-sm text-gray-600">{t('deleteWarning')}</p>
                                 </div>
                             </div>
 
                             <div className="bg-card p-3 rounded-md mb-6">
-                                <p className="text-sm font-bold text-secondary">{deleteModal.adTitle}</p>
-                                <p className="text-xs text-gray-500 mt-1">{language === 'ar' ? 'لا يمكن التراجع عن هذا الإجراء' : 'This action cannot be undone'}</p>
+                                <p className="text-sm font-bold text-text-main">{deleteModal.adTitle}</p>
+                                <p className="text-xs text-gray-500 mt-1">{t('thisActionCannotBeUndone')}</p>
                             </div>
 
                             <div className="flex gap-3 justify-end">
@@ -438,13 +416,13 @@ export default function DashboardPage() {
                                     onClick={closeDeleteModal}
                                     className="px-4 py-2 border border-border-color text-text-main rounded-md hover:bg-card/60 transition-all"
                                 >
-                                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                    {t('cancel')}
                                 </button>
                                 <button
                                     onClick={() => deleteAd(deleteModal.adId!)}
                                     className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all"
                                 >
-                                    {language === 'ar' ? 'حذف' : 'Delete'}
+                                    {t('delete')}
                                 </button>
                             </div>
                         </div>

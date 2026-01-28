@@ -28,7 +28,7 @@ import { useLanguage } from "@/lib/language-context";
 
 export default function AdminDashboard() {
     const { user, logout } = useAuthStore();
-    const { language, t } = useLanguage();
+    const { language } = useLanguage();
     const router = useRouter();
 
     const [loading, setLoading] = useState(true);
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                                                                 <div className="w-10 h-10 bg-card border border-border-color flex items-center justify-center text-[10px] font-black italic text-gray-600">ID.{i + 1}</div>
                                                                 <div className="flex flex-col">
                                                                     <span className="text-[12px] font-black group-hover:text-primary transition-colors">{ad.title}</span>
-                                                                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{ad.category} • {ad.location}</span>
+                                                                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{ad.category} &bull; {ad.location}</span>
                                                                 </div>
                                                             </div>
                                                             <Link href={`/ads/view?id=${ad.id}`} target="_blank" className="w-8 h-8 flex items-center justify-center bg-card rounded-sm hover:bg-primary hover:text-black transition-all">
@@ -388,14 +388,14 @@ export default function AdminDashboard() {
                                                         {view === 'ads' && (
                                                             <div className="flex flex-col">
                                                                 <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors">{item.title}</span>
-                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.category} • {item.location}</span>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.category} &bull; {item.location}</span>
                                                                 <span className="text-[8px] font-black text-gray-600 uppercase mt-1">ID: {item.id}</span>
                                                             </div>
                                                         )}
                                                         {view === 'subscriptions' && (
                                                             <div className="flex flex-col">
                                                                 <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors truncate max-w-[200px]">{item.package_name}</span>
-                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.user_name} • {item.user_phone}</span>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.user_name} &bull; {item.user_phone}</span>
                                                                 <span className="text-[10px] font-black text-primary uppercase mt-1">{item.package_price}</span>
                                                             </div>
                                                         )}
