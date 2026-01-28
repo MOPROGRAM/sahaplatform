@@ -22,7 +22,8 @@ import {
     X,
     Trash2,
     ExternalLink,
-    Sparkles
+    Sparkles,
+    Flag
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -39,11 +40,12 @@ export default function AdminDashboard() {
         totalUsers: 0,
         totalAds: 0,
         pendingSubscriptions: 0,
-        activeSubscriptions: 0
+        activeSubscriptions: 0,
+        totalReports: 0
     });
 
     const [dataList, setDataList] = useState<any[]>([]);
-    const [view, setView] = useState('overview'); // overview, users, ads, subscriptions
+    const [view, setView] = useState('overview'); // overview, users, ads, subscriptions, reports
     const [searchTerm, setSearchTerm] = useState('');
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -51,18 +53,20 @@ export default function AdminDashboard() {
         setLoading(true);
         try {
             if (view === 'overview') {
-                const [usersCount, adsCount, subsPending, subsActive] = await Promise.all([
+                const [usersCount, adsCount, subsPending, subsActive, reportsCount] = await Promise.all([
                     (supabase as any).from('users').select('*', { count: 'exact', head: true }),
                     (supabase as any).from('ads').select('*', { count: 'exact', head: true }),
                     (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-                    (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'completed')
+                    (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+                    (supabase as any).from('reports').select('*', { count: 'exact', head: true })
                 ]);
 
                 setStats({
                     totalUsers: usersCount.count || 0,
                     totalAds: adsCount.count || 0,
                     pendingSubscriptions: subsPending.count || 0,
-                    activeSubscriptions: subsActive.count || 0
+                    activeSubscriptions: subsActive.count || 0,
+                    totalReports: reportsCount.error ? 0 : (reportsCount.count || 0)
                 });
 
                 // Fetch recent ads for overview
@@ -91,6 +95,17 @@ export default function AdminDashboard() {
                     .select('*')
                     .order('created_at', { ascending: false });
                 setDataList(data || []);
+            } else if (view === 'reports') {
+                 const { data, error } = await (supabase as any)
+                    .from('reports')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) {
+                    console.warn("Reports table might not exist", error);
+                    setDataList([]); 
+                } else {
+                    setDataList(data || []);
+                }
             }
         } catch (error) {
             console.error("Fetch failed:", error);
@@ -100,8 +115,8 @@ export default function AdminDashboard() {
     }, [view]);
 
     useEffect(() => {
-        // Strict Admin Check
-        if (!user || user.role !== 'ADMIN') {
+        // Strict Admin Check - Allow motwasel@yahoo.com
+        if (!user || (user.role !== 'ADMIN' && user.email !== 'motwasel@yahoo.com')) {
             router.push('/');
             return;
         }
@@ -157,7 +172,20 @@ export default function AdminDashboard() {
         }
     };
 
-    if (!user || user.role !== 'ADMIN') return null;
+    const handleResolveReport = async (id: string) => {
+        setActionLoading(id);
+        try {
+            // Assuming we delete the report when resolved
+            await (supabase as any).from('reports').delete().eq('id', id);
+            fetchDashboardData();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    if (!user || (user.role !== 'ADMIN' && user.email !== 'motwasel@yahoo.com')) return null;
 
     return (
         <div className="min-h-screen bg-gray-bg text-[#e1e1e1] flex flex-col font-sans" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -198,6 +226,7 @@ export default function AdminDashboard() {
                     {[
                         { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'DASHBOARD OVERVIEW', icon: <BarChart3 size={18} /> },
                         { id: 'subscriptions', label: language === 'ar' ? 'طلبات الاشتراكات' : 'PAID AD REQUESTS', icon: <DollarSign size={18} />, badge: stats.pendingSubscriptions },
+                        { id: 'reports', label: language === 'ar' ? 'البلاغات' : 'USER REPORTS', icon: <Flag size={18} />, badge: stats.totalReports > 0 ? stats.totalReports : undefined },
                         { id: 'ads', label: language === 'ar' ? 'إدارة الإعلانات' : 'AD MODERATION', icon: <Package size={18} /> },
                         { id: 'users', label: language === 'ar' ? 'قاعدة المستخدمين' : 'USER DATABASE', icon: <Users size={18} /> },
                     ].map((item) => (
@@ -252,6 +281,7 @@ export default function AdminDashboard() {
                                     <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2 italic">
                                         {view === 'overview' && (language === 'ar' ? 'النظرة العامة' : 'SYSTEM STATUS')}
                                         {view === 'subscriptions' && (language === 'ar' ? 'الاشتراكات المدفوعة' : 'FINANCIAL OPS')}
+                                        {view === 'reports' && (language === 'ar' ? 'بلاغات المستخدمين' : 'USER REPORTS')}
                                         {view === 'ads' && (language === 'ar' ? 'الرقابة على الإعلانات' : 'CONTENT MODERATION')}
                                         {view === 'users' && (language === 'ar' ? 'قاعدة البيانات' : 'USER INFRASTRUCTURE')}
                                     </h2>
@@ -377,6 +407,7 @@ export default function AdminDashboard() {
                                             {dataList.filter(item =>
                                                 view === 'users' ? (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) || item.email?.toLowerCase().includes(searchTerm.toLowerCase())) :
                                                     view === 'ads' ? (item.title?.toLowerCase().includes(searchTerm.toLowerCase())) :
+                                                    view === 'reports' ? (item.reason?.toLowerCase().includes(searchTerm.toLowerCase()) || item.ad_id?.includes(searchTerm)) :
                                                         (item.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) || item.package_name?.toLowerCase().includes(searchTerm.toLowerCase()))
                                             ).map((item) => (
                                                 <tr key={item.id} className="hover:bg-card transition-colors group">
@@ -400,6 +431,18 @@ export default function AdminDashboard() {
                                                                 <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors truncate max-w-[200px]">{item.package_name}</span>
                                                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.user_name} &bull; {item.user_phone}</span>
                                                                 <span className="text-[10px] font-black text-primary uppercase mt-1">{item.package_price}</span>
+                                                                {item.message && item.message.includes('Payment Verified') && (
+                                                                    <span className="text-[8px] font-mono text-green-500 mt-1 bg-green-500/5 p-1 rounded border border-green-500/10 block whitespace-pre-wrap">
+                                                                        {item.message.split('[System]')[1] || 'Payment Info Available'}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {view === 'reports' && (
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors">{item.reason || 'No Reason Provided'}</span>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">AD ID: {item.ad_id}</span>
+                                                                <span className="text-[8px] font-black text-red-500 uppercase mt-1">REPORT ID: {item.id}</span>
                                                             </div>
                                                         )}
                                                     </td>
@@ -433,6 +476,11 @@ export default function AdminDashboard() {
                                                                     }`}>
                                                                     {item.status}
                                                                 </span>
+                                                            </div>
+                                                        )}
+                                                        {view === 'reports' && (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">PENDING REVIEW</span>
                                                             </div>
                                                         )}
                                                     </td>
@@ -483,6 +531,29 @@ export default function AdminDashboard() {
                                                                     >
                                                                         <X size={12} />
                                                                         Reject
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {view === 'reports' && (
+                                                                <>
+                                                                    <Link href={`/ads/view?id=${item.ad_id}`} target="_blank" className="w-8 h-8 flex items-center justify-center rounded-sm bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all">
+                                                                        <ExternalLink size={16} />
+                                                                    </Link>
+                                                                    <button
+                                                                        disabled={actionLoading === item.id}
+                                                                        onClick={() => handleResolveReport(item.id)}
+                                                                        className="w-8 h-8 flex items-center justify-center rounded-sm bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white transition-all"
+                                                                        title="Resolve (Delete Report)"
+                                                                    >
+                                                                        <Check size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        disabled={actionLoading === item.id}
+                                                                        onClick={() => handleDeleteAd(item.ad_id)}
+                                                                        className="w-8 h-8 flex items-center justify-center rounded-sm bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                                                                        title="Delete Ad"
+                                                                    >
+                                                                        <Trash2 size={16} />
                                                                     </button>
                                                                 </>
                                                             )}

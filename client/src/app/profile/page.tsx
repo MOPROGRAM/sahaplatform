@@ -177,6 +177,13 @@ export default function ProfilePage() {
                                     {user.userType === 'PROVIDER' ? (language === 'ar' ? 'مقدم خدمة' : 'PROVIDER') : (language === 'ar' ? 'باحث' : 'SEEKER')}
                                 </span>
                             </div>
+                            {/* Admin Link for motwasel@yahoo.com */}
+                            {user.email === 'motwasel@yahoo.com' && (
+                                <Link href="/admin" className="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-red-600/10 text-red-600 border border-red-600/20 rounded-full hover:bg-red-600 hover:text-white transition-all group/admin">
+                                    <ShieldCheck size={12} />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">{language === 'ar' ? 'لوحة التحكم الرئيسية' : 'MASTER ADMIN'}</span>
+                                </Link>
+                            )}
                         </div>
                     </div>
 

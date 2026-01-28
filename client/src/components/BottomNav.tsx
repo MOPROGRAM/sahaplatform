@@ -1,4 +1,4 @@
-ي"use client";
+"use client";
 
 import { Home, Search, PlusSquare, MessageSquare, UserCircle, Moon, Sun } from "lucide-react"; // Added Moon, Sun
 import Link from "next/link";

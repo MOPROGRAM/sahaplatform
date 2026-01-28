@@ -228,11 +228,27 @@ export default function Header() {
             </div>
 
             {/* Promoted Ads Banner (sticky under header content) */}
-            {!pathname?.startsWith('/help') && !pathname?.startsWith('/advertise') && (
-                <div className="w-full">
-                    <PromotedBanner />
-                </div>
-            )}
+            {(() => {
+                const hiddenPaths = [
+                    '/help', 
+                    '/advertise', 
+                    '/profile', 
+                    '/messages', 
+                    '/dashboard', 
+                    '/ads/my', 
+                    '/settings', 
+                    '/notifications',
+                    '/login',
+                    '/admin'
+                ];
+                const shouldShow = !hiddenPaths.some(path => pathname?.startsWith(path));
+                
+                return shouldShow ? (
+                    <div className="w-full">
+                        <PromotedBanner />
+                    </div>
+                ) : null;
+            })()}
         </header>
     );
 }

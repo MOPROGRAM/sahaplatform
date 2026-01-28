@@ -2,7 +2,7 @@
 
 export const runtime = 'edge';
 
-import { ArrowLeft, Star, MessageCircle, Mail, Phone, Zap, CheckCircle2, Loader2, Send } from 'lucide-react';
+import { ArrowLeft, Star, MessageCircle, Mail, Phone, Zap, CheckCircle2, Loader2, Send, CreditCard, Lock } from 'lucide-react';
 import { useLanguage } from '@/lib/language-context';
 import { useAuthStore } from "@/store/useAuthStore";
 import { useState } from "react";
@@ -17,11 +17,15 @@ export default function AdvertisePage() {
     const [selectedPlan, setSelectedPlan] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [paymentStep, setPaymentStep] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
-        message: ''
+        message: '',
+        cardNumber: '',
+        expiry: '',
+        cvc: ''
     });
 
     const contactEmail = t('contactEmail');
@@ -94,9 +98,23 @@ export default function AdvertisePage() {
             ...formData,
             name: user.name || '',
             email: user.email || '',
-            phone: (user as any).phone || ''
+            phone: (user as any).phone || '',
+            cardNumber: '',
+            expiry: '',
+            cvc: ''
         });
         setShowForm(true);
+        setPaymentStep(false);
+        setMessage('');
+    };
+
+    const handleNextStep = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.name || !formData.email || !formData.phone) {
+            setMessage(language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill all required fields');
+            return;
+        }
+        setPaymentStep(true);
         setMessage('');
     };
 
@@ -105,7 +123,13 @@ export default function AdvertisePage() {
         setLoading(true);
         setMessage('');
 
+        // Simulate Payment Processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         try {
+            const transactionId = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+            const finalMessage = `${formData.message}\n\n[System] Payment Verified via Visa\nTransaction ID: ${transactionId}\nCard: **** **** **** ${formData.cardNumber.slice(-4) || '0000'}`;
+
             const response = await fetch(`${window.location.origin}/api/subscribe`, {
                 method: 'POST',
                 headers: {
@@ -117,7 +141,7 @@ export default function AdvertisePage() {
                     userPhone: formData.phone,
                     packageName: selectedPlan.name,
                     packagePrice: selectedPlan.price,
-                    message: formData.message,
+                    message: finalMessage,
                     userId: user?.id
                 }),
             });
@@ -263,63 +287,138 @@ export default function AdvertisePage() {
                                 <p className="opacity-90 text-sm">{selectedPlan?.name} - {selectedPlan?.price}</p>
                             </div>
 
-                            <form onSubmit={handleFormSubmit} className="p-4 space-y-3">
+                            <form onSubmit={paymentStep ? handleFormSubmit : handleNextStep} className="p-4 space-y-3">
                                 {message && (
                                     <div className={`p-3 rounded-lg text-xs font-bold ${message.includes('نجاح') || message.includes('successfully') ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
                                         {message}
                                     </div>
                                 )}
 
-                                <div>
-                                    <label className="block text-xs font-black text-text-muted mb-1 uppercase tracking-wider">{t("name")}</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                    />
-                                </div>
+                                {!paymentStep ? (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-black text-text-muted mb-1 uppercase tracking-wider">{t("name")}</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={formData.name}
+                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                            />
+                                        </div>
 
-                                <div>
-                                    <label className="block text-sm font-black text-text-muted mb-1 uppercase tracking-wider">{t("email")}</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                    />
-                                </div>
+                                        <div>
+                                            <label className="block text-sm font-black text-text-muted mb-1 uppercase tracking-wider">{t("email")}</label>
+                                            <input
+                                                type="email"
+                                                required
+                                                value={formData.email}
+                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                            />
+                                        </div>
 
-                                <div>
-                                    <label className="block text-sm font-black text-text-muted mb-1 uppercase tracking-wider">{t("phone")}</label>
-                                    <input
-                                        type="tel"
-                                        value={formData.phone}
-                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                        className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                    />
-                                </div>
+                                        <div>
+                                            <label className="block text-sm font-black text-text-muted mb-1 uppercase tracking-wider">{t("phone")}</label>
+                                            <input
+                                                type="tel"
+                                                required
+                                                value={formData.phone}
+                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                            />
+                                        </div>
 
-                                <div>
-                                    <label className="block text-sm font-black text-text-muted mb-1 uppercase tracking-wider">{t("messageOptional")}</label>
-                                    <textarea
-                                        rows={3}
-                                        value={formData.message}
-                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                        className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
-                                    />
-                                </div>
+                                        <div>
+                                            <label className="block text-sm font-black text-text-muted mb-1 uppercase tracking-wider">{t("messageOptional")}</label>
+                                            <textarea
+                                                rows={3}
+                                                value={formData.message}
+                                                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                                className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="space-y-4 animate-in fade-in slide-in-from-right duration-300">
+                                        <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2 mb-2">
+                                            <Lock size={16} />
+                                            <span className="text-xs font-black uppercase tracking-widest">{language === 'ar' ? 'دفع آمن ومحمي' : 'SECURE PAYMENT'}</span>
+                                        </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full bg-primary text-white py-3 rounded-lg font-black uppercase tracking-widest hover:bg-primary-hover shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 text-sm"
-                                >
-                                    {loading ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
-                                    {loading ? t("sending") : t("sendRequest")}
-                                </button>
+                                        <div>
+                                            <label className="block text-xs font-black text-text-muted mb-1 uppercase tracking-wider">{language === 'ar' ? 'رقم البطاقة' : 'CARD NUMBER'}</label>
+                                            <div className="relative">
+                                                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    placeholder="0000 0000 0000 0000"
+                                                    maxLength={19}
+                                                    value={formData.cardNumber}
+                                                    onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+                                                    className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 pl-10 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-black text-text-muted mb-1 uppercase tracking-wider">{language === 'ar' ? 'تاريخ الانتهاء' : 'EXPIRY'}</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    placeholder="MM/YY"
+                                                    maxLength={5}
+                                                    value={formData.expiry}
+                                                    onChange={(e) => setFormData({ ...formData, expiry: e.target.value })}
+                                                    className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-center font-mono"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-black text-text-muted mb-1 uppercase tracking-wider">CVC</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    placeholder="123"
+                                                    maxLength={3}
+                                                    value={formData.cvc}
+                                                    onChange={(e) => setFormData({ ...formData, cvc: e.target.value })}
+                                                    className="w-full border border-border-color bg-gray-bg text-text-main p-2.5 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-center font-mono"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="pt-2 flex gap-3">
+                                    {paymentStep && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setPaymentStep(false)}
+                                            className="px-4 py-2 rounded-lg font-bold border border-border-color text-text-muted hover:bg-card hover:text-text-main transition-all text-xs uppercase"
+                                        >
+                                            {language === 'ar' ? 'عودة' : 'BACK'}
+                                        </button>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="flex-1 bg-primary text-white py-2.5 rounded-lg font-bold hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-wider text-xs"
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <Loader2 size={16} className="animate-spin" />
+                                                <span>{language === 'ar' ? 'جاري المعالجة...' : 'PROCESSING...'}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {paymentStep ? <CreditCard size={16} /> : <Send size={16} />}
+                                                <span>{paymentStep ? (language === 'ar' ? `دفع ${selectedPlan?.price}` : `PAY ${selectedPlan?.price}`) : (language === 'ar' ? 'متابعة للدفع' : 'PROCEED TO PAYMENT')}</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>

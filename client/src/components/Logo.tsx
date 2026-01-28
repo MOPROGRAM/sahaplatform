@@ -15,7 +15,7 @@ export const Logo: React.FC<LogoProps> = ({ className = "w-auto h-8", color = "c
             aria-label="Logo"
         >
             <path 
-                d="M 10 15 L 35 40 H 65 L 90 65" 
+                d="M 32 28 L 20 40 H 80 L 68 52" 
                 stroke={color} 
                 strokeWidth="12" 
                 strokeLinecap="round" 
