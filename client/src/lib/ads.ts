@@ -71,7 +71,7 @@ export const adsService = {
             .select(`
                 *,
                 author:users!author_id(id, name, email, phone),
-                city:cities!city_id(id, name, nameAr, nameEn),
+                city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
             .eq('is_active', true);
@@ -174,9 +174,9 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User!author_id(id, name, email, phone),
-                city:City!city_id(id, name, nameAr, nameEn),
-                currency:Currency!currency_id(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, name_ar, name_en),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
             .eq('id', id);
 
@@ -218,9 +218,9 @@ export const adsService = {
             .from('Ad')
             .select(`
                 *,
-                author:User!author_id(id, name, email, phone),
-                city:City!city_id(id, name, nameAr, nameEn),
-                currency:Currency!currency_id(id, code, symbol, name)
+                author:users!author_id(id, name, email, phone),
+                city:cities!city_id(id, name, name_ar, name_en),
+                currency:currencies!currency_id(id, code, symbol, name)
             `)
             .eq('author_id', user.id)
             .order('created_at', { ascending: false });
@@ -281,7 +281,7 @@ export const adsService = {
             .select(`
                 *,
                 author:users!author_id(id, name, email, phone),
-                city:cities!city_id(id, name, nameAr, nameEn),
+                city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
             .single();
@@ -343,7 +343,7 @@ export const adsService = {
             .select(`
                 *,
                 author:users!author_id(id, name, email, phone),
-                city:cities!city_id(id, name, nameAr, nameEn),
+                city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
             .single();
