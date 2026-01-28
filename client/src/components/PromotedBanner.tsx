@@ -50,16 +50,15 @@ export default function PromotedBanner() {
 
     if (loading) {
         return (
-            <div className="w-full bg-[#111] py-4 border-b border-border-color">
-                <div className="max-w-[1920px] mx-auto px-4">
-                    <div className="w-full h-[120px] bg-white dark:bg-[#1a1a1a] rounded-2xl border border-border-color animate-pulse relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
-                        <div className="h-full flex items-center justify-between px-8">
-                            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-800 rounded" />
-                            <div className="h-8 w-64 bg-gray-200 dark:bg-gray-800 rounded" />
-                            <div className="h-10 w-24 bg-gray-200 dark:bg-gray-800 rounded" />
-                        </div>
-                    </div>
+            <div className="w-full relative overflow-hidden py-8 border-b border-border-color min-h-[160px]">
+                {/* Orange/Glow Background Strip */}
+                <div className="absolute inset-0 bg-[#111]">
+                    <div className="absolute top-[-50%] right-[-10%] w-[50%] h-[200%] bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+                    <div className="absolute bottom-[-50%] left-[-10%] w-[50%] h-[200%] bg-yellow-400/20 rounded-full blur-[100px] animate-pulse" />
+                </div>
+                
+                <div className="relative max-w-[1920px] mx-auto px-4 z-10">
+                    <div className="w-full h-[100px] bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-sm rounded-xl border border-white/10 shadow-lg animate-pulse" />
                 </div>
             </div>
         );
@@ -77,51 +76,53 @@ export default function PromotedBanner() {
     const currencyCode = (ad.currency && typeof ad.currency === 'object') ? ad.currency.code : (ad.currency || 'SAR');
 
     return (
-        <div className="w-full bg-[#111] py-4 border-b border-border-color">
-            <div className="max-w-[1920px] mx-auto px-4">
-                <div className="relative w-full h-[120px] bg-white dark:bg-[#1a1a1a] rounded-2xl border border-border-color shadow-lg overflow-hidden group">
+        <div className="w-full relative overflow-hidden py-6 border-b border-border-color group/banner">
+            
+            {/* 1. THE STRIP (Outer Container with Orange/Glow Theme) */}
+            <div className="absolute inset-0 bg-[#0a0a0a]">
+                {/* The "Orange Currency Card" Style applied to the whole strip background */}
+                <div className="absolute top-[-50%] right-[-10%] w-[40%] h-[200%] bg-primary/15 rounded-full blur-[80px]" />
+                <div className="absolute bottom-[-50%] left-[-10%] w-[40%] h-[200%] bg-yellow-400/15 rounded-full blur-[80px]" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5 mix-blend-overlay" /> {/* Optional texture */}
+            </div>
+
+            {/* 2. THE INNER CONTENT (The Ad Card) */}
+            <div className="relative max-w-[1920px] mx-auto px-4 z-10">
+                <div className="relative w-full bg-white dark:bg-[#151515] rounded-xl shadow-2xl border border-white/5 overflow-hidden transition-all duration-500 hover:shadow-primary/10">
                     
-                    {/* Background Design Elements (The "Card" Look) */}
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                        {/* Yellow/Orange Circles - mimicking the card design */}
-                        <div className="absolute top-[-50%] right-[-10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl" />
-                        <div className="absolute bottom-[-50%] left-[-10%] w-[200px] h-[200px] bg-yellow-400/10 rounded-full blur-3xl" />
+                    {/* Inner Card Content */}
+                    <Link href={`/ads/${ad.id}`} className="flex flex-col sm:flex-row items-center gap-4 p-4 h-auto sm:h-[100px] text-text-main hover:opacity-95 transition-opacity">
                         
-                        {/* Background Image (Low Opacity) */}
+                        {/* Image Thumbnail (New addition for the 'Card' feel) */}
                         {imageUrl && (
-                            <div className="absolute inset-0 opacity-[0.07] dark:opacity-[0.15]">
+                            <div className="relative w-full sm:w-[120px] h-[120px] sm:h-full shrink-0 rounded-lg overflow-hidden hidden sm:block">
                                 <Image
                                     src={imageUrl}
-                                    alt="Background"
+                                    alt={ad.title}
                                     fill
                                     className="object-cover"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white dark:from-[#1a1a1a] dark:via-transparent dark:to-[#1a1a1a]" />
                             </div>
                         )}
-                    </div>
 
-                    {/* Content Container */}
-                    <Link href={`/ads/${ad.id}`} className="relative h-full flex items-center justify-between gap-4 px-4 sm:px-8 z-10 text-text-main hover:opacity-90 transition-opacity">
-                        
-                        {/* Left Side: Price & Featured Badge */}
-                        <div className="flex flex-col items-start gap-1 shrink-0">
-                            <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">
-                                <Zap size={12} className="fill-primary" />
+                        {/* Price Section */}
+                        <div className="flex flex-col items-start gap-1 shrink-0 min-w-[120px]">
+                            <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20 self-start">
+                                <Zap size={10} className="fill-primary" />
                                 <span className="text-[10px] font-black uppercase tracking-wider">{(t as any)["featured"]}</span>
                             </div>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl sm:text-4xl font-black tracking-tight text-primary">
+                                <span className="text-2xl sm:text-3xl font-black tracking-tight text-primary">
                                     {ad.price ? new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price) : ''}
                                 </span>
-                                <span className="text-xs sm:text-sm font-bold text-text-muted uppercase">{currencyCode}</span>
+                                <span className="text-xs font-bold text-text-muted uppercase">{currencyCode}</span>
                             </div>
                         </div>
 
-                        {/* Center: Title & Info (Hidden on very small screens, shown on sm+) */}
-                        <div className="flex-1 hidden sm:flex flex-col items-center text-center px-4">
-                            <h3 className="text-lg sm:text-xl font-bold line-clamp-1 mb-1">{ad.title}</h3>
-                            <div className="flex items-center gap-4 text-xs text-text-muted">
+                        {/* Middle Info */}
+                        <div className="flex-1 w-full flex flex-col items-start sm:items-center sm:text-center gap-1">
+                            <h3 className="text-lg font-bold line-clamp-1 w-full">{ad.title}</h3>
+                            <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
                                 {ad.location && (
                                     <span className="flex items-center gap-1">
                                         <MapPin size={12} />
@@ -137,52 +138,45 @@ export default function PromotedBanner() {
                             </div>
                         </div>
 
-                        {/* Mobile Title (Only shown on small screens) */}
-                        <div className="flex-1 sm:hidden">
-                            <h3 className="text-sm font-bold line-clamp-2">{ad.title}</h3>
-                        </div>
-
-                        {/* Right Side: Action Button */}
-                        <div className="shrink-0 flex items-center gap-4">
-                             <button className="hidden md:flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-full font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all hover:scale-105 active:scale-95">
+                        {/* Action Button */}
+                        <div className="shrink-0 hidden sm:flex">
+                             <span className="flex items-center gap-2 bg-gray-100 dark:bg-white/5 hover:bg-primary hover:text-white text-text-main px-5 py-2 rounded-lg font-bold text-sm transition-all">
                                 {(t as any)["viewDetails"]}
                                 {language === 'ar' ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                            </button>
-                            {/* Mobile Arrow */}
-                            <div className="md:hidden w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full text-primary">
-                                {language === 'ar' ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                            </div>
+                            </span>
                         </div>
                     </Link>
 
-                    {/* Navigation Buttons (Only visible on hover if multiple ads) */}
+                    {/* Navigation Buttons (Outside link, inside card) */}
                     {ads.length > 1 && (
                         <>
                             <button 
                                 onClick={handlePrev}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 dark:bg-black/50 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:scale-110 active:scale-95 hidden sm:flex"
+                                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/80 dark:bg-black/50 rounded-full shadow-md opacity-0 group-hover/banner:opacity-100 transition-opacity z-20 hover:scale-110 active:scale-95 hidden sm:flex"
                             >
-                                <ChevronRight size={20} />
+                                <ChevronRight size={18} />
                             </button>
                             <button 
                                 onClick={handleNext}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 dark:bg-black/50 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:scale-110 active:scale-95 hidden sm:flex"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/80 dark:bg-black/50 rounded-full shadow-md opacity-0 group-hover/banner:opacity-100 transition-opacity z-20 hover:scale-110 active:scale-95 hidden sm:flex"
                             >
-                                <ChevronLeft size={20} />
+                                <ChevronLeft size={18} />
                             </button>
-                            
-                            {/* Dots Indicator */}
-                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-                                {ads.map((_, idx) => (
-                                    <div 
-                                        key={idx} 
-                                        className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentIndex ? 'bg-primary w-4' : 'bg-gray-300 dark:bg-gray-600'}`} 
-                                    />
-                                ))}
-                            </div>
                         </>
                     )}
                 </div>
+                 
+                 {/* Pagination Dots (Below card) */}
+                {ads.length > 1 && (
+                    <div className="flex justify-center gap-1.5 mt-3">
+                        {ads.map((_, idx) => (
+                            <div 
+                                key={idx} 
+                                className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentIndex ? 'bg-white w-4' : 'bg-white/20'}`} 
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
