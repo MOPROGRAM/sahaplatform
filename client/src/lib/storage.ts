@@ -93,7 +93,7 @@ export const storageService = {
 
         // تحديث الصورة في جدول المستخدمين
         await supabase
-            .from('User')
+            .from('users')
             .update({ image: publicUrl })
             .eq('id', user.id);
 
