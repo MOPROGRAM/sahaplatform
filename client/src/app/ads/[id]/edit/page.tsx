@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2, Save, MapPin } from "lucide-react";
@@ -131,24 +133,6 @@ export default function EditAdPage() {
 
             // Upload new images if any
             const imageUrls = [...existingImages];
-            if (newImages.length > 0) {
-                for (const image of newImages) {
-                    const fileExt = image.name.split('.').pop();
-                    const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
-                    const filePath = `ads/${fileName}`;
-
-                    const { error: uploadError } = await supabase.storage
-                        .from('images')
-                        .upload(filePath, image);
-
-                    if (!uploadError) {
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('images')
-                            .getPublicUrl(filePath);
-                        imageUrls.push(publicUrl);
-                    }
-                }
-            }
 
             // Update ad
             const updateData: any = {
