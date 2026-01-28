@@ -19,7 +19,7 @@
   --card-bg: #0f0f0f;
   --text-main: #ffffff;
   --text-muted: #b0b0b0;
-  --border-color: rgba(0,0,0,0.1);
+  --border-color: #1a1a1a;
 
   /* Depth & Glow Variables (base subdued) */
   --glow-border: 1px solid rgba(2,6,23,0.04);
@@ -33,7 +33,7 @@
   --card-bg: #0a0a0a;
   --text-main: #ffffff;
   --text-muted: #9aa4b2;
-  --border-color: rgba(255,255,255,0.08);
+  --border-color: rgba(255,255,255,0.04);
   --black: #ffffff;
   --white: #0a0a0a;
 
@@ -59,7 +59,7 @@
   --card-bg: #ffffff;
   --text-main: #000000; /* absolute black text */
   --text-muted: #334155;
-  --border-color: rgba(0,0,0,0.1);
+  --border-color: rgba(0,0,0,0.06);
   --black: #000000;
   --white: #ffffff;
 

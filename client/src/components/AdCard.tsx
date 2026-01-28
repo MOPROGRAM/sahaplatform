@@ -18,8 +18,6 @@ interface AdCardProps {
     authorName?: string;
     category?: string;
     subCategory?: string;
-    description_ar?: string; // Added
-    description_en?: string; // Added
     className?: string;
     language?: 'ar' | 'en';
     isFeatured?: boolean;
@@ -38,12 +36,9 @@ export default function AdCard({
     images = [],
     createdAt,
     category,
-    subCategory, // Added
     className = "",
     language = 'ar',
     isFeatured = false,
-    description_ar, // Added
-    description_en, // Added
     onMapHighlight,
     isHighlighted = false,
     layout = 'vertical'
@@ -71,7 +66,6 @@ export default function AdCard({
     }
 
     const isVertical = layout === 'vertical';
-    const currentDescription = language === 'ar' ? description_ar : description_en; // Helper variable
 
     return (
         <Link
@@ -85,7 +79,7 @@ export default function AdCard({
             <div className={`relative shrink-0 overflow-hidden ${isVertical ? "w-full h-20" : "w-[25%]"}`}>
                 {isFeatured && (
                     <div className="absolute top-1 left-1 z-10 bg-primary text-white px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md">
-                        {t("featured")}
+                        {t('featured')}
                     </div>
                 )}
 
@@ -108,7 +102,7 @@ export default function AdCard({
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-text-muted font-black text-2xl opacity-10 select-none uppercase bg-gray-50 dark:bg-white/5">{t("siteName")}</div>
+                    <div className="w-full h-full flex items-center justify-center text-text-muted font-black text-2xl opacity-10 select-none uppercase bg-gray-50 dark:bg-white/5">{t('siteName')}</div>
                 )}
             </div>
 
@@ -119,23 +113,11 @@ export default function AdCard({
                     {title}
                 </h3>
 
-                {subCategory && (
-                    <p className="text-[10px] text-text-muted font-medium mb-1 line-clamp-1">
-                        {(t as any)[subCategory] || subCategory}
-                    </p>
-                )}
-
-                {currentDescription && (
-                    <p className="text-[10px] text-text-muted line-clamp-2 leading-tight mb-1">
-                        {currentDescription.length > 100 ? currentDescription.substring(0, 100) + "..." : currentDescription}
-                    </p>
-                )}
-
                 {/* Specs Grid */}
                 <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 text-[8px] text-text-muted ${isVertical ? "mt-auto mb-1" : "mt-1 mb-2"}`}>
                     <div className="flex items-center gap-0.5 font-normal">
                         <MapPin size={8} className="text-gray-400" />
-                        <span className="truncate">{location?.split(",")[0].trim()}</span>
+                        <span className="truncate">{location?.split(',')[0].trim()}</span>
                     </div>
                     <div className="flex items-center gap-0.5 font-normal">
                         <Clock size={8} className="text-gray-400" />

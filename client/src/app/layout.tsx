@@ -55,13 +55,13 @@ export default function RootLayout({
     const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
     return (
-        <html dir={dir} lang={lang} className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning>
+        <html dir={dir} lang={lang} className={`${inter.variable} ${cairo.variable} ${tajawal.variable} ${readex.variable}`} suppressHydrationWarning style={{ colorScheme: 'dark' }}>
             <head>
                 <meta name="google-site-verification" content="xcw2YfF0cO2WZTP9CGV3_aTSK591RFzLOuFaYuObdrI" />
             </head>
             <body>
                 <LanguageProvider initialLanguage={lang}>
-                    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+                    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                         <ErrorBoundary>
                             <div className="flex min-h-screen bg-gray-bg">
                                 <main className="flex-1 w-full">
