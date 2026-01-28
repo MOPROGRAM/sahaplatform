@@ -14,8 +14,8 @@ export default function PromotedBanner() {
         let mounted = true;
         const fetchPromoted = async () => {
             try {
-                const data = await adsService.getAds({ isBoosted: true, limit: 10 });
-                if (mounted) setAds(data || []);
+                const result = await adsService.getAds({ isBoosted: true, limit: 10 });
+                if (mounted) setAds(result.data || []);
             } catch (e) {
                 console.error(e);
             } finally {

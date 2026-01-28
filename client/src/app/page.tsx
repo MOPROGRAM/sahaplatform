@@ -81,8 +81,8 @@ export default function HomePage() {
                 filters.isBoosted = true;
             }
 
-            const data = await adsService.getAds(filters);
-            setAds(data as any || []);
+            const result = await adsService.getAds(filters);
+            setAds(result.data || []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);

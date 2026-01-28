@@ -138,18 +138,19 @@ export const adsService = {
             const limit = filters.limit || 50;
             query = query.limit(limit);
 
-            const { data, error } = await query;
+            const { data, error, count } = await query;
 
             if (error) {
-                console.error('Error fetching ads:', error);
-                return [];
+                console.error('Supabase error fetching ads:', error);
+                // Return empty result instead of throwing to prevent app crash
+                return { data: [], count: 0, error };
             }
-
-            // Return data directly (already in snake_case)
-            return (data || []) as unknown as Ad[];
+            
+            return { data: (data || []) as unknown as Ad[], count: count || 0, error: null };
         } catch (error) {
             console.error('Unexpected error fetching ads:', error);
-            return [];
+            // Return empty result instead of throwing
+            return { data: [], count: 0, error };
         }
     },
 

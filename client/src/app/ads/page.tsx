@@ -127,8 +127,8 @@ function AdsContent() {
                 cityId
             };
 
-            const data = await adsService.getAds(filters);
-            setAds(Array.isArray(data) ? (data as any) : []);
+            const result = await adsService.getAds(filters);
+            setAds(result.data || []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
