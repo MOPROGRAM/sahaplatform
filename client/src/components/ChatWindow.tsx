@@ -16,8 +16,10 @@ interface Message {
     file_url?: string;
     file_name?: string;
     created_at: string;
-    sender: {
-        name: string;
+    sender?: {
+        id?: string;
+        name?: string;
+        email?: string;
         image?: string;
     };
 }
@@ -147,12 +149,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             };
             const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
 
-            // Normalize returned fields (snake_case vs camelCase)
-            const id = sentMessage.id || (sentMessage as any).ID || (sentMessage as any).message_id;
-            const contentResp = sentMessage.content || (sentMessage as any).body || '';
-            const messageType = (sentMessage.messageType as string) || (sentMessage.message_type as string) || type;
-            const createdAt = sentMessage.createdAt || sentMessage.created_at || new Date().toISOString();
-            const senderId = sentMessage.senderId || sentMessage.sender_id || user?.id;
+            // Normalize returned fields (snake_case)
+            const id = sentMessage.id;
+            const contentResp = sentMessage.content;
+            const messageType = sentMessage.message_type || type;
+            const createdAt = sentMessage.created_at || new Date().toISOString();
+            const senderId = sentMessage.sender_id || user?.id;
 
             // Add message locally immediately
             const newMessage: Message = {

@@ -260,17 +260,7 @@ export const conversationsService = {
             })
             .eq('id', conversationId);
 
-        const mappedMessage = {
-            ...message,
-            senderId: message.sender_id,
-            receiverId: message.receiver_id,
-            conversationId: message.conversation_id,
-            messageType: message.message_type,
-            createdAt: message.created_at,
-            isRead: message.is_read
-        };
-
-        return mappedMessage as any;
+        return message as Message;
     },
 
     // الاشتراك في التحديثات

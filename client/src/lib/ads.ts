@@ -93,8 +93,8 @@ export const adsService = {
 
             // Filter by subcategory
             if (filters.subCategory) {
-                // Since subCategory column might not exist, we search in description/title
-                query = query.or(`title.ilike.%${filters.subCategory}%,description.ilike.%${filters.subCategory}%`);
+                // Search in sub_category column AND title/description for broader match
+                query = query.or(`sub_category.ilike.%${filters.subCategory}%,title.ilike.%${filters.subCategory}%,description.ilike.%${filters.subCategory}%`);
             }
 
             // Simple search by title and description
