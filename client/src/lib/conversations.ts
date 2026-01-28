@@ -54,8 +54,8 @@ export const conversationsService = {
             // استخدام أسماء الأعمدة الفعلية من قاعدة البيانات
             const { data: participantData, error: participantError } = await (supabase as any)
                 .from('_conversation_participants') 
-                .select('a')
-                .eq('b', user.id);
+                .select('conversation_id')
+                .eq('user_id', user.id);
 
             if (participantError) {
                 console.error('Error fetching conversation participants:', participantError);
@@ -66,16 +66,16 @@ export const conversationsService = {
                 return [];
             }
 
-            const conversationIds = participantData.map((p: any) => p.a);
+            const conversationIds = participantData.map((p: any) => p.conversation_id);
 
             // الحصول على المحادثات مع المشاركين
             const { data: conversations, error: conversationsError } = await (supabase as any)
-                .from('conversations')
+                .from('Conversation')
                 .select(`
                     *,
-                    ad:ads(id, title, images),
+                    ad:Ad(id, title, images),
                     participants:_conversation_participants(
-                        user:users!b(id, name, email)
+                        user:User!user_id(id, name, email)
                     )
                 `)
                 .in('id', conversationIds)
@@ -110,10 +110,10 @@ export const conversationsService = {
 
         // الحصول على المحادثة مع الإعلان والمشاركين
         const { data: conversation, error: conversationError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .select(`
                 *,
-                ad:ads(id, title, images)
+                ad:Ad(id, title, images)
             `)
             .eq('id', id)
             .single();
@@ -126,17 +126,17 @@ export const conversationsService = {
         // الحصول على المشاركين يدوياً لضمان الدقة
         const { data: participants, error: pError } = await (supabase as any)
             .from('_conversation_participants')
-            .select('user:users!b(id, name, email)')
-            .eq('a', id);
+            .select('user:User!user_id(id, name, email)')
+            .eq('conversation_id', id);
 
         const transformedParticipants = participants?.map((p: any) => p.user) || [];
 
         // الحصول على الرسائل
         const { data: messages, error: messagesError } = await (supabase as any)
-            .from('messages')
+            .from('Message')
             .select(`
                 *,
-                sender:users!sender_id(id, name, email)
+                sender:User!sender_id(id, name, email)
             `)
             .eq('conversation_id', id)
             .order('created_at', { ascending: true });
@@ -179,14 +179,14 @@ export const conversationsService = {
 
         const { data: myParticipations } = await (supabase as any)
             .from('_conversation_participants')
-            .select('a')
-            .eq('b', user.id);
+            .select('conversation_id')
+            .eq('user_id', user.id);
 
-        const myConvIds = myParticipations?.map((p: any) => p.a) || [];
+        const myConvIds = myParticipations?.map((p: any) => p.conversation_id) || [];
 
         if (myConvIds.length > 0) {
             const { data: existingConv } = await (supabase as any)
-                .from('conversations')
+                .from('Conversation')
                 .select('id')
                 .eq('ad_id', adId)
                 .in('id', myConvIds)
@@ -199,7 +199,7 @@ export const conversationsService = {
         }
 
         const { data: newConversation, error: createError } = await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .insert({ ad_id: adId })
             .select()
             .single();
@@ -209,8 +209,8 @@ export const conversationsService = {
         await (supabase as any)
             .from('_conversation_participants')
             .insert([
-                { a: newConversation.id, b: user.id },
-                { a: newConversation.id, b: participantId }
+                { conversation_id: newConversation.id, user_id: user.id },
+                { conversation_id: newConversation.id, user_id: participantId }
             ]);
 
         const finalConv = await this.getConversation(newConversation.id);
@@ -227,16 +227,16 @@ export const conversationsService = {
 
         const { data: participants } = await (supabase as any)
             .from('_conversation_participants')
-            .select('b')
-            .eq('a', conversationId)
-            .neq('b', user.id);
+            .select('user_id')
+            .eq('conversation_id', conversationId)
+            .neq('user_id', user.id);
 
         if (!participants?.length) throw new Error('Invalid conversation');
 
-        const receiverId = participants[0].b;
+        const receiverId = participants[0].user_id;
 
         const { data: message, error: messageError } = await (supabase as any)
-            .from('messages')
+            .from('Message')
             .insert({
                 content,
                 message_type: messageType,
@@ -246,14 +246,14 @@ export const conversationsService = {
             })
             .select(`
                 *,
-                sender:users!sender_id(id, name, email)
+                sender:User!sender_id(id, name, email)
             `)
             .single();
 
         if (messageError) throw new Error('Failed to send message');
 
         await (supabase as any)
-            .from('conversations')
+            .from('Conversation')
             .update({
                 last_message: content,
                 last_message_time: new Date().toISOString(),
@@ -280,7 +280,7 @@ export const conversationsService = {
             .on('postgres_changes', { 
                 event: 'INSERT', 
                 schema: 'public', 
-                table: 'messages', 
+                table: 'Message', 
                 filter: `conversation_id=eq.${conversationId}` 
             }, callback)
             .subscribe();
