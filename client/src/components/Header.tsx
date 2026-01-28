@@ -228,9 +228,11 @@ export default function Header() {
             </div>
 
             {/* Promoted Ads Banner (sticky under header content) */}
-            <div className="w-full">
-                <PromotedBanner />
-            </div>
+            {!pathname?.startsWith('/help') && !pathname?.startsWith('/advertise') && (
+                <div className="w-full">
+                    <PromotedBanner />
+                </div>
+            )}
         </header>
     );
 }

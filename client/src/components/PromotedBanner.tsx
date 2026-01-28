@@ -54,7 +54,7 @@ export default function PromotedBanner() {
                 </div>
                 
                 {/* Content Container - Horizontal Scroll */}
-                <div className="relative flex items-center gap-4 p-5 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
+                <div className="relative flex items-center gap-3 p-3 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
                     {ads.map((ad) => {
                         let imageUrl = null;
                         try {
@@ -70,8 +70,8 @@ export default function PromotedBanner() {
                                 href={`/ads/${ad.id}`} 
                                 className="snap-start shrink-0 w-[250px] sm:w-[300px] md:w-[18%] flex flex-col bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 group"
                             >
-                                {/* Image Area - Reduced Height (75% of previous h-32) */}
-                                <div className="relative h-24 w-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
+                                {/* Image Area - Reduced Height (75% of previous h-24 = 72px) */}
+                                <div className="relative h-[72px] w-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
                                     {imageUrl ? (
                                         <Image
                                             src={imageUrl}
@@ -90,9 +90,9 @@ export default function PromotedBanner() {
                                 </div>
 
                                 {/* Content Area - Compacted */}
-                                <div className="p-2.5 flex flex-col gap-1 flex-1 justify-between">
+                                <div className="p-2 flex flex-col gap-1 flex-1 justify-between">
                                     <div>
-                                        <h3 className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1 leading-tight mb-0.5">
+                                        <h3 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1 leading-tight mb-0.5">
                                             {ad.title}
                                         </h3>
                                         <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
@@ -103,7 +103,7 @@ export default function PromotedBanner() {
 
                                     <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-gray-100 dark:border-gray-800">
                                         <div className="flex items-baseline gap-1 text-primary font-black">
-                                            <span className="text-base">
+                                            <span className="text-sm">
                                                 {ad.price ? new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(ad.price) : ''}
                                             </span>
                                             <span className="text-[9px] uppercase">{currencyCode}</span>
