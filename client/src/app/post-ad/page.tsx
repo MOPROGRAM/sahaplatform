@@ -1,5 +1,8 @@
 "use client";
 
+export const runtime = "edge";
+
+
 import { useState, useEffect, useCallback } from "react";
 import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle } from "lucide-react";
 import Link from "next/link";

@@ -1,5 +1,8 @@
 "use client";
 
+export const runtime = "edge";
+
+
 import { useState } from "react";
 import { adsService } from "@/lib/ads";
 import { useAuthStore } from "@/store/useAuthStore";

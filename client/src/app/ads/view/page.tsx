@@ -1,5 +1,8 @@
 "use client";
 
+export const runtime = "edge";
+
+
 import { useSearchParams } from "next/navigation";
 import AdDetailsContent from "./AdDetailsContent";
 import { Suspense } from "react";

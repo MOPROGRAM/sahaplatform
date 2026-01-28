@@ -1,5 +1,8 @@
 "use client";
 
+export const runtime = "edge";
+
+
 import { useState, useEffect } from "react";
 import { Moon, Sun, Globe, Bell, Shield, User, Palette, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
