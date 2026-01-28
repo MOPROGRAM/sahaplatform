@@ -71,7 +71,7 @@ export default function Header() {
             <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-6">
                 {/* Brand */}
                 <Link href="/" className="group shrink-0" prefetch={false}>
-                    <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
+                    <span className="text-2xl sm:text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t("siteName")}</span>
                 </Link>
 
                 {/* Region & Currency Selector */}
@@ -142,7 +142,7 @@ export default function Header() {
 
                 {/* Navigation & Actions */}
                 <nav className="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
-                    <Link href="/ads" className={`transition-colors ${pathname?.startsWith("/ads") ? "text-primary border-b-2 border-primary pb-1" : "text-text-main hover:text-primary"}`}>{t("ads")}</Link>
+                    <Link href="/ads" className={`transition-colors ${pathname?.startsWith("/ads") ? "text-primary border-b-2 border-primary pb-1" : "text-text-main hover:text-primary"}`}>{t("categories")}</Link>
                     <Link href="/advertise" className={`transition-colors ${pathname === "/advertise" ? "text-primary border-b-2 border-primary" : "text-text-main hover:text-primary"}`}>{t("advertise")}</Link>
                 </nav>
 

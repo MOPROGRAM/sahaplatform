@@ -142,22 +142,22 @@ export default function AdvertisePage() {
         <div className="min-h-screen bg-gray-bg flex flex-col">
             <Header />
 
-            {/* Hero Section */}
-            <section className="bg-gradient-to-r from-primary to-primary-hover text-white py-8 shadow-lg">
+            {/* Hero Section - Refactored for consistency */}
+            <section className="bg-card-bg text-text-main py-8 shadow-sm border-b border-border-color"> {/* Simplified background, added border */}
                 <div className="max-w-6xl mx-auto px-4 text-center">
-                    <Star className="w-12 h-12 mx-auto mb-3 animate-pulse" />
+                    <Star className="w-12 h-12 mx-auto mb-3 text-primary" /> {/* Removed animate-pulse */}
                     <h1 className="text-3xl md:text-4xl font-black mb-3 uppercase tracking-tight">
                         {t("advertiseWithUs")}
                     </h1>
-                    <p className="text-lg opacity-90 mb-6 max-w-2xl mx-auto">
+                    <p className="text-lg text-text-muted mb-6 max-w-2xl mx-auto"> {/* Changed opacity-90 to text-text-muted */}
                         {language === 'ar' ? 'ضاعف مبيعاتك ووصولك للعملاء الجادين' : 'double your sales and reach serious customers'}
                     </p>
                 </div>
             </section>
 
             <main className="max-w-6xl mx-auto px-4 py-8 flex-1">
-                {/* Contact Info Banner */}
-                <div className="bento-card bg-white dark:bg-[#1a1a1a] p-6 mb-8 shadow-premium border-none">
+                {/* Contact Info Banner - Adjusted for consistency */}
+                <div className="bento-card p-6 mb-8 shadow-sm border border-border-color"> {/* Removed bg-white dark:bg-[#1a1a1a], replaced shadow-premium with shadow-sm, border-none with border border-border-color */}
                     <h2 className="text-xl font-black text-center mb-4 text-text-main">
                         {t("contactUsToSubscribe")}
                     </h2>
@@ -197,7 +197,7 @@ export default function AdvertisePage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                     {plans.map((plan, index) => (
-                        <div key={index} className={`depth-card p-6 relative flex flex-col ${plan.popular ? 'border-2 border-primary ring-2 ring-primary/10' : ''}`}>
+                        <div key={index} className={`depth-card p-6 relative flex flex-col ${plan.popular ? 'border-2 border-primary ring-2 ring-primary/10' : 'border border-border-color'}`}> {/* Added consistent border-border-color */}
                             {plan.popular && (
                                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-0.5 rounded-full text-xs font-black uppercase tracking-wider">
                                     {t("mostPopular")}
@@ -251,7 +251,7 @@ export default function AdvertisePage() {
                 {/* Subscription Form Modal */}
                 {showForm && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-solid-overlay">
-                        <div className="bg-card-bg rounded-lg shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="bg-card-bg rounded-lg shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200 border border-border-color"> {/* Added border-border-color */}
                             <div className="bg-primary p-4 text-white relative">
                                 <button
                                     onClick={() => setShowForm(false)}
@@ -325,23 +325,22 @@ export default function AdvertisePage() {
                     </div>
                 )}
 
-                {/* Benefits Section */}
-                <div className="bg-card-bg rounded-lg p-6 text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-50"></div>
-                    <Zap className="w-10 h-10 text-primary mx-auto mb-3 relative z-10" />
-                    <h3 className="text-xl font-black mb-2 text-text-main relative z-10">
+                {/* Benefits Section - Refactored for consistency */}
+                <div className="bento-card p-6 text-center shadow-sm border border-border-color"> {/* Replaced with bento-card, removed radial gradient */}
+                    <Zap className="w-10 h-10 text-primary mx-auto mb-3" /> {/* Removed relative z-10 */}
+                    <h3 className="text-xl font-black mb-2 text-text-main">
                         {t("whyPremiumAds")}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5 relative z-10">
-                        <div className="bg-gray-bg rounded-md p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5"> {/* Removed relative z-10 */}
+                        <div className="bento-card p-4"> {/* Changed bg-gray-bg rounded-md to bento-card */}
                             <div className="text-3xl font-black text-primary mb-1">5x</div>
                             <p className="text-text-main font-bold text-sm">{t("moreViews")}</p>
                         </div>
-                        <div className="bg-gray-bg rounded-md p-4">
+                        <div className="bento-card p-4"> {/* Changed bg-gray-bg rounded-md to bento-card */}
                             <div className="text-3xl font-black text-primary mb-1">3x</div>
                             <p className="text-text-main font-bold text-sm">{t("moreContacts")}</p>
                         </div>
-                        <div className="bg-gray-bg rounded-md p-4">
+                        <div className="bento-card p-4"> {/* Changed bg-gray-bg rounded-md to bento-card */}
                             <div className="text-3xl font-black text-primary mb-1">10x</div>
                             <p className="text-text-main font-bold text-sm">{t("betterSales")}</p>
                         </div>

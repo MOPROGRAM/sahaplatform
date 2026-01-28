@@ -19,7 +19,7 @@
   --card-bg: #0f0f0f;
   --text-main: #ffffff;
   --text-muted: #b0b0b0;
-  --border-color: #1a1a1a;
+  --border-color: rgba(0,0,0,0.2);
 
   /* Depth & Glow Variables (base subdued) */
   --glow-border: 1px solid rgba(2,6,23,0.04);
@@ -33,7 +33,7 @@
   --card-bg: #0a0a0a;
   --text-main: #ffffff;
   --text-muted: #9aa4b2;
-  --border-color: rgba(255,255,255,0.04);
+  --border-color: rgba(255,255,255,0.15);
   --black: #ffffff;
   --white: #0a0a0a;
 
@@ -59,7 +59,7 @@
   --card-bg: #ffffff;
   --text-main: #000000; /* absolute black text */
   --text-muted: #334155;
-  --border-color: rgba(0,0,0,0.06);
+  --border-color: rgba(0,0,0,0.2);
   --black: #000000;
   --white: #ffffff;
 
@@ -1198,7 +1198,7 @@ textarea:focus {
   border: 1px solid var(--border-color);
   box-shadow: 0 6px 18px rgba(2,6,23,0.04);
   border-radius: 10px;
-} 
+}
 
 /* Dark variants: use solid dark surfaces (no blur) */
 .dark .glass-morphism,
@@ -1208,7 +1208,7 @@ textarea:focus {
   background: var(--card-bg);
   border: 1px solid rgba(255,255,255,0.03);
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-} 
+}
 
 /* Add a simple glass-card and glass-input (matte defaults) */
 .glass-card {
@@ -1317,4 +1317,168 @@ textarea:focus {
   0% { box-shadow: 0 0 0 0 rgba(255,77,0,0.16); }
   70% { box-shadow: 0 0 0 18px rgba(255,77,0,0.0); }
   100% { box-shadow: 0 0 0 0 rgba(255,77,0,0); }
+}
+
+/* ===== Promoted Banner Card (Uiverse Inspired) ===== */
+.promoted-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 180px;
+  width: 280px;
+  border-radius: 25px;
+  background: lightgrey; /* Placeholder, will use dynamic background */
+  overflow: hidden;
+  transition: 100ms ease;
+  box-shadow: rgba(0, 0, 0, 0.15) 2px 3px 4px;
+}
+
+.promoted-info-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 75%;
+  color: white;
+}
+
+.promoted-left-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+  z-index: 1;
+  padding-left: 18px;
+}
+
+.promoted-info-button {
+  display: block;
+  border: none;
+  background: transparent;
+}
+
+.promoted-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  width: 100%;
+  height: 100%;
+}
+
+.promoted-temperature {
+  font-size: 34pt;
+  font-weight: 500;
+  line-height: 8%;
+}
+
+.promoted-right-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 100%;
+  padding-right: 18px;
+  z-index: 1;
+}
+
+.promoted-right-side > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.promoted-title {
+  font-size: 19pt;
+  line-height: 1em;
+}
+
+.promoted-date {
+  font-size: 15px;
+}
+
+.promoted-background-design {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: var(--card-bg); /* Can be dynamic or based on ad image */
+  overflow: hidden;
+}
+
+.promoted-circle {
+  background-color: #efc745;
+}
+
+.promoted-circle:nth-child(1) {
+  position: absolute;
+  top: -80%;
+  right: -50%;
+  width: 300px;
+  height: 300px;
+  opacity: 0.4;
+  border-radius: 50%;
+}
+
+.promoted-circle:nth-child(2) {
+  position: absolute;
+  top: -70%;
+  right: -30%;
+  width: 210px;
+  height: 210px;
+  opacity: 0.4;
+  border-radius: 50%;
+}
+
+.promoted-circle:nth-child(3) {
+  position: absolute;
+  top: -35%;
+  right: -8%;
+  width: 100px;
+  height: 100px;
+  opacity: 1;
+  border-radius: 50%;
+}
+
+.promoted-days-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 25%;
+  background-color: var(--card-bg); /* Can be dynamic */
+  gap: 2px;
+  box-shadow: inset 0px 2px 5px #974859;
+}
+
+.promoted-days-section button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background-color: var(--card-bg); /* Can be dynamic */
+  box-shadow: inset 0px 2px 5px #974859;
+  cursor: pointer;
+  transition: 100ms ease;
+  gap: 5px;
+}
+
+.promoted-days-section button:hover {
+  scale: 0.9;
+  border-radius: 10px;
+}
+
+.promoted-days-section .promoted-day {
+  font-size: 10pt;
+  font-weight: 500;
+  color: white;
+  opacity: 0.7;
+}
+
+.promoted-icon-weather-day {
+  display: flex;
+  align-items: center;
+  width: 20px;
+  height: 100%;
 }
