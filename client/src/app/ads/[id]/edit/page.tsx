@@ -115,19 +115,6 @@ export default function EditAdPage() {
         }
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        const validFiles = files.filter(file =>
-            file.type.startsWith('image/') &&
-            file.size <= 5 * 1024 * 1024
-        );
-        if (validFiles.length !== files.length) {
-            setError(language === 'ar' ? "بعض الصور غير صالحة" : "Some images are invalid");
-            return;
-        }
-        setNewImages(validFiles);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");

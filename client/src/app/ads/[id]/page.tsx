@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import AdDetailsContent from "../view/AdDetailsContent";
 import { adsService } from '@/lib/ads';
 import nextDynamic from 'next/dynamic';
 
 // Force dynamic rendering where necessary
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 const AdDetailsWrapperClient = nextDynamic(() => import('./AdDetailsClientWrapper').then(m => m.AdDetailsClientWrapper), { ssr: false });
 
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
                 images: image ? [image] : undefined,
             },
         } as any;
-    } catch (e) {
+    } catch {
         return { title: 'Ad' };
     }
 }

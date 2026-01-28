@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/store/useAuthStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     ShieldCheck,
     Users,
@@ -44,16 +44,7 @@ export default function AdminDashboard() {
     const [searchTerm, setSearchTerm] = useState('');
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-    useEffect(() => {
-        // Strict Admin Check
-        if (!user || user.role !== 'ADMIN') {
-            router.push('/');
-            return;
-        }
-        fetchDashboardData();
-    }, [user, router, view]);
-
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         setLoading(true);
         try {
             if (view === 'overview') {
@@ -103,7 +94,16 @@ export default function AdminDashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [view]);
+
+    useEffect(() => {
+        // Strict Admin Check
+        if (!user || user.role !== 'ADMIN') {
+            router.push('/');
+            return;
+        }
+        fetchDashboardData();
+    }, [user, router, view, fetchDashboardData]);
 
     const handleUpdateAdStatus = async (id: string, active: boolean) => {
         setActionLoading(id);

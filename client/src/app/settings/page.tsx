@@ -44,7 +44,7 @@ export default function SettingsPage() {
             name: user.name || "",
             phone: user.phone || "",
         });
-    }, [user]);
+    }, [user, router]);
 
     const handleProfileUpdate = async () => {
         if (!profileData.name.trim()) {

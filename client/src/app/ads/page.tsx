@@ -10,7 +10,7 @@ import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import AdvancedFilter from '@/components/AdvancedFilter';
-import { Sparkles, Layers, Building, Car, Briefcase, ShoppingBag, Smartphone, Wrench } from 'lucide-react';
+import { Layers, Building, Car, Briefcase, ShoppingBag, Smartphone, Wrench } from 'lucide-react';
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 // Removed dynamic import for AdsMap as it's no longer used
@@ -62,7 +62,7 @@ function AdsContent() {
     const searchQueryParam = searchParams.get('search');
     const categoryParam = searchParams.get('category');
     const subCategoryParam = searchParams.get('subcategory');
-    const { category, subCategory, tags, setCategory, setSubCategory, toggleTag, resetFilters, minPrice, maxPrice, minArea, maxArea, cityId, sortBy, sortOrder } = useFilterStore();
+    const { category, subCategory, tags, setCategory, setSubCategory, resetFilters, minPrice, maxPrice, minArea, maxArea, cityId, sortBy, sortOrder } = useFilterStore();
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
