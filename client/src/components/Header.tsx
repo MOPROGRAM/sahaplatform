@@ -217,26 +217,26 @@ export default function Header() {
                                                     {t("systemManagement")}
                                                 </Link>
                                             )}
-                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
                                                 <LayoutDashboard size={14} />
                                                 {t("dashboard")}
                                             </Link>
-                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
                                                 <ShieldCheck size={14} />
                                                 {t("myAds")}
                                             </Link>
-                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative" onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
                                                 <MessageSquare size={14} />
                                                 {t("messages")}
                                                 {unreadCount > 0 && (
                                                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">{unreadCount}</span>
                                                 )}
                                             </Link>
-                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
                                                 <Bell size={14} />
                                                 {t("notifications")}
                                             </Link>
-                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
                                                 <Settings size={14} />
                                                 {t("settings")}
                                             </Link>

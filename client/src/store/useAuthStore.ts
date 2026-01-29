@@ -36,8 +36,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         try {
             await authService.loginWithGoogle();
         } catch (error) {
-            set({ loading: false });
+            console.error("Login failed:", error);
             throw error;
+        } finally {
+            set({ loading: false });
         }
     },
     register: async (email, password, name, userType = 'SEEKER') => {

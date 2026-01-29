@@ -81,7 +81,7 @@ export const authService = {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: typeof window !== 'undefined' ? `${window.location.origin}` : undefined,
+                redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
                 queryParams: {
                     access_type: 'offline',
                     prompt: 'consent',
@@ -95,36 +95,59 @@ export const authService = {
 
     async syncUserData(user: any, token?: string) {
         try {
+            // Ensure we have the latest user data from Supabase Auth
+            const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+            
+            if (authError || !currentUser) {
+                console.warn('Could not verify user for sync:', authError);
+                // Fallback to the passed user if getUser fails (though it shouldn't if session is valid)
+            }
+            
+            const targetUser = currentUser || user;
+
             // Check if user exists first to decide on points allocation
-            const { data: existingUser } = await (supabase as any)
+            // We use maybeSingle() to avoid 400 errors if multiple rows exist (though id is unique)
+            const { data: existingUser, error: fetchError } = await (supabase as any)
                 .from('users')
                 .select('id, points')
-                .eq('id', user.id)
-                .single();
+                .eq('id', targetUser.id)
+                .maybeSingle();
 
-            const userData: any = {
-                id: user.id,
-                email: user.email,
-                name: user.user_metadata?.name || '',
-                role: user.user_metadata?.role || 'USER',
-                user_type: user.user_metadata?.userType || 'SEEKER',
-                verified: !!user.email_confirmed_at,
-            };
-
-            // Only set default points for new users
-            if (!existingUser) {
-                userData.points = 10;
+            if (fetchError) {
+                console.warn('Error fetching existing user:', fetchError);
             }
 
-            // محاولة إدراج أو تحديث بيانات المستخدم في جدول users
-            const { error } = await (supabase as any)
+            const userData: any = {
+                id: targetUser.id,
+                email: targetUser.email,
+                name: targetUser.user_metadata?.name || '',
+                role: targetUser.user_metadata?.role || 'USER',
+                user_type: targetUser.user_metadata?.userType || 'SEEKER',
+                verified: !!targetUser.email_confirmed_at,
+            };
+
+            // Only set default points for new users (if not found in DB)
+            if (!existingUser) {
+                userData.points = 10;
+            } else {
+                // If user exists, we might want to preserve their points or update if needed
+                // For now, we don't overwrite points in the upsert unless necessary
+                // If existingUser has points, we don't put points in userData to avoid resetting it
+                // UNLESS we want to sync other fields.
+            }
+
+            // Remove undefined values to avoid 400 errors
+            Object.keys(userData).forEach(key => userData[key] === undefined && delete userData[key]);
+
+            // Upsert user data
+            const { error: upsertError } = await (supabase as any)
                 .from('users')
                 .upsert(userData, {
                     onConflict: 'id'
                 });
 
-            if (error) {
-                console.warn('Failed to sync user data:', error);
+            if (upsertError) {
+                console.warn('Failed to sync user data:', upsertError);
             }
         } catch (error) {
             console.warn('Error syncing user data:', error);
