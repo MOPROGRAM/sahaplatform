@@ -52,6 +52,12 @@ const config: Config = {
         sans: ['Inter', 'Cairo', 'Tajawal', 'sans-serif'],
         arabic: ['Cairo', 'Tajawal', 'sans-serif'],
       },
+      backdropBlur: {
+        'glass': '10px',
+      },
+      backgroundImage: {
+        'mesh-gradient': 'linear-gradient(135deg, #ff6b35 0%, #f97316 50%, #ea580c 100%)',
+      },
     },
   },
   plugins: [],

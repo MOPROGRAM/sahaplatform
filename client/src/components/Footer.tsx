@@ -1,30 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import PixelWaterBackground from "@/components/PixelWaterBackground";
 
 export default function Footer() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     return (
-        <footer className="mt-auto bg-card-bg border-t border-border-color py-6 px-4">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="flex items-center gap-6 text-[12px] font-bold text-text-muted">
-                    <span className="font-[1000] italic text-text-main tracking-tighter uppercase">{t('siteName')} SYNC © 2026</span>
-                    <div className="flex gap-4">
-                        <Link href="/help" className="hover:text-primary cursor-pointer transition-colors uppercase tracking-widest text-[10px]">{t('help')}</Link>
-                        <Link href="/advertise" className="hover:text-primary cursor-pointer transition-colors uppercase tracking-widest text-[10px]">{t('advertiseWithUs')}</Link>
-                    </div>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2.5 bg-gray-50 border border-border-color rounded-md px-3 py-1.5 shadow-inner">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                        <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">{t('secureProtocol')}</span>
-                    </div>
-                </div>
-            </div>
-            <div className="max-w-7xl mx-auto mt-4 pt-4 border-t border-border-color/30 text-center">
-                <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">{t('footerNotice')}</p>
+        <footer className="mt-auto border-t border-border-color py-12 px-4 relative min-h-[160px]">
+            <PixelWaterBackground className="absolute bottom-0 left-0 right-0 w-full h-[50%]" />
+            <div className="max-w-7xl mx-auto flex justify-center items-center relative z-10">
+                <span className="font-[1000] text-text-main tracking-tighter text-sm">
+                    {language === 'ar' ? 'ساحة 2026' : 'saha 2026'}
+                </span>
             </div>
         </footer>
     );

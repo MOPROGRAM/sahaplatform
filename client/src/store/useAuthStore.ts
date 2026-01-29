@@ -1,29 +1,43 @@
 import { create } from 'zustand';
 import { AuthUser, authService } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 interface AuthState {
     user: AuthUser | null;
-    session: any;
+    token: string | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
+    loginWithGoogle: () => Promise<void>;
     register: (email: string, password: string, name: string, userType?: string) => Promise<void>;
-    logout: () => Promise<void>;
-    initialize: () => Promise<void>;
+    logout: () => void;
+    initialize: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
     user: null,
-    session: null,
+    token: null,
     loading: true,
     login: async (email, password) => {
         set({ loading: true });
         try {
             const response = await authService.login(email, password);
-            authService.setToken(response.token);
             set({
                 user: response.user,
-                session: response.token
+                token: response.token
             });
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+    loginWithGoogle: async () => {
+        set({ loading: true });
+        try {
+            await authService.loginWithGoogle();
+        } catch (error) {
+            console.error("Login failed:", error);
+            throw error;
         } finally {
             set({ loading: false });
         }
@@ -32,42 +46,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await authService.register(email, password, name, userType);
-            const loginResponse = await authService.login(email, password);
-            authService.setToken(loginResponse.token);
             set({
-                user: loginResponse.user,
-                session: loginResponse.token
+                user: response.user,
+                token: response.token
             });
+        } catch (error) {
+            throw error;
         } finally {
             set({ loading: false });
         }
     },
     logout: async () => {
-        authService.removeToken();
-        set({ user: null, session: null });
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+        set({ user: null, token: null });
     },
     initialize: async () => {
         set({ loading: true });
         try {
-            const token = authService.getToken();
-            if (token) {
-                set({ session: token });
-                try {
-                    // Fetch real profile from backend
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/auth/me`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const user = await response.json();
-                        set({ user });
-                    } else {
-                        authService.removeToken();
-                        set({ user: null, session: null });
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch profile:", e);
-                }
+            const session = await authService.getCurrentSession();
+            if (session?.user) {
+                // Ensure user data is synced to DB
+                await authService.syncUserData(session.user, session.access_token);
+                
+                set({
+                    user: {
+                        id: session.user.id,
+                        email: session.user.email || '',
+                        name: session.user.user_metadata?.name || '',
+                        role: session.user.user_metadata?.role || 'USER',
+                        userType: session.user.user_metadata?.userType || 'SEEKER',
+                        verified: !!session.user.email_confirmed_at,
+                        points: 0,
+                        created_at: session.user.created_at,
+                    },
+                    token: session.access_token
+                });
             }
+        } catch (e) {
+            console.error("Failed to initialize auth:", e);
         } finally {
             set({ loading: false });
         }

@@ -22,10 +22,10 @@ CREATE TABLE "Ad" (
     "images" TEXT NOT NULL DEFAULT '[]',
     "video" TEXT,
     "isBoosted" BOOLEAN NOT NULL DEFAULT false,
-    "authorId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Ad_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Ad_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable

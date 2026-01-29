@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgres"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -46,6 +46,7 @@ model User {
   verified      Boolean        @default(false)
   phone         String?
   phoneVerified Boolean        @default(false)
+  points        Int            @default(0) // Added for points system
   countryId     String?
   cityId        String?
   country       Country?       @relation(fields: [countryId], references: [id])
@@ -83,6 +84,8 @@ model Ad {
   currency    Currency @relation(fields: [currencyId], references: [id])
   category    String
   location    String?
+  address     String?
+  paymentMethod String?
   cityId      String?
   city        City?    @relation(fields: [cityId], references: [id])
   latitude    Float?
@@ -90,10 +93,11 @@ model Ad {
   images      String   @default("[]")
   video       String?
   isBoosted   Boolean  @default(false)
+  boostedUntil DateTime? @map("boosted_until")
   isActive    Boolean  @default(true)
   views       Int      @default(0)
-  authorId    String
-  author      User     @relation(fields: [authorId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   conversations Conversation[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

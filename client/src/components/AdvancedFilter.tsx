@@ -1,116 +1,132 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
+import { useLanguage } from "@/lib/language-context";
 import { useFilterStore } from "@/store/useFilterStore";
-import { ChevronDown, MapPin, Search } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { supabase } from "@/lib/supabase";
 
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
+interface City {
+    id: string;
+    name: string;
+    name_ar: string;
+    name_en: string;
 }
 
 export default function AdvancedFilter() {
-    const { category, setCategory, tags, toggleTag } = useFilterStore();
+    const { language, t } = useLanguage();
+    const { minPrice, maxPrice, setMinPrice, setMaxPrice, tags, addTag, removeTag, setCityId, cityId, setSortBy, sortBy, setSortOrder, sortOrder } = useFilterStore();
+    const [isOpen, setIsOpen] = useState(false);
+    const [cities, setCities] = useState<City[]>([]);
 
-    const mainCategories = [
-        { id: 'jobs', label: 'وظائف', labelEn: 'Jobs' },
-        { id: 'realestate', label: 'عقارات', labelEn: 'Real Estate' },
-        { id: 'cars', label: 'سيارات', labelEn: 'Vehicles' },
-        { id: 'services', label: 'خدمات', labelEn: 'Services' },
-        { id: 'electronics', label: 'إلكترونيات', labelEn: 'Electronics' },
-    ];
+    const fetchCities = useCallback(async () => {
+        try {
+            const { data } = await (supabase as any).from("cities").select("*").eq("is_active", true);
+            setCities(data || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
+    }, []);
 
-    const subFilters = [
-        { label: 'المنطقة', items: ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة'] },
-        { label: 'النوع', items: ['سكني', 'تجاري', 'إيجار', 'بيع', 'استثمار'] },
-        { label: 'السعر', items: ['أقل من 50k', '50k - 200k', '200k - 500k', '500k+'] },
-    ];
+    useEffect(() => {
+        fetchCities();
+    }, [fetchCities]);
+
+    const availableTags = ["rent", "sale"]; // Example tags
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-sm shadow-sm overflow-hidden text-[13px]">
-            {/* Search Header */}
-            <div className="p-3 border-b border-gray-100 dark:border-gray-800 flex flex-wrap gap-2 items-center">
-                <div className="flex-1 flex gap-2 border border-primary/30 p-1 rounded-sm">
-                    <div className="flex items-center gap-1 px-2 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800 cursor-pointer text-xs">
-                        <MapPin size={14} className="text-primary" />
-                        <span>الرياض</span>
-                        <ChevronDown size={12} />
-                    </div>
-                    <input
-                        className="flex-1 bg-transparent outline-none px-2"
-                        placeholder="عن ماذا تبحث اليوم؟ (وظائف، عقارات، سيارات...)"
-                    />
-                    <button className="bg-primary hover:bg-primary-dark text-white px-6 py-1.5 font-bold rounded-sm transition-colors flex items-center gap-2">
-                        <Search size={16} />
-                        <span>بحث</span>
-                    </button>
-                </div>
+        <div className="w-full">
+            <div className="bento-card p-1 flex justify-between items-center bg-white dark:bg-[#1a1a1a] shadow-premium">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold text-text-main hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                >
+                    <SlidersHorizontal size={16} />
+                    {t("filter")}
+                    <ChevronDown size={14} className={`transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`} />
+                </button>
             </div>
 
-            {/* Row 1: Main Categories */}
-            <div className="flex border-b border-gray-50 dark:border-gray-800">
-                <div className="w-24 bg-gray-50 dark:bg-slate-800 p-2 text-gray-400 font-bold shrink-0">التصنيف</div>
-                <div className="flex flex-wrap gap-x-4 gap-y-2 p-2 px-4">
-                    <button
-                        onClick={() => setCategory(null)}
-                        className={cn("hover:text-primary whitespace-nowrap", !category && "text-primary font-bold")}
-                    >
-                        الكل
-                    </button>
-                    {mainCategories.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => setCategory(cat.id)}
-                            className={cn("hover:text-primary whitespace-nowrap", category === cat.id && "text-primary font-bold")}
+            {isOpen && (
+                <div className="bento-card p-6 mt-4 space-y-6 bg-white dark:bg-[#1a1a1a] animate-in fade-in slide-in-from-top-2">
+                    {/* Price Range */}
+                    <div>
+                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight mb-3 border-b-2 border-primary w-fit pb-1">
+                            {t("priceRange")}
+                        </h4>
+                        <div className="flex gap-3">
+                            <input
+                                type="number"
+                                placeholder={t("min")}
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                                className="bento-input flex-1"
+                            />
+                            <input
+                                type="number"
+                                placeholder={t("max")}
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                                className="bento-input flex-1"
+                            />
+                        </div>
+                    </div>
+
+                    {/* City Filter */}
+                    <div>
+                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight mb-3 border-b-2 border-primary w-fit pb-1">
+                            {t("location")}
+                        </h4>
+                        <select
+                            value={cityId || ""}
+                            onChange={(e) => setCityId(e.target.value)}
+                            className="bento-input w-full appearance-none cursor-pointer"
                         >
-                            {cat.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Row 2 & 3: Dynamic Sub-filters */}
-            {subFilters.map((row, idx) => (
-                <div key={idx} className="flex border-b border-gray-50 dark:border-gray-100 last:border-0 dark:border-gray-800">
-                    <div className="w-24 bg-gray-50 dark:bg-slate-800 p-2 text-gray-400 font-bold shrink-0">{row.label}</div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-2 p-2 px-4">
-                        {row.items.map((item) => (
-                            <button
-                                key={item}
-                                onClick={() => toggleTag(item)}
-                                className={cn(
-                                    "hover:text-primary whitespace-nowrap transition-colors",
-                                    tags.includes(item) && "bg-primary/10 text-primary px-1 rounded-sm font-medium"
-                                )}
-                            >
-                                {item}
-                            </button>
-                        ))}
+                            <option value="">{t("allCities")}</option>
+                            {cities.map((city) => (
+                                <option key={city.id} value={city.id}>
+                                    {language === "ar" ? city.name_ar : city.name_en}
+                                </option>
+                            ))}
+                        </select>
                     </div>
-                </div>
-            ))}
 
-            {/* Selected Tags Summary */}
-            {tags.length > 0 && (
-                <div className="bg-primary/5 p-2 px-4 flex gap-2 items-center flex-wrap">
-                    <span className="text-[11px] text-gray-400">الفلاتر النشطة:</span>
-                    {tags.map(tag => (
-                        <span key={tag} className="bg-white dark:bg-slate-800 border border-primary/20 text-primary px-2 py-0.5 rounded-sm flex items-center gap-1 text-[11px]">
-                            {tag}
-                            <button
-                                onClick={() => toggleTag(tag)}
-                                className="hover:text-red-500 font-bold"
-                            >
-                                ×
-                            </button>
-                        </span>
-                    ))}
-                    <button
-                        onClick={() => useFilterStore.getState().resetFilters()}
-                        className="text-[11px] text-gray-400 hover:text-red-500 underline underline-offset-2"
-                    >
-                        مسح الكل
-                    </button>
+                    {/* Tags Filter */}
+                    <div>
+                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight mb-3 border-b-2 border-primary w-fit pb-1">
+                            {t("tags")}
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                            {availableTags.map((tag) => (
+                                <button
+                                    key={tag}
+                                    type="button"
+                                    onClick={() => (tags.includes(tag) ? removeTag(tag) : addTag(tag))}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${tags.includes(tag)
+                                        ? "bg-primary text-white shadow-md"
+                                        : "bg-gray-100 dark:bg-white/5 text-text-muted hover:bg-gray-200 dark:hover:bg-white/10"}
+                                    `}
+                                >
+                                    {(t as any)[tag] || tag}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Sort By */}
+                    <div>
+                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight mb-3 border-b-2 border-primary w-fit pb-1">
+                            {t("sortBy")}
+                        </h4>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as any)}
+                            className="bento-input w-full appearance-none cursor-pointer"
+                        >
+                            <option value="createdAt">{t("newest")}</option>
+                            <option value="price">{t("price")}</option>
+                        </select>
+                    </div>
                 </div>
             )}
         </div>

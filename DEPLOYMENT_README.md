@@ -1,11 +1,11 @@
-# دليل تحديث موقع صحة - المنشور على Vercel و Render
+# دليل تحديث موقع صحة - المنشور على Cloudflare و Supabase
 
 ## الموقع منشور ويعمل بالفعل! ✅
 
 ### البنية الحالية:
-- **الفرونت إند**: Vercel (Next.js)
-- **الباك إند**: Render (Node.js + Express)
-- **قاعدة البيانات**: PostgreSQL على Render
+- **الفرونت إند**: Cloudflare Pages (Next.js)
+- **الباك إند**: Cloudflare Functions (Next.js API Routes)
+- **قاعدة البيانات**: Supabase (PostgreSQL)
 
 ### التحديثات المكتملة:
 
@@ -67,29 +67,37 @@ https://[رابط-الباكيند]/api/setup-database
 curl -X POST https://your-backend-url/api/setup-database
 ```
 
-#### **الخطوة 2: تحديث رابط API في Vercel** 🌐
-اذهب إلى **Vercel Dashboard** → **Settings** → **Environment Variables**:
+#### **الخطوة 1: إعداد Supabase** 🗄️
+1. تأكد من أن مشروع Supabase جاهز مع جميع الجداول
+2. احصل على مفاتيح API من لوحة تحكم Supabase:
+   - Project URL
+   - Anon Key
+   - Service Role Key
+
+#### **الخطوة 2: نشر على Cloudflare Pages** 🌐
+1. اربط مشروعك بـ Git على Cloudflare Pages
+2. اضف متغيرات البيئة:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://[your-project-ref].supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=[your-anon-key]
+SUPABASE_SERVICE_ROLE_KEY=[your-service-role-key]
+```
+3. اضبط Build Settings:
+   - Build Command: `npm run build`
+   - Build Output Directory: `.next`
+   - Root Directory: `client`
+
+#### **الخطوة 3: تفعيل قاعدة البيانات (اختياري)** 🗃️
+إذا كانت البيانات الأساسية غير موجودة، اذهب إلى:
 
 ```
-NEXT_PUBLIC_API_URL=https://[رابط-render-الخاص-بك]/api
+https://[your-cloudflare-domain]/api/setup-database
 ```
 
-**مثال:**
-```
-NEXT_PUBLIC_API_URL=https://saha-backend.onrender.com/api
-```
+أرسل طلب POST - سيتم إدراج البيانات الأساسية تلقائياً!
 
-#### **الخطوة 3: تفعيل قاعدة البيانات** 🗃️
-بعد تحديث Vercel، اذهب إلى:
-
-```
-https://sahafrontend.vercel.app/api/setup-database
-```
-
-انقر على POST - سيتم إعداد قاعدة البيانات تلقائياً!
-
-#### **الخطوة 3: اختبار الموقع** ✅
-- افتح https://sahafrontend.vercel.app
+#### **الخطوة 4: اختبار الموقع** ✅
+- افتح رابط Cloudflare Pages الخاص بك
 - جميع الميزات ستعمل فوراً!
 - سجل حساباً جديداً
 - أنشئ إعلاناً
@@ -106,7 +114,7 @@ https://sahafrontend.vercel.app/api/setup-database
 
 ### ملاحظات مهمة:
 
-- قاعدة البيانات على Render لا تحتاج تعديل - المخطط متوافق
+- قاعدة البيانات على Supabase - نفذ `supabase-setup.sql` لإعداد الجداول
 - جميع البيانات التجريبية تم استبدالها بوظائف حقيقية
 - الكود محسن ومُختبر للإنتاج
 - الأمان مُطبق على جميع نقاط النهاية
@@ -147,9 +155,43 @@ https://sahafrontend.vercel.app/api/setup-database
 
 ### للدعم الفني:
 إذا واجهت أي مشاكل:
-1. تحقق من logs Render/Vercel
-2. تأكد من متغيرات البيئة
-3. تحقق من اتصال قاعدة البيانات
+1. تحقق من logs Cloudflare Pages
+2. تأكد من متغيرات البيئة في Cloudflare
+3. تحقق من إعداد الجداول في Supabase
 4. اختبر البناء محلياً أولاً
 
 الموقع الآن جاهز لاستقبال المستخدمين الحقيقيين! 🎉
+
+---
+
+## Cloudflare Production Checklist (مهم جداً) 🔧
+1. **Enable Cloudflare Images (optional but recommended)**
+   - Upload optimized versions of frequently-served images to Cloudflare Images (AVIF/WebP enabled there).
+   - Alternatively, configure Cloudflare to auto-convert images via Image Resizing / Polish.
+
+2. **Cache & Headers**
+   - Add cache rules to set long-lived `Cache-Control` for static assets (images, JS/CSS, fonts).
+   - Use `Cache-Control: public, max-age=31536000, immutable` for hashed assets and `Cache-Control: s-maxage=60, stale-while-revalidate=86400` for dynamic pages.
+
+3. **Build & Export**
+   - Use the included script for Cloudflare Pages export:
+     ```bash
+     cd client
+     npm run build
+     npm run export
+     ```
+   - The export uses `@cloudflare/next-on-pages` to generate a Pages-compatible output.
+
+4. **Lighthouse Audit (Recommended on preview URL)**
+   - Deploy to a preview/production URL first (Cloudflare Pages preview). Then run Lighthouse from your workstation:
+     - Open Chrome and run devtools Lighthouse (or `npx lighthouse <preview-url> --output html --output-path=report.html`).
+   - Fix high-impact items: images (AVIF/WebP), caching, unused JS, and critical CSS.
+
+5. **Security & Rate-Limits**
+   - Protect admin endpoints with IP allowlist or role checks.
+   - Monitor Supabase rate limits and add rate-limiting at the edge if required.
+
+6. **CI Automation (Optional)**
+   - Add a CI step that runs `npm run build` and `npx lighthouse-ci` on preview deploys to gate merging.
+
+If you’d like, I can add an automated `lighthouse-ci` config and a GitHub Action that runs on pull requests and deploy previews. (I will add it automatically if you want me to proceed.)

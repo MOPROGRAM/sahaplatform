@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+export const runtime = "edge";
+
+
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { apiService } from "@/lib/api";
+import { adsService } from "@/lib/ads";
 
 function TestViewContent() {
     const searchParams = useSearchParams();
@@ -15,19 +18,19 @@ function TestViewContent() {
         if (id) {
             fetchAd();
         }
-    }, [id]);
+    }, [fetchAd]);
 
-    const fetchAd = async () => {
+    const fetchAd = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await apiService.getAd(id!);
+            const data = await adsService.getAd(id!);
             setAd(data);
         } catch (err: any) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
     if (!id) return <div>No ID provided</div>;
 

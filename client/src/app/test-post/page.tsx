@@ -1,7 +1,10 @@
 "use client";
 
+export const runtime = "edge";
+
+
 import { useState } from "react";
-import { apiService } from "@/lib/api";
+import { adsService } from "@/lib/ads";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 
@@ -39,7 +42,7 @@ export default function TestPostPage() {
                 latitude: 24.7136,
                 longitude: 46.6753
             };
-            const res = await apiService.createAd(data);
+            const res = await adsService.createAd(data);
             setResponse(res);
         } catch (err: any) {
             setError(err.message);

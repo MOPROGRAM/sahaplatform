@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 // Get ads by authenticated user (protected)
 router.get('/my', authMiddleware, async (req, res) => {
     try {
-        const ads = await adService.getAllAds({ authorId: req.user.id });
+        const ads = await adService.getAllAds({ userId: req.user.id });
         res.json(ads);
     } catch (error) {
         res.status(500).json({ error: error.message });
