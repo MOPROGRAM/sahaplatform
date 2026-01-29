@@ -9,7 +9,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { conversationsService } from "@/lib/conversations";
-import PixelWaterBackground from "@/components/PixelWaterBackground";
 
 export default function Header() {
     const { user, logout } = useAuthStore();
@@ -97,9 +96,8 @@ export default function Header() {
     };
 
     return (
-        <header className={`sticky top-0 z-[100] backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
+        <header className={`sticky top-0 z-[100] backdrop-blur-lg border-b border-border-color bg-white/80 dark:bg-[#0a0a0a]/90 ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
             <div className="relative">
-                <PixelWaterBackground className="absolute inset-0 w-full h-full" />
                 <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-6 relative z-10">
                 {/* Brand */}
                 <Link href="/" className="group shrink-0 flex items-center gap-2" prefetch={false}>
@@ -134,7 +132,7 @@ export default function Header() {
                     </button>
 
                     {showRegion && (
-                        <div className="absolute top-full mt-2 left-0 w-64 bento-card shadow-2xl p-4 z-[1010] animate-in fade-in zoom-in-95 duration-200 border border-gray-100 dark:border-white/10">
+                        <div className="absolute top-full mt-2 left-0 w-64 bento-card bg-white dark:bg-[#1a1a1a] shadow-2xl p-4 z-[1010] animate-in fade-in zoom-in-95 duration-200 border border-gray-100 dark:border-white/10">
                             <div className="space-y-4">
                                 <div>
                                     <h4 className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">{t('country')}</h4>
@@ -218,7 +216,7 @@ export default function Header() {
                             </button>
 
                             {showUserMenu && (
-                                <div className="absolute top-full right-0 mt-2 w-56 bento-card shadow-2xl py-2 z-[1010] animate-in fade-in duration-200 rounded-2xl border border-gray-100 dark:border-white/10">
+                                <div className="absolute top-full right-0 mt-2 w-56 bento-card bg-white dark:bg-[#1a1a1a] shadow-2xl py-2 z-[1010] animate-in fade-in duration-200 rounded-2xl border border-gray-100 dark:border-white/10">
                                     <div className="space-y-1 p-1">
                                         {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
                                             <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative z-10" onClick={() => setShowUserMenu(false)}>
