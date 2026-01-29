@@ -154,9 +154,9 @@ export default function AdCard({
                         <MapPin size={8} className="text-gray-400" />
                         <span className="truncate">{location?.split(",")[0].trim()}</span>
                     </div>
-                    <div className="flex items-center gap-0.5 font-normal">
+                    <div className="flex items-center gap-0.5 font-normal" suppressHydrationWarning>
                         <Clock size={8} className="text-gray-400" />
-                        <span>{formatRelativeTime(createdAt, language)}</span>
+                        <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
                     </div>
                 </div>
 

@@ -93,8 +93,8 @@ export const adsService = {
 
             // Filter by subcategory
             if (filters.subCategory) {
-                // Search in sub_category column AND title/description for broader match
-                query = query.or(`sub_category.ilike.%${filters.subCategory}%,title.ilike.%${filters.subCategory}%,description.ilike.%${filters.subCategory}%`);
+                // Search in title/description only to avoid referencing a non-existent column
+                query = query.or(`title.ilike.%${filters.subCategory}%,description.ilike.%${filters.subCategory}%`);
             }
 
             // Simple search by title and description
@@ -113,7 +113,7 @@ export const adsService = {
             // Tags Filter (Rent/Sale etc)
             if (filters.tags && filters.tags.length > 0) {
                 filters.tags.forEach(tag => {
-                    let tagConditions = `sub_category.ilike.%${tag}%,title.ilike.%${tag}%,description.ilike.%${tag}%`;
+                    let tagConditions = `title.ilike.%${tag}%,description.ilike.%${tag}%`;
                     if (tag === 'rent') tagConditions += `,title.ilike.%إيجار%,description.ilike.%إيجار%`;
                     if (tag === 'sale') tagConditions += `,title.ilike.%بيع%,description.ilike.%بيع%`;
                     query = query.or(tagConditions);
@@ -226,7 +226,6 @@ export const adsService = {
             description: adData.description,
             price: adData.price,
             category: adData.category,
-            sub_category: adData.subCategory, 
             location: adData.location,
             images: Array.isArray(adData.images) ? JSON.stringify(adData.images) : adData.images,
             video: adData.video,
@@ -275,7 +274,6 @@ export const adsService = {
         if (updates.description) dbUpdates.description = updates.description;
         if (updates.price) dbUpdates.price = updates.price;
         if (updates.category) dbUpdates.category = updates.category;
-        if (updates.subCategory) dbUpdates.sub_category = updates.subCategory;
         if (updates.location) dbUpdates.location = updates.location;
         if (updates.images) dbUpdates.images = updates.images;
         if (updates.video) dbUpdates.video = updates.video;
