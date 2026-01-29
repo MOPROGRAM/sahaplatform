@@ -176,7 +176,7 @@ export default function Header() {
 
                     <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                         <button onClick={toggleTheme} className="p-2 border border-border-color rounded-full hover:border-primary hover:text-primary transition-colors">
-                            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+                            {mounted ? (theme === "light" ? <Moon size={18} /> : <Sun size={18} />) : <Moon size={18} className="opacity-0" />}
                         </button>
                         <button onClick={() => setLanguage(language === "ar" ? "en" : "ar")} className="p-2 border border-border-color rounded-full hover:border-primary hover:text-primary transition-colors">
                             <Globe size={18} />

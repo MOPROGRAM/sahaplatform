@@ -283,7 +283,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gradient-to-br from-[#ff6b35] via-[#ff8a4a] to-white" : "bg-white dark:bg-[#1a1a1a]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-white" : "bg-white dark:bg-[#1a1a1a]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}

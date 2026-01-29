@@ -7,6 +7,11 @@ export const translations = {
         contactEmail: 'motwasel@yahoo.com',
         contactPhone: '+966582003887',
         contactWhatsApp: '+966582003887',
+        
+        // Common
+        close: 'إغلاق',
+        swipeToClose: 'اسحب للإغلاق',
+        back: 'رجوع',
 
         // Navigation
         home: 'الرئيسية',
@@ -348,6 +353,11 @@ export const translations = {
         contactEmail: 'motwasel@yahoo.com',
         contactPhone: '+966582003887',
         contactWhatsApp: '+966582003887',
+
+        // Common
+        close: 'Close',
+        swipeToClose: 'Swipe to close',
+        back: 'Back',
 
         // Theme
         darkMode: 'Dark Mode',
