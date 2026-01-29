@@ -7,6 +7,7 @@ interface AuthState {
     token: string | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
+    loginWithGoogle: () => Promise<void>;
     register: (email: string, password: string, name: string, userType?: string) => Promise<void>;
     logout: () => void;
     initialize: () => void;
@@ -28,6 +29,15 @@ export const useAuthStore = create<AuthState>((set) => ({
             throw error;
         } finally {
             set({ loading: false });
+        }
+    },
+    loginWithGoogle: async () => {
+        set({ loading: true });
+        try {
+            await authService.loginWithGoogle();
+        } catch (error) {
+            set({ loading: false });
+            throw error;
         }
     },
     register: async (email, password, name, userType = 'SEEKER') => {
@@ -57,6 +67,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         try {
             const session = await authService.getCurrentSession();
             if (session?.user) {
+                // Ensure user data is synced to DB
+                await authService.syncUserData(session.user, session.access_token);
+                
                 set({
                     user: {
                         id: session.user.id,

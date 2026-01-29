@@ -77,6 +77,22 @@ export const authService = {
         };
     },
 
+    async loginWithGoogle() {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: typeof window !== 'undefined' ? `${window.location.origin}` : undefined,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                },
+            },
+        });
+
+        if (error) throw new Error(error.message);
+        return data;
+    },
+
     async syncUserData(user: any, token?: string) {
         try {
             // Check if user exists first to decide on points allocation
