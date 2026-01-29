@@ -22,7 +22,7 @@ export const authService = {
             .from('users')
             .select('points')
             .eq('id', data.user?.id)
-            .single();
+            .maybeSingle();
 
         return {
             token: data.session?.access_token || '',
@@ -117,27 +117,20 @@ export const authService = {
                 console.warn('Error fetching existing user:', fetchError);
             }
 
+            // Important: Supabase DB only has 'id' and 'points' for now.
+            // Sending other fields like email/name will cause 400 Error if columns don't exist.
             const userData: any = {
                 id: targetUser.id,
-                email: targetUser.email,
-                name: targetUser.user_metadata?.name || '',
-                role: targetUser.user_metadata?.role || 'USER',
-                user_type: targetUser.user_metadata?.userType || 'SEEKER',
-                verified: !!targetUser.email_confirmed_at,
+                // Only include other fields if your DB schema actually supports them!
+                // For now, based on user instruction, we stick to ID and Points logic.
+                // email: targetUser.email, 
+                // name: targetUser.user_metadata?.name || '',
             };
 
             // Only set default points for new users (if not found in DB)
             if (!existingUser) {
                 userData.points = 10;
-            } else {
-                // If user exists, we might want to preserve their points or update if needed
-                // For now, we don't overwrite points in the upsert unless necessary
-                // If existingUser has points, we don't put points in userData to avoid resetting it
-                // UNLESS we want to sync other fields.
             }
-
-            // Remove undefined values to avoid 400 errors
-            Object.keys(userData).forEach(key => userData[key] === undefined && delete userData[key]);
 
             // Upsert user data
             const { error: upsertError } = await (supabase as any)

@@ -106,6 +106,14 @@ export default function PostAdPage() {
         try {
             const { data: { user: currentUser } } = await supabase.auth.getUser();
             if (!currentUser) throw new Error("Not authenticated");
+            
+            // Try to sync/check points, but don't fail the whole process if it fails
+            // This prevents 500 errors if the users table is not perfectly synced
+            try {
+                 await supabase.from('users').select('points').eq('id', currentUser.id).maybeSingle();
+            } catch (syncErr) {
+                console.warn("Could not verify points, proceeding anyway:", syncErr);
+            }
 
             // Upload images
             const imageUrls: string[] = [];
