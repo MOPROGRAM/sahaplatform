@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, Phone, MessageCircle, User } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -63,6 +64,7 @@ export default function AdCard({
     authorName // Added to destructuring
 }: AdCardProps) {
     const { t } = useLanguage();
+    const router = useRouter();
     const [isFavorite, setIsFavorite] = useState(false);
     const [peel, setPeel] = useState<{x: number; y: number}>({ x: 0, y: 0 });
     const [faceIndex, setFaceIndex] = useState(0);
@@ -180,7 +182,7 @@ export default function AdCard({
     const renderStandardFace = () => (
         <div className={`w-full h-full flex bg-white dark:bg-[#1a1a1a] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
              {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : (isFeatured ? "w-full h-48" : "w-full h-20")) : "w-[35%] h-full"}`}>
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-20") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
                 <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
@@ -269,9 +271,23 @@ export default function AdCard({
                      {location && (
                         <div className="flex items-center gap-1 text-[10px] text-text-muted">
                             <MapPin size={10} />
-                            <span className="truncate max-w-[80px]">{location.split(",")[0]}</span>
+                            <span className="truncate max-w-[60px]">{location.split(",")[0]}</span>
                         </div>
                     )}
+
+                    {category && (
+                        <span
+                            className="text-[10px] font-bold text-primary hover:underline cursor-pointer truncate max-w-[80px]"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                router.push(`/ads?category=${category}`);
+                            }}
+                        >
+                            {t(category)}
+                        </span>
+                    )}
+
                      <div className="flex items-center gap-1 text-[10px] text-text-muted">
                         <Clock size={10} />
                         <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
@@ -283,25 +299,15 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-white min-h-48" : "bg-white dark:bg-[#1a1a1a]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
         >
-             {isFeatured && (
-                <div className="absolute inset-0 z-0 pointer-events-none">
-                    <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <path d="M0 60 Q 20 40 40 60 T 80 60 T 120 40 V 100 H 0 Z" fill="rgba(255,255,255,0.15)" />
-                        <path d="M0 40 Q 25 70 50 40 T 100 50 V 100 H 0 Z" fill="rgba(255,255,255,0.1)" />
-                        <path d="M0 80 Q 30 50 60 80 T 120 70 V 100 H 0 Z" fill="rgba(255,255,255,0.2)" />
-                    </svg>
-                </div>
-            )}
-
             {/* Close/Next Controls */}
             <div className="absolute top-1 left-1 z-20">
                 <motion.button
-                    className={`px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-white/20 text-white backdrop-blur-sm" : "bg-gray-100 text-text-main"}`}
+                    className={`px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-[#ffd700] text-black backdrop-blur-sm" : "bg-gray-100 text-text-main"}`}
                     drag="y"
                     dragMomentum={false}
                     onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -322,7 +328,7 @@ export default function AdCard({
                 </motion.button>
                  <div className="absolute inset-0 pointer-events-none">
                     <div
-                        className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-white/30" : "bg-gray-200"}`}
+                        className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-[#ffd700]/30" : "bg-gray-200"}`}
                         style={{
                             width: cornerMax,
                             height: cornerMax,
@@ -336,34 +342,34 @@ export default function AdCard({
             </div>
 
             <div className="flex flex-col h-full relative z-10 pt-4">
-                <h3 className={`text-[12px] font-black leading-tight mb-1 ${isFeatured ? "text-white drop-shadow-md" : "text-text-main"}`}>{currentTitle}</h3>
+                <h3 className="text-[12px] font-black leading-tight mb-1 text-text-main">{currentTitle}</h3>
                 {currentDescription && (
-                    <p className={`text-[10px] leading-tight mb-2 line-clamp-4 ${isFeatured ? "text-white/90" : "text-text-muted"}`}>
+                    <p className="text-[10px] leading-tight mb-2 line-clamp-4 text-text-muted">
                         {currentDescription}
                     </p>
                 )}
                 
-                <div className={`grid grid-cols-2 gap-2 text-[9px] mb-2 ${isFeatured ? "text-white/80" : "text-text-muted"}`}>
+                <div className="grid grid-cols-2 gap-2 text-[9px] mb-2 text-text-muted">
                      {location && (
                         <div className="flex items-center gap-1">
-                            <MapPin size={9} className={isFeatured ? "text-white" : "text-gray-400"} />
+                            <MapPin size={9} className="text-gray-400" />
                             <span className="truncate">{location?.split(",")[0].trim()}</span>
                         </div>
                     )}
                      <div className="flex items-center gap-1">
-                        <Clock size={9} className={isFeatured ? "text-white" : "text-gray-400"} />
+                        <Clock size={9} className="text-gray-400" />
                         <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
                     </div>
                 </div>
 
                 <div className="mt-auto flex items-center justify-between">
                      <button
-                        className={`px-2 py-1 text-[10px] font-black rounded transition-colors ${isFeatured ? "bg-white/20 text-white hover:bg-white/30" : "bg-gray-100 dark:bg-white/10 text-text-main hover:bg-primary/10"}`}
+                        className={`px-2 py-1 text-[10px] font-black rounded transition-colors ${isFeatured ? "bg-[#ffd700]/20 text-black hover:bg-[#ffd700]/30" : "bg-gray-100 dark:bg-white/10 text-text-main hover:bg-primary/10"}`}
                         onClick={handleNextFace}
                     >
                         {isFeatured ? t("contact") : t("back")}
                     </button>
-                    <span className={`text-[9px] ${isFeatured ? "text-white/80" : "text-text-muted"}`}>
+                    <span className="text-[9px] text-text-muted">
                         اسحب للإغلاق
                     </span>
                 </div>
@@ -373,7 +379,7 @@ export default function AdCard({
 
     const renderContactFace = () => (
          <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#1a1a1a]`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -429,7 +435,14 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700"} ${isVertical ? "flex-col h-full" : (language === "ar" ? "flex-row-reverse" : "flex-row")} ${className}`}
+            className={`bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} ${
+                isFeatured 
+                    ? "border-[#ffd700] ring-1 ring-[#ffd700]/50" 
+                    : (isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700")
+            } rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block ${className}`}
+            style={{ 
+                height: isVertical && !imageHeight ? '180px' : 'auto'
+            }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >

@@ -55,7 +55,7 @@ export default function PromotedBanner() {
                     </div>
                     
                     {/* Content Container - Horizontal Scroll */}
-                    <div className="relative flex items-center gap-3 p-2 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
+                    <div className="relative flex items-center gap-2 p-2 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
                         {stripAds.map((ad) => {
                             let images: string[] = [];
                             try {
@@ -69,12 +69,11 @@ export default function PromotedBanner() {
                             }
 
                             return (
-                                <div key={ad.id} className="snap-start shrink-0 w-[200px] sm:w-[220px]">
+                                <div key={ad.id} className="snap-start shrink-0 w-[calc(50%-8px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-8px)] lg:w-[calc(20%-8px)] xl:w-[calc(16.666%-8px)] 2xl:w-[calc(14.285%-8px)]">
                                     <AdCard 
                                         {...ad}
                                         images={images}
                                         layout="vertical"
-                                        imageHeight="h-[62px]"
                                         className="h-full relative isolate
                                             bg-gradient-to-br from-[#fff7e6] via-[#ffe2a8] to-[#ffd58a] dark:from-[#2a2108] dark:via-[#3a2a0e] dark:to-[#4a3512]
                                             shadow-[0_2px_6px_rgba(255,191,0,0.15),0_12px_24px_rgba(255,191,0,0.12),0_24px_32px_-8px_rgba(0,0,0,0.1)] 
