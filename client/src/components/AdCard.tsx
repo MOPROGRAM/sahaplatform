@@ -180,7 +180,7 @@ export default function AdCard({
     const renderStandardFace = () => (
         <div className={`w-full h-full flex bg-white dark:bg-[#1a1a1a] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
              {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-48") : "w-[35%] h-full"}`}>
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : (isFeatured ? "w-full h-48" : "w-full h-20")) : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
                 <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
@@ -283,7 +283,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-white" : "bg-white dark:bg-[#1a1a1a]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-white min-h-48" : "bg-white dark:bg-[#1a1a1a]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -388,11 +388,11 @@ export default function AdCard({
                  </button>
              </div>
 
-            <div className="flex flex-col h-full relative z-10 pt-6 items-center text-center">
-                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                    <User className="text-primary" size={20} />
+            <div className="flex flex-col h-full relative z-10 pt-2 items-center text-center">
+                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                    <User className="text-primary" size={16} />
                  </div>
-                 <h3 className="text-[11px] font-bold text-text-main mb-3">{authorName || t("seller")}</h3>
+                 <h3 className="text-[11px] font-bold text-text-main mb-2">{authorName || t("seller")}</h3>
                  
                  <div className="flex flex-col gap-2 w-full px-2">
                     <button className="flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded text-[10px] font-bold hover:bg-primary/90 transition-colors">
@@ -440,9 +440,14 @@ export default function AdCard({
                     animate={{ rotateY: faceIndex * 180 }}
                     transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }} // Cubic bezier for smoother flip
                 >
+                    {/* Invisible Spacer to maintain size */}
+                    <div className="invisible pointer-events-none opacity-0 select-none relative" aria-hidden="true">
+                        {isFeatured ? renderDetailsFace() : renderStandardFace()}
+                    </div>
+
                     {/* Front Physical Side */}
                     <div 
-                        className="relative w-full h-full"
+                        className="absolute inset-0 w-full h-full"
                         style={{ backfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
                     >
                         {renderContent(getFrontContent())}

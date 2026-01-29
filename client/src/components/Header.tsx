@@ -85,17 +85,20 @@ export default function Header() {
                 {/* Brand */}
                 <Link href="/" className="group shrink-0 flex items-center gap-2" prefetch={false}>
                     {/* Mobile Logo */}
-                    <Logo className="h-9 w-auto text-primary sm:hidden transition-transform group-hover:scale-110" />
+                    <Logo className="h-9 w-auto sm:hidden text-primary transition-all duration-1000 group-hover:scale-110" strokeWidth="8.11" />
                     
                     {/* Desktop Logo (Name + Underline) */}
                     <div className="hidden sm:flex flex-col items-center">
-                        <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105 leading-none">
+                        <span 
+                            className="text-3xl font-black tracking-tighter italic transition-all duration-1000 group-hover:scale-105 leading-none text-primary"
+                        >
                             {t("siteName")}
                         </span>
                         <Logo 
                             viewBox="14 22 72 36" 
                             preserveAspectRatio="none"
-                            className="h-4 w-[101.1%] text-primary transition-transform group-hover:scale-110" 
+                            className="h-4 w-[101.1%] transition-all duration-1000 group-hover:scale-110 text-primary"
+                            strokeWidth="8.11"
                         />
                     </div>
                 </Link>
