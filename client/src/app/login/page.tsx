@@ -40,6 +40,14 @@ export default function LoginPage() {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: `${window.location.origin}/auth/callback` }
+        });
+        if (error) console.error(error);
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-bg via-primary/5 to-primary/10 transition-colors duration-300">
             <div className="w-full max-w-[420px] space-y-4">
