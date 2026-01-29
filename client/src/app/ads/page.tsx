@@ -25,7 +25,11 @@ function cn(...inputs: ClassValue[]) {
 interface Ad {
     id: string;
     title: string;
+    titleAr?: string;
+    titleEn?: string;
     description?: string;
+    descriptionAr?: string;
+    descriptionEn?: string;
     price: number | null;
     category: string;
     subCategory?: string | null;
@@ -239,6 +243,8 @@ function AdsContent() {
                                 key={ad.id}
                                 id={ad.id}
                                 title={ad.title}
+                                titleAr={ad.titleAr}
+                                titleEn={ad.titleEn}
                                 price={ad.price || 0}
                                 currency={ad.currency}
                                 location={ad.location || ''}
@@ -249,6 +255,8 @@ function AdsContent() {
                                 isFeatured={ad.is_boosted || false}
                                 authorName={ad.author?.name}
                                 description={ad.description}
+                                descriptionAr={ad.descriptionAr}
+                                descriptionEn={ad.descriptionEn}
                             // Removed onMapHighlight and isHighlighted props as map is removed
                             />
                         ))}

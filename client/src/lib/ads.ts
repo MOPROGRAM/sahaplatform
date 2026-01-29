@@ -228,10 +228,10 @@ export const adsService = {
             category: adData.category,
             sub_category: adData.subCategory, 
             location: adData.location,
-            images: adData.images,
+            images: Array.isArray(adData.images) ? JSON.stringify(adData.images) : adData.images,
             video: adData.video,
             author_id: user.id,
-            city_id: adData.cityId,
+            city_id: adData.cityId || null,
             currency_id: adData.currencyId || 'sar', // Default to SAR if not provided
             is_boosted: adData.isBoosted || false,
             is_active: true, // Default active

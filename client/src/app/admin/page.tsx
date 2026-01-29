@@ -41,11 +41,12 @@ export default function AdminDashboard() {
         totalAds: 0,
         pendingSubscriptions: 0,
         activeSubscriptions: 0,
-        totalReports: 0
+        totalReports: 0,
+        supportTickets: 0
     });
 
     const [dataList, setDataList] = useState<any[]>([]);
-    const [view, setView] = useState('overview'); // overview, users, ads, subscriptions, reports
+    const [view, setView] = useState('overview'); // overview, users, ads, subscriptions, reports, messages
     const [searchTerm, setSearchTerm] = useState('');
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -53,12 +54,13 @@ export default function AdminDashboard() {
         setLoading(true);
         try {
             if (view === 'overview') {
-                const [usersCount, adsCount, subsPending, subsActive, reportsCount] = await Promise.all([
+                const [usersCount, adsCount, subsPending, subsActive, reportsCount, supportCount] = await Promise.all([
                     (supabase as any).from('users').select('*', { count: 'exact', head: true }),
                     (supabase as any).from('ads').select('*', { count: 'exact', head: true }),
                     (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
                     (supabase as any).from('subscription_requests').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-                    (supabase as any).from('reports').select('*', { count: 'exact', head: true })
+                    (supabase as any).from('reports').select('*', { count: 'exact', head: true }),
+                    (supabase as any).from('conversations').select('*', { count: 'exact', head: true }).is('ad_id', null)
                 ]);
 
                 setStats({
@@ -66,7 +68,8 @@ export default function AdminDashboard() {
                     totalAds: adsCount.count || 0,
                     pendingSubscriptions: subsPending.count || 0,
                     activeSubscriptions: subsActive.count || 0,
-                    totalReports: reportsCount.error ? 0 : (reportsCount.count || 0)
+                    totalReports: reportsCount.error ? 0 : (reportsCount.count || 0),
+                    supportTickets: supportCount.count || 0
                 });
 
                 // Fetch recent ads for overview
@@ -106,6 +109,18 @@ export default function AdminDashboard() {
                 } else {
                     setDataList(data || []);
                 }
+            } else if (view === 'messages') {
+                const { data } = await (supabase as any)
+                    .from('conversations')
+                    .select(`
+                        *,
+                        participants:conversation_participants(
+                            user:users!user_id(id, name, email)
+                        )
+                    `)
+                    .is('ad_id', null)
+                    .order('last_message_time', { ascending: false });
+                setDataList(data || []);
             }
         } catch (error) {
             console.error("Fetch failed:", error);
@@ -230,7 +245,7 @@ export default function AdminDashboard() {
                             {language === 'ar' ? 'بوابة الإشراف المركزية' : 'CENTRAL ADMINISTRATION PORTAL'}
                         </h1>
                         <div className="flex items-center gap-2">
-                            <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Saha Core v3.0</span>
+                            <span className="text-[8px] font-bold text-gray-500 tracking-widest">{language === 'ar' ? 'نواة صحة 3.0' : 'saha core v3.0'}</span>
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
                         </div>
                     </div>
@@ -240,7 +255,7 @@ export default function AdminDashboard() {
                     <div className="hidden md:flex items-center gap-4 border-l border-border-color pl-6 h-14">
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] font-black text-white leading-none uppercase">{user.name}</span>
-                            <span className="text-[8px] font-bold text-primary uppercase mt-1">SUPER_ADMIN</span>
+                            <span className="text-[8px] font-bold text-primary uppercase mt-1">{language === 'ar' ? 'مدير عام' : 'SUPER_ADMIN'}</span>
                         </div>
                         <button onClick={() => { logout(); router.push('/'); }} className="w-8 h-8 rounded-full bg-card hover:bg-red-500/20 text-text-muted hover:text-red-500 flex items-center justify-center transition-all border border-transparent hover:border-red-500/30">
                             <LogOut size={16} />
@@ -252,9 +267,10 @@ export default function AdminDashboard() {
             <div className="flex flex-1 overflow-hidden">
                 {/* Sleek Dark Sidebar */}
                 <aside className="w-64 bg-gray-bg border-r border-border-color p-4 flex flex-col gap-1.5">
-                    <div className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 mt-2 px-3">System Modules</div>
+                    <div className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 mt-2 px-3">{language === 'ar' ? 'وحدات النظام' : 'System Modules'}</div>
                     {[
                         { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'DASHBOARD OVERVIEW', icon: <BarChart3 size={18} /> },
+                        { id: 'messages', label: language === 'ar' ? 'رسائل الدعم' : 'SUPPORT MESSAGES', icon: <MessageSquare size={18} />, badge: stats.supportTickets },
                         { id: 'subscriptions', label: language === 'ar' ? 'طلبات الاشتراكات' : 'PAID AD REQUESTS', icon: <DollarSign size={18} />, badge: stats.pendingSubscriptions },
                         { id: 'reports', label: language === 'ar' ? 'البلاغات' : 'USER REPORTS', icon: <Flag size={18} />, badge: stats.totalReports > 0 ? stats.totalReports : undefined },
                         { id: 'ads', label: language === 'ar' ? 'إدارة الإعلانات' : 'AD MODERATION', icon: <Package size={18} /> },
@@ -280,14 +296,6 @@ export default function AdminDashboard() {
                             )}
                         </button>
                     ))}
-
-                    <div className="mt-auto p-4 bg-gradient-to-br from-primary/5 to-transparent border border-primary/10 rounded-sm">
-                        <div className="flex items-center gap-2 mb-2 text-primary">
-                            <ShieldCheck size={14} />
-                            <span className="text-[9px] font-black uppercase tracking-[0.1em]">Verified Access</span>
-                        </div>
-                        <p className="text-[9px] text-gray-500 font-bold leading-tight uppercase">Admin session secured via encrypted protocol.</p>
-                    </div>
                 </aside>
 
                 {/* Main Content Area */}
@@ -300,7 +308,7 @@ export default function AdminDashboard() {
                                     <ShieldCheck size={24} className="text-primary/50" />
                                 </div>
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] mt-8 text-primary animate-pulse">Initializing Interface...</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] mt-8 text-primary animate-pulse">{language === 'ar' ? 'جاري تهيئة الواجهة...' : 'Initializing Interface...'}</span>
                         </div>
                     ) : (
                         <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -310,6 +318,7 @@ export default function AdminDashboard() {
                                 <div>
                                     <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2 italic">
                                         {view === 'overview' && (language === 'ar' ? 'النظرة العامة' : 'SYSTEM STATUS')}
+                                        {view === 'messages' && (language === 'ar' ? 'رسائل الدعم الفني' : 'SUPPORT CENTER')}
                                         {view === 'subscriptions' && (language === 'ar' ? 'الاشتراكات المدفوعة' : 'FINANCIAL OPS')}
                                         {view === 'reports' && (language === 'ar' ? 'بلاغات المستخدمين' : 'USER REPORTS')}
                                         {view === 'ads' && (language === 'ar' ? 'الرقابة على الإعلانات' : 'CONTENT MODERATION')}
@@ -365,7 +374,7 @@ export default function AdminDashboard() {
                                             <div className="p-4 border-b border-border-color flex justify-between items-center">
                                                 <h3 className="text-[11px] font-black tracking-[0.2em] flex items-center gap-2">
                                                     <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                                                    RECENT ASSETS
+                                                    {language === 'ar' ? 'أحدث الأصول' : 'RECENT ASSETS'}
                                                 </h3>
                                                 <button onClick={() => setView('ads')} className="text-[9px] font-black text-primary hover:tracking-widest transition-all uppercase">DECRYPT ALL</button>
                                             </div>
@@ -438,6 +447,10 @@ export default function AdminDashboard() {
                                                 view === 'users' ? (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) || item.email?.toLowerCase().includes(searchTerm.toLowerCase())) :
                                                     view === 'ads' ? (item.title?.toLowerCase().includes(searchTerm.toLowerCase())) :
                                                     view === 'reports' ? (item.reason?.toLowerCase().includes(searchTerm.toLowerCase()) || item.ad_id?.includes(searchTerm)) :
+                                                    view === 'messages' ? (
+                                                        item.participants?.some((p: any) => p.user.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                                                        item.last_message?.toLowerCase().includes(searchTerm.toLowerCase())
+                                                    ) :
                                                         (item.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) || item.package_name?.toLowerCase().includes(searchTerm.toLowerCase()))
                                             ).map((item) => (
                                                 <tr key={item.id} className="hover:bg-card transition-colors group">
@@ -473,6 +486,17 @@ export default function AdminDashboard() {
                                                                 <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors">{item.reason || 'No Reason Provided'}</span>
                                                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">AD ID: {item.ad_id}</span>
                                                                 <span className="text-[8px] font-black text-red-500 uppercase mt-1">REPORT ID: {item.id}</span>
+                                                            </div>
+                                                        )}
+                                                        {view === 'messages' && (
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[12px] font-black text-white group-hover:text-primary transition-colors">
+                                                                    {item.participants?.find((p: any) => p.user.id !== user?.id)?.user?.name || 'Unknown User'}
+                                                                </span>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate max-w-[200px]">
+                                                                    {item.last_message || 'No messages'}
+                                                                </span>
+                                                                <span className="text-[8px] font-black text-primary/50 uppercase mt-1 tracking-[0.2em]">TICKET ID: {item.id.substring(0, 8)}</span>
                                                             </div>
                                                         )}
                                                     </td>
@@ -511,6 +535,13 @@ export default function AdminDashboard() {
                                                         {view === 'reports' && (
                                                             <div className="flex items-center gap-2">
                                                                 <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">PENDING REVIEW</span>
+                                                            </div>
+                                                        )}
+                                                        {view === 'messages' && (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-[10px] font-mono text-gray-400">
+                                                                    {new Date(item.last_message_time).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US')}
+                                                                </span>
                                                             </div>
                                                         )}
                                                     </td>
@@ -591,6 +622,15 @@ export default function AdminDashboard() {
                                                                 <button className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-black transition-all">
                                                                     <ShieldCheck size={12} />
                                                                     Manage
+                                                                </button>
+                                                            )}
+                                                            {view === 'messages' && (
+                                                                <button
+                                                                    onClick={() => router.push(`/messages?id=${item.id}`)}
+                                                                    className="flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm hover:bg-primary hover:text-black transition-all"
+                                                                >
+                                                                    <MessageSquare size={14} />
+                                                                    {language === 'ar' ? 'رد' : 'REPLY'}
                                                                 </button>
                                                             )}
                                                         </div>

@@ -166,8 +166,11 @@ export default function Header() {
                                 className="flex items-center gap-2 px-2 py-1 hover:bg-primary/10 rounded-lg transition-all group border border-transparent hover:border-primary/20"
                             >
                                 <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm uppercase shrink-0">
-                                    {user.name?.substring(0, 1)}
-                                </div>
+                  {user.name?.substring(0, 1)}
+                </div>
+                <div className="hidden md:block text-start">
+                  <p className="text-sm font-bold text-text-main leading-none">{user.name}</p>
+                </div>
                                 <ChevronDown size={12} className="text-gray-400" />
                             </button>
 
@@ -176,7 +179,7 @@ export default function Header() {
                                     <div className="fixed inset-0 z-[105]" onClick={() => setShowUserMenu(false)}></div>
                                     <div className="absolute top-full right-0 mt-2 w-56 bento-card shadow-2xl py-2 z-[110] animate-in fade-in duration-200 rounded-2xl">
                                         <div className="space-y-1 p-1">
-                                            {user.role === "ADMIN" && (
+                                            {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
                                                 <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <Settings size={14} />
                                                     {t("systemManagement")}

@@ -29,7 +29,6 @@ const countries = [
 ];
 
 const cities = [
-    { nameAr: 'الرياض', nameEn: 'Riyadh', countryCode: 'SA', lat: 24.7136, lng: 46.6753 },
     { nameAr: 'جدة', nameEn: 'Jeddah', countryCode: 'SA', lat: 21.4858, lng: 39.1925 },
     { nameAr: 'مكة المكرمة', nameEn: 'Mecca', countryCode: 'SA', lat: 21.3891, lng: 39.8579 },
     { nameAr: 'دبي', nameEn: 'Dubai', countryCode: 'AE', lat: 25.2048, lng: 55.2708 },
@@ -114,7 +113,7 @@ async function main() {
             phone: '+966501234567',
             phoneVerified: true,
             countryId: (await prisma.country.findUnique({ where: { code: 'SA' } })).id,
-            cityId: (await prisma.city.findFirst({ where: { nameAr: 'الرياض' } })).id
+            cityId: (await prisma.city.findFirst({ where: { nameAr: 'جدة' } })).id
         }
     });
 
@@ -131,22 +130,22 @@ async function main() {
             phone: '+966500000000',
             phoneVerified: true,
             countryId: (await prisma.country.findUnique({ where: { code: 'SA' } })).id,
-            cityId: (await prisma.city.findFirst({ where: { nameAr: 'الرياض' } })).id
+            cityId: (await prisma.city.findFirst({ where: { nameAr: 'جدة' } })).id
         }
     });
 
     // 5. Create test ads with different categories and created_at dates
     const ads = [
         {
-            title: 'شقة للإيجار في الرياض',
-            titleAr: 'شقة للإيجار في الرياض',
-            titleEn: 'Apartment for rent in Riyadh',
-            description: 'شقة ممتازة للإيجار في حي النخيل',
-            descriptionAr: 'شقة ممتازة للإيجار في حي النخيل',
-            descriptionEn: 'Excellent apartment for rent in Al Nakheel district',
+            title: 'شقة للإيجار في جدة',
+            titleAr: 'شقة للإيجار في جدة',
+            titleEn: 'Apartment for rent in Jeddah',
+            description: 'شقة ممتازة للإيجار في حي الروضة',
+            descriptionAr: 'شقة ممتازة للإيجار في حي الروضة',
+            descriptionEn: 'Excellent apartment for rent in Al Rawdah district',
             price: 2500,
             category: 'realestate',
-            location: 'الرياض',
+            location: 'جدة',
             images: JSON.stringify(['https://via.placeholder.com/400x300/FF6B6B/FFFFFF?text=شقة+للإيجار']),
             createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
         },
@@ -185,7 +184,7 @@ async function main() {
             descriptionEn: 'Dell i7 laptop, 16GB RAM, excellent condition',
             price: 3500,
             category: 'electronics',
-            location: 'الرياض',
+            location: 'جدة',
             images: JSON.stringify(['https://via.placeholder.com/400x300/45B7D1/FFFFFF?text=لابتوب+ديل']),
             createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
         },
@@ -198,7 +197,7 @@ async function main() {
             descriptionEn: 'Professional website design at competitive prices',
             price: 5000,
             category: 'services',
-            location: 'الرياض',
+            location: 'جدة',
             images: JSON.stringify(['https://via.placeholder.com/400x300/FFA07A/FFFFFF?text=تصميم+مواقع']),
             createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
         },
@@ -224,7 +223,7 @@ async function main() {
             descriptionEn: '3 bedroom apartment with private garden',
             price: 1200000,
             category: 'realestate',
-            location: 'الرياض',
+            location: 'جدة',
             images: JSON.stringify(['https://via.placeholder.com/400x300/FFA07A/FFFFFF?text=شقة+للبيع']),
             createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
         }

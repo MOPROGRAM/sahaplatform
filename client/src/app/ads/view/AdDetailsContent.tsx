@@ -187,7 +187,16 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                             {(ad.currency && typeof ad.currency === 'object') ? ad.currency.code : (ad.currency || 'SAR')}
                                         </span>
                                     </div>
-                                    {ad.created_at && <span className="text-[9px] font-black text-text-muted mt-1 uppercase italic tracking-tighter">{language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}</span>}
+                                    {ad.created_at && (
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-[9px] font-black text-text-muted mt-1 uppercase italic tracking-tighter">
+                                                {language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}
+                                            </span>
+                                            <span className="text-[9px] text-text-muted opacity-50 font-medium">
+                                                {formatDateTime(ad.created_at, language)}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

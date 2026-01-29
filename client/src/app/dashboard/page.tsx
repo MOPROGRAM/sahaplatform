@@ -21,7 +21,10 @@ import {
     Zap,
     Calendar,
     DollarSign,
-    Bell
+    Bell,
+    ArrowLeft,
+    X,
+    AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -65,7 +68,7 @@ export default function DashboardPage() {
         {
             name: t('pointsPack1'),
             points: 10,
-            price: '7.5 SAR',
+            price: '7.5 SAR (2 USD)',
             description: t('pointsPack1Desc'),
             features: [`10 ${t('points')}`, t('promoteAdDesc'), t('verifiedBadge')],
             color: 'bg-blue-500'
@@ -214,6 +217,32 @@ export default function DashboardPage() {
         fetchDashboardData();
     }, [user, router, activeTab, fetchDashboardData]);
 
+    const handleContactSupport = async () => {
+        setProcessing(true);
+        try {
+            const token = useAuthStore.getState().token;
+            const res = await fetch('/api/support/chat', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to start support chat');
+            }
+            
+            const data = await res.json();
+            router.push(`/messages?id=${data.conversationId}`);
+        } catch (error: any) {
+            console.error("Support chat error:", error);
+            alert(language === 'ar' ? 'عذراً، حدث خطأ أثناء الاتصال بالدعم' : 'Error connecting to support');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     const deleteAd = async (adId: string) => {
         try {
             await adsService.deleteAd(adId);
@@ -281,6 +310,13 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
+                    {(user.role === 'ADMIN' || user.email === 'motwasel@yahoo.com') && (
+                        <Link href="/admin" className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 transition-all rounded-sm shadow-lg mb-2">
+                            <Settings size={14} />
+                            <span>{language === 'ar' ? 'لوحة المسؤول' : 'Admin Panel'}</span>
+                        </Link>
+                    )}
+
                     <nav className="glass-card overflow-hidden">
                         {[
                             { label: t('overview'), icon: <LayoutDashboard size={14} />, id: 'overview' },
@@ -295,6 +331,15 @@ export default function DashboardPage() {
                             </button>
                         ))}
                     </nav>
+
+                    <button 
+                        onClick={handleContactSupport}
+                        disabled={processing}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-blue-500 bg-card hover:bg-blue-50 transition-all border border-blue-100 rounded-sm mb-2"
+                    >
+                        {processing ? <Loader2 size={14} className="animate-spin" /> : <Headphones size={14} />}
+                        <span>{language === 'ar' ? 'تواصل مع الدعم' : 'Contact Support'}</span>
+                    </button>
 
                     <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-card hover:bg-red-50 transition-all border border-red-100 rounded-sm">
                         <LogOut size={14} />
@@ -326,9 +371,17 @@ export default function DashboardPage() {
                                         <Package size={14} className="text-primary" />
                                         <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">Operational Fleet / Listings</h3>
                                     </div>
-                                    <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
-                                        <PlusCircle size={12} /> ADD UNIT
-                                    </Link>
+                                    <div className="flex gap-2">
+                                        <button 
+                                            onClick={openBuyPoints} 
+                                            className="bg-yellow-500 text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-yellow-600 shadow-lg active:scale-95 transition-all"
+                                        >
+                                            <Zap size={12} /> {language === 'ar' ? 'شراء نقاط' : 'Buy Points'}
+                                        </button>
+                                        <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                                            <PlusCircle size={12} /> ADD UNIT
+                                        </Link>
+                                    </div>
                                 </div>
 
                                 <div className="bento-grid">
@@ -376,6 +429,14 @@ export default function DashboardPage() {
                                                         <Link href={`/ads/${ad.id}/edit`} className="px-3 py-1 bg-blue-500 text-white rounded text-xs font-bold hover:bg-blue-600 transition-all">
                                                             Edit
                                                         </Link>
+                                                        <button 
+                                                            onClick={() => {
+                                                                setPromoteModal({ open: true, adId: ad.id, adTitle: ad.title, days: 1 });
+                                                            }} 
+                                                            className="px-3 py-1 bg-yellow-500 text-white rounded text-xs font-bold hover:bg-yellow-600 transition-all flex items-center gap-1"
+                                                        >
+                                                            <Zap size={12} /> Boost
+                                                        </button>
                                                         <button onClick={() => openDeleteModal(ad.id, ad.title)} className="px-3 py-1 bg-red-500 text-white rounded text-xs font-bold hover:bg-red-600 transition-all">
                                                             Delete
                                                         </button>
@@ -781,6 +842,116 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </>
+            )}
+
+            {promoteModal.open && (
+                <div className="fixed inset-0 z-[50] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-border-color" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                        <div className="bg-primary/5 p-6 border-b border-border-color flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-black text-text-main uppercase tracking-tight">{language === 'ar' ? 'ترويج الإعلان' : 'Promote Ad'}</h3>
+                                <p className="text-sm text-text-muted mt-1">{promoteModal.adTitle}</p>
+                            </div>
+                            <button onClick={() => setPromoteModal({ ...promoteModal, open: false })} className="text-text-muted hover:text-text-main transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6">
+                            <div className="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl flex gap-3 mb-6">
+                                <Zap className="w-6 h-6 text-yellow-500 shrink-0" />
+                                <div>
+                                    <h4 className="font-bold text-yellow-700 dark:text-yellow-500 text-sm mb-1">
+                                        {language === 'ar' ? 'لماذا تروج إعلانك؟' : 'Why promote?'}
+                                    </h4>
+                                    <p className="text-xs text-yellow-600 dark:text-yellow-400 leading-relaxed">
+                                        {language === 'ar' 
+                                            ? 'تظهر الإعلانات المروجة في أعلى القائمة وفي الشريط المتحرك، مما يزيد المشاهدات بنسبة 500%.' 
+                                            : 'Promoted ads appear at the top and in the ticker, increasing views by 500%.'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-text-muted uppercase mb-2">
+                                        {language === 'ar' ? 'مدة الترويج (أيام)' : 'Duration (Days)'}
+                                    </label>
+                                    <div className="flex items-center gap-4 bg-card border border-border-color rounded-xl p-2">
+                                        <button 
+                                            onClick={() => setPromoteModal(p => ({ ...p, days: Math.max(1, p.days - 1) }))}
+                                            className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-bold text-lg"
+                                        >
+                                            -
+                                        </button>
+                                        <div className="flex-1 text-center">
+                                            <input 
+                                                type="number" 
+                                                min="1" 
+                                                max="30"
+                                                value={promoteModal.days}
+                                                onChange={(e) => {
+                                                    const val = parseInt(e.target.value);
+                                                    if (!isNaN(val)) {
+                                                        setPromoteModal(p => ({ ...p, days: Math.min(30, Math.max(1, val)) }));
+                                                    }
+                                                }}
+                                                className="w-full text-center text-2xl font-black text-primary bg-transparent border-none focus:ring-0 p-0"
+                                            />
+                                            <span className="text-xs font-bold text-text-muted block uppercase tracking-wider">{language === 'ar' ? 'أيام' : 'Days'}</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => setPromoteModal(p => ({ ...p, days: Math.min(30, p.days + 1) }))}
+                                            className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-bold text-lg"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-between p-4 bg-card border border-border-color rounded-xl">
+                                    <span className="text-sm font-bold text-text-muted uppercase tracking-wider">{language === 'ar' ? 'التكلفة الإجمالية' : 'Total Cost'}</span>
+                                    <div className="text-right">
+                                        <span className="text-2xl font-black text-text-main block">{promoteModal.days * 1}</span>
+                                        <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">{language === 'ar' ? 'نقاط' : 'POINTS'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="pt-2">
+                                    <div className="flex justify-between text-xs font-bold text-text-muted mb-2">
+                                        <span>{language === 'ar' ? 'رصيدك الحالي' : 'Your Balance'}</span>
+                                        <span className={(user?.points || 0) < promoteModal.days ? 'text-red-500' : 'text-green-500'}>
+                                            {user?.points || 0} {language === 'ar' ? 'نقطة' : 'PTS'}
+                                        </span>
+                                    </div>
+                                    {(user?.points || 0) < promoteModal.days && (
+                                        <div className="text-red-500 text-xs font-bold mb-4 flex items-center gap-1">
+                                            <AlertTriangle size={12} />
+                                            {language === 'ar' ? 'رصيد غير كافي' : 'Insufficient balance'}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 mt-2">
+                                <button 
+                                    onClick={() => setPromoteModal({ ...promoteModal, open: false })} 
+                                    className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-text-main rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                                >
+                                    {t('cancel')}
+                                </button>
+                                <button 
+                                    onClick={handlePromote}
+                                    disabled={processing || (user?.points || 0) < promoteModal.days}
+                                    className="flex-1 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {processing ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
+                                    {language === 'ar' ? 'ترويج الآن' : 'Promote Now'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

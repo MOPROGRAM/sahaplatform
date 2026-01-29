@@ -49,3 +49,21 @@ export function formatRelativeTime(date: string | Date, language: 'ar' | 'en' = 
 export function formatNumber(number: number, language: 'ar' | 'en' = 'en'): string {
     return new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(number);
 }
+
+/**
+ * Formats a date to absolute string
+ * @param date - Date to format
+ * @param language - Language code
+ */
+export function formatDateTime(date: string | Date, language: 'ar' | 'en' = 'en'): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return new Intl.DateTimeFormat(language === 'ar' ? 'ar-SA' : 'en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+    }).format(d);
+}

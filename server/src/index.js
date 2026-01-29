@@ -54,10 +54,10 @@ app.post('/api/setup-database', async (req, res) => {
         // Auth tables
         await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Account" ("id" TEXT NOT NULL PRIMARY KEY, "userId" TEXT NOT NULL, "type" TEXT NOT NULL, "provider" TEXT NOT NULL, "providerAccountId" TEXT NOT NULL, "refresh_token" TEXT, "access_token" TEXT, "expires_at" INTEGER, "token_type" TEXT, "scope" TEXT, "id_token" TEXT, "session_state" TEXT);`;
         await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Session" ("id" TEXT NOT NULL PRIMARY KEY, "sessionToken" TEXT NOT NULL UNIQUE, "userId" TEXT NOT NULL, "expires" TIMESTAMP(3) NOT NULL);`;
-        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "User" ("id" TEXT NOT NULL PRIMARY KEY, "name" TEXT, "email" TEXT NOT NULL UNIQUE, "emailVerified" TIMESTAMP(3), "image" TEXT, "password" TEXT, "role" TEXT NOT NULL DEFAULT 'USER', "verified" BOOLEAN NOT NULL DEFAULT false, "phone" TEXT, "phoneVerified" BOOLEAN NOT NULL DEFAULT false, "countryId" TEXT, "cityId" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "User" ("id" TEXT NOT NULL PRIMARY KEY, "name" TEXT, "email" TEXT NOT NULL UNIQUE, "emailVerified" TIMESTAMP(3), "image" TEXT, "password" TEXT, "role" TEXT NOT NULL DEFAULT 'USER', "verified" BOOLEAN NOT NULL DEFAULT false, "phone" TEXT, "phoneVerified" BOOLEAN NOT NULL DEFAULT false, "points" INTEGER DEFAULT 0, "countryId" TEXT, "cityId" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
 
         // Ads tables
-        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Ad" ("id" TEXT NOT NULL PRIMARY KEY, "title" TEXT NOT NULL, "titleAr" TEXT, "titleEn" TEXT, "description" TEXT NOT NULL, "descriptionAr" TEXT, "descriptionEn" TEXT, "price" REAL, "currencyId" TEXT NOT NULL DEFAULT 'sar', "category" TEXT NOT NULL, "cityId" TEXT, "latitude" REAL, "longitude" REAL, "images" TEXT NOT NULL DEFAULT '[]', "video" TEXT, "isBoosted" BOOLEAN NOT NULL DEFAULT false, "isActive" BOOLEAN NOT NULL DEFAULT true, "views" INTEGER NOT NULL DEFAULT 0, "userId" TEXT NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
+        await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Ad" ("id" TEXT NOT NULL PRIMARY KEY, "title" TEXT NOT NULL, "titleAr" TEXT, "titleEn" TEXT, "description" TEXT NOT NULL, "descriptionAr" TEXT, "descriptionEn" TEXT, "price" REAL, "currencyId" TEXT NOT NULL DEFAULT 'sar', "category" TEXT NOT NULL, "cityId" TEXT, "latitude" REAL, "longitude" REAL, "images" TEXT NOT NULL DEFAULT '[]', "video" TEXT, "isBoosted" BOOLEAN NOT NULL DEFAULT false, "boosted_until" TIMESTAMP(3), "isActive" BOOLEAN NOT NULL DEFAULT true, "views" INTEGER NOT NULL DEFAULT 0, "userId" TEXT NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);`;
 
         console.log('✅ تم إنشاء جميع الجداول');
 
@@ -87,7 +87,7 @@ app.post('/api/setup-database', async (req, res) => {
         await prisma.$executeRaw`
             INSERT OR IGNORE INTO "City" (id, name, nameAr, nameEn, "countryId", latitude, longitude, "isActive")
             VALUES
-            ('riyadh', 'Riyadh', 'الرياض', 'Riyadh', 'SA', 24.7136, 46.6753, true),
+            ('jeddah', 'Jeddah', 'جدة', 'Jeddah', 'SA', 21.4858, 39.1925, true),
             ('dubai', 'Dubai', 'دبي', 'Dubai', 'AE', 25.2048, 55.2708, true),
             ('cairo', 'Cairo', 'القاهرة', 'Cairo', 'EG', 30.0444, 31.2357, true);
         `;

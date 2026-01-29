@@ -104,6 +104,18 @@ export default function MessagesPage() {
                                                 <h4 className={`text-[12px] font-black truncate uppercase tracking-tight ${isSelected ? 'text-primary' : 'text-text-main'}`}>{otherMember.name}</h4>
                                                 <span className="text-[8px] font-black text-text-muted uppercase">{new Date(conv.last_message_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
+                                            <div className="flex items-center gap-1 mt-0.5 mb-1">
+                                                {conv.ad ? (
+                                                    <span className="text-[9px] font-bold text-secondary bg-secondary/10 px-1.5 py-0.5 rounded">
+                                                        {conv.ad.title}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[9px] font-bold text-blue-500 bg-blue-500/10 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                        <ShieldCheck size={8} />
+                                                        {language === 'ar' ? 'دعم فني' : 'SUPPORT'}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div className="flex justify-between items-center mt-1">
                                                 <p className="text-[10px] font-bold text-text-muted truncate">
                                                     {conv.last_message || (language === 'ar' ? 'لا توجد رسائل بعد' : 'no messages yet')}

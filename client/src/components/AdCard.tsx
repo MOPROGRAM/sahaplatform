@@ -18,8 +18,12 @@ interface AdCardProps {
     authorName?: string;
     category?: string;
     subCategory?: string;
+    titleAr?: string;
+    titleEn?: string;
     description_ar?: string; // Added
     description_en?: string; // Added
+    descriptionAr?: string; // Added camelCase support
+    descriptionEn?: string; // Added camelCase support
     className?: string;
     language?: 'ar' | 'en';
     isFeatured?: boolean;
@@ -42,8 +46,13 @@ export default function AdCard({
     className = "",
     language = 'ar',
     isFeatured = false,
+    titleAr,
+    titleEn,
     description_ar, // Added
     description_en, // Added
+    descriptionAr, // Added camelCase support
+    descriptionEn, // Added camelCase support
+    description, // Added fallback
     onMapHighlight,
     isHighlighted = false,
     layout = 'vertical'
@@ -71,9 +80,15 @@ export default function AdCard({
     }
 
     const isVertical = layout === 'vertical';
-    const currentDescription = language === 'ar' ? description_ar : description_en; // Helper variable
+    const currentDescription = language === 'ar' 
+        ? (description_ar || descriptionAr || description) 
+        : (description_en || descriptionEn || description); // Helper variable with fallbacks
 
-    const currencyCode = (currency && typeof currency === 'object') ? currency.code : (currency || 'SAR');
+    const currentTitle = language === 'ar'
+        ? (titleAr || title)
+        : (titleEn || title);
+
+    const currencyCode = (currency && typeof currency === 'object') ? (currency as any).code : (currency || 'SAR');
     
     return (
         <Link
@@ -118,7 +133,7 @@ export default function AdCard({
             <div className={`flex-1 flex flex-col p-1.5 ${isVertical ? "gap-0.5" : ""}`}>
                 {/* Title */}
                 <h3 className="text-[12px] font-black text-text-main line-clamp-2 leading-tight min-h-[2.5em]">
-                    {title}
+                    {currentTitle}
                 </h3>
 
                 {subCategory && (

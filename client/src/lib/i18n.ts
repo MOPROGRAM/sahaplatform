@@ -232,6 +232,9 @@ export const translations = {
         sortBy: 'ترتيب حسب',
         newest: 'الأحدث',
         oldest: 'الأقدم',
+        allCities: 'كل المدن',
+        tags: 'الوسوم',
+        sale: 'للبيع',
 
         // Advertise Page Specific
         basicPlan: 'الباقة الأساسية',
@@ -315,6 +318,11 @@ export const translations = {
         contactEmail: 'motwasel@yahoo.com',
         contactPhone: '+966582003887',
         contactWhatsApp: '+966582003887',
+
+        // Theme
+        darkMode: 'Dark Mode',
+        lightMode: 'Light Mode',
+        toggleTheme: 'Toggle Theme',
 
         // Navigation
         home: 'Home',
@@ -618,6 +626,9 @@ export const translations = {
         sortBy: 'Sort By',
         newest: 'Newest',
         oldest: 'Oldest',
+        allCities: 'All Cities',
+        tags: 'Tags',
+        sale: 'Sale',
         listingType: 'Listing Type',
         forSale: 'For Sale',
         forRent: 'For Rent',

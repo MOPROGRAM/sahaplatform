@@ -4,7 +4,7 @@ export const runtime = "edge";
 
 
 import { useState, useEffect, useCallback } from "react";
-import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle, X } from "lucide-react";
+import { Camera, MapPin, Tag, Info, CheckCircle2, Loader2, Search, PlusCircle, X, Rocket } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
@@ -38,6 +38,7 @@ export default function PostAdPage() {
         phone: "",
         email: "",
         isBoosted: false,
+        boostDays: 1,
         enableLocation: true,
         area: "",
         listingType: "sale", // 'rent' or 'sale'
@@ -144,16 +145,28 @@ export default function PostAdPage() {
                 location: formData.enableLocation && formData.location ? formData.location : null,
                 latitude: coordinates?.lat || null,
                 longitude: coordinates?.lng || null,
-                images: JSON.stringify(imageUrls),
+                images: imageUrls,
                 currencyId: 'sar',
                 paymentMethod: formData.paymentMethod || null,
-                isBoosted: formData.isBoosted,
+                isBoosted: false, // Create as regular first, then promote if needed
                 phone: formData.phone || null,
                 email: formData.email || null,
-                cityId: null
             };
 
             const createdAd = await adsService.createAd(adData);
+
+            // Handle Promotion
+            if (formData.isBoosted && formData.boostDays) {
+                try {
+                     await adsService.promoteAd(createdAd.id, formData.boostDays);
+                } catch (promoteError) {
+                    console.error("Promotion failed:", promoteError);
+                    // We don't block the flow, just maybe show a toast or alert?
+                    // Since we are redirecting, maybe passing a query param?
+                    // For now, we'll just proceed. The ad is created.
+                }
+            }
+
             router.push(`/ads/view?id=${createdAd.id}`);
         } catch (err: any) {
             console.error("Error creating ad:", err);
@@ -356,26 +369,111 @@ export default function PostAdPage() {
                                         name="description"
                                         value={formData.description}
                                         onChange={handleInputChange}
-                                        rows={5}
-                                        className="bento-input resize-none font-medium"
+                                        className="bento-input min-h-[150px]"
+                                        placeholder={t('descriptionPlaceholder')}
                                     />
                                 </div>
 
-                                <div className="pt-5 border-t border-gray-100">
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="btn-saha-primary !w-full !py-4 !rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
-                                    >
-                                        {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} />}
-                                        {loading ? t('loading') : t('deployListing')}
-                                    </button>
+                                {/* Promotion Section */}
+                                <div className={`bento-card p-6 border-2 transition-all ${formData.isBoosted ? 'border-primary bg-primary/5' : 'border-transparent bg-gray-50 dark:bg-white/5'}`}>
+                                    <div className="flex items-start gap-4">
+                                        <div className={`p-3 rounded-xl transition-colors ${formData.isBoosted ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
+                                            <Rocket size={24} />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h3 className="font-bold text-lg">{t('promoteAd')}</h3>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`text-xs font-black uppercase tracking-widest ${user.points >= (formData.boostDays || 7) ? 'text-green-500' : 'text-red-500'}`}>
+                                                        {t('pointsBalance')}: {user.points}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-text-muted mb-4 leading-relaxed">
+                                                {t('promoteAdDesc')}
+                                            </p>
+                                            
+                                            <div className="flex flex-col gap-4">
+                                                <label className="flex items-center gap-3 cursor-pointer group">
+                                                    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${formData.isBoosted ? 'border-primary bg-primary text-white' : 'border-gray-300 dark:border-gray-600 group-hover:border-primary'}`}>
+                                                        {formData.isBoosted && <CheckCircle2 size={16} />}
+                                                    </div>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        name="isBoosted" 
+                                                        checked={formData.isBoosted} 
+                                                        onChange={(e) => {
+                                                            if (user.points < (formData.boostDays || 7) && e.target.checked) {
+                                                                setError(language === 'ar' ? "رصيد النقاط غير كافٍ" : "Insufficient points balance");
+                                                                return;
+                                                            }
+                                                            handleInputChange(e);
+                                                            if (!e.target.checked) setError("");
+                                                        }}
+                                                        className="hidden" 
+                                                    />
+                                                    <span className="font-bold">{language === 'ar' ? 'نعم، أريد تمييز إعلاني' : 'Yes, I want to promote my ad'}</span>
+                                                </label>
+
+                                                {formData.isBoosted && (
+                                                    <div className="flex items-center gap-3 animate-in slide-in-from-top-2 fade-in flex-wrap">
+                                                        <div className="flex items-center gap-2 bg-white dark:bg-black/20 p-1 rounded-lg border border-border-color">
+                                                            <input 
+                                                                type="number"
+                                                                name="boostDays" 
+                                                                min="1"
+                                                                max="30"
+                                                                value={formData.boostDays} 
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value;
+                                                                    if (!val) {
+                                                                        setFormData(prev => ({ ...prev, boostDays: 0 })); // Temporarily 0 to allow typing
+                                                                        return;
+                                                                    }
+                                                                    const days = parseInt(val);
+                                                                    if (days > 30) return; // Max 30
+                                                                    
+                                                                    if (user.points < days) {
+                                                                        setError(language === 'ar' ? "رصيد النقاط غير كافٍ لهذه المدة" : "Insufficient points for this duration");
+                                                                    } else {
+                                                                        setError("");
+                                                                    }
+                                                                    setFormData(prev => ({ ...prev, boostDays: days }));
+                                                                }}
+                                                                className="bento-input py-2 text-sm w-20 text-center font-bold !border-none !ring-0 !shadow-none bg-transparent"
+                                                            />
+                                                            <span className="text-xs font-black uppercase tracking-widest text-text-muted pr-3 border-r border-border-color h-full flex items-center">
+                                                                {t('days')}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-2 rounded-lg">
+                                                            {language === 'ar' ? `التكلفة: ${formData.boostDays || 0} نقطة` : `Cost: ${formData.boostDays || 0} Points`}
+                                                        </span>
+                                                        {user.points < (formData.boostDays || 1) && (
+                                                            <Link href="/dashboard" className="text-xs font-bold text-primary hover:underline ml-auto">
+                                                                {t('buyPoints')}
+                                                            </Link>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading || (formData.isBoosted && user.points < formData.boostDays)}
+                                    className="btn-saha-primary w-full py-4 text-lg shadow-xl shadow-primary/20"
+                                >
+                                    {loading ? <Loader2 className="animate-spin mx-auto" /> : (formData.isBoosted ? (language === 'ar' ? `نشر وترويج (-${formData.boostDays} نقطة)` : `Post & Promote (-${formData.boostDays} Points)`) : t('deployListing'))}
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             </main>
+
             <Footer />
         </div>
     );

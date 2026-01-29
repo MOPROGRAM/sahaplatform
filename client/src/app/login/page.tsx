@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguage } from '@/lib/language-context';
 import { User, Mail, Lock, ShieldCheck, ChevronRight } from 'lucide-react';
 import DepthInput from '@/components/ui/DepthInput';
+import { Logo } from '@/components/Logo';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -44,7 +45,8 @@ export default function LoginPage() {
             <div className="w-full max-w-[420px] space-y-4">
                 {/* Branding Accent */}
                 <div className="flex flex-col items-center mb-8">
-                    <Link href="/" className="flex flex-col group items-center">
+                    <Link href="/" className="flex flex-col group items-center gap-2">
+                        <Logo className="h-16 w-auto text-primary transition-transform group-hover:scale-110" />
                         <span className="text-4xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t('siteName')}</span>
                         <div className="h-1 w-12 bg-primary mt-2 shadow-md group-hover:w-20 transition-all"></div>
                     </Link>
@@ -53,7 +55,7 @@ export default function LoginPage() {
                 {/* Main Card */}
                 <div className="bento-card !p-10 shadow-premium bg-white border-none">
                     <div className="mb-8 text-center">
-                        <h2 className="text-2xl font-black text-text-main uppercase tracking-tighter">{isLogin ? (language === 'ar' ? 'تسجيل الدخول' : 'Login') : (language === 'ar' ? 'تسجيل حساب' : 'Register')}</h2>
+                        <h2 className="text-2xl font-black text-text-main uppercase tracking-tighter">{isLogin ? t('login') : t('register')}</h2>
                         <div className="h-1 w-12 bg-primary mt-3 mx-auto rounded-full"></div>
                     </div>
 

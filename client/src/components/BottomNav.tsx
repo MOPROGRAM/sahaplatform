@@ -15,7 +15,6 @@ export default function BottomNav() {
         { label: t("postAd"), icon: <PlusSquare size={26} />, path: "/post-ad", center: true },
         { label: t("messages"), icon: <MessageSquare size={22} />, path: "/messages" },
         { label: t("dashboard"), icon: <UserCircle size={22} />, path: "/dashboard" },
-        { label: theme === "light" ? (t as any)["darkMode"] : (t as any)["lightMode"], icon: theme === "light" ? <Moon size={22} /> : <Sun size={22} />, action: toggleTheme }, // Added Theme Switch
     ];
 
     return (

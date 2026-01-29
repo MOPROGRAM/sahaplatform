@@ -36,10 +36,14 @@ const AdsSkeleton = () => (
 interface Ad {
     id: string;
     title: string;
+    titleAr?: string;
+    titleEn?: string;
     price: number | null;
     location: string | null;
     category: string;
     description?: string;
+    descriptionAr?: string;
+    descriptionEn?: string;
     created_at: string;
     images: string;
     is_boosted?: boolean;
@@ -174,6 +178,11 @@ export default function HomePage() {
                                     <AdCard
                                         id={ad.id}
                                         title={ad.title}
+                                        titleAr={ad.titleAr}
+                                        titleEn={ad.titleEn}
+                                        description={ad.description}
+                                        descriptionAr={ad.descriptionAr}
+                                        descriptionEn={ad.descriptionEn}
                                         price={ad.price || 0}
                                         currency={ad.currency || currency.toUpperCase()}
                                         location={ad.city?.name || ad.location || ''}
