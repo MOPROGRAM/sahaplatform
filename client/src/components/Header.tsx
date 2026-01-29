@@ -116,8 +116,8 @@ export default function Header() {
 
                     {showRegion && (
                         <>
-                            <div className="fixed inset-0 z-[99]" onClick={() => setShowRegion(false)}></div>
-                            <div className="absolute top-full mt-2 left-0 w-64 bento-card shadow-2xl p-4 z-[110] animate-in fade-in zoom-in-95 duration-200 border border-gray-100 dark:border-white/10">
+                            <div className="fixed inset-0 z-[1005]" onClick={() => setShowRegion(false)}></div>
+                            <div className="absolute top-full mt-2 left-0 w-64 bento-card shadow-2xl p-4 z-[1010] animate-in fade-in zoom-in-95 duration-200 border border-gray-100 dark:border-white/10">
                                 <div className="space-y-4">
                                     <div>
                                         <h4 className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">{t('country')}</h4>
@@ -203,40 +203,40 @@ export default function Header() {
 
                             {showUserMenu && (
                                 <>
-                                    <div className="fixed inset-0 z-[99]" onClick={() => setShowUserMenu(false)}></div>
+                                    <div className="fixed inset-0 z-[1005]" onClick={() => setShowUserMenu(false)}></div>
                                     <div className="absolute top-full right-0 mt-2 w-56 bento-card shadow-2xl py-2 z-[1010] animate-in fade-in duration-200 rounded-2xl border border-gray-100 dark:border-white/10">
                                         <div className="space-y-1 p-1">
                                             {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
-                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative z-10">
+                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative z-10" onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); }}>
                                                     <ShieldCheck size={14} />
                                                     {t("systemManagement")}
                                                 </Link>
                                             )}
-                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); }}>
                                                 <LayoutDashboard size={14} />
                                                 {t("dashboard")}
                                             </Link>
-                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); }}>
                                                 <ShieldCheck size={14} />
                                                 {t("myAds")}
                                             </Link>
-                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); }}>
                                                 <MessageSquare size={14} />
                                                 {t("messages")}
                                                 {unreadCount > 0 && (
                                                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">{unreadCount}</span>
                                                 )}
                                             </Link>
-                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); }}>
                                                 <Bell size={14} />
                                                 {t("notifications")}
                                             </Link>
-                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false} onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); }}>
                                                 <Settings size={14} />
                                                 {t("settings")}
                                             </Link>
                                             <div className="border-t border-border-color my-1"></div>
-                                            <button onClick={() => { logout(); setShowUserMenu(false); }} className={`flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full relative z-10 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                                            <button onClick={(e) => { e.stopPropagation(); logout(); setShowUserMenu(false); }} className={`flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full relative z-10 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                                                 <LogOut size={14} />
                                                 {t("logout")}
                                             </button>

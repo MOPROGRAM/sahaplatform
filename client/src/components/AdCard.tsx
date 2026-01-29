@@ -242,6 +242,7 @@ export default function AdCard({
                         src={images[0]}
                         alt={title}
                         fill
+                        priority={isFeatured}
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
