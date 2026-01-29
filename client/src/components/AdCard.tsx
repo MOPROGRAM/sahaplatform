@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench } from "lucide-react";
+import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, Phone, MessageCircle, User } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -59,15 +59,56 @@ export default function AdCard({
     onMapHighlight,
     isHighlighted = false,
     layout = 'vertical',
-    imageHeight
+    imageHeight,
+    authorName // Added to destructuring
 }: AdCardProps) {
     const { t } = useLanguage();
     const [isFavorite, setIsFavorite] = useState(false);
     const [peel, setPeel] = useState<{x: number; y: number}>({ x: 0, y: 0 });
-    const [flipped, setFlipped] = useState(false);
+    const [faceIndex, setFaceIndex] = useState(0);
     const [backPeelY, setBackPeelY] = useState(0);
     const cornerMax = 96;
     const peelY = Math.max(0, Math.min(cornerMax, peel.y));
+
+    // Faces configuration
+    const faces = isFeatured ? ['image', 'details', 'contact'] : ['image', 'details'];
+    
+    // Helpers to determine content for physical sides
+    const getFrontContent = () => {
+        const i = faceIndex;
+        // If current face is even, it's on the front. 
+        // If current face is odd (back visible), front should prep for next even (i+1).
+        const typeIndex = (i % 2 === 0) ? i : i + 1;
+        return faces[typeIndex % faces.length];
+    };
+
+    const getBackContent = () => {
+        const i = faceIndex;
+        // If current face is odd, it's on the back.
+        // If current face is even (front visible), back should prep for next odd (i+1).
+        const typeIndex = (i % 2 !== 0) ? i : i + 1;
+        return faces[typeIndex % faces.length];
+    };
+
+    const handleNextFace = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        setFaceIndex(prev => prev + 1);
+    };
+
+    const handleResetFace = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const len = faces.length;
+        const current = faceIndex;
+        // Calculate steps to next image (index 0)
+        const nextImage = current + (len - (current % len));
+        setFaceIndex(nextImage);
+    };
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -114,7 +155,7 @@ export default function AdCard({
     const isVertical = layout === 'vertical';
     const currentDescription = language === 'ar' 
         ? (description_ar || descriptionAr || description) 
-        : (description_en || descriptionEn || description); // Helper variable with fallbacks
+        : (description_en || descriptionEn || description); 
 
     const currentTitle = language === 'ar'
         ? (titleAr || title)
@@ -124,215 +165,263 @@ export default function AdCard({
     const peelProgress = peelY / cornerMax;
     const openThreshold = 0.4;
     
-    return (
-        <Link
-            href={`/ads/${id}`}
-            className={`bento-card bento-card-hover group flex shadow hover:shadow-lg ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700"} ${isVertical ? "flex-col h-full" : (language === "ar" ? "flex-row-reverse" : "flex-row")} ${className}`}
-            onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
-            onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
-        >
-            <div className="relative w-full" style={{ perspective: 1000 }}>
-                <motion.div
-                    style={{ transformStyle: 'preserve-3d' }}
-                    animate={{ rotateY: flipped ? 180 : 0 }}
-                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+    // Render Functions
+    const renderImageFace = () => (
+        <div className={`relative shrink-0 overflow-hidden w-full h-full bg-white dark:bg-[#1a1a1a]`}>
+            {/* Shine Effect */}
+            <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
+
+            {/* Flip/Peel Interaction */}
+            <div className="absolute top-1 left-1 z-20">
+                <motion.button
+                    className={`px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-primary text-white" : "bg-white/80 dark:bg-black/50 text-text-muted backdrop-blur-sm hover:bg-white dark:hover:bg-black/70"}`}
+                    drag="y"
+                    dragMomentum={false}
+                    onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onDrag={(e, info) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setPeel({
+                            x: 0,
+                            y: Math.max(0, Math.min(cornerMax, info.offset.y)),
+                        });
+                    }}
+                    onDragEnd={() => {
+                        if (peelProgress >= openThreshold) {
+                            handleNextFace();
+                        }
+                        setPeel({ x: 0, y: 0 });
+                    }}
+                    onClick={handleNextFace}
                 >
-                    <div style={{ backfaceVisibility: 'hidden' }}>
+                    {isFeatured ? t("featured") : t("details")}
+                </motion.button>
 
-            {/* Image Area */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-[72px]") : "w-[25%]"}`}>
-                {isFeatured && (
-                    <div className="absolute top-1 left-1 z-20">
-                        <motion.button
-                            className="px-1 py-0.5 bg-primary text-white rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none"
-                            drag="y"
-                            dragMomentum={false}
-                            onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                            onDrag={(e, info) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setPeel({
-                                    x: 0,
-                                    y: Math.max(0, Math.min(cornerMax, info.offset.y)),
-                                });
-                            }}
-                            onDragEnd={() => {
-                                if (peelProgress >= openThreshold) {
-                                    setFlipped(true);
-                                }
-                                setPeel({ x: 0, y: 0 });
-                            }}
-                        >
-                            {t("featured")}
-                        </motion.button>
-
-                        <div className="absolute inset-0 pointer-events-none">
-                            <div
-                                className="absolute top-0 left-0 bg-white/90 dark:bg-[#1f1f1f]/90 shadow-2xl"
-                                style={{
-                                    width: cornerMax,
-                                    height: cornerMax,
-                                    clipPath: `polygon(0px 0px, 8px 0px, 0px ${peelY}px)`,
-                                    borderTopLeftRadius: 8,
-                                    transform: `perspective(600px) rotateX(${Math.min(45, peelY / 2)}deg)`,
-                                    transformOrigin: "top left"
-                                }}
-                            />
-                        </div>
-                    </div>
-                )}
-
-                <button
-                    onClick={handleFavoriteClick}
-                    className="absolute top-1 right-1 z-10 p-0.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
-                >
-                    <Heart
-                        size={12}
-                        className={isFavorite ? "fill-red-500 text-red-500" : ""}
+                <div className="absolute inset-0 pointer-events-none">
+                    <div
+                        className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-gradient-to-br from-[#ff6b35] to-[#ff8a4a]" : "bg-white/90 dark:bg-[#1f1f1f]/90"}`}
+                        style={{
+                            width: cornerMax,
+                            height: cornerMax,
+                            clipPath: `polygon(0px 0px, 8px 0px, 0px ${peelY}px)`,
+                            borderTopLeftRadius: 8,
+                            transform: `perspective(600px) rotateX(${Math.min(45, peelY / 2)}deg)`,
+                            transformOrigin: "top left"
+                        }}
                     />
-                </button>
-
-                {images.length > 0 ? (
-                    <Image
-                        src={images[0]}
-                        alt={title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-white/5 select-none">
-                        <Logo className="w-12 h-12 text-primary opacity-70" />
-                    </div>
-                )}
+                </div>
             </div>
 
-            {/* Content Area */}
-            <div className={`flex-1 flex flex-col p-1.5 ${isVertical ? "gap-0.5" : ""}`}>
-                {/* Title */}
-                <h3 className="text-[12px] font-black text-text-main line-clamp-2 leading-tight min-h-[2.5em]">
-                    {currentTitle}
-                </h3>
+            <button
+                onClick={handleFavoriteClick}
+                className="absolute top-1 right-1 z-10 p-0.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
+            >
+                <Heart
+                    size={12}
+                    className={isFavorite ? "fill-red-500 text-red-500" : ""}
+                />
+            </button>
 
-                {subCategory && (
-                    <p className="text-[10px] text-text-muted font-medium mb-1 line-clamp-1">
-                        {(t as any)[subCategory] || subCategory}
-                    </p>
-                )}
+            {images.length > 0 ? (
+                <Image
+                    src={images[0]}
+                    alt={title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-white/5 select-none group-hover:bg-gray-100 dark:group-hover:bg-white/10 transition-colors">
+                    <Logo className="w-12 h-12 text-primary opacity-70 group-hover:scale-110 transition-transform duration-500" />
+                </div>
+            )}
+            
+            {/* Minimal Info Overlay for Image Face */}
+             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 text-white">
+                <h3 className="text-[12px] font-black line-clamp-1">{currentTitle}</h3>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-xs font-bold">
+                        {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
+                    </span>
+                    <span className="text-[8px] opacity-80">{currencyCode}</span>
+                </div>
+            </div>
+        </div>
+    );
 
+    const renderDetailsFace = () => (
+        <div
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gradient-to-br from-[#ff6b35] via-[#ff8a4a] to-white" : "bg-white dark:bg-[#1a1a1a]"}`}
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
+        >
+             {isFeatured && (
+                <div className="absolute inset-0 z-0 pointer-events-none">
+                    <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M0 60 Q 20 40 40 60 T 80 60 T 120 40 V 100 H 0 Z" fill="rgba(255,255,255,0.15)" />
+                        <path d="M0 40 Q 25 70 50 40 T 100 50 V 100 H 0 Z" fill="rgba(255,255,255,0.1)" />
+                        <path d="M0 80 Q 30 50 60 80 T 120 70 V 100 H 0 Z" fill="rgba(255,255,255,0.2)" />
+                    </svg>
+                </div>
+            )}
+
+            {/* Close/Next Controls */}
+            <div className="absolute top-1 left-1 z-20">
+                <motion.button
+                    className={`px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-white/20 text-white backdrop-blur-sm" : "bg-gray-100 text-text-main"}`}
+                    drag="y"
+                    dragMomentum={false}
+                    onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onDrag={(e, info) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setBackPeelY(Math.max(0, Math.min(cornerMax, -info.offset.y)));
+                    }}
+                    onDragEnd={() => {
+                        if (backPeelY >= cornerMax * 0.4) {
+                            handleResetFace();
+                        }
+                        setBackPeelY(0);
+                    }}
+                    onClick={handleResetFace}
+                >
+                    إغلاق
+                </motion.button>
+                 <div className="absolute inset-0 pointer-events-none">
+                    <div
+                        className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-white/30" : "bg-gray-200"}`}
+                        style={{
+                            width: cornerMax,
+                            height: cornerMax,
+                            clipPath: `polygon(0px 0px, 8px 0px, 0px ${backPeelY}px)`,
+                            borderTopLeftRadius: 8,
+                            transform: `perspective(600px) rotateX(${Math.min(45, backPeelY / 2)}deg)`,
+                            transformOrigin: "top left"
+                        }}
+                    />
+                </div>
+            </div>
+
+            <div className="flex flex-col h-full relative z-10 pt-4">
+                <h3 className={`text-[12px] font-black leading-tight mb-1 ${isFeatured ? "text-white drop-shadow-md" : "text-text-main"}`}>{currentTitle}</h3>
                 {currentDescription && (
-                    <p className="text-[10px] text-text-muted line-clamp-2 leading-tight mb-1">
-                        {currentDescription.length > 100 ? currentDescription.substring(0, 100) + "..." : currentDescription}
+                    <p className={`text-[10px] leading-tight mb-2 line-clamp-4 ${isFeatured ? "text-white/90" : "text-text-muted"}`}>
+                        {currentDescription}
                     </p>
                 )}
-
-                {/* Specs Grid */}
-                <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 text-[8px] text-text-muted ${isVertical ? "mt-auto mb-1" : "mt-1 mb-2"}`}>
-                    <div className="flex items-center gap-0.5 font-normal">
-                        <MapPin size={8} className="text-gray-400" />
-                        <span className="truncate">{location?.split(",")[0].trim()}</span>
-                    </div>
-                    <div className="flex items-center gap-0.5 font-normal" suppressHydrationWarning>
-                        <Clock size={8} className="text-gray-400" />
+                
+                <div className={`grid grid-cols-2 gap-2 text-[9px] mb-2 ${isFeatured ? "text-white/80" : "text-text-muted"}`}>
+                     {location && (
+                        <div className="flex items-center gap-1">
+                            <MapPin size={9} className={isFeatured ? "text-white" : "text-gray-400"} />
+                            <span className="truncate">{location?.split(",")[0].trim()}</span>
+                        </div>
+                    )}
+                     <div className="flex items-center gap-1">
+                        <Clock size={9} className={isFeatured ? "text-white" : "text-gray-400"} />
                         <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
                     </div>
                 </div>
 
-                {/* Price & Category Footer */}
-                <div className="mt-auto flex justify-between items-end pt-1 border-t border-border-color/50">
-                    <div className="flex items-baseline gap-0.5 text-text-main">
-                        <span className="text-xs font-black">
-                            {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
-                        </span>
-                        <span className="text-[8px] font-normal text-text-muted uppercase">{currencyCode}</span>
-                    </div>
-                    {category && (
-                        <span className="text-[8px] font-bold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 px-1 py-0.5 rounded-sm uppercase flex items-center gap-0.5">
-                            {getCategoryIcon(category)}
-                            {(t as any)[category] || category}
-                        </span>
-                    )}
+                <div className="mt-auto flex items-center justify-between">
+                     <button
+                        className={`px-2 py-1 text-[10px] font-black rounded transition-colors ${isFeatured ? "bg-white/20 text-white hover:bg-white/30" : "bg-gray-100 dark:bg-white/10 text-text-main hover:bg-primary/10"}`}
+                        onClick={handleNextFace}
+                    >
+                        {isFeatured ? t("contact") : t("back")}
+                    </button>
+                    <span className={`text-[9px] ${isFeatured ? "text-white/80" : "text-text-muted"}`}>
+                        اسحب للإغلاق
+                    </span>
                 </div>
             </div>
+        </div>
+    );
+
+    const renderContactFace = () => (
+         <div
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#1a1a1a]`}
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
+        >
+            {/* Close Button (similar logic) */}
+             <div className="absolute top-1 left-1 z-20">
+                 <button 
+                    className="px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md bg-gray-100 text-text-main"
+                    onClick={handleResetFace}
+                 >
+                    إغلاق
+                 </button>
+             </div>
+
+            <div className="flex flex-col h-full relative z-10 pt-6 items-center text-center">
+                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                    <User className="text-primary" size={20} />
+                 </div>
+                 <h3 className="text-[11px] font-bold text-text-main mb-3">{authorName || t("seller")}</h3>
+                 
+                 <div className="flex flex-col gap-2 w-full px-2">
+                    <button className="flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded text-[10px] font-bold hover:bg-primary/90 transition-colors">
+                        <Phone size={12} />
+                        {t("call")}
+                    </button>
+                    <button className="flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors">
+                        <MessageCircle size={12} />
+                        {t("whatsapp")}
+                    </button>
+                 </div>
+
+                  <div className="mt-auto flex items-center justify-between w-full">
+                     <button
+                        className="px-2 py-1 text-[10px] font-black rounded bg-gray-100 text-text-main hover:bg-gray-200"
+                        onClick={handleNextFace}
+                    >
+                        الصورة
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    const renderContent = (type: string) => {
+        switch (type) {
+            case 'image': return renderImageFace();
+            case 'details': return renderDetailsFace();
+            case 'contact': return renderContactFace();
+            default: return renderImageFace();
+        }
+    };
+
+    return (
+        <Link
+            href={`/ads/${id}`}
+            className={`bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700"} ${isVertical ? "flex-col h-full" : (language === "ar" ? "flex-row-reverse" : "flex-row")} ${className}`}
+            onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
+            onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
+        >
+            <div className="relative w-full h-full" style={{ perspective: 1000 }}>
+                <motion.div
+                    className="w-full h-full relative"
+                    style={{ transformStyle: 'preserve-3d' }}
+                    animate={{ rotateY: faceIndex * 180 }}
+                    transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }} // Cubic bezier for smoother flip
+                >
+                    {/* Front Physical Side */}
+                    <div 
+                        className="absolute inset-0 w-full h-full"
+                        style={{ backfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
+                    >
+                        {renderContent(getFrontContent())}
                     </div>
 
-                    {/* Back Face */}
-                    <div
-                        className="absolute inset-0 p-2 bg-white/95 dark:bg-[#1a1a1a]/95 border border-border-color rounded-md shadow-2xl cursor-pointer"
-                        style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' }}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            // السماح للنقر على الظهر أن يفتح صفحة التفاصيل (رابط البطاقة سيتعامل مع التنقل)
-                        }}
+                    {/* Back Physical Side */}
+                    <div 
+                        className="absolute inset-0 w-full h-full"
+                        style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
                     >
-                        {/* Draggable top-left corner to close by dragging up */}
-                        <div className="absolute top-1 left-1 z-20">
-                            <motion.button
-                                className="px-1 py-0.5 bg-primary text-white rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none"
-                                drag="y"
-                                dragMomentum={false}
-                                onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                onDrag={(e, info) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setBackPeelY(Math.max(0, Math.min(cornerMax, -info.offset.y)));
-                                }}
-                                onDragEnd={() => {
-                                    if (backPeelY >= cornerMax * 0.4) {
-                                        setFlipped(false);
-                                    }
-                                    setBackPeelY(0);
-                                }}
-                            >
-                                إغلاق
-                            </motion.button>
-                            <div className="absolute inset-0 pointer-events-none">
-                                <div
-                                    className="absolute top-0 left-0 bg-white/90 dark:bg-[#1f1f1f]/90 shadow-2xl"
-                                    style={{
-                                        width: cornerMax,
-                                        height: cornerMax,
-                                        clipPath: `polygon(0px 0px, 8px 0px, 0px ${backPeelY}px)`,
-                                        borderTopLeftRadius: 8,
-                                        transform: `perspective(600px) rotateX(${Math.min(45, backPeelY / 2)}deg)`,
-                                        transformOrigin: "top left"
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-col h-full">
-                            <h3 className="text-[12px] font-black text-text-main leading-tight mb-1">{currentTitle}</h3>
-                            {currentDescription && (
-                                <p className="text-[10px] text-text-muted leading-tight mb-2">
-                                    {currentDescription}
-                                </p>
-                            )}
-                            <div className="grid grid-cols-2 gap-2 text-[9px] text-text-muted mb-2">
-                                {location && (
-                                    <div className="flex items-center gap-1">
-                                        <MapPin size={9} className="text-gray-400" />
-                                        <span className="truncate">{location?.split(",")[0].trim()}</span>
-                                    </div>
-                                )}
-                                <div className="flex items-baseline gap-1 text-text-main">
-                                    <span className="text-[11px] font-black">
-                                        {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
-                                    </span>
-                                    <span className="text-[9px] font-medium text-text-muted uppercase">{currencyCode}</span>
-                                </div>
-                            </div>
-                            <div className="mt-auto flex items-center justify-between">
-                                <button
-                                    className="px-2 py-1 text-[10px] font-black rounded bg-gray-100 dark:bg-white/10 text-text-main hover:bg-primary/10 transition-colors"
-                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFlipped(false); }}
-                                >
-                                    رجوع
-                                </button>
-                                <span className="text-[9px] text-text-muted">
-                                    اسحب الزاوية للأعلى لإغلاق
-                                </span>
-                            </div>
-                        </div>
+                        {renderContent(getBackContent())}
                     </div>
                 </motion.div>
             </div>
