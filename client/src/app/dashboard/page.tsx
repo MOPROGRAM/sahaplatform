@@ -65,6 +65,11 @@ export default function DashboardPage() {
         cvc: ''
     });
     const [paymentMethod, setPaymentMethod] = useState<'card' | 'email'>('card');
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const plans = [
         {
@@ -287,6 +292,8 @@ export default function DashboardPage() {
     };
 
     if (!user) return null;
+
+    if (!mounted) return <div className="min-h-screen bg-background"></div>;
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-bg">

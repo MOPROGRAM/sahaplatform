@@ -48,8 +48,14 @@ export default function ProfilePage() {
     });
     const [updateMessage, setUpdateMessage] = useState('');
     const [favorites, setFavorites] = useState<any[]>([]);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!mounted) return;
         if (!user) {
             router.push('/login');
             return;
@@ -59,7 +65,19 @@ export default function ProfilePage() {
         } else {
             setLoading(false);
         }
-    }, [user, activeTab, router]);
+    }, [user, activeTab, router, mounted]);
+
+    useEffect(() => {
+        if (user && mounted) {
+             setProfileData(prev => ({
+                ...prev,
+                name: user.name || '',
+                email: user.email || ''
+            }));
+        }
+    }, [user, mounted]);
+
+    if (!mounted) return <div className="min-h-screen bg-background"></div>;
 
     useEffect(() => {
         if (activeTab !== 'favorites') return;

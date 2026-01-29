@@ -21,6 +21,11 @@ export default function Header() {
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showRegion, setShowRegion] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const currencyMap: Record<string, string> = {
         sa: 'sar',
@@ -174,7 +179,7 @@ export default function Header() {
                         </button>
                     </div>
 
-                    {user ? (
+                    {mounted && user ? (
                         <div className="relative">
                             <button
                                 onClick={() => setShowUserMenu(!showUserMenu)}
