@@ -70,6 +70,17 @@ export default function AdCard({
     const cornerMax = 96;
     const peelY = Math.max(0, Math.min(cornerMax, peel.y));
 
+    useEffect(() => {
+        try {
+            const key = 'saha:favorites';
+            const raw = window.localStorage.getItem(key);
+            if (raw) {
+                const list = JSON.parse(raw) as any[];
+                setIsFavorite(list.some(a => a.id === id));
+            }
+        } catch {}
+    }, [id]);
+
     // Faces configuration
     const faces = isFeatured ? ['image', 'details', 'contact'] : ['image', 'details'];
     
@@ -408,10 +419,10 @@ export default function AdCard({
 
     const renderContent = (type: string) => {
         switch (type) {
-            case 'image': return renderImageFace();
+            case 'image': return renderStandardFace();
             case 'details': return renderDetailsFace();
             case 'contact': return renderContactFace();
-            default: return renderImageFace();
+            default: return renderStandardFace();
         }
     };
 

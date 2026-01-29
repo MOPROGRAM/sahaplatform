@@ -121,16 +121,9 @@ export const authService = {
             // Sending other fields like email/name will cause 400 Error if columns don't exist.
             const userData: any = {
                 id: targetUser.id,
-                // Only include other fields if your DB schema actually supports them!
-                // For now, based on user instruction, we stick to ID and Points logic.
-                // email: targetUser.email, 
-                // name: targetUser.user_metadata?.name || '',
+                email: targetUser.email, // Safe to add email usually
+                updated_at: new Date().toISOString(),
             };
-
-            // Only set default points for new users (if not found in DB)
-            if (!existingUser) {
-                userData.points = 10;
-            }
 
             // Upsert user data
             const { error: upsertError } = await (supabase as any)

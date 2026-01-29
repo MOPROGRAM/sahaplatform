@@ -290,6 +290,10 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                                 alt="Attachment" 
                                                 className="max-w-[250px] max-h-[250px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
                                                 onClick={() => window.open(msg.file_url, '_blank')}
+                                                onError={(e) => {
+                                                    e.currentTarget.src = '/placeholder-image.png'; // Fallback
+                                                    e.currentTarget.onerror = null; // Prevent loop
+                                                }}
                                             />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                                                 <Download className="text-white opacity-80" size={24} />
