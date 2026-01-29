@@ -2,17 +2,13 @@
 
 import Link from "next/link";
 import {
-    MapPin,
-    Calendar,
-    Eye,
-    ShieldCheck,
-    ChevronLeft,
-    MessageCircle,
-    Phone,
-    Loader2,
-    Share2,
-    Maximize2
+    Maximize2,
+    X,
+    Flag,
+    AlertTriangle,
+    CheckCircle2
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 import ChatWindow from "@/components/ChatWindow";
 import Header from "@/components/Header";
 import Image from "next/image";
@@ -61,6 +57,11 @@ export default function AdDetailsContent({ id }: { id: string }) {
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [showChat, setShowChat] = useState(false);
     const [showPhone, setShowPhone] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState("");
+    const [reportDetails, setReportDetails] = useState("");
+    const [isReporting, setIsReporting] = useState(false);
+    const [reportStatus, setReportStatus] = useState<"idle" | "success" | "error">("idle");
 
     useEffect(() => {
         let mounted = true;
@@ -121,18 +122,47 @@ export default function AdDetailsContent({ id }: { id: string }) {
             router.push('/login');
             return;
         }
-        if (user.id === ad?.author_id) {
+        if (user.id === ad?.user_id) {
             alert(language === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
             return;
         }
 
         try {
-            // Check or create conversation for this ad
-            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.author_id || '');
+            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.user_id || '');
             setConversationId(conversation.id);
             setShowChat(true);
         } catch (error) {
             console.error("Failed to start conversation:", error);
+        }
+    };
+
+    const handleReportSubmit = async () => {
+        if (!reportReason) return;
+        setIsReporting(true);
+        try {
+            const { error } = await supabase
+                .from('ad_reports')
+                .insert({
+                    ad_id: adId,
+                    reporter_id: user?.id,
+                    reason: reportReason,
+                    details: reportDetails,
+                    status: 'pending'
+                });
+
+            if (error) throw error;
+            setReportStatus("success");
+            setTimeout(() => {
+                setShowReportModal(false);
+                setReportStatus("idle");
+                setReportReason("");
+                setReportDetails("");
+            }, 2000);
+        } catch (error) {
+            console.error("Report failed:", error);
+            setReportStatus("error");
+        } finally {
+            setIsReporting(false);
         }
     };
 
@@ -153,6 +183,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
             </div>
         </div>
     );
+
     if (!ad) return <div className="text-center p-20 font-black uppercase">Ad not found</div>;
 
     const lat = ad.latitude;
@@ -219,7 +250,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <h3 className="text-[14px] font-black uppercase text-text-main border-b-2 border-primary w-fit pb-1">{t('description')}</h3>
                                 <p className="text-[12px] font-medium leading-relaxed text-text-main bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-border-color italic">
                                     {ad.description}
-                                </p> 
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -232,7 +263,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <div
                                     className="absolute inset-0 bg-cover bg-center scale-110 opacity-25"
                                     style={{ backgroundImage: `url(${ad.images[0]})` }}
-                                ></div> 
+                                ></div>
 
                                 {(() => {
                                     const images = ad.images || [];
@@ -249,7 +280,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <div className="absolute bottom-3 right-3 flex gap-2">
                                     <button className="bg-black/50 text-white p-2 rounded-xl hover:scale-105 transition-all backdrop-blur-md"><Maximize2 size={16} /></button>
                                     <button className="bg-black/50 text-white p-2 rounded-xl hover:scale-105 transition-all backdrop-blur-md"><Share2 size={16} /></button>
-                                </div> 
+                                </div>
                             </div>
                             {(() => {
                                 const images = ad.images || [];
@@ -297,7 +328,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         <div className="flex items-center gap-3 mb-6 bg-primary/10 p-3 rounded-2xl border border-primary/10 transition-colors hover:bg-primary/20">
                             <div className="w-12 h-12 bg-white dark:bg-white/10 rounded-full flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
                                 <span className="font-black text-primary text-sm italic">SE</span>
-                            </div> 
+                            </div>
                             <div className="flex flex-col min-w-0">
                                 <h4 className="text-[12px] font-black text-text-main truncate flex items-center gap-1">
                                     Seller
@@ -355,17 +386,78 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                 <div className="flex flex-col"><span className="text-[10px] font-black text-blue-700 uppercase tracking-tighter">Verified Seller</span><p className="text-[9px] text-text-muted font-bold leading-tight">This seller has provided valid identity documents for safety.</p></div>
                             </div>
                             <button
-                                onClick={() => {
-                                    if (confirm(language === 'ar' ? 'هل أنت متأكد من الإبلاغ عن هذا المحتوى؟' : 'Are you sure you want to report this content?')) {
-                                        alert(language === 'ar' ? 'تم الإبلاغ بنجاح' : 'Reported successfully');
-                                    }
-                                }}
-                                className="text-[9px] font-black text-text-muted hover:text-red-500 transition-colors uppercase italic underline w-fit"
+                                onClick={() => setShowReportModal(true)}
+                                className="text-[9px] font-black text-text-muted hover:text-red-500 transition-colors uppercase italic underline w-fit flex items-center gap-1"
                             >
+                                <Flag size={10} />
                                 {language === 'ar' ? 'الإبلاغ عن محتوى مشبوه' : 'Report Suspicious Content'}
                             </button>
                         </div>
                     </div>
+
+                    {showReportModal && (
+                        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                            <div className="bg-white dark:bg-[#1a1a1a] w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-border-color animate-in zoom-in-95 duration-300">
+                                <div className="p-6">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-xl font-black text-text-main flex items-center gap-2">
+                                            <AlertTriangle className="text-red-500" />
+                                            {language === 'ar' ? 'إبلاغ عن إعلان' : 'Report Ad'}
+                                        </h3>
+                                        <button onClick={() => setShowReportModal(false)} className="text-text-muted hover:text-text-main transition-colors">
+                                            <X size={24} />
+                                        </button>
+                                    </div>
+
+                                    {reportStatus === "success" ? (
+                                        <div className="py-10 text-center space-y-4 animate-in zoom-in">
+                                            <div className="w-16 h-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto">
+                                                <CheckCircle2 size={32} />
+                                            </div>
+                                            <h4 className="text-lg font-black">{language === 'ar' ? 'تم إرسال بلاغك بنجاح' : 'Report sent successfully'}</h4>
+                                            <p className="text-text-muted text-sm">{language === 'ar' ? 'شكراً لك على مساعدتنا في الحفاظ على أمان المنصة.' : 'Thank you for helping us keep the platform safe.'}</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {["scam", "spam", "inappropriate", "wrongCategory", "other"].map(reason => (
+                                                    <button
+                                                        key={reason}
+                                                        onClick={() => setReportReason(reason)}
+                                                        className={`w-full p-4 rounded-2xl text-right transition-all border flex justify-between items-center ${reportReason === reason
+                                                            ? 'border-primary bg-primary/5 text-primary font-black'
+                                                            : 'border-border-color hover:border-text-muted text-text-muted'}`}
+                                                    >
+                                                        <span>{(t as any)(reason)}</span>
+                                                        {reportReason === reason && <CheckCircle2 size={16} />}
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase text-text-muted">{language === 'ar' ? 'تفاصيل إضافية (اختياري)' : 'Additional Details (Optional)'}</label>
+                                                <textarea
+                                                    value={reportDetails}
+                                                    onChange={(e) => setReportDetails(e.target.value)}
+                                                    placeholder={language === 'ar' ? 'اكتب ملاحظاتك هنا...' : 'Write your notes here...'}
+                                                    className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-border-color rounded-2xl text-sm focus:border-primary transition-colors outline-none h-24 resize-none"
+                                                />
+                                            </div>
+
+                                            <button
+                                                onClick={handleReportSubmit}
+                                                disabled={!reportReason || isReporting}
+                                                className="w-full py-4 bg-red-500 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-500/20 active:scale-95 flex items-center justify-center gap-2"
+                                            >
+                                                {isReporting ? <Loader2 className="animate-spin" /> : <Flag size={18} />}
+                                                {language === 'ar' ? 'إرسال البلاغ الآن' : 'SUBMIT REPORT NOW'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {showChat && conversationId && (
                         <div className="fixed bottom-0 right-10 w-80 sm:w-96 z-[1000] animate-in slide-in-from-bottom-5">

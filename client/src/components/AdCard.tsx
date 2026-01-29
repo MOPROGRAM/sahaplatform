@@ -78,38 +78,6 @@ export default function AdCard({
     const router = useRouter();
     const currentLanguage = language || contextLanguage;
     const [isFavorite, setIsFavorite] = useState(false);
-    const [showReport, setShowReport] = useState(false);
-    const [reportReason, setReportReason] = useState("");
-    const [isReporting, setIsReporting] = useState(false);
-    const [reportStatus, setReportStatus] = useState<"idle" | "success" | "error">("idle");
-
-    const handleReportSubmit = async () => {
-        if (!reportReason) return;
-        setIsReporting(true);
-        try {
-            const { error } = await supabase
-                .from('ad_reports')
-                .insert({
-                    ad_id: id,
-                    reporter_id: (await supabase.auth.getUser()).data.user?.id,
-                    reason: reportReason,
-                    status: 'pending'
-                });
-
-            if (error) throw error;
-            setReportStatus("success");
-            setTimeout(() => {
-                setShowReport(false);
-                setReportStatus("idle");
-                setReportReason("");
-            }, 2000);
-        } catch (error) {
-            console.error("Report failed:", error);
-            setReportStatus("error");
-        } finally {
-            setIsReporting(false);
-        }
-    };
     const [peel, setPeel] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [faceIndex, setFaceIndex] = useState(0);
     const [backPeelY, setBackPeelY] = useState(0);
@@ -144,8 +112,8 @@ export default function AdCard({
     const descriptionLimit = 160;
     const hasMoreDetails = currentDescription && currentDescription.length > descriptionLimit;
     const faces = hasMoreDetails
-        ? ['image', 'contact', 'details', 'details_more']
-        : ['image', 'contact', 'details'];
+        ? ['image', 'details', 'details_more', 'contact']
+        : ['image', 'details', 'contact'];
 
     // Helpers to determine content for physical sides
     const getFrontContent = () => {
@@ -253,7 +221,7 @@ export default function AdCard({
                         }}
                         onClick={handleNextFace}
                     >
-                        {isFeatured ? t("featured") : (t as any)("contact")}
+                        {isFeatured ? t("featured") : t("details")}
                     </motion.button>
 
                     <div className="absolute inset-0 pointer-events-none">
@@ -281,28 +249,7 @@ export default function AdCard({
                             className={isFavorite ? "fill-red-500 text-red-500" : ""}
                         />
                     </button>
-                    {phone && (
-                        <>
-                            <a
-                                href={`tel:${phone}`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="p-1 rounded-full bg-primary text-white transition-all shadow-sm hover:scale-110 active:scale-95 flex items-center justify-center"
-                                title={(t as any)("call")}
-                            >
-                                <Phone size={10} />
-                            </a>
-                            <a
-                                href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="p-1 rounded-full bg-[#25D366] text-white transition-all shadow-sm hover:scale-110 active:scale-95 flex items-center justify-center"
-                                title={(t as any)("whatsapp")}
-                            >
-                                <Logo className="w-2.5 h-2.5 invert" />
-                            </a>
-                        </>
-                    )}
+
                 </div>
 
                 {images.length > 0 ? (
@@ -364,7 +311,7 @@ export default function AdCard({
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 
     const renderDetailsFace = () => (
@@ -559,55 +506,16 @@ export default function AdCard({
                             {(t as any)("email" as any)}
                         </a>
                     )}
-
-                    {/* Report Button */}
-                    <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowReport(!showReport); }}
-                        className="mt-2 flex items-center justify-center gap-1 text-[8px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-widest transition-colors"
-                    >
-                        <Flag size={8} />
-                        {(t as any)("reportAd")}
-                    </button>
-
-                    {showReport && (
-                        <div className="absolute inset-x-0 bottom-0 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-white/10 p-2 z-[30] animate-in slide-in-from-bottom-5">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-[9px] font-black uppercase text-text-main">{(t as any)("reportReason")}</span>
-                                <button onClick={() => setShowReport(false)} className="text-text-muted hover:text-text-main"><X size={10} /></button>
-                            </div>
-                            <div className="grid grid-cols-2 gap-1 mb-2">
-                                {["scam", "spam", "inappropriate", "wrongCategory"].map(reason => (
-                                    <button
-                                        key={reason}
-                                        onClick={() => setReportReason(reason)}
-                                        className={`px-1.5 py-1 rounded text-[8px] font-bold text-right transition-colors ${reportReason === reason ? 'bg-primary text-white' : 'bg-gray-50 dark:bg-white/5 text-text-muted hover:bg-gray-100'}`}
-                                    >
-                                        {(t as any)(reason)}
-                                    </button>
-                                ))}
-                            </div>
-                            <button
-                                onClick={handleReportSubmit}
-                                disabled={!reportReason || isReporting}
-                                className="w-full py-1.5 bg-red-500 text-white rounded text-[9px] font-black uppercase disabled:opacity-50"
-                            >
-                                {isReporting ? "..." : (t as any)("reportAd")}
-                            </button>
-                            {reportStatus === "success" && (
-                                <p className="text-[8px] text-green-500 font-bold mt-1 text-center">{(t as any)("reportSubmitted")}</p>
-                            )}
-                        </div>
-                    )}
                 </div>
+            </div>
 
-                <div className="mt-auto flex items-center justify-between w-full pt-1 border-t border-gray-100 dark:border-gray-800">
-                    <button
-                        className="px-2 py-0.5 text-[8px] font-black rounded bg-gray-100 dark:bg-white/10 text-text-main hover:bg-gray-200"
-                        onClick={handleNextFace}
-                    >
-                        {t("home")}
-                    </button>
-                </div>
+            <div className="mt-auto flex items-center justify-between w-full pt-1 border-t border-gray-100 dark:border-gray-800">
+                <button
+                    className="px-2 py-0.5 text-[8px] font-black rounded bg-gray-100 dark:bg-white/10 text-text-main hover:bg-gray-200"
+                    onClick={handleNextFace}
+                >
+                    {t("home")}
+                </button>
             </div>
         </div>
     );
