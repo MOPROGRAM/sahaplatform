@@ -166,84 +166,105 @@ export default function AdCard({
     const openThreshold = 0.4;
     
     // Render Functions
-    const renderImageFace = () => (
-        <div className={`relative shrink-0 overflow-hidden w-full h-full bg-white dark:bg-[#1a1a1a]`}>
-            {/* Shine Effect */}
-            <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
+    const renderStandardFace = () => (
+        <div className={`w-full h-full flex bg-white dark:bg-[#1a1a1a] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
+             {/* Image Section */}
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-48") : "w-[35%] h-full"}`}>
+                {/* Shine Effect */}
+                <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
-            {/* Flip/Peel Interaction */}
-            <div className="absolute top-1 left-1 z-20">
-                <motion.button
-                    className={`px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-primary text-white" : "bg-white/80 dark:bg-black/50 text-text-muted backdrop-blur-sm hover:bg-white dark:hover:bg-black/70"}`}
-                    drag="y"
-                    dragMomentum={false}
-                    onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                    onDrag={(e, info) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setPeel({
-                            x: 0,
-                            y: Math.max(0, Math.min(cornerMax, info.offset.y)),
-                        });
-                    }}
-                    onDragEnd={() => {
-                        if (peelProgress >= openThreshold) {
-                            handleNextFace();
-                        }
-                        setPeel({ x: 0, y: 0 });
-                    }}
-                    onClick={handleNextFace}
-                >
-                    {isFeatured ? t("featured") : t("details")}
-                </motion.button>
-
-                <div className="absolute inset-0 pointer-events-none">
-                    <div
-                        className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-gradient-to-br from-[#ff6b35] to-[#ff8a4a]" : "bg-white/90 dark:bg-[#1f1f1f]/90"}`}
-                        style={{
-                            width: cornerMax,
-                            height: cornerMax,
-                            clipPath: `polygon(0px 0px, 8px 0px, 0px ${peelY}px)`,
-                            borderTopLeftRadius: 8,
-                            transform: `perspective(600px) rotateX(${Math.min(45, peelY / 2)}deg)`,
-                            transformOrigin: "top left"
+                {/* Flip/Peel Interaction */}
+                <div className="absolute top-1 left-1 z-20">
+                    <motion.button
+                        className={`px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-primary text-white" : "bg-white/80 dark:bg-black/50 text-text-muted backdrop-blur-sm hover:bg-white dark:hover:bg-black/70"}`}
+                        drag="y"
+                        dragMomentum={false}
+                        onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onDrag={(e, info) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setPeel({
+                                x: 0,
+                                y: Math.max(0, Math.min(cornerMax, info.offset.y)),
+                            });
                         }}
-                    />
+                        onDragEnd={() => {
+                            if (peelProgress >= openThreshold) {
+                                handleNextFace();
+                            }
+                            setPeel({ x: 0, y: 0 });
+                        }}
+                        onClick={handleNextFace}
+                    >
+                        {isFeatured ? t("featured") : t("details")}
+                    </motion.button>
+
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div
+                            className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-gradient-to-br from-[#ff6b35] to-[#ff8a4a]" : "bg-white/90 dark:bg-[#1f1f1f]/90"}`}
+                            style={{
+                                width: cornerMax,
+                                height: cornerMax,
+                                clipPath: `polygon(0px 0px, 8px 0px, 0px ${peelY}px)`,
+                                borderTopLeftRadius: 8,
+                                transform: `perspective(600px) rotateX(${Math.min(45, peelY / 2)}deg)`,
+                                transformOrigin: "top left"
+                            }}
+                        />
+                    </div>
                 </div>
+
+                <button
+                    onClick={handleFavoriteClick}
+                    className="absolute top-1 right-1 z-10 p-0.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
+                >
+                    <Heart
+                        size={12}
+                        className={isFavorite ? "fill-red-500 text-red-500" : ""}
+                    />
+                </button>
+
+                {images.length > 0 ? (
+                    <Image
+                        src={images[0]}
+                        alt={title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-white/5 select-none group-hover:bg-gray-100 dark:group-hover:bg-white/10 transition-colors">
+                        <Logo className="w-12 h-12 text-primary opacity-70 group-hover:scale-110 transition-transform duration-500" />
+                    </div>
+                )}
             </div>
 
-            <button
-                onClick={handleFavoriteClick}
-                className="absolute top-1 right-1 z-10 p-0.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
-            >
-                <Heart
-                    size={12}
-                    className={isFavorite ? "fill-red-500 text-red-500" : ""}
-                />
-            </button>
-
-            {images.length > 0 ? (
-                <Image
-                    src={images[0]}
-                    alt={title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
-            ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-white/5 select-none group-hover:bg-gray-100 dark:group-hover:bg-white/10 transition-colors">
-                    <Logo className="w-12 h-12 text-primary opacity-70 group-hover:scale-110 transition-transform duration-500" />
+            {/* Content Section */}
+            <div className={`flex-1 flex flex-col p-2 ${isVertical ? "gap-1" : "justify-center"}`}>
+                 <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-sm font-bold text-text-main line-clamp-2 hover:text-primary transition-colors duration-300">
+                        {currentTitle}
+                    </h3>
                 </div>
-            )}
-            
-            {/* Minimal Info Overlay for Image Face */}
-             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 text-white">
-                <h3 className="text-[12px] font-black line-clamp-1">{currentTitle}</h3>
-                <div className="flex items-baseline gap-1">
-                    <span className="text-xs font-bold">
+
+                <div className="flex items-center gap-2 mt-auto">
+                     <p className="text-lg font-black text-primary">
                         {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
-                    </span>
-                    <span className="text-[8px] opacity-80">{currencyCode}</span>
+                        <span className="text-[10px] font-normal text-text-muted mx-1">{currencyCode}</span>
+                    </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 mt-1">
+                     {location && (
+                        <div className="flex items-center gap-1 text-[10px] text-text-muted">
+                            <MapPin size={10} />
+                            <span className="truncate max-w-[80px]">{location.split(",")[0]}</span>
+                        </div>
+                    )}
+                     <div className="flex items-center gap-1 text-[10px] text-text-muted">
+                        <Clock size={10} />
+                        <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -410,7 +431,7 @@ export default function AdCard({
                 >
                     {/* Front Physical Side */}
                     <div 
-                        className="absolute inset-0 w-full h-full"
+                        className="relative w-full h-full"
                         style={{ backfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
                     >
                         {renderContent(getFrontContent())}
