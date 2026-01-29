@@ -29,7 +29,7 @@ export default function PromotedBanner() {
     if (loading) {
         return (
             <div className="w-full my-6 px-4">
-                <div className="w-full h-[240px] bg-gray-100 dark:bg-[#1a1a1a] rounded-[2rem] animate-pulse relative overflow-hidden">
+                <div className="w-full h-[184px] bg-gray-100 dark:bg-[#1a1a1a] rounded-[2rem] animate-pulse relative overflow-hidden">
                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
                 </div>
             </div>
@@ -43,7 +43,7 @@ export default function PromotedBanner() {
     return (
         <div className="w-full my-6 px-4 space-y-6">
             {strips.map((stripAds, index) => (
-                <div key={index} className="relative w-full bg-gradient-to-br from-[#FF4D00] via-[#ff6a00] to-white rounded-[2rem] shadow-xl overflow-hidden border-4 border-white/20">
+                <div key={index} className="relative w-full bg-gradient-to-br from-[#ff6b35] via-[#ff8a4a] to-white rounded-[2rem] shadow-xl overflow-hidden">
                     
                     {/* Wavy Pattern / Texture Effect */}
                     <div className="absolute inset-0 z-0">
@@ -55,7 +55,7 @@ export default function PromotedBanner() {
                     </div>
                     
                     {/* Content Container - Horizontal Scroll */}
-                    <div className="relative flex items-center gap-3 p-3 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
+                    <div className="relative flex items-center gap-3 p-2 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
                         {stripAds.map((ad) => {
                             let images: string[] = [];
                             try {
@@ -74,7 +74,14 @@ export default function PromotedBanner() {
                                         {...ad}
                                         images={images}
                                         layout="vertical"
-                                        className="h-full border-2 border-yellow-500 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                                        imageHeight="h-[62px]"
+                                        className="h-full relative isolate
+                                            bg-gradient-to-br from-[#fff7e6] via-[#ffe2a8] to-[#ffd58a] dark:from-[#2a2108] dark:via-[#3a2a0e] dark:to-[#4a3512]
+                                            shadow-[0_2px_6px_rgba(255,191,0,0.15),0_12px_24px_rgba(255,191,0,0.12),0_24px_32px_-8px_rgba(0,0,0,0.1)] 
+                                            hover:shadow-[0_16px_32px_-8px_rgba(255,191,0,0.25)]
+                                            border-[0.5px] border-amber-200 dark:border-amber-300/30
+                                            ring-1 ring-inset ring-amber-300/60 dark:ring-amber-200/20
+                                            hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500 ease-out"
                                         isFeatured={true}
                                         language={language}
                                     />

@@ -190,6 +190,27 @@ function AdsContent() {
                 </aside>
 
                 <section className="col-span-12 lg:col-span-10 flex flex-col gap-2">
+                {/* Mobile Categories Strip */}
+                <div className="lg:hidden bg-white border border-border-color rounded-lg shadow-md p-1 mt-2 overflow-x-auto no-scrollbar">
+                    <div className="flex flex-nowrap gap-2 whitespace-nowrap px-1">
+                        <button
+                            onClick={() => handleCategoryChange(null)}
+                            className={cn("px-3 py-1.5 rounded-full text-sm font-bold transition-all", !category ? 'bg-primary text-white shadow-md' : 'text-primary hover:bg-primary/10')}
+                        >
+                            {t('allAds')}
+                        </button>
+                        {mainCategories.map((cat) => (
+                            <button
+                                key={cat.key}
+                                onClick={() => handleCategoryChange(cat.key)}
+                                className={cn("px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2", category === cat.key ? 'bg-primary text-white shadow-md' : 'text-text-main hover:bg-gray-100')}
+                            >
+                                <cat.icon size={14} />
+                                <span>{cat.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Subcategory Filter Row */}
                 {category && subCategoriesMap[category] && (

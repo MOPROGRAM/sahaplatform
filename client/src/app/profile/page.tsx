@@ -25,6 +25,7 @@ import Link from "next/link";
 import { adsService, Ad } from "@/lib/ads";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AdCard from "@/components/AdCard";
 
 
 
@@ -46,6 +47,7 @@ export default function ProfilePage() {
         confirmPassword: ''
     });
     const [updateMessage, setUpdateMessage] = useState('');
+    const [favorites, setFavorites] = useState<any[]>([]);
 
     useEffect(() => {
         if (!user) {
@@ -58,6 +60,17 @@ export default function ProfilePage() {
             setLoading(false);
         }
     }, [user, activeTab, router]);
+
+    useEffect(() => {
+        if (activeTab !== 'favorites') return;
+        try {
+            const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
+            const list = raw ? JSON.parse(raw) : [];
+            setFavorites(Array.isArray(list) ? list : []);
+        } catch {
+            setFavorites([]);
+        }
+    }, [activeTab]);
 
     const fetchUserAds = async () => {
         try {
@@ -378,14 +391,57 @@ export default function ProfilePage() {
 
                     {/* Favorites Tab (for seekers) */}
                     {activeTab === 'favorites' && (
-                        <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm text-center">
-                            <Heart size={48} className="text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-black text-text-muted uppercase tracking-tight">
-                                {language === 'ar' ? 'المفضلة' : 'Favorites'}
-                            </h3>
-                            <p className="text-[12px] text-gray-500 mt-2">
-                                {language === 'ar' ? 'لم تقم بإضافة أي إعلانات للمفضلة بعد' : 'You haven\'t added any favorites yet'}
-                            </p>
+                        <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <Heart size={18} className="text-primary" />
+                                    <h3 className="text-[12px] font-black uppercase tracking-widest text-secondary">
+                                        {language === 'ar' ? 'المفضلة' : 'Favorites'}
+                                    </h3>
+                                </div>
+                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{favorites.length}</span>
+                            </div>
+                            {favorites.length === 0 ? (
+                                <div className="text-center">
+                                    <Heart size={48} className="text-gray-300 mx-auto mb-4" />
+                                    <p className="text-[12px] text-gray-500 mt-2">
+                                        {language === 'ar' ? 'لم تقم بإضافة أي إعلانات للمفضلة بعد' : "You haven't added any favorites yet"}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {favorites.map((fav) => (
+                                        <div key={fav.id} className="relative">
+                                            <button
+                                                onClick={() => {
+                                                    try {
+                                                        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
+                                                        const list = raw ? JSON.parse(raw) : [];
+                                                        const updated = Array.isArray(list) ? list.filter((a: any) => a.id !== fav.id) : [];
+                                                        if (typeof window !== 'undefined') window.localStorage.setItem('saha:favorites', JSON.stringify(updated));
+                                                        setFavorites(updated);
+                                                    } catch {}
+                                                }}
+                                                className="absolute top-2 left-2 z-10 px-2 py-1 text-[10px] font-black uppercase tracking-widest bg-red-600 text-white rounded-xs shadow hover:bg-red-700 transition-all"
+                                            >
+                                                {language === 'ar' ? 'إزالة' : 'Remove'}
+                                            </button>
+                                            <AdCard
+                                                id={fav.id}
+                                                title={fav.title}
+                                                price={fav.price}
+                                                currency={fav.currency}
+                                                location={fav.location}
+                                                images={fav.image ? [fav.image] : []}
+                                                createdAt={fav.createdAt}
+                                                language={language}
+                                                layout="vertical"
+                                                imageHeight="h-[120px]"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 

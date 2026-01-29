@@ -102,7 +102,9 @@ export default function MessagesPage() {
                                         <div className="flex-1 min-w-0 text-right">
                                             <div className="flex justify-between items-start">
                                                 <h4 className={`text-[12px] font-black truncate uppercase tracking-tight ${isSelected ? 'text-primary' : 'text-text-main'}`}>{otherMember.name}</h4>
-                                                <span className="text-[8px] font-black text-text-muted uppercase">{new Date(conv.last_message_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                <span className="text-[8px] font-black text-text-muted uppercase" suppressHydrationWarning>
+                                                    {conv?.last_message_time ? new Date(conv.last_message_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                                </span>
                                             </div>
                                             <div className="flex items-center gap-1 mt-0.5 mb-1">
                                                 {conv.ad ? (

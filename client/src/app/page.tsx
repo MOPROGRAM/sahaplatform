@@ -18,8 +18,8 @@ import { clsx } from "clsx";
 const AdsSkeleton = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-1.5 pb-10">
         {[...Array(12)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[200px] animate-pulse">
-                <div className="h-20 bg-gray-200 dark:bg-white/10 w-full" />
+            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm h-[192px] animate-pulse">
+                <div className="h-[72px] bg-gray-200 dark:bg-white/10 w-full" />
                 <div className="p-2 space-y-2">
                     <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
                     <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-1/2" />
@@ -164,6 +164,31 @@ export default function HomePage() {
                             <button onClick={() => setFilter("all")} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${filter === "all" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("viewAll")}</button>
                             <button onClick={() => setFilter("featured")} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${filter === "featured" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("featured")}</button>
                             <button onClick={() => setFilter("new")} className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${filter === "new" ? "bg-white dark:bg-zinc-800 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}>{t("newAd")}</button>
+                        </div>
+                    </div>
+
+                    {/* Mobile Categories Strip */}
+                    <div className="xl:hidden bg-white border border-border-color rounded-lg shadow-md p-1 mt-2 overflow-x-auto no-scrollbar">
+                        <div className="flex flex-nowrap gap-2 whitespace-nowrap px-1">
+                            <Link
+                                href="/ads"
+                                className="px-3 py-1.5 rounded-full text-sm font-bold transition-all bg-primary/10 text-primary hover:bg-primary/20"
+                            >
+                                {t('allAds')}
+                            </Link>
+                            {categoriesList.map((cat) => (
+                                <Link
+                                    key={cat.key}
+                                    href={`/ads?category=${cat.key}`}
+                                    className="px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 text-text-main hover:bg-gray-100"
+                                >
+                                    <cat.icon size={14} />
+                                    <span>{(t as any)[cat.key] || cat.key}</span>
+                                    <span className="text-[10px] font-bold text-text-muted bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">
+                                        {categoryCounts[cat.key] || 0}
+                                    </span>
+                                </Link>
+                            ))}
                         </div>
                     </div>
 

@@ -24,7 +24,8 @@ import {
     Bell,
     ArrowLeft,
     X,
-    AlertTriangle
+    AlertTriangle,
+    Headphones
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -43,7 +44,7 @@ export default function DashboardPage() {
     const [stats, setStats] = useState([
         { label: "Views", value: "0", icon: <Eye size={12} />, color: "text-blue-500" },
         { label: "Messages", value: "0", icon: <MessageSquare size={12} />, color: "text-green-500" },
-        { label: "Listings", value: "0", icon: <Package size={12} />, color: "text-orange-500" },
+        { label: "Listings", value: "0", icon: <Package size={12} />, color: "text-primary" },
         { label: "Growth", value: "0%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
     ]);
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; adId: string | null; adTitle: string }>({ open: false, adId: null, adTitle: '' });
@@ -63,6 +64,7 @@ export default function DashboardPage() {
         expiry: '',
         cvc: ''
     });
+    const [paymentMethod, setPaymentMethod] = useState<'card' | 'email'>('card');
 
     const plans = [
         {
@@ -120,11 +122,14 @@ export default function DashboardPage() {
             
             if (selectedPlan.manual) {
                 requestType = 'manual_request';
-            } else {
+            } else if (paymentMethod === 'card') {
                 // Simulate Payment
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 const transactionId = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
                 finalMessage = `${buyPointsFormData.message}\n\n[System] Payment Verified via Visa\nTransaction ID: ${transactionId}\nCard: **** **** **** ${buyPointsFormData.cardNumber.slice(-4) || '0000'}`;
+            } else {
+                 // Email Request
+                 finalMessage = `${buyPointsFormData.message}\n\n[System] Payment Method: Email Request (Resend)\nStatus: Pending Payment`;
             }
 
             const response = await fetch('/api/subscribe', {
@@ -199,7 +204,7 @@ export default function DashboardPage() {
             setStats([
                 { label: language === 'ar' ? "رصيد النقاط" : "Points Balance", value: (user?.points || 0).toString(), icon: <Zap size={12} />, color: "text-yellow-500" },
                 { label: language === 'ar' ? "المشاهدات" : "Views", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
-                { label: language === 'ar' ? "الإعلانات" : "Listings", value: activeAds.toString(), icon: <Package size={12} />, color: "text-orange-500" },
+                { label: language === 'ar' ? "الإعلانات" : "Listings", value: activeAds.toString(), icon: <Package size={12} />, color: "text-primary" },
                 { label: language === 'ar' ? "النمو" : "Growth", value: "+12%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
             ]);
         } catch (error) {
@@ -419,7 +424,7 @@ export default function DashboardPage() {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <Clock size={12} />
-                                                            {getRelativeTime(ad.created_at)}
+                                                            {ad.created_at ? getRelativeTime(ad.created_at) : (language === 'ar' ? 'غير متوفر' : 'N/A')}
                                                         </span>
                                                     </div>
                                                     <div className="flex gap-2">
@@ -749,47 +754,82 @@ export default function DashboardPage() {
                                         </p>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">Card Number</label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                required
-                                                placeholder="0000 0000 0000 0000"
-                                                maxLength={19}
-                                                value={buyPointsFormData.cardNumber}
-                                                onChange={(e) => setBuyPointsFormData({...buyPointsFormData, cardNumber: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim()})}
-                                                className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono"
-                                            />
-                                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
-                                        </div>
+                                    <div className="flex gap-2 mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                                        <button
+                                            type="button"
+                                            onClick={() => setPaymentMethod('card')}
+                                            className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${paymentMethod === 'card' ? 'bg-white dark:bg-[#1a1a1a] text-primary shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                                        >
+                                            {language === 'ar' ? 'بطاقة ائتمان' : 'Credit Card'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPaymentMethod('email')}
+                                            className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${paymentMethod === 'email' ? 'bg-white dark:bg-[#1a1a1a] text-primary shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                                        >
+                                            {language === 'ar' ? 'طلب عبر البريد' : 'Email Request'}
+                                        </button>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">Expiry</label>
-                                            <input
-                                                type="text"
-                                                required
-                                                placeholder="MM/YY"
-                                                maxLength={5}
-                                                value={buyPointsFormData.expiry}
-                                                onChange={(e) => setBuyPointsFormData({...buyPointsFormData, expiry: e.target.value})}
-                                                className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono text-center"
-                                            />
+
+                                    {paymentMethod === 'card' ? (
+                                        <>
+                                            <div>
+                                                <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">Card Number</label>
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        required={paymentMethod === 'card'}
+                                                        placeholder="0000 0000 0000 0000"
+                                                        maxLength={19}
+                                                        value={buyPointsFormData.cardNumber}
+                                                        onChange={(e) => setBuyPointsFormData({...buyPointsFormData, cardNumber: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim()})}
+                                                        className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono"
+                                                    />
+                                                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">Expiry</label>
+                                                    <input
+                                                        type="text"
+                                                        required={paymentMethod === 'card'}
+                                                        placeholder="MM/YY"
+                                                        maxLength={5}
+                                                        value={buyPointsFormData.expiry}
+                                                        onChange={(e) => setBuyPointsFormData({...buyPointsFormData, expiry: e.target.value})}
+                                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono text-center"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">CVC</label>
+                                                    <input
+                                                        type="text"
+                                                        required={paymentMethod === 'card'}
+                                                        placeholder="123"
+                                                        maxLength={3}
+                                                        value={buyPointsFormData.cvc}
+                                                        onChange={(e) => setBuyPointsFormData({...buyPointsFormData, cvc: e.target.value.replace(/\D/g, '')})}
+                                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono text-center"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="bg-primary/5 border border-primary/10 rounded-xl p-6 text-center">
+                                            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                <Zap className="text-primary" size={24} />
+                                            </div>
+                                            <h4 className="font-bold text-text-main mb-2">
+                                                {language === 'ar' ? 'طلب شراء نقاط' : 'Points Purchase Request'}
+                                            </h4>
+                                            <p className="text-xs text-text-muted leading-relaxed">
+                                                {language === 'ar' 
+                                                    ? 'سيتم إرسال طلبك عبر البريد الإلكتروني إلى فريق المبيعات. سنتواصل معك قريباً لإتمام عملية الدفع وتفعيل النقاط.' 
+                                                    : 'Your request will be sent via email to our sales team. We will contact you shortly to complete the payment and activate your points.'}
+                                            </p>
                                         </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-text-muted uppercase mb-1.5">CVC</label>
-                                            <input
-                                                type="text"
-                                                required
-                                                placeholder="123"
-                                                maxLength={3}
-                                                value={buyPointsFormData.cvc}
-                                                onChange={(e) => setBuyPointsFormData({...buyPointsFormData, cvc: e.target.value.replace(/\D/g, '')})}
-                                                className="w-full px-4 py-3 bg-gray-50 dark:bg-[#111] border border-border-color rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono text-center"
-                                            />
-                                        </div>
-                                    </div>
+                                    )}
 
                                     <div className="flex gap-3 mt-6">
                                         <button type="button" onClick={() => setPaymentStep(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-text-main rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
@@ -797,7 +837,9 @@ export default function DashboardPage() {
                                         </button>
                                         <button type="submit" disabled={processing} className="flex-1 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all flex items-center justify-center gap-2">
                                             {processing && <Loader2 className="animate-spin" size={16} />}
-                                            {language === 'ar' ? `دفع ${selectedPlan.price}` : `Pay ${selectedPlan.price}`}
+                                            {language === 'ar' 
+                                                ? (paymentMethod === 'card' ? `دفع ${selectedPlan.price}` : 'إرسال الطلب')
+                                                : (paymentMethod === 'card' ? `Pay ${selectedPlan.price}` : 'Send Request')}
                                         </button>
                                     </div>
                                 </form>

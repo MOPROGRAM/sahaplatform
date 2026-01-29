@@ -9,6 +9,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { conversationsService } from "@/lib/conversations";
+import PixelWaterBackground from "@/components/PixelWaterBackground";
 
 export default function Header() {
     const { user, logout } = useAuthStore();
@@ -68,19 +69,33 @@ export default function Header() {
     };
 
     return (
-        <header className={`sticky top-0 z-[100] bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
-            <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-6">
+        <header className={`sticky top-0 z-[100] backdrop-blur-lg border-b border-border-color ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
+            <div className="relative">
+                <PixelWaterBackground className="absolute inset-0 w-full h-full" />
+                <div className="max-w-[1920px] mx-auto px-4 flex items-center gap-6 relative z-10">
                 {/* Brand */}
                 <Link href="/" className="group shrink-0 flex items-center gap-2" prefetch={false}>
-                    <Logo className="h-9 w-auto text-primary transition-transform group-hover:scale-110" />
-                    <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105 hidden sm:block">{t("siteName")}</span>
+                    {/* Mobile Logo */}
+                    <Logo className="h-9 w-auto text-primary sm:hidden transition-transform group-hover:scale-110" />
+                    
+                    {/* Desktop Logo (Name + Underline) */}
+                    <div className="hidden sm:flex flex-col items-center">
+                        <span className="text-3xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105 leading-none">
+                            {t("siteName")}
+                        </span>
+                        <Logo 
+                            viewBox="14 22 72 36" 
+                            preserveAspectRatio="none"
+                            className="h-4 w-[101.1%] text-primary transition-transform group-hover:scale-110" 
+                        />
+                    </div>
                 </Link>
 
                 {/* Region & Currency Selector */}
                 <div className="relative">
                     <button
                         onClick={() => setShowRegion(!showRegion)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-slate-900 border border-border-color rounded-md hover:border-primary transition-all group"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-slate-900 border border-border-color rounded-full hover:border-primary transition-all group"
                     >
                         <MapPin size={12} className="text-primary" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-text-main">{t(country as any)} | {t(currency as any)}</span>
@@ -151,10 +166,10 @@ export default function Header() {
                 <div className="flex items-center gap-3 shrink-0">
 
                     <div className="hidden lg:flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                        <button onClick={toggleTheme} className="p-2 hover:text-primary transition-colors">
+                        <button onClick={toggleTheme} className="p-2 border border-border-color rounded-full hover:border-primary hover:text-primary transition-colors">
                             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
                         </button>
-                        <button onClick={() => setLanguage(language === "ar" ? "en" : "ar")} className="p-2 hover:text-primary transition-colors">
+                        <button onClick={() => setLanguage(language === "ar" ? "en" : "ar")} className="p-2 border border-border-color rounded-full hover:border-primary hover:text-primary transition-colors">
                             <Globe size={18} />
                         </button>
                     </div>
@@ -163,14 +178,14 @@ export default function Header() {
                         <div className="relative">
                             <button
                                 onClick={() => setShowUserMenu(!showUserMenu)}
-                                className="flex items-center gap-2 px-2 py-1 hover:bg-primary/10 rounded-lg transition-all group border border-transparent hover:border-primary/20"
+                                className="flex items-center gap-2 px-2 py-1 hover:bg-primary/10 rounded-full transition-all group border border-transparent hover:border-primary/20"
                             >
                                 <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm uppercase shrink-0">
-                  {user.name?.substring(0, 1)}
-                </div>
-                <div className="hidden md:block text-start">
-                  <p className="text-sm font-bold text-text-main leading-none">{user.name}</p>
-                </div>
+                                    {(user.name || user.email || 'U').substring(0, 1).toUpperCase()}
+                                </div>
+                                <div className="hidden md:block text-start">
+                                    <p className="text-sm font-bold text-text-main leading-none">{user.name || user.email?.split('@')[0] || t('guest')}</p>
+                                </div>
                                 <ChevronDown size={12} className="text-gray-400" />
                             </button>
 
@@ -179,9 +194,26 @@ export default function Header() {
                                     <div className="fixed inset-0 z-[105]" onClick={() => setShowUserMenu(false)}></div>
                                     <div className="absolute top-full right-0 mt-2 w-56 bento-card shadow-2xl py-2 z-[110] animate-in fade-in duration-200 rounded-2xl">
                                         <div className="space-y-1 p-1">
+                                            {/* Mobile Only Options */}
+                                            <div className="lg:hidden px-4 py-2 space-y-3 border-b border-border-color mb-2">
+                                                 <div className="flex items-center justify-between">
+                                                     <span className="text-[10px] font-black uppercase text-text-muted">{t('theme')}</span>
+                                                     <button onClick={toggleTheme} className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-md text-primary">
+                                                         {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
+                                                     </button>
+                                                 </div>
+                                                 <div className="flex items-center justify-between">
+                                                     <span className="text-[10px] font-black uppercase text-text-muted">{t('language')}</span>
+                                                     <button onClick={() => setLanguage(language === "ar" ? "en" : "ar")} className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-md text-primary flex items-center gap-1 text-[10px] font-bold">
+                                                         <Globe size={14} />
+                                                         {language === "ar" ? "English" : "العربية"}
+                                                     </button>
+                                                 </div>
+                                            </div>
+
                                             {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
                                                 <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors" onClick={() => setShowUserMenu(false)}>
-                                                    <Settings size={14} />
+                                                    <ShieldCheck size={14} />
                                                     {t("systemManagement")}
                                                 </Link>
                                             )}
@@ -205,7 +237,7 @@ export default function Header() {
                                                 {t("notifications")}
                                             </Link>
                                             <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" onClick={() => setShowUserMenu(false)}>
-                                                <User size={14} />
+                                                <Settings size={14} />
                                                 {t("settings")}
                                             </Link>
                                             <div className="border-t border-border-color my-1"></div>
@@ -226,6 +258,7 @@ export default function Header() {
                         <PlusCircle size={16} />
                         {t("postAd")}
                     </Link>
+                </div>
                 </div>
             </div>
 

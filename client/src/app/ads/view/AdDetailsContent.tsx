@@ -22,7 +22,7 @@ import { useLanguage } from "@/lib/language-context";
 import { adsService, Ad as AdsAd } from "@/lib/ads";
 import { conversationsService } from "@/lib/conversations";
 import { useAuthStore } from "@/store/useAuthStore";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatRelativeTime, formatDateTime } from "@/lib/utils";
 
 interface Ad {
     id: string;
@@ -190,7 +190,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                                     {ad.created_at && (
                                         <div className="flex flex-col items-end">
                                             <span className="text-[9px] font-black text-text-muted mt-1 uppercase italic tracking-tighter">
-                                                {language === 'ar' ? 'نُشر' : 'LISTED'} {formatRelativeTime(ad.created_at, language)}
+                                                {language === 'ar' ? 'نُشر' : 'LISTED'} {ad.created_at ? formatRelativeTime(ad.created_at, language) : ''}
                                             </span>
                                             <span className="text-[9px] text-text-muted opacity-50 font-medium">
                                                 {formatDateTime(ad.created_at, language)}

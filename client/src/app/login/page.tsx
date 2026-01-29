@@ -46,9 +46,8 @@ export default function LoginPage() {
                 {/* Branding Accent */}
                 <div className="flex flex-col items-center mb-8">
                     <Link href="/" className="flex flex-col group items-center gap-2">
-                        <Logo className="h-16 w-auto text-primary transition-transform group-hover:scale-110" />
                         <span className="text-4xl font-black tracking-tighter text-primary italic transition-transform group-hover:scale-105">{t('siteName')}</span>
-                        <div className="h-1 w-12 bg-primary mt-2 shadow-md group-hover:w-20 transition-all"></div>
+                        <Logo className="h-16 w-auto text-primary transition-transform group-hover:scale-110" />
                     </Link>
                 </div>
 

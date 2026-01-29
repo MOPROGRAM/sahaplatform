@@ -23,7 +23,8 @@ import {
     Trash2,
     ExternalLink,
     Sparkles,
-    Flag
+    Flag,
+    MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -164,20 +165,24 @@ export default function AdminDashboard() {
                     const pointsMatch = request.message.match(/\[System\] Points: (\d+)/);
                     if (pointsMatch && pointsMatch[1]) {
                         const pointsToAdd = parseInt(pointsMatch[1]);
-                        if (pointsToAdd > 0) {
-                            const { data: userData } = await (supabase as any)
+                        if (pointsToAdd > 0 && request.user_id) {
+                            const { data: userData, error: pointsError } = await (supabase as any)
                                 .from('users')
                                 .select('points')
                                 .eq('id', request.user_id)
                                 .single();
 
-                            const currentPoints = userData?.points || 0;
-                            const newPoints = currentPoints + pointsToAdd;
+                            if (!pointsError) {
+                                const currentPoints = (userData && typeof userData.points === 'number') ? userData.points : 0;
+                                const newPoints = currentPoints + pointsToAdd;
 
-                            await (supabase as any)
-                                .from('users')
-                                .update({ points: newPoints })
-                                .eq('id', request.user_id);
+                                await (supabase as any)
+                                    .from('users')
+                                    .update({ points: newPoints })
+                                    .eq('id', request.user_id);
+                            } else {
+                                console.warn('Points column fetch failed or user not found', pointsError);
+                            }
                         }
                     }
                 }
@@ -347,7 +352,7 @@ export default function AdminDashboard() {
                                     <div className="bento-grid">
                                         {[
                                             { label: 'Network Nodes', value: stats.totalUsers, icon: <Users size={20} />, color: 'bg-blue-500/10 border-blue-500/20 text-blue-500', trend: '+12% INC', size: 'bento-small' },
-                                            { label: 'Active Assets', value: stats.totalAds, icon: <Package size={20} />, color: 'bg-orange-500/10 border-orange-500/20 text-orange-500', trend: 'STABLE', size: 'bento-small' },
+                                            { label: 'Active Assets', value: stats.totalAds, icon: <Package size={20} />, color: 'bg-primary/10 border-primary/20 text-primary', trend: 'STABLE', size: 'bento-small' },
                                             { label: 'Pending Subs', value: stats.pendingSubscriptions, icon: <Clock size={20} />, color: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500', trend: 'CRITICAL', highlight: stats.pendingSubscriptions > 0, size: 'bento-large' },
                                             { label: 'Completed Rev', value: stats.activeSubscriptions, icon: <DollarSign size={20} />, color: 'bg-green-500/10 border-green-500/20 text-green-500', trend: 'OPTIMIZED', size: 'bento-small' }
                                         ].map((s, i) => (
@@ -422,7 +427,7 @@ export default function AdminDashboard() {
                                                                 <span className={`text-[10px] font-black uppercase tracking-widest ${log.highlight ? 'text-primary' : 'text-white'}`}>{log.title}</span>
                                                                 <span className="text-[8px] font-bold text-gray-500">@{log.time}</span>
                                                             </div>
-                                                            <p className="text-[10px] font-bold text-text-muted italic">"{log.desc}"</p>
+                                                            <p className="text-[10px] font-bold text-text-muted italic">&quot;{log.desc}&quot;</p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -506,7 +511,7 @@ export default function AdminDashboard() {
                                                                 {item.verified ? (
                                                                     <span className="bg-green-500/10 text-green-500 border border-green-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">VERIFIED</span>
                                                                 ) : (
-                                                                    <span className="bg-orange-500/10 text-orange-500 border border-orange-500/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">PENDING_KYC</span>
+                                                                    <span className="bg-primary/10 text-primary border border-primary/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest rounded-sm">PENDING_KYC</span>
                                                                 )}
                                                             </div>
                                                         )}
@@ -539,9 +544,9 @@ export default function AdminDashboard() {
                                                         )}
                                                         {view === 'messages' && (
                                                             <div className="flex items-center gap-2">
-                                                                <span className="text-[10px] font-mono text-gray-400">
-                                                                    {new Date(item.last_message_time).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US')}
-                                                                </span>
+                                                                 <span className="text-[10px] font-mono text-gray-400" suppressHydrationWarning>
+                                                                     {item?.last_message_time ? new Date(item.last_message_time).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US') : ''}
+                                                                 </span>
                                                             </div>
                                                         )}
                                                     </td>
@@ -552,7 +557,7 @@ export default function AdminDashboard() {
                                                                     <button
                                                                         disabled={actionLoading === item.id}
                                                                         onClick={() => handleUpdateAdStatus(item.id, !item.is_active)}
-                                                                        className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all ${item.is_active ? 'bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white' : 'bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white'}`}
+                                                                        className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all ${item.is_active ? 'bg-primary/10 text-primary hover:bg-primary hover:text-white' : 'bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white'}`}
                                                                     >
                                                                         {item.is_active ? <X size={16} /> : <Check size={16} />}
                                                                     </button>

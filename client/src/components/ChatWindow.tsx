@@ -245,9 +245,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             </div>
 
             {/* Safety Bar */}
-            <div className="bg-orange-50 py-1.5 px-3 border-b border-orange-100 flex items-center gap-2">
-                <div className="text-orange-600"><ShieldCheck size={12} /></div>
-                <p className="text-[9px] font-black text-orange-800 uppercase italic tracking-tight">Security Alert: Always keep transactions within Saha platform.</p>
+            <div className="bg-primary/10 py-1.5 px-3 border-b border-primary/20 flex items-center gap-2">
+                <div className="text-primary"><ShieldCheck size={12} /></div>
+                <p className="text-[9px] font-black text-primary uppercase italic tracking-tight">Security Alert: Always keep transactions within Saha platform.</p>
             </div>
 
             {/* Messages Area - High Density */}
