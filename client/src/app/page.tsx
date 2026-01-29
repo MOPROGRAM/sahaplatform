@@ -50,10 +50,16 @@ interface Ad {
     author_id: string;
     author?: {
         name?: string;
+        email?: string;
+        avg_rating?: number;
+        ratings_count?: number;
     };
     city?: {
         name: string;
     };
+    phone?: string;
+    email?: string;
+    currency?: string | { code: string; symbol: string; };
 }
 
 const categoriesList = [
@@ -209,13 +215,18 @@ export default function HomePage() {
                                         descriptionAr={ad.descriptionAr}
                                         descriptionEn={ad.descriptionEn}
                                         price={ad.price || 0}
-                                        currency={ad.currency || currency.toUpperCase()}
+                                        currency={typeof ad.currency === 'string' ? ad.currency : ad.currency?.code || currency.toUpperCase()}
                                         location={ad.city?.name || ad.location || ''}
                                         images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
                                         createdAt={ad.created_at}
                                         category={ad.category}
                                         language={language}
                                         isFeatured={ad.is_boosted || false}
+                                        authorId={ad.author_id}
+                                        phone={ad.phone}
+                                        email={ad.author?.email}
+                                        authorRating={ad.author?.avg_rating}
+                                        authorRatingsCount={ad.author?.ratings_count}
                                     />
                                 </div>
                             ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -32,7 +32,7 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ conversationId, onClose }: ChatWindowProps) {
     const { user } = useAuthStore();
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(true);
@@ -86,16 +86,16 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         .single()
                         .then(({ data: userData }) => {
                             if (userData) {
-                                setMessages(prev => prev.map(m => 
-                                    m.id === processedMessage.id 
+                                setMessages(prev => prev.map(m =>
+                                    m.id === processedMessage.id
                                         ? { ...m, sender: { name: userData.name } }
                                         : m
                                 ));
                             }
                         });
                 } else if (payload.eventType === 'UPDATE' && newItemConversationId === conversationId) {
-                    setMessages(prev => prev.map(m => 
-                        m.id === newItem.id 
+                    setMessages(prev => prev.map(m =>
+                        m.id === newItem.id
                             ? { ...m, is_read: newItem.is_read }
                             : m
                     ));
@@ -141,7 +141,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 setMessages(processedMessages);
                 setParticipants(data.conversation.participants || []);
                 setAdInfo(data.conversation.ad);
-                
+
                 // Mark messages as read
                 conversationsService.markAsRead(conversationId);
             }
@@ -202,6 +202,54 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
+    const handleDownload = async (url: string, fileName: string) => {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error('Download failed:', error);
+            window.open(url, '_blank');
+        }
+    };
+
+    const [showRateModal, setShowRateModal] = useState(false);
+    const [userRating, setUserRating] = useState(0);
+    const [ratingComment, setRatingComment] = useState("");
+    const [ratingLoading, setRatingLoading] = useState(false);
+
+    const handleRateUser = async () => {
+        if (!userRating || !otherMember.id) return;
+        setRatingLoading(true);
+        try {
+            const { error } = await supabase
+                .from('user_ratings')
+                .upsert({
+                    seller_id: otherMember.id,
+                    buyer_id: user?.id,
+                    rating: userRating,
+                    comment: ratingComment
+                });
+            if (error) throw error;
+            setShowRateModal(false);
+            setUserRating(0);
+            setRatingComment("");
+            alert(language === 'ar' ? 'شكراً لتقييمك!' : 'Thank you for your rating!');
+        } catch (error) {
+            console.error("Rating failed:", error);
+            alert(language === 'ar' ? 'فشل التقييم' : 'Rating failed');
+        } finally {
+            setRatingLoading(false);
+        }
+    };
+
     const handleFileUpload = async (file: File, type: 'file' | 'image') => {
         const fileName = `${Date.now()}-${file.name}`;
         const bucket = type === 'image' ? 'chat-images' : 'chat-files';
@@ -250,6 +298,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             <span className="text-[9px] font-black text-text-muted uppercase tracking-tighter">Active - Verified {otherMember.role}</span>
                         </div>
                     </div>
+                    {/* Rate Seller Button */}
+                    <button
+                        onClick={() => setShowRateModal(true)}
+                        className="flex items-center gap-1 px-2 py-1 bg-yellow-400/10 text-yellow-600 hover:bg-yellow-400 hover:text-white rounded-lg text-[9px] font-black transition-all border border-yellow-400/20 mr-2"
+                    >
+                        <Star size={10} className="fill-current" />
+                        {(t as any)("rateSeller")}
+                    </button>
                 </div>
                 <div className="flex items-center gap-3">
                     {adInfo && (
@@ -273,7 +329,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === user?.id;
                     const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)$/i.test(msg.file_url));
-                    
+
                     return (
                         <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                             <div className={`relative max-w-[75%] px-3 py-2 shadow-sm transition-all hover:shadow-md ${isMe
@@ -285,10 +341,10 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 {isImage && msg.file_url && (
                                     <div className="mb-1">
                                         <div className="relative group overflow-hidden rounded-lg border border-black/10">
-                                            <img 
-                                                src={msg.file_url} 
-                                                alt="Attachment" 
-                                                className="max-w-[250px] max-h-[250px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
+                                            <img
+                                                src={msg.file_url}
+                                                alt="Attachment"
+                                                className="max-w-[250px] max-h-[250px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
                                                 onClick={() => window.open(msg.file_url, '_blank')}
                                                 onError={(e) => {
                                                     e.currentTarget.src = '/placeholder-image.png'; // Fallback
@@ -299,14 +355,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                                 <Download className="text-white opacity-80" size={24} />
                                             </div>
                                         </div>
-                                        <a 
-                                            href={msg.file_url} 
-                                            download 
-                                            target="_blank" 
+                                        <button
+                                            onClick={() => handleDownload(msg.file_url!, msg.file_name || 'image.jpg')}
                                             className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
                                         >
                                             <Download size={10} /> {language === 'ar' ? 'تحميل الصورة' : 'Download Image'}
-                                        </a>
+                                        </button>
                                     </div>
                                 )}
 
@@ -330,9 +384,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                         <FileText size={24} className={'text-primary'} />
                                         <div className="flex flex-col min-w-0">
                                             <span className="text-[10px] font-black truncate max-w-[150px]">{msg.file_name || 'Attached File'}</span>
-                                            <a href={msg.file_url} download target="_blank" className={`flex items-center gap-1 text-[9px] font-black hover:underline text-primary`}>
+                                            <button
+                                                onClick={() => handleDownload(msg.file_url!, msg.file_name || 'file')}
+                                                className={`flex items-center justify-start gap-1 text-[9px] font-black hover:underline text-primary text-right`}
+                                            >
                                                 <Download size={10} /> {language === 'ar' ? 'تحميل' : 'DOWNLOAD NOW'}
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -395,6 +452,47 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     </button>
                 </div>
             </div>
+
+            {/* Rating Modal Overlays */}
+            {showRateModal && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-white/10 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-text-main">{(t as any)("rateSeller")}</h3>
+                            <button onClick={() => setShowRateModal(false)} className="text-text-muted hover:text-text-main"><X size={16} /></button>
+                        </div>
+
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        onClick={() => setUserRating(star)}
+                                        className={`transition-all hover:scale-125 ${userRating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                                    >
+                                        <Star size={32} className={userRating >= star ? 'fill-current' : ''} />
+                                    </button>
+                                ))}
+                            </div>
+
+                            <textarea
+                                value={ratingComment}
+                                onChange={(e) => setRatingComment(e.target.value)}
+                                placeholder={language === 'ar' ? 'أضف تعليقاً (اختياري)...' : 'Add a comment (optional)...'}
+                                className="w-full bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-2xl p-4 text-xs font-bold outline-none focus:border-primary transition-all resize-none h-24"
+                            />
+
+                            <button
+                                onClick={handleRateUser}
+                                disabled={!userRating || ratingLoading}
+                                className="w-full py-3 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:bg-primary-hover disabled:opacity-50 active:scale-95 transition-all"
+                            >
+                                {ratingLoading ? "..." : (t as any)("ratingSubmitted")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

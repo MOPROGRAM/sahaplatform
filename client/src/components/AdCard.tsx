@@ -5,10 +5,11 @@ import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, Phone, MessageCircle, User } from "lucide-react";
+import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, Phone, MessageCircle, User, Star, Flag, AlertTriangle, CheckCircle2, X, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 interface AdCardProps {
     id: string;
@@ -35,6 +36,11 @@ interface AdCardProps {
     isHighlighted?: boolean;
     layout?: 'vertical' | 'horizontal';
     imageHeight?: string;
+    phone?: string;
+    email?: string;
+    authorId?: string;
+    authorRating?: number;
+    authorRatingsCount?: number;
 }
 
 export default function AdCard({
@@ -61,12 +67,50 @@ export default function AdCard({
     isHighlighted = false,
     layout = 'vertical',
     imageHeight,
-    authorName // Added to destructuring
+    authorName,
+    phone,
+    email,
+    authorId,
+    authorRating = 0,
+    authorRatingsCount = 0
 }: AdCardProps) {
-    const { t } = useLanguage();
+    const { t, language: contextLanguage } = useLanguage();
     const router = useRouter();
+    const currentLanguage = language || contextLanguage;
     const [isFavorite, setIsFavorite] = useState(false);
-    const [peel, setPeel] = useState<{x: number; y: number}>({ x: 0, y: 0 });
+    const [showReport, setShowReport] = useState(false);
+    const [reportReason, setReportReason] = useState("");
+    const [isReporting, setIsReporting] = useState(false);
+    const [reportStatus, setReportStatus] = useState<"idle" | "success" | "error">("idle");
+
+    const handleReportSubmit = async () => {
+        if (!reportReason) return;
+        setIsReporting(true);
+        try {
+            const { error } = await supabase
+                .from('ad_reports')
+                .insert({
+                    ad_id: id,
+                    reporter_id: (await supabase.auth.getUser()).data.user?.id,
+                    reason: reportReason,
+                    status: 'pending'
+                });
+
+            if (error) throw error;
+            setReportStatus("success");
+            setTimeout(() => {
+                setShowReport(false);
+                setReportStatus("idle");
+                setReportReason("");
+            }, 2000);
+        } catch (error) {
+            console.error("Report failed:", error);
+            setReportStatus("error");
+        } finally {
+            setIsReporting(false);
+        }
+    };
+    const [peel, setPeel] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [faceIndex, setFaceIndex] = useState(0);
     const [backPeelY, setBackPeelY] = useState(0);
     const cornerMax = 96;
@@ -80,25 +124,38 @@ export default function AdCard({
                 const list = JSON.parse(raw) as any[];
                 setIsFavorite(list.some(a => a.id === id));
             }
-        } catch {}
+        } catch { }
     }, [id]);
 
+    const isVertical = layout === 'vertical';
+    const currentDescription = currentLanguage === 'ar'
+        ? (description_ar || descriptionAr || description)
+        : (description_en || descriptionEn || description);
+
+    const currentTitle = currentLanguage === 'ar'
+        ? (titleAr || title)
+        : (titleEn || title);
+
+    const currencyCode = (currency && typeof currency === 'object') ? (currency as any).code : (currency || 'SAR');
+    const peelProgress = peelY / cornerMax;
+    const openThreshold = 0.4;
+
     // Faces configuration
-    const faces = isFeatured ? ['image', 'details', 'contact'] : ['image', 'details'];
-    
+    const descriptionLimit = 160;
+    const hasMoreDetails = currentDescription && currentDescription.length > descriptionLimit;
+    const faces = hasMoreDetails
+        ? ['image', 'contact', 'details', 'details_more']
+        : ['image', 'contact', 'details'];
+
     // Helpers to determine content for physical sides
     const getFrontContent = () => {
         const i = faceIndex;
-        // If current face is even, it's on the front. 
-        // If current face is odd (back visible), front should prep for next even (i+1).
         const typeIndex = (i % 2 === 0) ? i : i + 1;
         return faces[typeIndex % faces.length];
     };
 
     const getBackContent = () => {
         const i = faceIndex;
-        // If current face is odd, it's on the back.
-        // If current face is even (front visible), back should prep for next odd (i+1).
         const typeIndex = (i % 2 !== 0) ? i : i + 1;
         return faces[typeIndex % faces.length];
     };
@@ -118,7 +175,6 @@ export default function AdCard({
         }
         const len = faces.length;
         const current = faceIndex;
-        // Calculate steps to next image (index 0)
         const nextImage = current + (len - (current % len));
         setFaceIndex(nextImage);
     };
@@ -149,7 +205,7 @@ export default function AdCard({
                 const updated = list.filter(a => a.id !== id);
                 window.localStorage.setItem(key, JSON.stringify(updated));
             }
-        } catch {}
+        } catch { }
     };
 
     const getCategoryIcon = (catKey?: string) => {
@@ -165,23 +221,11 @@ export default function AdCard({
         }
     }
 
-    const isVertical = layout === 'vertical';
-    const currentDescription = language === 'ar' 
-        ? (description_ar || descriptionAr || description) 
-        : (description_en || descriptionEn || description); 
 
-    const currentTitle = language === 'ar'
-        ? (titleAr || title)
-        : (titleEn || title);
-
-    const currencyCode = (currency && typeof currency === 'object') ? (currency as any).code : (currency || 'SAR');
-    const peelProgress = peelY / cornerMax;
-    const openThreshold = 0.4;
-    
     // Render Functions
     const renderStandardFace = () => (
         <div className={`w-full h-full flex bg-white dark:bg-[#1a1a1a] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
-             {/* Image Section */}
+            {/* Image Section */}
             <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-20") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
                 <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
@@ -209,7 +253,7 @@ export default function AdCard({
                         }}
                         onClick={handleNextFace}
                     >
-                        {isFeatured ? t("featured") : t("details")}
+                        {isFeatured ? t("featured") : (t as any)("contact")}
                     </motion.button>
 
                     <div className="absolute inset-0 pointer-events-none">
@@ -227,15 +271,39 @@ export default function AdCard({
                     </div>
                 </div>
 
-                <button
-                    onClick={handleFavoriteClick}
-                    className="absolute top-1 right-1 z-10 p-0.5 rounded-full bg-white/80 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-md hover:scale-110 active:scale-95"
-                >
-                    <Heart
-                        size={12}
-                        className={isFavorite ? "fill-red-500 text-red-500" : ""}
-                    />
-                </button>
+                <div className="absolute top-1 right-1 z-[15] flex flex-col gap-1">
+                    <button
+                        onClick={handleFavoriteClick}
+                        className="p-1 rounded-full bg-white/90 backdrop-blur-sm text-text-muted hover:text-red-500 transition-all shadow-sm hover:scale-110 active:scale-95 border border-black/5"
+                    >
+                        <Heart
+                            size={12}
+                            className={isFavorite ? "fill-red-500 text-red-500" : ""}
+                        />
+                    </button>
+                    {phone && (
+                        <>
+                            <a
+                                href={`tel:${phone}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1 rounded-full bg-primary text-white transition-all shadow-sm hover:scale-110 active:scale-95 flex items-center justify-center"
+                                title={(t as any)("call")}
+                            >
+                                <Phone size={10} />
+                            </a>
+                            <a
+                                href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1 rounded-full bg-[#25D366] text-white transition-all shadow-sm hover:scale-110 active:scale-95 flex items-center justify-center"
+                                title={(t as any)("whatsapp")}
+                            >
+                                <Logo className="w-2.5 h-2.5 invert" />
+                            </a>
+                        </>
+                    )}
+                </div>
 
                 {images.length > 0 ? (
                     <Image
@@ -255,26 +323,32 @@ export default function AdCard({
 
             {/* Content Section */}
             <div className={`flex-1 flex flex-col p-2 ${isVertical ? "gap-1" : "justify-center"}`}>
-                 <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-2">
                     <h3 className="text-sm font-bold text-text-main line-clamp-2 hover:text-primary transition-colors duration-300">
                         {currentTitle}
                     </h3>
                 </div>
 
                 <div className="flex items-center gap-2 mt-auto">
-                     <p className="text-lg font-black text-primary">
+                    <p className="text-lg font-black text-primary">
                         {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
                         <span className="text-[10px] font-normal text-text-muted mx-1">{currencyCode}</span>
                     </p>
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 mt-1">
-                     {location && (
+                    <div className="flex items-center gap-2">
+                        {location && (
+                            <div className="flex items-center gap-1 text-[10px] text-text-muted">
+                                <MapPin size={10} />
+                                <span className="truncate max-w-[50px]">{location.split(",")[0]}</span>
+                            </div>
+                        )}
                         <div className="flex items-center gap-1 text-[10px] text-text-muted">
-                            <MapPin size={10} />
-                            <span className="truncate max-w-[60px]">{location.split(",")[0]}</span>
+                            <Clock size={10} />
+                            <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
                         </div>
-                    )}
+                    </div>
 
                     {category && (
                         <span
@@ -285,14 +359,9 @@ export default function AdCard({
                                 router.push(`/ads?category=${category}`);
                             }}
                         >
-                            {t(category)}
+                            {t(category as any)}
                         </span>
                     )}
-
-                     <div className="flex items-center gap-1 text-[10px] text-text-muted">
-                        <Clock size={10} />
-                        <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -327,7 +396,7 @@ export default function AdCard({
                 >
                     إغلاق
                 </motion.button>
-                 <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-0 pointer-events-none">
                     <div
                         className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-[#ffd700]/30" : "bg-gray-200"}`}
                         style={{
@@ -349,75 +418,194 @@ export default function AdCard({
                         {currentDescription}
                     </p>
                 )}
-                
-                <div className="grid grid-cols-2 gap-2 text-[9px] mb-2 text-text-muted">
-                     {location && (
-                        <div className="flex items-center gap-1">
-                            <MapPin size={9} className="text-gray-400" />
-                            <span className="truncate">{location?.split(",")[0].trim()}</span>
-                        </div>
-                    )}
-                     <div className="flex items-center gap-1">
-                        <Clock size={9} className="text-gray-400" />
-                        <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
-                    </div>
-                </div>
 
-                <div className="mt-auto flex items-center justify-between">
-                     <button
-                        className={`px-2 py-1 text-[10px] font-black rounded transition-colors ${isFeatured ? "bg-[#ffd700]/20 text-black hover:bg-[#ffd700]/30" : "bg-gray-100 dark:bg-white/10 text-text-main hover:bg-primary/10"}`}
+                <div className="mt-auto flex items-center justify-between gap-2">
+                    <button
+                        className="flex-1 py-1.5 bg-primary/10 text-primary hover:bg-primary text-[10px] font-black rounded-lg transition-all hover:text-white uppercase tracking-wider"
                         onClick={handleNextFace}
                     >
-                        {isFeatured ? t("contact") : t("back")}
+                        {t("contact")}
                     </button>
-                    <span className="text-[9px] text-text-muted">
-                        اسحب للإغلاق
-                    </span>
+                    <button
+                        className="px-3 py-1.5 bg-gray-100 dark:bg-white/10 text-text-muted hover:text-text-main text-[10px] font-black rounded-lg transition-all"
+                        onClick={handleResetFace}
+                    >
+                        {t("back" as any)}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    const renderDetailsMoreFace = () => (
+        <div
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
+        >
+            {/* Close/Next Controls */}
+            <div className="absolute top-1 left-1 z-20">
+                <button
+                    className={`px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md bg-gray-100 text-text-main`}
+                    onClick={handleResetFace}
+                >
+                    إغلاق
+                </button>
+            </div>
+
+            <div className="flex flex-col h-full relative z-10 pt-4">
+                <h3 className="text-[10px] font-black leading-tight mb-1 text-primary italic uppercase tracking-widest">{t("details")} (تابع)</h3>
+                {currentDescription && (
+                    <p className="text-[10px] leading-tight mb-2 text-text-muted">
+                        {currentDescription.substring(descriptionLimit)}
+                    </p>
+                )}
+
+                <div className="mt-auto flex items-center justify-between gap-2">
+                    <button
+                        className="flex-1 py-1.5 bg-primary/10 text-primary hover:bg-primary text-[10px] font-black rounded-lg transition-all hover:text-white uppercase tracking-wider"
+                        onClick={handleNextFace}
+                    >
+                        {(t as any)("contact")}
+                    </button>
+                    <button
+                        className="px-3 py-1.5 bg-gray-100 dark:bg-white/10 text-text-muted hover:text-text-main text-[10px] font-black rounded-lg transition-all"
+                        onClick={handleResetFace}
+                    >
+                        {(t as any)("back" as any)}
+                    </button>
                 </div>
             </div>
         </div>
     );
 
     const renderContactFace = () => (
-         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
+        <div
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
             onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
             }}
         >
-            {/* Close Button (similar logic) */}
-             <div className="absolute top-1 left-1 z-20">
-                 <button 
+            <div className="absolute top-1 left-1 z-20">
+                <button
                     className="px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider shadow-md bg-gray-100 text-text-main"
                     onClick={handleResetFace}
-                 >
+                >
                     إغلاق
-                 </button>
-             </div>
+                </button>
+            </div>
 
-            <div className="flex flex-col h-full relative z-10 pt-2 items-center text-center">
-                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+            <div className="flex flex-col w-full h-full relative z-10 pt-2 items-center text-center">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
                     <User className="text-primary" size={16} />
-                 </div>
-                 <h3 className="text-[11px] font-bold text-text-main mb-2">{authorName || t("seller")}</h3>
-                 
-                 <div className="flex flex-col gap-2 w-full px-2">
-                    <button className="flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded text-[10px] font-bold hover:bg-primary/90 transition-colors">
-                        <Phone size={12} />
-                        {t("call")}
-                    </button>
-                    <button className="flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors">
-                        <MessageCircle size={12} />
-                        {t("whatsapp")}
-                    </button>
-                 </div>
+                </div>
+                <h3 className="text-[10px] font-bold text-text-main mb-1 line-clamp-1">{authorName || (t as any)("seller")}</h3>
 
-                  <div className="mt-auto flex items-center justify-between w-full">
-                     <button
-                        className="px-2 py-1 text-[10px] font-black rounded bg-gray-100 text-text-main hover:bg-gray-200"
+                {/* Seller Rating Display */}
+                <div className="flex items-center gap-1 mb-2">
+                    <div className="flex items-center">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                            <Star
+                                key={s}
+                                size={8}
+                                className={s <= Math.round(authorRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
+                            />
+                        ))}
+                    </div>
+                    <span className="text-[8px] font-black text-text-muted">({authorRatingsCount})</span>
+                </div>
+
+                <div className="flex flex-col gap-1.5 w-full px-1">
+                    <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/messages?adId=${id}&receiverId=${authorId}`); }}
+                        className="flex items-center justify-center gap-2 w-full py-1.5 bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-colors shadow-sm"
+                    >
+                        <MessageCircle size={10} />
+                        {(t as any)("messages")}
+                    </button>
+
+                    {phone && (
+                        <>
+                            <a
+                                href={`tel:${phone}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-sm"
+                            >
+                                <Phone size={10} />
+                                {(t as any)("call")}
+                            </a>
+                            <a
+                                href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#26bd5c] transition-colors shadow-sm"
+                            >
+                                <Logo className="w-3 h-3 invert" />
+                                {(t as any)("whatsapp")}
+                            </a>
+                        </>
+                    )}
+
+                    {email && (
+                        <a
+                            href={`mailto:${email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center justify-center gap-2 w-full py-1.5 bg-gray-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-gray-700 transition-colors shadow-sm"
+                        >
+                            <Mail size={10} />
+                            {(t as any)("email" as any)}
+                        </a>
+                    )}
+
+                    {/* Report Button */}
+                    <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowReport(!showReport); }}
+                        className="mt-2 flex items-center justify-center gap-1 text-[8px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-widest transition-colors"
+                    >
+                        <Flag size={8} />
+                        {(t as any)("reportAd")}
+                    </button>
+
+                    {showReport && (
+                        <div className="absolute inset-x-0 bottom-0 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-white/10 p-2 z-[30] animate-in slide-in-from-bottom-5">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-[9px] font-black uppercase text-text-main">{(t as any)("reportReason")}</span>
+                                <button onClick={() => setShowReport(false)} className="text-text-muted hover:text-text-main"><X size={10} /></button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-1 mb-2">
+                                {["scam", "spam", "inappropriate", "wrongCategory"].map(reason => (
+                                    <button
+                                        key={reason}
+                                        onClick={() => setReportReason(reason)}
+                                        className={`px-1.5 py-1 rounded text-[8px] font-bold text-right transition-colors ${reportReason === reason ? 'bg-primary text-white' : 'bg-gray-50 dark:bg-white/5 text-text-muted hover:bg-gray-100'}`}
+                                    >
+                                        {(t as any)(reason)}
+                                    </button>
+                                ))}
+                            </div>
+                            <button
+                                onClick={handleReportSubmit}
+                                disabled={!reportReason || isReporting}
+                                className="w-full py-1.5 bg-red-500 text-white rounded text-[9px] font-black uppercase disabled:opacity-50"
+                            >
+                                {isReporting ? "..." : (t as any)("reportAd")}
+                            </button>
+                            {reportStatus === "success" && (
+                                <p className="text-[8px] text-green-500 font-bold mt-1 text-center">{(t as any)("reportSubmitted")}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-auto flex items-center justify-between w-full pt-1 border-t border-gray-100 dark:border-gray-800">
+                    <button
+                        className="px-2 py-0.5 text-[8px] font-black rounded bg-gray-100 dark:bg-white/10 text-text-main hover:bg-gray-200"
                         onClick={handleNextFace}
                     >
-                        الصورة
+                        {t("home")}
                     </button>
                 </div>
             </div>
@@ -428,6 +616,7 @@ export default function AdCard({
         switch (type) {
             case 'image': return renderStandardFace();
             case 'details': return renderDetailsFace();
+            case 'details_more': return renderDetailsMoreFace();
             case 'contact': return renderContactFace();
             default: return renderStandardFace();
         }
@@ -436,18 +625,29 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} ${
-                isFeatured 
-                    ? "border-[#ffd700] ring-1 ring-[#ffd700]/50" 
-                    : (isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700")
-            } rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block ${className}`}
-            style={{ 
+            className={`bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} ${isFeatured
+                ? "border-amber-400 ring-2 ring-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                : (isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700")
+                } rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block ${className}`}
+            style={{
                 height: isVertical && !imageHeight ? '180px' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
-            <div className="relative w-full h-full" style={{ perspective: 1000 }}>
+            {isFeatured && (
+                <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden rounded-2xl">
+                    {/* Animated Glitter Streak */}
+                    <div className="absolute inset-[-100%] bg-gradient-to-r from-transparent via-amber-100/60 to-transparent skew-x-[35deg] animate-shimmer"
+                        style={{ backgroundSize: '200% 100%', animationDuration: '2.5s' }}
+                    />
+                    {/* Golden Glow Border Outer */}
+                    <div className="absolute inset-0 border-2 border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.5)]" />
+                    {/* Corner Glint */}
+                    <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-white/20 to-transparent blur-md" />
+                </div>
+            )}
+            <div className={`relative w-full h-full ${isFeatured ? 'z-[2]' : ''}`} style={{ perspective: 1000 }}>
                 <motion.div
                     className="w-full h-full relative"
                     style={{ transformStyle: 'preserve-3d' }}
@@ -460,7 +660,7 @@ export default function AdCard({
                     </div>
 
                     {/* Front Physical Side */}
-                    <div 
+                    <div
                         className="absolute inset-0 w-full h-full"
                         style={{ backfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
                     >
@@ -468,7 +668,7 @@ export default function AdCard({
                     </div>
 
                     {/* Back Physical Side */}
-                    <div 
+                    <div
                         className="absolute inset-0 w-full h-full"
                         style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
                     >

@@ -149,6 +149,11 @@ export default function MyAdsPage() {
                                     createdAt={ad.created_at}
                                     category={ad.category}
                                     language={language}
+                                    authorId={ad.author_id}
+                                    phone={ad.phone}
+                                    email={ad.author?.email}
+                                    authorRating={ad.author?.avg_rating}
+                                    authorRatingsCount={ad.author?.ratings_count}
                                 />
                                 <div className="mt-2 flex justify-end gap-2 px-2">
                                     <button

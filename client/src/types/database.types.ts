@@ -121,6 +121,8 @@ export interface Database {
                     verified: boolean | null
                     created_at: string
                     updated_at: string | null
+                    avg_rating: number | null
+                    ratings_count: number | null
                 }
                 Insert: {
                     id?: string
@@ -143,6 +145,93 @@ export interface Database {
                     verified?: boolean | null
                 }
                 Relationships: []
+            }
+            ad_reports: {
+                Row: {
+                    id: string
+                    ad_id: string
+                    reporter_id: string
+                    reason: string
+                    details: string | null
+                    status: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    ad_id: string
+                    reporter_id: string
+                    reason: string
+                    details?: string | null
+                    status?: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    ad_id?: string
+                    reporter_id?: string
+                    reason?: string
+                    details?: string | null
+                    status?: string
+                    created_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "ad_reports_ad_id_fkey"
+                        columns: ["ad_id"]
+                        isOneToOne: false
+                        referencedRelation: "ads"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "ad_reports_reporter_id_fkey"
+                        columns: ["reporter_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            user_ratings: {
+                Row: {
+                    id: string
+                    seller_id: string
+                    buyer_id: string
+                    rating: number
+                    comment: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    seller_id: string
+                    buyer_id: string
+                    rating: number
+                    comment?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    seller_id?: string
+                    buyer_id?: string
+                    rating?: number
+                    comment?: string | null
+                    created_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "user_ratings_buyer_id_fkey"
+                        columns: ["buyer_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "user_ratings_seller_id_fkey"
+                        columns: ["seller_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
             }
             cities: {
                 Row: {

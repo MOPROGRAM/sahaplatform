@@ -47,12 +47,13 @@ export default function PostAdPage() {
     const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
 
     const subCategoriesMap: Record<string, string[]> = {
-        realestate: ['apartments', 'villas', 'lands', 'commercial', 'rent', 'offices', 'chalets', 'compounds', 'stores'],
-        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'trucks', 'honda', 'nissan', 'chevrolet', 'kia', 'lexus', 'mazda', 'jeep', 'landrover'],
-        jobs: ['it', 'sales', 'engineering', 'medical', 'education', 'marketing', 'accounting', 'management', 'technicians', 'drivers', 'security', 'customer_service'],
-        electronics: ['phones', 'computers', 'appliances', 'gaming', 'laptops', 'tvs', 'cameras', 'tablets', 'smartwatches', 'accessories'],
-        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design', 'delivery', 'events', 'transport', 'teaching', 'contracting'],
-        goods: ['furniture', 'fashion', 'sports', 'books', 'clothes', 'watches', 'perfumes', 'antiques', 'camping', 'other'],
+        realestate: ['apartments', 'villas', 'lands', 'commercial', 'offices', 'chalets', 'compounds', 'stores', 'duplex', 'studio', 'penthouse', 'building', 'warehouse', 'showroom', 'workshop', 'farm', 'resthouse'],
+        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'honda', 'nissan', 'chevrolet', 'kia', 'lexus', 'mazda', 'jeep', 'landrover', 'trucks', 'motorcycle', 'boat', 'heavy_equipment', 'car_parts'],
+        jobs: ['it', 'sales', 'engineering', 'medical', 'education', 'accounting', 'management', 'technicians', 'drivers', 'security', 'customer_service', 'marketing', 'translation', 'photography', 'software_dev'],
+        electronics: ['phones', 'computers', 'laptops', 'tvs', 'cameras', 'tablets', 'smartwatches', 'accessories', 'gaming', 'appliances', 'audio', 'smart_home'],
+        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design', 'delivery', 'events', 'transport', 'teaching', 'contracting', 'home_repair', 'catering', 'legal_services', 'medical_services', 'real_estate_services', 'car_services'],
+        goods: ['furniture', 'fashion', 'sports', 'books', 'clothes', 'watches', 'perfumes', 'antiques', 'camping', 'misc'],
+        other: ["misc"],
     };
 
     // Redirect to login if not authenticated
@@ -86,8 +87,8 @@ export default function PostAdPage() {
         }
 
         if (images.length + validFiles.length > 5) {
-             setError(language === 'ar' ? "الحد الأقصى 5 صور" : "Maximum 5 images");
-             return;
+            setError(language === 'ar' ? "الحد الأقصى 5 صور" : "Maximum 5 images");
+            return;
         }
 
         setImages(prev => [...prev, ...validFiles]);
@@ -106,11 +107,11 @@ export default function PostAdPage() {
         try {
             const { data: { user: currentUser } } = await supabase.auth.getUser();
             if (!currentUser) throw new Error("Not authenticated");
-            
+
             // Try to sync/check points, but don't fail the whole process if it fails
             // This prevents 500 errors if the users table is not perfectly synced
             try {
-                 await supabase.from('users').select('points').eq('id', currentUser.id).maybeSingle();
+                await supabase.from('users').select('points').eq('id', currentUser.id).maybeSingle();
             } catch (syncErr) {
                 console.warn("Could not verify points, proceeding anyway:", syncErr);
             }
@@ -166,7 +167,7 @@ export default function PostAdPage() {
             // Handle Promotion
             if (formData.isBoosted && formData.boostDays) {
                 try {
-                     await adsService.promoteAd(createdAd.id, formData.boostDays);
+                    await adsService.promoteAd(createdAd.id, formData.boostDays);
                 } catch (promoteError) {
                     console.error("Promotion failed:", promoteError);
                     // We don't block the flow, just maybe show a toast or alert?
@@ -214,7 +215,7 @@ export default function PostAdPage() {
                     {/* Form Column */}
                     <div className="md:col-span-2">
                         <form onSubmit={handleSubmit} className="bento-card p-8 space-y-8 bg-white dark:bg-[#1a1a1a] shadow-premium border-none">
-                            {error && <div className="bg-red-50 text-red-600 p-4 text-sm font-bold rounded-2xl flex items-center gap-2"><Info size={16}/>{error}</div>}
+                            {error && <div className="bg-red-50 text-red-600 p-4 text-sm font-bold rounded-2xl flex items-center gap-2"><Info size={16} />{error}</div>}
 
                             <div className="space-y-6">
                                 <div>
@@ -291,37 +292,37 @@ export default function PostAdPage() {
                                     </div>
                                 </div>
 
-                                    {formData.category === 'realestate' && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                            <div>
-                                                <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{language === 'ar' ? 'المساحة (م²)' : 'Area (m²)'} *</label>
-                                                <input
-                                                    name="area"
-                                                    type="number"
-                                                    value={formData.area}
-                                                    onChange={handleInputChange}
-                                                    className="bento-input"
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{language === 'ar' ? 'نوع العرض' : 'Listing Type'} *</label>
-                                                <select
-                                                    name="listingType"
-                                                    value={formData.listingType}
-                                                    onChange={handleInputChange}
-                                                    className="bento-input cursor-pointer"
-                                                    required
-                                                >
-                                                    <option value="sale">{language === 'ar' ? 'للبيع' : 'For Sale'}</option>
-                                                    <option value="rent">{language === 'ar' ? 'للإيجار' : 'For Rent'}</option>
-                                                </select>
-                                            </div>
+                                {formData.category === 'realestate' && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div>
+                                            <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{language === 'ar' ? 'المساحة (م²)' : 'Area (m²)'} *</label>
+                                            <input
+                                                name="area"
+                                                type="number"
+                                                value={formData.area}
+                                                onChange={handleInputChange}
+                                                className="bento-input"
+                                                required
+                                            />
                                         </div>
-                                    )}
+                                        <div>
+                                            <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{language === 'ar' ? 'نوع العرض' : 'Listing Type'} *</label>
+                                            <select
+                                                name="listingType"
+                                                value={formData.listingType}
+                                                onChange={handleInputChange}
+                                                className="bento-input cursor-pointer"
+                                                required
+                                            >
+                                                <option value="sale">{language === 'ar' ? 'للبيع' : 'For Sale'}</option>
+                                                <option value="rent">{language === 'ar' ? 'للإيجار' : 'For Rent'}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
 
-                                    {formData.category === 'realestate' && (
-                                        <div className="space-y-2">
+                                {formData.category === 'realestate' && (
+                                    <div className="space-y-2">
                                         <label className="text-[11px] font-black uppercase tracking-widest block"><MapPin size={12} className="inline" /> {t('location')}</label>
                                         <MapSelector onLocationSelect={handleLocationSelect} height="250px" />
                                     </div>
@@ -330,16 +331,16 @@ export default function PostAdPage() {
                                 {/* Images Section */}
                                 <div>
                                     <label className="text-[11px] font-black uppercase tracking-widest block mb-2">{t('photos')} ({t('optional')})</label>
-                                    <div 
+                                    <div
                                         className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-primary transition-colors cursor-pointer relative bg-gray-50 dark:bg-black/20"
                                         onClick={() => document.getElementById('images-input')?.click()}
                                     >
-                                        <input 
+                                        <input
                                             id="images-input"
-                                            type="file" 
-                                            multiple 
-                                            accept="image/*" 
-                                            className="hidden" 
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            className="hidden"
                                             onChange={handleImageChange}
                                         />
                                         <div className="flex flex-col items-center gap-3 text-gray-400">
@@ -348,14 +349,14 @@ export default function PostAdPage() {
                                             <span className="text-xs opacity-70">{t('max5Images')}</span>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Image Previews */}
                                     {images.length > 0 && (
                                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mt-4">
                                             {images.map((file, idx) => (
                                                 <div key={idx} className="aspect-square relative rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shadow-sm group">
                                                     <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
-                                                    <button 
+                                                    <button
                                                         type="button"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -400,16 +401,16 @@ export default function PostAdPage() {
                                             <p className="text-sm text-text-muted mb-4 leading-relaxed">
                                                 {t('promoteAdDesc')}
                                             </p>
-                                            
+
                                             <div className="flex flex-col gap-4">
                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                     <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${formData.isBoosted ? 'border-primary bg-primary text-white' : 'border-gray-300 dark:border-gray-600 group-hover:border-primary'}`}>
                                                         {formData.isBoosted && <CheckCircle2 size={16} />}
                                                     </div>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        name="isBoosted" 
-                                                        checked={formData.isBoosted} 
+                                                    <input
+                                                        type="checkbox"
+                                                        name="isBoosted"
+                                                        checked={formData.isBoosted}
                                                         onChange={(e) => {
                                                             if (user.points < (formData.boostDays || 7) && e.target.checked) {
                                                                 setError(language === 'ar' ? "رصيد النقاط غير كافٍ" : "Insufficient points balance");
@@ -418,7 +419,7 @@ export default function PostAdPage() {
                                                             handleInputChange(e);
                                                             if (!e.target.checked) setError("");
                                                         }}
-                                                        className="hidden" 
+                                                        className="hidden"
                                                     />
                                                     <span className="font-bold">{language === 'ar' ? 'نعم، أريد تمييز إعلاني' : 'Yes, I want to promote my ad'}</span>
                                                 </label>
@@ -426,12 +427,12 @@ export default function PostAdPage() {
                                                 {formData.isBoosted && (
                                                     <div className="flex items-center gap-3 animate-in slide-in-from-top-2 fade-in flex-wrap">
                                                         <div className="flex items-center gap-2 bg-white dark:bg-black/20 p-1 rounded-lg border border-border-color">
-                                                            <input 
+                                                            <input
                                                                 type="number"
-                                                                name="boostDays" 
+                                                                name="boostDays"
                                                                 min="1"
                                                                 max="30"
-                                                                value={formData.boostDays} 
+                                                                value={formData.boostDays}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     if (!val) {
@@ -440,7 +441,7 @@ export default function PostAdPage() {
                                                                     }
                                                                     const days = parseInt(val);
                                                                     if (days > 30) return; // Max 30
-                                                                    
+
                                                                     if (user.points < days) {
                                                                         setError(language === 'ar' ? "رصيد النقاط غير كافٍ لهذه المدة" : "Insufficient points for this duration");
                                                                     } else {

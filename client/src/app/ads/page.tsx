@@ -12,7 +12,7 @@ import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import AdvancedFilter from '@/components/AdvancedFilter';
-import { Layers, Building, Car, Briefcase, ShoppingBag, Smartphone, Wrench } from 'lucide-react';
+import { Layers, Building, Car, Briefcase, ShoppingBag, Smartphone, Wrench, ChevronDown } from 'lucide-react';
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 // Removed dynamic import for AdsMap as it's no longer used
@@ -39,7 +39,15 @@ interface Ad {
     images: string;
     created_at: string;
     views?: number;
-    author?: { name?: string };
+    author?: {
+        name?: string,
+        email?: string,
+        avg_rating?: number,
+        ratings_count?: number
+    };
+    author_id: string;
+    phone?: string;
+    email?: string;
     is_boosted?: boolean;
     currency?: string | { code: string; symbol: string; };
 }
@@ -77,12 +85,12 @@ function AdsContent() {
     // Removed highlightedAdId state and related map logic
 
     const subCategoriesMap: { [key: string]: string[] } = {
-        realestate: ['apartments', 'villas', 'lands', 'commercial', 'rent', 'offices', 'chalets', 'compounds', 'stores'],
-        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'trucks', 'honda', 'nissan', 'chevrolet', 'kia', 'lexus', 'mazda', 'jeep', 'landrover'],
-        jobs: ['it', 'sales', 'engineering', 'medical', 'education', 'marketing', 'accounting', 'management', 'technicians', 'drivers', 'security', 'customer_service'],
-        electronics: ['phones', 'computers', 'appliances', 'gaming', 'laptops', 'tvs', 'cameras', 'tablets', 'smartwatches', 'accessories'],
-        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design', 'delivery', 'events', 'transport', 'teaching', 'contracting'],
-        goods: ['furniture', 'fashion', 'sports', 'books', 'clothes', 'watches', 'perfumes', 'antiques', 'camping', 'other'],
+        realestate: ['apartments', 'villas', 'lands', 'commercial', 'offices', 'chalets', 'compounds', 'stores', 'duplex', 'studio', 'penthouse', 'building', 'warehouse', 'showroom', 'workshop', 'farm', 'resthouse'],
+        cars: ['toyota', 'hyundai', 'ford', 'mercedes', 'bmw', 'honda', 'nissan', 'chevrolet', 'kia', 'lexus', 'mazda', 'jeep', 'landrover', 'trucks', 'motorcycle', 'boat', 'heavy_equipment', 'car_parts'],
+        jobs: ['it', 'sales', 'engineering', 'medical', 'education', 'accounting', 'management', 'technicians', 'drivers', 'security', 'customer_service', 'marketing', 'translation', 'photography', 'software_dev'],
+        electronics: ['phones', 'computers', 'laptops', 'tvs', 'cameras', 'tablets', 'smartwatches', 'accessories', 'gaming', 'appliances', 'audio', 'smart_home'],
+        services: ['cleaning', 'moving', 'maintenance', 'legal', 'design', 'delivery', 'events', 'transport', 'teaching', 'contracting', 'home_repair', 'catering', 'legal_services', 'medical_services', 'real_estate_services', 'car_services'],
+        goods: ['furniture', 'fashion', 'sports', 'books', 'clothes', 'watches', 'perfumes', 'antiques', 'camping', 'misc'],
         other: ["misc"],
     };
 
@@ -190,108 +198,124 @@ function AdsContent() {
                 </aside>
 
                 <section className="col-span-12 lg:col-span-10 flex flex-col gap-2">
-                {/* Mobile Categories Strip */}
-                <div className="lg:hidden bg-white border border-border-color rounded-lg shadow-md p-1 mt-2 overflow-x-auto no-scrollbar">
-                    <div className="flex flex-nowrap gap-2 whitespace-nowrap px-1">
-                        <button
-                            onClick={() => handleCategoryChange(null)}
-                            className={cn("px-3 py-1.5 rounded-full text-sm font-bold transition-all", !category ? 'bg-primary text-white shadow-md' : 'text-primary hover:bg-primary/10')}
-                        >
-                            {t('allAds')}
-                        </button>
-                        {mainCategories.map((cat) => (
+                    {/* Mobile Categories Strip */}
+                    <div className="lg:hidden bg-white border border-border-color rounded-lg shadow-md p-1 mt-2 overflow-x-auto no-scrollbar">
+                        <div className="flex flex-nowrap gap-2 whitespace-nowrap px-1">
                             <button
-                                key={cat.key}
-                                onClick={() => handleCategoryChange(cat.key)}
-                                className={cn("px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2", category === cat.key ? 'bg-primary text-white shadow-md' : 'text-text-main hover:bg-gray-100')}
-                            >
-                                <cat.icon size={14} />
-                                <span>{cat.name}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Subcategory Filter Row */}
-                {category && subCategoriesMap[category] && (
-                    <div className="bg-white border border-border-color rounded-lg shadow-md p-1 mt-3 overflow-x-auto no-scrollbar">
-                        <div className="flex flex-nowrap gap-2 whitespace-nowrap">
-                            <button
-                                onClick={() => handleSubCategoryChange(null)}
-                                className={cn("px-3 py-1.5 rounded-full text-sm font-bold transition-all", !subCategory ? 'bg-indigo-600 text-white shadow-md' : 'text-indigo-600 hover:bg-indigo-100')}
+                                onClick={() => handleCategoryChange(null)}
+                                className={cn("px-3 py-1.5 rounded-full text-sm font-bold transition-all", !category ? 'bg-primary text-white shadow-md' : 'text-primary hover:bg-primary/10')}
                             >
                                 {t('allAds')}
                             </button>
-                            {subCategoriesMap[category].map((sub) => (
+                            {mainCategories.map((cat) => (
                                 <button
-                                    key={sub}
-                                    onClick={() => handleSubCategoryChange(sub)}
-                                    className={cn("px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 uppercase", subCategory === sub ? 'bg-indigo-600 text-white shadow-md' : 'text-indigo-600 hover:bg-indigo-100')}
+                                    key={cat.key}
+                                    onClick={() => handleCategoryChange(cat.key)}
+                                    className={cn("px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2", category === cat.key ? 'bg-primary text-white shadow-md' : 'text-text-main hover:bg-gray-100')}
                                 >
-                                    {(t as any)[sub] || sub}
+                                    <cat.icon size={14} />
+                                    <span>{cat.name}</span>
                                 </button>
                             ))}
                         </div>
                     </div>
-                )}
 
-                {/* Advanced Filters (Tag Filters) */}
-                <AdvancedFilter />
+                    {/* Subcategory Filter Row */}
+                    {category && subCategoriesMap[category] && (
+                        <div className="bg-white border border-border-color rounded-lg shadow-md p-1 mt-3 overflow-x-auto no-scrollbar">
+                            <div className="flex flex-nowrap gap-2 whitespace-nowrap">
+                                <button
+                                    onClick={() => handleSubCategoryChange(null)}
+                                    className={cn("px-3 py-1.5 rounded-full text-sm font-bold transition-all", !subCategory ? 'bg-indigo-600 text-white shadow-md' : 'text-indigo-600 hover:bg-indigo-100')}
+                                >
+                                    {t('allAds')}
+                                </button>
+                                {subCategoriesMap[category].map((sub) => (
+                                    <button
+                                        key={sub}
+                                        onClick={() => handleSubCategoryChange(sub)}
+                                        className={cn("px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300", subCategory === sub ? 'bg-secondary text-white shadow-premium' : 'text-secondary hover:bg-secondary/10 bg-secondary/5')}
+                                    >
+                                        {t(sub as any)}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
-                <div className="bg-white border border-gray-200 rounded-sm p-3 shadow-sm flex items-center justify-between">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <h1 className="text-[14px] font-[1000] text-secondary uppercase tracking-tight">
-                            {category ? (t as any)[category] || category : t('allAds')}
-                            {subCategory && (
-                                <>
-                                    <span className="text-gray-300 mx-2">/</span>
-                                    <span className="text-primary">{(t as any)[subCategory] || subCategory}</span>
-                                </>
-                            )}
-                        </h1>
+                    {/* Advanced Filters (Tag Filters) */}
+                    <AdvancedFilter />
+
+                    <div className="bg-white dark:bg-[#1a1a1a] border border-border-color rounded-2xl p-4 shadow-premium flex items-center justify-between transition-all hover:border-primary/30">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <h1 className="text-sm font-black text-text-main uppercase tracking-widest flex items-center gap-2">
+                                {category ? (
+                                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg">
+                                        {t(category as any)}
+                                    </span>
+                                ) : (
+                                    <span className="text-text-muted">{t('allAds')}</span>
+                                )}
+
+                                {subCategory && (
+                                    <>
+                                        <ChevronDown size={14} className="-rotate-90 text-gray-300" />
+                                        <span className="text-secondary font-black">
+                                            {t(subCategory as any)}
+                                        </span>
+                                    </>
+                                )}
+                            </h1>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider">
+                                {t('foundAds').replace('{{count}}', ads.length.toString())}
+                            </span>
+                        </div>
                     </div>
-                    <span className="text-[10px] font-black text-gray-400 bg-gray-50 px-2 py-1 rounded-sm uppercase italic">
-                        {t('foundAds').replace('{{count}}', ads.length.toString())}
-                    </span>
-                </div>
 
-                {loading ? (
-                    <AdsSkeleton />
-                ) : ads.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 pb-10">
-                        {ads.map((ad) => (
-                            <AdCard
-                                key={ad.id}
-                                id={ad.id}
-                                title={ad.title}
-                                titleAr={ad.titleAr}
-                                titleEn={ad.titleEn}
-                                price={ad.price || 0}
-                                currency={ad.currency}
-                                location={ad.location || ''}
-                                images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
-                                createdAt={ad.created_at}
-                                category={ad.category}
-                                language={language}
-                                isFeatured={ad.is_boosted || false}
-                                authorName={ad.author?.name}
-                                description={ad.description}
-                                descriptionAr={ad.descriptionAr}
-                                descriptionEn={ad.descriptionEn}
-                            // Removed onMapHighlight and isHighlighted props as map is removed
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="bento-card border-dashed p-20 text-center">
-                        <p className="text-gray-400 font-black uppercase text-[11px] tracking-[0.2em]">{t('noResults')}</p>
-                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 btn-saha-outline !px-6 !rounded-xl">{t('clearFilters')}</button>
-                    </div>
-                )}
+                    {loading ? (
+                        <AdsSkeleton />
+                    ) : ads.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 pb-10">
+                            {ads.map((ad) => (
+                                <AdCard
+                                    key={ad.id}
+                                    id={ad.id}
+                                    title={ad.title}
+                                    titleAr={ad.titleAr}
+                                    titleEn={ad.titleEn}
+                                    price={ad.price || 0}
+                                    currency={typeof ad.currency === 'string' ? ad.currency : ad.currency?.code}
+                                    location={ad.location || ''}
+                                    images={ad.images ? (typeof ad.images === 'string' ? JSON.parse(ad.images) : ad.images) : []}
+                                    createdAt={ad.created_at}
+                                    category={ad.category}
+                                    language={language}
+                                    isFeatured={ad.is_boosted || false}
+                                    authorName={ad.author?.name}
+                                    description={ad.description}
+                                    descriptionAr={ad.descriptionAr}
+                                    descriptionEn={ad.descriptionEn}
+                                    authorId={ad.author_id}
+                                    phone={ad.phone}
+                                    email={ad.author?.email}
+                                    authorRating={ad.author?.avg_rating}
+                                    authorRatingsCount={ad.author?.ratings_count}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bento-card border-dashed p-20 text-center">
+                            <p className="text-gray-400 font-black uppercase text-[11px] tracking-[0.2em]">{t('noResults')}</p>
+                            <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 btn-saha-outline !px-6 !rounded-xl">{t('clearFilters')}</button>
+                        </div>
+                    )}
 
-            </section>
+                </section>
             </main >
-        <Footer />
+            <Footer />
         </div >
     );
 }

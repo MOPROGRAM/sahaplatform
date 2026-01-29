@@ -37,6 +37,8 @@ export type Ad = {
         name?: string;
         email: string;
         phone?: string;
+        avg_rating?: number;
+        ratings_count?: number;
     };
     city?: {
         id: string;
@@ -75,7 +77,7 @@ export const adsService = {
                 .from('ads')
                 .select(`
                     *,
-                    author:users!ads_author_id_fkey(id, name, email),
+                    author:users!ads_author_id_fkey(id, name, email, avg_rating, ratings_count),
                     city:cities!city_id(id, name, name_ar, name_en),
                     currency:currencies!currency_id(id, code, symbol, name)
                 `)
@@ -128,8 +130,8 @@ export const adsService = {
             // Sort
             if (filters.sortBy) {
                 // Map camelCase sortBy to snake_case column
-                const sortColumn = filters.sortBy === 'createdAt' ? 'created_at' : 
-                                   filters.sortBy === 'price' ? 'price' : 'created_at';
+                const sortColumn = filters.sortBy === 'createdAt' ? 'created_at' :
+                    filters.sortBy === 'price' ? 'price' : 'created_at';
                 query = query.order(sortColumn, { ascending: filters.sortOrder === 'asc' });
             } else {
                 query = query.order('created_at', { ascending: false });
@@ -145,7 +147,7 @@ export const adsService = {
                 // Return empty result instead of throwing to prevent app crash
                 return { data: [], count: 0, error };
             }
-            
+
             return { data: (data || []) as unknown as Ad[], count: count || 0, error: null };
         } catch (error) {
             console.error('Unexpected error fetching ads:', error);
@@ -161,7 +163,7 @@ export const adsService = {
                 .from('ads')
                 .select(`
                     *,
-                    author:users!ads_author_id_fkey(id, name, email),
+                    author:users!ads_author_id_fkey(id, name, email, avg_rating, ratings_count),
                     city:cities!city_id(id, name, name_ar, name_en),
                     currency:currencies!currency_id(id, code, symbol, name)
                 `)
@@ -197,7 +199,7 @@ export const adsService = {
             .from('ads')
             .select(`
                 *,
-                author:users!ads_author_id_fkey(id, name, email, phone),
+                author:users!ads_author_id_fkey(id, name, email, phone, avg_rating, ratings_count),
                 city:cities!city_id(id, name, name_ar, name_en),
                 currency:currencies!currency_id(id, code, symbol, name)
             `)
@@ -226,6 +228,7 @@ export const adsService = {
             description: adData.description,
             price: adData.price,
             category: adData.category,
+            sub_category: adData.subCategory || null,
             location: adData.location,
             images: Array.isArray(adData.images) ? JSON.stringify(adData.images) : adData.images,
             video: adData.video,
@@ -274,6 +277,7 @@ export const adsService = {
         if (updates.description) dbUpdates.description = updates.description;
         if (updates.price) dbUpdates.price = updates.price;
         if (updates.category) dbUpdates.category = updates.category;
+        if (updates.subCategory) dbUpdates.sub_category = updates.subCategory;
         if (updates.location) dbUpdates.location = updates.location;
         if (updates.images) dbUpdates.images = updates.images;
         if (updates.video) dbUpdates.video = updates.video;
