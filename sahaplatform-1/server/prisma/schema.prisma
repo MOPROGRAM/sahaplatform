@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String         @default("USER")
+  userType      String         @default("SEEKER") // PROVIDER or SEEKER
+  verified      Boolean        @default(false)
+  phone         String?
+  phoneVerified Boolean        @default(false)
+  countryId     String?
+  cityId        String?
+  country       Country?       @relation(fields: [countryId], references: [id])
+  city          City?          @relation(fields: [cityId], references: [id])
+  accounts      Account[]
+  sessions      Session[]
+  ads           Ad[]
+  sentMessages  Message[]      @relation("SentMessages")
+  receivedMessages Message[]   @relation("ReceivedMessages")
+  conversations Conversation[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Ad {
+  id          String   @id @default(cuid())
+  title       String
+  titleAr     String?
+  titleEn     String?
+  description String
+  descriptionAr String?
+  descriptionEn String?
+  price       Float?
+  currencyId  String   @default("sar")
+  currency    Currency @relation(fields: [currencyId], references: [id])
+  category    String
+  location    String?
+  address     String?
+  paymentMethod String?
+  cityId      String?
+  city        City?    @relation(fields: [cityId], references: [id])
+  latitude    Float?
+  longitude   Float?
+  images      String   @default("[]")
+  video       String?
+  isBoosted   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  views       Int      @default(0)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  conversations Conversation[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Message {
+  id          String     @id @default(cuid())
+  content     String
+  messageType String     @default("text") // text, image, file, voice
+  fileUrl     String?
+  fileName    String?
+  fileSize    Int?
+  senderId    String
+  receiverId  String
+  conversationId String
+  isRead      Boolean    @default(false)
+  sender      User       @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User       @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  createdAt   DateTime   @default(now())
+}
+
+model Conversation {
+  id          String    @id @default(cuid())
+  lastMessage String?
+  lastMessageTime DateTime @default(now())
+  adId        String?
+  ad          Ad?       @relation(fields: [adId], references: [id])
+  messages    Message[]
+  participants User[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  userId      String
+  planName    String
+  planType    String
+  price       Float
+  currencyId  String   @default("sar")
+  currency    Currency @relation(fields: [currencyId], references: [id])
+  status      String   @default("active")
+  startDate   DateTime @default(now())
+  endDate     DateTime
+  autoRenew   Boolean  @default(true)
+  paymentId   String?
+  user        User     @relation(fields: [userId], references: [id])
+  payments    Payment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Country {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  nameAr      String   @unique
+  nameEn      String   @unique
+  code        String   @unique
+  phoneCode   String
+  currencyId  String
+  currency    Currency @relation(fields: [currencyId], references: [id])
+  flag        String?
+  isActive    Boolean  @default(true)
+  cities      City[]
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  nameAr    String
+  nameEn    String
+  countryId String
+  country   Country  @relation(fields: [countryId], references: [id])
+  latitude  Float?
+  longitude Float?
+  isActive  Boolean  @default(true)
+  ads       Ad[]
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, countryId])
+}
+
+model Currency {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  nameAr      String    @unique
+  nameEn      String    @unique
+  code        String    @unique
+  symbol      String
+  countries   Country[]
+  ads         Ad[]
+  subscriptions Subscription[]
+  payments    Payment[]
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Float
+  currencyId  String
+  currency    Currency @relation(fields: [currencyId], references: [id])
+  status      String   @default("pending")
+  paymentMethod String
+  transactionId String @unique
+  description String
+  subscriptionId String?
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

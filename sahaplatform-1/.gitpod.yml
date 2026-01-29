@@ -1,0 +1,17 @@
+image: gitpod/workspace-node:18
+
+tasks:
+  - init: npm run install:all
+    command: |
+      cd server
+      npx prisma generate
+      npx prisma migrate dev --name init
+      npx prisma db seed
+      cd ..
+      npm run dev
+
+ports:
+  - port: 3000
+    onOpen: open-browser
+  - port: 5000
+    onOpen: ignore
