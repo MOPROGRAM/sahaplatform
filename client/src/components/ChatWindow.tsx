@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -38,8 +38,13 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [sending, setSending] = useState(false);
     const [participants, setParticipants] = useState<any[]>([]);
     const [adInfo, setAdInfo] = useState<any>(null);
+    const [mounted, setMounted] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     // const socketRef = useRef<any>(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         let channel: any;
@@ -207,6 +212,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
 
+    if (!mounted) return null;
+
     if (loading) return (
         <div className="flex flex-col h-[500px] bg-white border border-gray-200 rounded-sm items-center justify-center">
             <Loader2 className="animate-spin text-primary" size={32} />
@@ -252,48 +259,79 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
             {/* Messages Area - High Density */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar">
-                {messages.map((msg, idx) => (
-                    <div key={msg.id || idx} className={`flex flex-col ${msg.sender_id === user?.id ? 'items-end' : 'items-start'}`}>
-                        <div className={`max-w-[75%] px-3 py-2 rounded-sm shadow-sm transition-all hover:shadow-md ${msg.sender_id === user?.id
-                            ? 'bg-primary text-white rounded-br-none'
-                            : 'bg-white border border-gray-100 text-secondary rounded-bl-none'}`}>
+                {messages.map((msg, idx) => {
+                    const isMe = msg.sender_id === user?.id;
+                    const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)$/i.test(msg.file_url));
+                    
+                    return (
+                        <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                            <div className={`relative max-w-[75%] px-3 py-2 shadow-sm transition-all hover:shadow-md ${isMe
+                                ? 'bg-[#005c4b] text-white rounded-2xl rounded-tr-none'
+                                : 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-none'}`}>
 
-                            {msg.message_type === 'text' && <p className="text-[11px] font-bold leading-relaxed">{msg.content}</p>}
+                                {msg.message_type === 'text' && <p className="text-[11px] font-bold leading-relaxed whitespace-pre-wrap">{msg.content}</p>}
 
-                            {msg.message_type === 'location' && (
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-[10px] font-black border-b border-black/5 pb-1 mb-1">
-                                        <MapPin size={12} /> SHARED LOCATION
+                                {isImage && msg.file_url && (
+                                    <div className="mb-1">
+                                        <div className="relative group overflow-hidden rounded-lg border border-black/10">
+                                            <img 
+                                                src={msg.file_url} 
+                                                alt="Attachment" 
+                                                className="max-w-[250px] max-h-[250px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
+                                                onClick={() => window.open(msg.file_url, '_blank')}
+                                            />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                                <Download className="text-white opacity-80" size={24} />
+                                            </div>
+                                        </div>
+                                        <a 
+                                            href={msg.file_url} 
+                                            download 
+                                            target="_blank" 
+                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-white/80' : 'text-primary'}`}
+                                        >
+                                            <Download size={10} /> {language === 'ar' ? 'تحميل الصورة' : 'Download Image'}
+                                        </a>
                                     </div>
-                                    <iframe
-                                        width="200"
-                                        height="150"
-                                        className="rounded-xs border-0"
-                                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) + 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) + 0.01}&layer=mapnik&marker=${msg.content.split('mlat=')[1].split('&')[0]}%2C${msg.content.split('mlon=')[1].split('#')[0]}`}
-                                    ></iframe>
-                                    <a href={msg.content} target="_blank" className="text-[9px] underline block mt-1 opacity-70">VIEW ON FULL MAP</a>
-                                </div>
-                            )}
+                                )}
 
-                            {msg.message_type === 'file' && (
-                                <div className="flex items-center gap-3 bg-card p-2 rounded-xs">
-                                    <FileText size={20} className="text-primary" />
-                                    <div className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-black truncate">{msg.file_name || 'Attached File'}</span>
-                                        <a href={msg.file_url} target="_blank" className="text-[9px] font-black text-primary hover:underline">DOWNLOAD NOW</a>
+                                {msg.message_type === 'location' && (
+                                    <div className="space-y-2">
+                                        <div className={`flex items-center gap-2 text-[10px] font-black border-b pb-1 mb-1 ${isMe ? 'border-white/20' : 'border-black/5'}`}>
+                                            <MapPin size={12} /> SHARED LOCATION
+                                        </div>
+                                        <iframe
+                                            width="200"
+                                            height="150"
+                                            className="rounded-lg border-0"
+                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) - 0.01}%2C${parseFloat(msg.content.split('mlon=')[1].split('#')[0]) + 0.01}%2C${parseFloat(msg.content.split('mlat=')[1].split('&')[0]) + 0.01}&layer=mapnik&marker=${msg.content.split('mlat=')[1].split('&')[0]}%2C${msg.content.split('mlon=')[1].split('#')[0]}`}
+                                        ></iframe>
+                                        <a href={msg.content} target="_blank" className="text-[9px] underline block mt-1 opacity-70">VIEW ON FULL MAP</a>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.sender_id === user?.id ? 'text-white/60' : 'text-text-muted'}`}>
-                                {(() => {
-                                    const date = new Date(msg.created_at);
-                                    return isNaN(date.getTime()) ? '...' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                                })()}
-                            </span>
+                                {msg.message_type === 'file' && !isImage && (
+                                    <div className={`flex items-center gap-3 p-2 rounded-lg ${isMe ? 'bg-black/20' : 'bg-gray-100'}`}>
+                                        <FileText size={24} className={isMe ? 'text-white' : 'text-primary'} />
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-[10px] font-black truncate max-w-[150px]">{msg.file_name || 'Attached File'}</span>
+                                            <a href={msg.file_url} download target="_blank" className={`flex items-center gap-1 text-[9px] font-black hover:underline ${isMe ? 'text-white/80' : 'text-primary'}`}>
+                                                <Download size={10} /> {language === 'ar' ? 'تحميل' : 'DOWNLOAD NOW'}
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <span className={`text-[8px] font-black mt-1 block uppercase tracking-tighter text-right ${isMe ? 'text-white/60' : 'text-gray-400'}`}>
+                                    {(() => {
+                                        const date = new Date(msg.created_at);
+                                        return isNaN(date.getTime()) ? '...' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    })()}
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 <div ref={scrollRef} />
             </div>
 

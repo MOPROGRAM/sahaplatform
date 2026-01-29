@@ -145,7 +145,11 @@ export default function PixelWaterBackground({ className }: PixelWaterBackground
                     const shape = shapesRef.current[idx] ?? 0;
 
                     if (alpha > 0.01) {
-                        ctx.fillStyle = isDark ? `rgba(120,120,120,${alpha})` : `rgba(0,0,0,${alpha * 0.15})`;
+                        // Light Orange color for active pixels (Orange-400 equivalent)
+                        // Use slightly different opacity for dark/light modes to ensure visibility
+                        ctx.fillStyle = isDark 
+                            ? `rgba(255, 165, 0, ${alpha * 1.5})`  // More visible in dark mode
+                            : `rgba(255, 165, 0, ${alpha})`;      // Standard in light mode
                     } else {
                         ctx.fillStyle = squareColor;
                     }
