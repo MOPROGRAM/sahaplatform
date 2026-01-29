@@ -263,12 +263,25 @@ export const conversationsService = {
         return message as Message;
     },
 
+    // تحديد الرسائل كمقروءة
+    async markAsRead(conversationId: string): Promise<void> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        await (supabase as any)
+            .from('messages')
+            .update({ is_read: true })
+            .eq('conversation_id', conversationId)
+            .eq('receiver_id', user.id)
+            .eq('is_read', false);
+    },
+
     // الاشتراك في التحديثات
     subscribeToConversation(conversationId: string, callback: (payload: any) => void): RealtimeChannel {
         return supabase
             .channel(`conversation-${conversationId}`)
             .on('postgres_changes', { 
-                event: 'INSERT', 
+                event: '*', 
                 schema: 'public', 
                 table: 'messages', 
                 filter: `conversation_id=eq.${conversationId}` 

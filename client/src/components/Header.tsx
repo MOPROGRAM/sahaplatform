@@ -27,6 +27,10 @@ export default function Header() {
         setMounted(true);
     }, []);
 
+    useEffect(() => {
+        setShowUserMenu(false);
+    }, [pathname]);
+
     const currencyMap: Record<string, string> = {
         sa: 'sar',
         ae: 'aed',
@@ -170,7 +174,7 @@ export default function Header() {
                 {/* Action Grid */}
                 <div className="flex items-center gap-3 shrink-0">
 
-                    <div className="hidden lg:flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                         <button onClick={toggleTheme} className="p-2 border border-border-color rounded-full hover:border-primary hover:text-primary transition-colors">
                             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
                         </button>
@@ -196,57 +200,40 @@ export default function Header() {
 
                             {showUserMenu && (
                                 <>
-                                    <div className="fixed inset-0 z-[105]" onClick={() => setShowUserMenu(false)}></div>
-                                    <div className="absolute top-full right-0 mt-2 w-56 bento-card shadow-2xl py-2 z-[110] animate-in fade-in duration-200 rounded-2xl">
+                                    <div className="fixed inset-0 z-[1005]" onClick={() => setShowUserMenu(false)}></div>
+                                    <div className="absolute top-full right-0 mt-2 w-56 bento-card shadow-2xl py-2 z-[1010] animate-in fade-in duration-200 rounded-2xl">
                                         <div className="space-y-1 p-1">
-                                            {/* Mobile Only Options */}
-                                            <div className="lg:hidden px-4 py-2 space-y-3 border-b border-border-color mb-2">
-                                                 <div className="flex items-center justify-between">
-                                                     <span className="text-[10px] font-black uppercase text-text-muted">{t('theme')}</span>
-                                                     <button onClick={toggleTheme} className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-md text-primary">
-                                                         {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
-                                                     </button>
-                                                 </div>
-                                                 <div className="flex items-center justify-between">
-                                                     <span className="text-[10px] font-black uppercase text-text-muted">{t('language')}</span>
-                                                     <button onClick={() => setLanguage(language === "ar" ? "en" : "ar")} className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-md text-primary flex items-center gap-1 text-[10px] font-bold">
-                                                         <Globe size={14} />
-                                                         {language === "ar" ? "English" : "العربية"}
-                                                     </button>
-                                                 </div>
-                                            </div>
-
                                             {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
-                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)}>
+                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative z-10">
                                                     <ShieldCheck size={14} />
                                                     {t("systemManagement")}
                                                 </Link>
                                             )}
-                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
+                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false}>
                                                 <LayoutDashboard size={14} />
                                                 {t("dashboard")}
                                             </Link>
-                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
+                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false}>
                                                 <ShieldCheck size={14} />
                                                 {t("myAds")}
                                             </Link>
-                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
+                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false}>
                                                 <MessageSquare size={14} />
                                                 {t("messages")}
                                                 {unreadCount > 0 && (
                                                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">{unreadCount}</span>
                                                 )}
                                             </Link>
-                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
+                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false}>
                                                 <Bell size={14} />
                                                 {t("notifications")}
                                             </Link>
-                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
+                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" prefetch={false}>
                                                 <Settings size={14} />
                                                 {t("settings")}
                                             </Link>
                                             <div className="border-t border-border-color my-1"></div>
-                                            <button onClick={() => { logout(); setTimeout(() => setShowUserMenu(false), 150); }} className={`flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full relative z-10 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                                            <button onClick={() => { logout(); setShowUserMenu(false); }} className={`flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full relative z-10 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                                                 <LogOut size={14} />
                                                 {t("logout")}
                                             </button>

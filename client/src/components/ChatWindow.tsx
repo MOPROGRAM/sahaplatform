@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -15,6 +15,7 @@ interface Message {
     message_type: 'text' | 'image' | 'file' | 'voice' | 'location';
     file_url?: string;
     file_name?: string;
+    is_read?: boolean;
     created_at: string;
     sender?: {
         id?: string;
@@ -66,6 +67,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         sender_id: newMessage.senderId || newMessage.sender_id,
                         content: newMessage.content,
                         message_type: (newMessage.messageType || newMessage.message_type || 'text') as any,
+                        is_read: newMessage.is_read !== undefined ? newMessage.is_read : (newMessage.isRead !== undefined ? newMessage.isRead : false),
                         created_at: newMessage.createdAt || newMessage.created_at || new Date().toISOString(),
                         sender: { name: '...' } // Temporary placeholder
                     };
@@ -91,6 +93,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 ));
                             }
                         });
+                } else if (payload.eventType === 'UPDATE' && newItemConversationId === conversationId) {
+                    setMessages(prev => prev.map(m => 
+                        m.id === newItem.id 
+                            ? { ...m, is_read: newItem.is_read }
+                            : m
+                    ));
                 }
             });
         }
@@ -133,6 +141,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 setMessages(processedMessages);
                 setParticipants(data.conversation.participants || []);
                 setAdInfo(data.conversation.ad);
+                
+                // Mark messages as read
+                conversationsService.markAsRead(conversationId);
             }
         } catch (error) {
             console.error("Failed to fetch chat:", error);
@@ -266,8 +277,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     return (
                         <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                             <div className={`relative max-w-[75%] px-3 py-2 shadow-sm transition-all hover:shadow-md ${isMe
-                                ? 'bg-[#005c4b] text-white rounded-2xl rounded-tr-none'
-                                : 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-none'}`}>
+                                ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-gray-900 dark:text-white rounded-2xl rounded-tr-none'
+                                : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-none'}`}>
 
                                 {msg.message_type === 'text' && <p className="text-[11px] font-bold leading-relaxed whitespace-pre-wrap">{msg.content}</p>}
 
@@ -288,7 +299,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                             href={msg.file_url} 
                                             download 
                                             target="_blank" 
-                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-white/80' : 'text-primary'}`}
+                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
                                         >
                                             <Download size={10} /> {language === 'ar' ? 'تحميل الصورة' : 'Download Image'}
                                         </a>
@@ -297,7 +308,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
                                 {msg.message_type === 'location' && (
                                     <div className="space-y-2">
-                                        <div className={`flex items-center gap-2 text-[10px] font-black border-b pb-1 mb-1 ${isMe ? 'border-white/20' : 'border-black/5'}`}>
+                                        <div className={`flex items-center gap-2 text-[10px] font-black border-b pb-1 mb-1 ${isMe ? 'border-black/5' : 'border-black/5'}`}>
                                             <MapPin size={12} /> SHARED LOCATION
                                         </div>
                                         <iframe
@@ -311,23 +322,30 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 )}
 
                                 {msg.message_type === 'file' && !isImage && (
-                                    <div className={`flex items-center gap-3 p-2 rounded-lg ${isMe ? 'bg-black/20' : 'bg-gray-100'}`}>
-                                        <FileText size={24} className={isMe ? 'text-white' : 'text-primary'} />
+                                    <div className={`flex items-center gap-3 p-2 rounded-lg ${isMe ? 'bg-black/5' : 'bg-gray-100'}`}>
+                                        <FileText size={24} className={'text-primary'} />
                                         <div className="flex flex-col min-w-0">
                                             <span className="text-[10px] font-black truncate max-w-[150px]">{msg.file_name || 'Attached File'}</span>
-                                            <a href={msg.file_url} download target="_blank" className={`flex items-center gap-1 text-[9px] font-black hover:underline ${isMe ? 'text-white/80' : 'text-primary'}`}>
+                                            <a href={msg.file_url} download target="_blank" className={`flex items-center gap-1 text-[9px] font-black hover:underline text-primary`}>
                                                 <Download size={10} /> {language === 'ar' ? 'تحميل' : 'DOWNLOAD NOW'}
                                             </a>
                                         </div>
                                     </div>
                                 )}
 
-                                <span className={`text-[8px] font-black mt-1 block uppercase tracking-tighter text-right ${isMe ? 'text-white/60' : 'text-gray-400'}`}>
-                                    {(() => {
-                                        const date = new Date(msg.created_at);
-                                        return isNaN(date.getTime()) ? '...' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                                    })()}
-                                </span>
+                                <div className={`flex items-center justify-end gap-1 mt-1 select-none`}>
+                                    <span className={`text-[9px] font-medium ${isMe ? 'text-gray-500 dark:text-gray-300' : 'text-gray-400'}`}>
+                                        {(() => {
+                                            const date = new Date(msg.created_at);
+                                            return isNaN(date.getTime()) ? '...' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                        })()}
+                                    </span>
+                                    {isMe && (
+                                        <span className={msg.is_read ? 'text-blue-500' : 'text-gray-400'}>
+                                            {msg.is_read ? <CheckCheck size={14} /> : <Check size={14} />}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
