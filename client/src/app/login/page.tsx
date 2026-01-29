@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguage } from '@/lib/language-context';
+import { supabase } from '@/lib/supabase';
 import { User, Mail, Lock, ShieldCheck, ChevronRight } from 'lucide-react';
 import DepthInput from '@/components/ui/DepthInput';
 import { Logo } from '@/components/Logo';
