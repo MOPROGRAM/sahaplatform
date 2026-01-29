@@ -217,36 +217,36 @@ export default function Header() {
                                             </div>
 
                                             {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
-                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors" onClick={() => setShowUserMenu(false)}>
+                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)}>
                                                     <ShieldCheck size={14} />
                                                     {t("systemManagement")}
                                                 </Link>
                                             )}
-                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
+                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
                                                 <LayoutDashboard size={14} />
                                                 {t("dashboard")}
                                             </Link>
-                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
+                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
                                                 <ShieldCheck size={14} />
                                                 {t("myAds")}
                                             </Link>
-                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
+                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
                                                 <MessageSquare size={14} />
                                                 {t("messages")}
                                                 {unreadCount > 0 && (
                                                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">{unreadCount}</span>
                                                 )}
                                             </Link>
-                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
+                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
                                                 <Bell size={14} />
                                                 {t("notifications")}
                                             </Link>
-                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors z-[120]" onClick={() => setShowUserMenu(false)} prefetch={false}>
+                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative z-10" onClick={() => setTimeout(() => setShowUserMenu(false), 150)} prefetch={false}>
                                                 <Settings size={14} />
                                                 {t("settings")}
                                             </Link>
                                             <div className="border-t border-border-color my-1"></div>
-                                            <button onClick={() => { logout(); setShowUserMenu(false); }} className={`flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                                            <button onClick={() => { logout(); setTimeout(() => setShowUserMenu(false), 150); }} className={`flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full relative z-10 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                                                 <LogOut size={14} />
                                                 {t("logout")}
                                             </button>

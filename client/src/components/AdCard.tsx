@@ -127,7 +127,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bento-card bento-card-hover group flex ${isHighlighted ? "border-primary ring-2 ring-primary/50" : ""} ${isVertical ? "flex-col h-full" : (language === "ar" ? "flex-row-reverse" : "flex-row")} ${className}`}
+            className={`bento-card bento-card-hover group flex shadow hover:shadow-lg ${isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700"} ${isVertical ? "flex-col h-full" : (language === "ar" ? "flex-row-reverse" : "flex-row")} ${className}`}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
