@@ -7,6 +7,8 @@ import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
 import { storageService } from "@/lib/storage";
 import VoiceCall from "@/components/VoiceCall";
+import IncomingCallNotification from "@/components/IncomingCallNotification";
+import { io, Socket } from "socket.io-client";
 // import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
 
@@ -48,6 +50,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
     const [editInput, setEditInput] = useState("");
     const [showVoiceCall, setShowVoiceCall] = useState(false);
+    const [incomingCall, setIncomingCall] = useState<any>(null);
+    const [socket, setSocket] = useState<Socket | null>(null);
     const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     // const socketRef = useRef<any>(null);
@@ -678,8 +682,28 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             <VoiceCall 
                 callerId={user.id}
                 calleeId={otherMember.id}
+                conversationId={conversationId}
                 onEndCall={() => setShowVoiceCall(false)}
                 isIncoming={false}
+            />
+        )}
+        
+        {/* Incoming Call Notification */}
+        {incomingCall && (
+            <IncomingCallNotification
+                callData={incomingCall}
+                onAccept={() => {
+                    setIncomingCall(null);
+                    setShowVoiceCall(true);
+                }}
+                onReject={() => {
+                    setIncomingCall(null);
+                    // إبلاغ الخادم برفض المكالمة
+                    socket?.emit('reject_call', {
+                        callId: incomingCall.callId,
+                        callerId: incomingCall.callerId
+                    });
+                }}
             />
         )}
     );
