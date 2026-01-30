@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -41,6 +41,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [adInfo, setAdInfo] = useState<any>(null);
     const [mounted, setMounted] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    // Rating State
+    const [isRatingOpen, setIsRatingOpen] = useState(false);
+    const [ratingValue, setRatingValue] = useState(0);
+    const [ratingComment, setRatingComment] = useState("");
+    const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+    
     // const socketRef = useRef<any>(null);
 
     useEffect(() => {
@@ -261,6 +267,52 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     <button onClick={onClose} className="p-1.5 hover:bg-red-50 text-text-muted hover:text-red-500 transition-all rounded-xs"><X size={16} /></button>
                 </div>
             </div>
+
+            {/* Rating Modal */}
+            {isRatingOpen && (
+                <div className="absolute inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6 relative animate-in fade-in zoom-in duration-200">
+                        <button 
+                            onClick={() => setIsRatingOpen(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        >
+                            <X size={20} />
+                        </button>
+                        
+                        <h3 className="text-lg font-black text-secondary mb-4 text-center">
+                            {language === 'ar' ? 'تقييم التجربة' : 'Rate Experience'}
+                        </h3>
+                        
+                        <div className="flex justify-center gap-2 mb-6">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    onClick={() => setRatingValue(star)}
+                                    className={`transition-all hover:scale-110 ${ratingValue >= star ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                                >
+                                    <Star size={32} />
+                                </button>
+                            ))}
+                        </div>
+                        
+                        <textarea
+                            value={ratingComment}
+                            onChange={(e) => setRatingComment(e.target.value)}
+                            placeholder={language === 'ar' ? 'اكتب تعليقك هنا...' : 'Write your comment here...'}
+                            className="w-full h-24 p-3 border border-gray-200 rounded-md text-sm mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        />
+                        
+                        <button
+                            onClick={submitRating}
+                            disabled={isSubmittingRating || ratingValue === 0}
+                            className="w-full py-2.5 bg-primary text-white rounded-md font-bold text-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            {isSubmittingRating && <Loader2 size={16} className="animate-spin" />}
+                            {language === 'ar' ? 'إرسال التقييم' : 'Submit Rating'}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Safety Bar */}
             <div className="bg-primary/10 py-1.5 px-3 border-b border-primary/20 flex items-center gap-2">

@@ -179,13 +179,12 @@ export default function ProfilePage() {
     const tabs = [
         { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'Overview', icon: <User size={14} /> },
         { id: 'listings', label: language === 'ar' ? 'إعلاناتي' : 'My Listings', icon: <Package size={14} /> },
+        { id: 'favorites', label: language === 'ar' ? 'المفضلة' : 'Favorites', icon: <Heart size={14} /> },
         { id: 'settings', label: language === 'ar' ? 'الإعدادات' : 'Settings', icon: <Settings size={14} /> },
     ];
 
     if (user.userType === 'PROVIDER') {
-        tabs.splice(1, 0, { id: 'services', label: language === 'ar' ? 'خدماتي' : 'My Services', icon: <ShieldCheck size={14} /> });
-    } else {
-        tabs.splice(1, 0, { id: 'favorites', label: language === 'ar' ? 'المفضلة' : 'Favorites', icon: <Heart size={14} /> });
+        tabs.splice(2, 0, { id: 'services', label: language === 'ar' ? 'خدماتي' : 'My Services', icon: <ShieldCheck size={14} /> });
     }
 
     return (
