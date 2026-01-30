@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
 import { storageService } from "@/lib/storage";
+import VoiceCall from "@/components/VoiceCall";
 // import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
 
@@ -46,6 +47,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [recordingTime, setRecordingTime] = useState(0);
     const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
     const [editInput, setEditInput] = useState("");
+    const [showVoiceCall, setShowVoiceCall] = useState(false);
     const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     // const socketRef = useRef<any>(null);
@@ -641,6 +643,13 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         (language === 'ar' ? 'تسجيل صوتي' : 'voice record')
                     }
                 </button>
+                <button 
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-sm text-[9px] font-black transition-all whitespace-nowrap shadow-sm active:scale-95"
+                    onClick={() => setShowVoiceCall(true)}
+                >
+                    <Phone size={12} className="rotate-90" /> 
+                    {language === 'ar' ? 'مكالمة صوتية' : 'voice call'}
+                </button>
             </div>
 
             {/* Input Main */}
@@ -663,5 +672,15 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 </div>
             </div>
         </div>
+        
+        {/* Voice Call Modal */}
+        {showVoiceCall && user?.id && (
+            <VoiceCall 
+                callerId={user.id}
+                calleeId={otherMember.id}
+                onEndCall={() => setShowVoiceCall(false)}
+                isIncoming={false}
+            />
+        )}
     );
 }
