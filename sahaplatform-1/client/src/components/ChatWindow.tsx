@@ -18,6 +18,8 @@ interface Message {
     fileName?: string;
     duration?: number; // for audio messages
     createdAt: string;
+    updatedAt?: string; // for edit tracking
+    isEdited?: boolean; // flag for edited messages
     sender: {
         name: string;
         image?: string;
@@ -42,6 +44,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
     const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
     const [recordingTime, setRecordingTime] = useState(0);
+    const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+    const [editInput, setEditInput] = useState("");
     const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     // const socketRef = useRef<any>(null);
@@ -269,6 +273,115 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         };
     }, [mediaRecorder]);
 
+    // وظائف إدارة الرسائل
+    const canModifyMessage = (message: Message): boolean => {
+        if (message.senderId !== user?.id) return false;
+        
+        const createdAt = new Date(message.createdAt);
+        const now = new Date();
+        const diffInHours = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+        
+        return diffInHours < 1; // أقل من ساعة
+    };
+
+    const deleteMessage = async (messageId: string) => {
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذه الرسالة؟' : 'Are you sure you want to delete this message?')) {
+            return;
+        }
+
+        try {
+            // تحديث الرسالة لتصبح محذوفة (بدلاً من الحذف الفعلي للحفاظ على التاريخ)
+            const deletedContent = language === 'ar' ? '[رسالة محذوفة]' : '[message deleted]';
+            
+            await supabase
+                .from('Message')
+                .update({ 
+                    content: deletedContent,
+                    messageType: 'text',
+                    fileUrl: null,
+                    fileName: null,
+                    isRead: true
+                })
+                .eq('id', messageId);
+
+            // تحديث الواجهة المحلية
+            setMessages(prev => prev.map(msg => 
+                msg.id === messageId 
+                    ? { ...msg, content: deletedContent, messageType: 'text', fileUrl: null, fileName: null }
+                    : msg
+            ));
+
+        } catch (error) {
+            console.error('Error deleting message:', error);
+            alert(language === 'ar' ? 'فشل في حذف الرسالة' : 'Failed to delete message');
+        }
+    };
+
+    const startEditing = (message: Message) => {
+        if (!canModifyMessage(message) || message.messageType !== 'text') return;
+        
+        setEditingMessageId(message.id);
+        setEditInput(message.content);
+    };
+
+    const saveEdit = async () => {
+        if (!editingMessageId || !editInput.trim()) return;
+
+        try {
+            const { data, error } = await supabase
+                .from('Message')
+                .update({ 
+                    content: editInput.trim(),
+                    updatedAt: new Date().toISOString(),
+                    isEdited: true
+                })
+                .eq('id', editingMessageId)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // تحديث الواجهة المحلية
+            setMessages(prev => prev.map(msg => 
+                msg.id === editingMessageId 
+                    ? { 
+                        ...msg, 
+                        content: editInput.trim(),
+                        updatedAt: data.updatedAt || new Date().toISOString(),
+                        isEdited: true
+                    }
+                    : msg
+            ));
+
+            setEditingMessageId(null);
+            setEditInput("");
+
+        } catch (error) {
+            console.error('Error editing message:', error);
+            alert(language === 'ar' ? 'فشل في تعديل الرسالة' : 'Failed to edit message');
+        }
+    };
+
+    const cancelEdit = () => {
+        setEditingMessageId(null);
+        setEditInput("");
+    };
+
+    const formatTimeDifference = (createdAt: string): string => {
+        const created = new Date(createdAt);
+        const now = new Date();
+        const diffInMinutes = Math.floor((now.getTime() - created.getTime()) / (1000 * 60));
+        
+        if (diffInMinutes < 1) return language === 'ar' ? 'الآن' : 'now';
+        if (diffInMinutes < 60) return `${diffInMinutes}${language === 'ar' ? 'د' : 'm'}`;
+        
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) return `${diffInHours}${language === 'ar' ? 'س' : 'h'}`;
+        
+        const diffInDays = Math.floor(diffInHours / 24);
+        return `${diffInDays}${language === 'ar' ? 'ي' : 'd'}`;
+    };
+
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
 
     if (loading) return (
@@ -324,7 +437,60 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             ? 'bg-primary text-white rounded-br-none'
                             : 'bg-white border border-gray-100 text-secondary rounded-bl-none'}`}>
 
-                            {msg.messageType === 'text' && <p className="text-[11px] font-bold leading-relaxed">{msg.content}</p>}
+                            {msg.messageType === 'text' && (
+                                <div>
+                                    {editingMessageId === msg.id ? (
+                                        <div className="flex gap-2">
+                                            <input
+                                                value={editInput}
+                                                onChange={(e) => setEditInput(e.target.value)}
+                                                onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                                                className="flex-1 bg-gray-100 border border-gray-300 px-2 py-1 rounded text-[11px]"
+                                                autoFocus
+                                            />
+                                            <button 
+                                                onClick={saveEdit}
+                                                className="bg-green-500 text-white px-2 py-1 rounded text-[10px]"
+                                            >
+                                                ✓
+                                            </button>
+                                            <button 
+                                                onClick={cancelEdit}
+                                                className="bg-gray-500 text-white px-2 py-1 rounded text-[10px]"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="group relative">
+                                            <p className="text-[11px] font-bold leading-relaxed">{msg.content}</p>
+                                            {msg.isEdited && (
+                                                <span className="text-[8px] text-text-muted italic">
+                                                    ({language === 'ar' ? 'معدل' : 'edited'})
+                                                </span>
+                                            )}
+                                            {canModifyMessage(msg) && (
+                                                <div className="absolute -top-6 right-0 bg-white border border-gray-200 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 p-1">
+                                                    <button 
+                                                        onClick={() => startEditing(msg)}
+                                                        className="text-[10px] text-blue-500 hover:text-blue-700 p-1"
+                                                        title={language === 'ar' ? 'تعديل' : 'edit'}
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => deleteMessage(msg.id)}
+                                                        className="text-[10px] text-red-500 hover:text-red-700 p-1"
+                                                        title={language === 'ar' ? 'حذف' : 'delete'}
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {msg.messageType === 'location' && (
                                 <div className="space-y-2">
