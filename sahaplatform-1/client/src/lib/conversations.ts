@@ -119,12 +119,23 @@ export const conversationsService = {
         }
 
         // الحصول على المشاركين يدوياً لضمان الدقة
-        const { data: participants, error: pError } = await (supabase as any)
+        const { data: participantIds, error: pError } = await (supabase as any)
             .from('_ConversationParticipants')
-            .select('user:User(id, name, email)')
+            .select('B')
             .eq('A', id);
 
-        const transformedParticipants = participants?.map((p: any) => p.user) || [];
+        // جلب معلومات المستخدمين
+        const userIds = participantIds?.map((p: any) => p.B) || [];
+        let transformedParticipants: any[] = [];
+        
+        if (userIds.length > 0) {
+            const { data: usersData, error: usersError } = await (supabase as any)
+                .from('User')
+                .select('id, name, email')
+                .in('id', userIds);
+                
+            transformedParticipants = usersData || [];
+        }
 
         // الحصول على الرسائل
         const { data: messages, error: messagesError } = await (supabase as any)
@@ -224,44 +235,23 @@ export const conversationsService = {
 
         if (!user) throw new Error('User not authenticated');
 
-        // البحث عن المشاركين في المحادثة بطرق مختلفة
-        let participants: any[] = [];
-        
-        // الطريقة الأولى: البحث المباشر
-        const { data: directParticipants } = await (supabase as any)
+        // الحصول على المشاركين يدوياً لضمان الدقة
+        const { data: participantIds } = await (supabase as any)
             .from('_ConversationParticipants')
             .select('B')
-            .eq('A', conversationId)
-            .neq('B', user.id);
+            .eq('A', conversationId);
 
-        if (directParticipants?.length) {
-            participants = directParticipants;
-        } else {
-            // الطريقة الثانية: البحث العكسي
-            const { data: reverseParticipants } = await (supabase as any)
-                .from('_ConversationParticipants')
-                .select('A')
-                .eq('B', conversationId)
-                .neq('A', user.id);
-
-            if (reverseParticipants?.length) {
-                participants = reverseParticipants;
-            } else {
-                // الطريقة الثالثة: الحصول على جميع المشاركين والتصفية
-                const { data: allParticipants } = await (supabase as any)
-                    .from('_ConversationParticipants')
-                    .select('*');
+        // جلب معلومات المستخدمين
+        const userIds = participantIds?.map((p: any) => p.B) || [];
+        let participants: any[] = [];
+        
+        if (userIds.length > 0) {
+            const { data: usersData } = await (supabase as any)
+                .from('User')
+                .select('id, name, email')
+                .in('id', userIds);
                 
-                // البحث عن المحادثة في جميع السجلات
-                const conversationRecords = allParticipants?.filter(
-                    (record: any) => record.A === conversationId || record.B === conversationId
-                ) || [];
-                
-                // استخراج المشاركين الآخرين
-                participants = conversationRecords
-                    .map((record: any) => record.A === conversationId ? record.B : record.A)
-                    .filter((id: string) => id !== user.id && id !== conversationId);
-            }
+            participants = usersData || [];
         }
 
         if (!participants?.length) {
