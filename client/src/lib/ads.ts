@@ -222,6 +222,29 @@ export const adsService = {
             throw new Error('User not authenticated');
         }
 
+        // Get currency ID from code (default to 'SAR')
+        let currencyId = adData.currencyId;
+        if (!currencyId || currencyId === 'sar') {
+            const { data: currencyData } = await (supabase as any)
+                .from('currencies')
+                .select('id')
+                .ilike('code', adData.currencyCode || 'sar')
+                .maybeSingle();
+
+            if (currencyData) {
+                currencyId = currencyData.id;
+            } else {
+                // Warning: If no currency is found, this might fail depending on DB constraints.
+                // We'll try to fetch ANY currency as a fallback
+                const { data: fallbackCurrency } = await (supabase as any)
+                    .from('currencies')
+                    .select('id')
+                    .limit(1)
+                    .maybeSingle();
+                if (fallbackCurrency) currencyId = fallbackCurrency.id;
+            }
+        }
+
         // Convert camelCase to snake_case for DB
         const dbData = {
             title: adData.title,
@@ -234,7 +257,7 @@ export const adsService = {
             video: adData.video,
             author_id: user.id,
             city_id: adData.cityId || null,
-            currency_id: adData.currencyId || 'sar', // Default to SAR if not provided
+            currency_id: currencyId,
             is_boosted: adData.isBoosted || false,
             is_active: true, // Default active
             payment_method: adData.paymentMethod,
