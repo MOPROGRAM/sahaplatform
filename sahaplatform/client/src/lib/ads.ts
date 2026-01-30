@@ -75,7 +75,7 @@ export const adsService = {
                 .from('ads')
                 .select(`
                     *,
-                    author:users!ads_author_id_fkey(id, name, email),
+                    author:users!ads_author_id_fkey(id, name, email, phone),
                     city:cities!city_id(id, name, name_ar, name_en),
                     currency:currencies!currency_id(id, code, symbol, name)
                 `)

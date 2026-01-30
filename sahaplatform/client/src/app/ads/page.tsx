@@ -40,9 +40,10 @@ interface Ad {
     created_at: string;
     views?: number;
     author_id?: string;
-    author?: { id?: string; name?: string };
+    author?: { id?: string; name?: string; phone?: string; };
     is_boosted?: boolean;
     currency?: string | { code: string; symbol: string; };
+    phone?: string;
 }
 
 const AdsSkeleton = () => (
@@ -277,6 +278,7 @@ function AdsContent() {
                                 isFeatured={ad.is_boosted || false}
                                 authorName={ad.author?.name}
                                 authorId={ad.author_id || ad.author?.id}
+                                phoneNumber={ad.phone || ad.author?.phone}
                                 description={ad.description}
                                 descriptionAr={ad.descriptionAr}
                                 descriptionEn={ad.descriptionEn}

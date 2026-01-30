@@ -48,9 +48,11 @@ interface Ad {
     images: string;
     is_boosted?: boolean;
     author_id: string;
+    phone?: string;
     author?: {
         id?: string;
         name?: string;
+        phone?: string;
     };
     city?: {
         name: string;
@@ -219,6 +221,7 @@ export default function HomePage() {
                                         isFeatured={ad.is_boosted || false}
                                         authorName={ad.author?.name}
                                         authorId={ad.author_id || ad.author?.id}
+                                        phoneNumber={ad.phone || ad.author?.phone}
                                     />
                                 </div>
                             ))}

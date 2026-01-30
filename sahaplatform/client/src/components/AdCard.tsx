@@ -38,6 +38,7 @@ interface AdCardProps {
     isHighlighted?: boolean;
     layout?: 'vertical' | 'horizontal';
     imageHeight?: string;
+    phoneNumber?: string; // Added
 }
 
 export default function AdCard({
@@ -65,7 +66,8 @@ export default function AdCard({
     layout = 'vertical',
     imageHeight,
     authorName, // Added to destructuring
-    authorId // Added to destructuring
+    authorId, // Added to destructuring
+    phoneNumber // Added to destructuring
 }: AdCardProps) {
     const { t } = useLanguage();
     const router = useRouter();
@@ -452,16 +454,30 @@ export default function AdCard({
                  <h3 className="text-[11px] font-bold text-text-main mb-2">{authorName || t("seller")}</h3>
                  
                  <div className="flex flex-col gap-2 w-full px-2">
-                    <button className="flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded text-[10px] font-bold hover:bg-primary/90 transition-colors">
+                    <a 
+                        href={`tel:${phoneNumber}`}
+                        className={`flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded text-[10px] font-bold hover:bg-primary/90 transition-colors ${!phoneNumber ? 'pointer-events-none opacity-50' : ''}`}
+                    >
                         <Phone size={12} />
                         {t("call")}
-                    </button>
-                    <button 
-                        onClick={handleStartChat}
-                        className="flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors"
+                    </a>
+                    
+                    <a 
+                        href={`https://wa.me/${phoneNumber}`} 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors ${!phoneNumber ? 'pointer-events-none opacity-50' : ''}`}
                     >
                         <MessageCircle size={12} />
-                        {language === 'ar' ? 'محادثة فورية' : 'Chat'}
+                        {t("whatsapp") || "WhatsApp"}
+                    </a>
+
+                    <button 
+                        onClick={handleStartChat}
+                        className="flex items-center justify-center gap-2 w-full py-1.5 bg-blue-600 text-white rounded text-[10px] font-bold hover:bg-blue-700 transition-colors"
+                    >
+                        <MessageCircle size={12} />
+                        {language === 'ar' ? 'محادثة داخلية' : 'Internal Chat'}
                     </button>
                  </div>
 
