@@ -5,6 +5,7 @@ import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X }
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
+import { storageService } from "@/lib/storage";
 // import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
 
@@ -165,22 +166,31 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     };
 
     const handleFileUpload = async (file: File, type: 'file' | 'image') => {
-        const fileName = `${Date.now()}-${file.name}`;
-        const bucket = type === 'image' ? 'chat-images' : 'chat-files';
-        const { error } = await supabase.storage
-            .from(bucket)
-            .upload(fileName, file);
+        try {
+            // التحقق من صحة الملف
+            if (type === 'image') {
+                if (!storageService.validateImageFile(file)) {
+                    throw new Error('Invalid image file or size too large');
+                }
+            } else {
+                if (!storageService.validateGeneralFile(file)) {
+                    throw new Error('Invalid file type or size too large');
+                }
+            }
 
-        if (error) {
+            // رفع الملف باستخدام خدمة التخزين
+            const fileUrl = await storageService.uploadMessageFile(file);
+            
+            return { 
+                fileUrl, 
+                fileName: file.name, 
+                fileSize: file.size 
+            };
+        } catch (error: any) {
             console.error('Error uploading file:', error);
+            alert(error.message || 'Failed to upload file');
             return null;
         }
-
-        const { data: urlData } = supabase.storage
-            .from(bucket)
-            .getPublicUrl(fileName);
-
-        return { fileUrl: urlData.publicUrl, fileName: file.name, fileSize: file.size };
     };
 
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
@@ -265,6 +275,24 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 </div>
                             )}
 
+                            {msg.messageType === 'image' && (
+                                <div className="space-y-2">
+                                    <div className="text-[10px] font-black text-text-muted mb-1">
+                                        {language === 'ar' ? 'صورة مشاركة' : 'shared image'}
+                                    </div>
+                                    <a href={msg.fileUrl} target="_blank" className="block max-w-[200px]">
+                                        <img 
+                                            src={msg.fileUrl} 
+                                            alt={msg.fileName || 'Shared image'}
+                                            className="rounded-xs max-w-full max-h-[150px] object-contain border border-gray-200"
+                                            onError={(e) => {
+                                                e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7Yr9mF2YrZhdmKPC90ZXh0Pjwvc3ZnPg==';
+                                            }}
+                                        />
+                                    </a>
+                                </div>
+                            )}
+
                             <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-text-muted'}`}>
                                 {(() => {
                                     const date = new Date(msg.createdAt);
@@ -282,6 +310,18 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
                     <MapPin size={12} /> {language === 'ar' ? 'مشاركة الموقع' : 'share location'}
                 </button>
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                    <ImageIcon size={12} /> {language === 'ar' ? 'إرسال صورة' : 'send image'}
+                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            const uploadData = await handleFileUpload(file, 'image');
+                            if (uploadData) {
+                                handleSend('image', `Shared image: ${file.name}`, uploadData);
+                            }
+                        }
+                    }} />
+                </label>
                 <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
                     <Paperclip size={12} /> {language === 'ar' ? 'إرفاق مستند' : 'attach document'}
                     <input type="file" className="hidden" onChange={async (e) => {
