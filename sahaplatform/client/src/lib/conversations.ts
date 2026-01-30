@@ -269,6 +269,25 @@ export const conversationsService = {
 
         console.log(`Sending message to conversation ${conversationId} from ${user.id}`);
 
+        // Ensure I am a participant (Fix for broken/migrated conversations)
+        const { data: myParticipation } = await (supabase as any)
+            .from('conversation_participants')
+            .select('user_id')
+            .eq('conversation_id', conversationId)
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+        if (!myParticipation) {
+            console.log(`Current user ${user.id} is NOT a participant in conversation ${conversationId}. Adding self...`);
+            const { error: addSelfError } = await (supabase as any)
+                .from('conversation_participants')
+                .insert({ conversation_id: conversationId, user_id: user.id });
+            
+            if (addSelfError) {
+                console.error('Failed to add self to conversation:', addSelfError);
+            }
+        }
+
         const { data: participants, error: participantsError } = await (supabase as any)
             .from('conversation_participants')
             .select('user_id')
