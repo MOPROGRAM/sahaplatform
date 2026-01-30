@@ -107,7 +107,7 @@ export default function AdvancedFilter() {
                                         : "bg-gray-100 dark:bg-white/5 text-text-muted hover:bg-gray-200 dark:hover:bg-white/10"}
                                     `}
                                 >
-                                    {(t as any)[tag] || tag}
+                                    {t(tag as any)}
                                 </button>
                             ))}
                         </div>

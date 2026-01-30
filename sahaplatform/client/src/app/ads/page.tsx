@@ -228,7 +228,7 @@ function AdsContent() {
                                     onClick={() => handleSubCategoryChange(sub)}
                                     className={cn("px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 uppercase", subCategory === sub ? 'bg-indigo-600 text-white shadow-md' : 'text-indigo-600 hover:bg-indigo-100')}
                                 >
-                                    {(t as any)[sub] || sub}
+                                    {t(sub as any)}
                                 </button>
                             ))}
                         </div>
@@ -241,11 +241,11 @@ function AdsContent() {
                 <div className="bg-white border border-gray-200 rounded-sm p-3 shadow-sm flex items-center justify-between">
                     <div className="flex flex-wrap items-center gap-2">
                         <h1 className="text-[14px] font-[1000] text-secondary uppercase tracking-tight">
-                            {category ? (t as any)[category] || category : t('allAds')}
+                            {category ? t(category as any) : t('allAds')}
                             {subCategory && (
                                 <>
                                     <span className="text-gray-300 mx-2">/</span>
-                                    <span className="text-primary">{(t as any)[subCategory] || subCategory}</span>
+                                    <span className="text-primary">{t(subCategory as any)}</span>
                                 </>
                             )}
                         </h1>

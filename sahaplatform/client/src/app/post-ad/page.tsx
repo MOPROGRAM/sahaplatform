@@ -175,7 +175,7 @@ export default function PostAdPage() {
                 }
             }
 
-            router.push(`/ads/view?id=${createdAd.id}`);
+            router.push(`/ads/${createdAd.id}`);
         } catch (err: any) {
             console.error("Error creating ad:", err);
             setError(err.message || "Error posting ad");
@@ -260,7 +260,7 @@ export default function PostAdPage() {
                                             >
                                                 <option value="">{t('chooseSubCategory')}</option>
                                                 {subCategoriesMap[formData.category].map(sub => (
-                                                    <option key={sub} value={sub}>{(t as any)[sub] || sub}</option>
+                                                    <option key={sub} value={sub}>{t(sub as any)}</option>
                                                 ))}
                                             </select>
                                         </div>

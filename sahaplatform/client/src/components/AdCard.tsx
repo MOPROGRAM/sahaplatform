@@ -165,7 +165,6 @@ export default function AdCard({
         }
     }
 
-    const isVertical = layout === 'vertical';
     const currentDescription = language === 'ar' 
         ? (description_ar || descriptionAr || description) 
         : (description_en || descriptionEn || description); 
@@ -178,6 +177,9 @@ export default function AdCard({
     const peelProgress = peelY / cornerMax;
     const openThreshold = 0.4;
     
+    // Define isVertical explicitly to avoid any scope issues
+    const isVertical = layout === 'vertical';
+
     // Render Functions
     const renderStandardFace = () => (
         <div className={`w-full h-full flex bg-white dark:bg-[#1a1a1a] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>

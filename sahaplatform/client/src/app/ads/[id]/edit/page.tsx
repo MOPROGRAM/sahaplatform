@@ -302,7 +302,7 @@ export default function EditAdPage() {
                                 >
                                     <option value="">{t('chooseSubCategory')}</option>
                                     {subCategoriesMap[formData.category].map(sub => (
-                                        <option key={sub} value={sub}>{(t as any)[sub] || sub}</option>
+                                        <option key={sub} value={sub}>{t(sub as any)}</option>
                                     ))}
                                 </select>
                             </div>

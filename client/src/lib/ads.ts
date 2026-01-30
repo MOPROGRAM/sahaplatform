@@ -245,6 +245,11 @@ export const adsService = {
             }
         }
 
+        if (!currencyId) {
+            console.error('No currency found in database. Please run setup_currencies.sql');
+            throw new Error('System configuration error: No active currency found.');
+        }
+
         // Convert camelCase to snake_case for DB
         const dbData = {
             title: adData.title,
@@ -266,6 +271,8 @@ export const adsService = {
             latitude: adData.latitude,
             longitude: adData.longitude
         };
+
+        console.log('Attempting to create ad with data:', dbData);
 
         const { data, error } = await (supabase as any)
             .from('ads')
