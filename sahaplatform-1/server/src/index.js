@@ -198,6 +198,7 @@ const adRoutes = require('./modules/ads/ad.controller');
 const conversationRoutes = require('./modules/conversations/conversation.controller');
 const countryRoutes = require('./modules/countries/country.controller');
 const subscriptionRoutes = require('./modules/subscriptions/subscription.controller');
+const callRoutes = require('./modules/calls/call.controller');
 const authMiddleware = require('./middleware/auth');
 
 app.use('/api/auth', authRoutes);
@@ -205,6 +206,7 @@ app.use('/api/ads', adRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/calls', callRoutes);
 
 // Serve frontend for all non-API routes
 app.get('*', (req, res) => {
@@ -215,12 +217,68 @@ app.get('*', (req, res) => {
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
+    // تسجيل المستخدم للمكالمات
+    socket.on('register_user', (data) => {
+        const { userId } = data;
+        if (userId) {
+            socket.userId = userId;
+            console.log(`User ${userId} registered for calls with socket ${socket.id}`);
+        }
+    });
+
+    // إرسال رسالة المحادثة
     socket.on('send_message', (data) => {
         io.emit('receive_message', data);
     });
 
+    // إرسال عرض SDP للمكالمة
+    socket.on('send_offer', (data) => {
+        const { callId, offer, targetUserId } = data;
+        // إرسال العرض إلى المستخدم المستهدف
+        socket.to(targetUserId).emit('receive_offer', { callId, offer, from: socket.userId });
+    });
+
+    // إرسال إجابة SDP
+    socket.on('send_answer', (data) => {
+        const { callId, answer, targetUserId } = data;
+        socket.to(targetUserId).emit('receive_answer', { callId, answer, from: socket.userId });
+    });
+
+    // إرسال مرشحات ICE
+    socket.on('send_ice_candidate', (data) => {
+        const { candidate, targetUserId } = data;
+        socket.to(targetUserId).emit('receive_ice_candidate', { candidate, from: socket.userId });
+    });
+
+    // إشعار المكالمة الواردة
+    socket.on('incoming_call', (data) => {
+        const { calleeId, callData } = data;
+        socket.to(calleeId).emit('call_notification', callData);
+    });
+
+    // قبول المكالمة
+    socket.on('accept_call', (data) => {
+        const { callId, callerId } = data;
+        socket.to(callerId).emit('call_accepted', { callId });
+    });
+
+    // رفض المكالمة
+    socket.on('reject_call', (data) => {
+        const { callId, callerId } = data;
+        socket.to(callerId).emit('call_rejected', { callId });
+    });
+
+    // إنهاء المكالمة
+    socket.on('end_call', (data) => {
+        const { callId, otherPartyId } = data;
+        socket.to(otherPartyId).emit('call_ended', { callId });
+    });
+
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        console.log('User disconnected:', socket.id);
+        if (socket.userId) {
+            console.log(`User ${socket.userId} disconnected`);
+        }
     });
 });
 
