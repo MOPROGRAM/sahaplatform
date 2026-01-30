@@ -10,6 +10,8 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { conversationsService } from "@/lib/conversations";
 
+import PixelWaterBackground from "@/components/PixelWaterBackground";
+
 export default function Header() {
     const { user, logout } = useAuthStore();
     const { language, setLanguage, t, theme, toggleTheme, country, setCountry, currency, setCurrency } = useLanguage();
@@ -98,7 +100,10 @@ export default function Header() {
     };
 
     return (
-        <header className={`sticky top-0 z-[100] backdrop-blur-lg border-b border-border-color bg-white/80 dark:bg-[#0a0a0a]/90 ${headerShrunk ? "py-2 shadow-lg" : "py-3"}`}>
+        <header className={`sticky top-0 z-[100] backdrop-blur-lg border-b border-border-color bg-white/80 dark:bg-[#0a0a0a]/90 ${headerShrunk ? "py-2 shadow-lg" : "py-3"} relative overflow-hidden`}>
+            {/* Pixel Water Background */}
+            <PixelWaterBackground className="absolute inset-0 w-full h-full opacity-30" />
+
             <div className="relative">
                 <div className="max-w-[1920px] mx-auto px-4 flex items-center justify-between gap-4 relative z-50">
                     {/* Brand & Left Mobile Controls */}
@@ -147,7 +152,7 @@ export default function Header() {
                         </button>
 
                         {showRegion && (
-                            <div className="absolute top-full mt-3 left-0 w-72 bento-card bg-white dark:bg-[#1a1a1a] shadow-[0_20px_50px_rgba(0,0,0,0.2)] p-5 z-[1010] animate-in fade-in zoom-in-95 duration-200 border border-border-color rounded-3xl">
+                            <div className="absolute top-full mt-3 left-0 w-72 bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] p-5 z-[1010] animate-in fade-in zoom-in-95 duration-200 border border-white/20 dark:border-white/10 rounded-3xl">
                                 <div className="space-y-6">
                                     <div>
                                         <div className="flex items-center gap-2 mb-3">
@@ -258,7 +263,7 @@ export default function Header() {
                                 </button>
 
                                 {showUserMenu && (
-                                    <div className="absolute top-full right-0 mt-2 w-56 bento-card bg-white dark:bg-[#1a1a1a] shadow-2xl py-2 z-[1010] animate-in fade-in duration-200 rounded-2xl border border-gray-100 dark:border-white/10">
+                                    <div className="absolute top-full right-0 mt-2 w-56 bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl shadow-2xl py-2 z-[1010] animate-in fade-in duration-200 rounded-2xl border border-white/20 dark:border-white/10">
                                         <div className="space-y-1 p-1">
                                             {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
                                                 <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative" onClick={() => setShowUserMenu(false)}>
@@ -343,7 +348,7 @@ export default function Header() {
                     />
 
                     {/* Drawer Content */}
-                    <div className={`absolute top-0 ${language === 'ar' ? 'right-0' : 'left-0'} h-full w-[85%] max-w-sm bg-white dark:bg-[#0a0a0a] shadow-2xl animate-in slide-in-from-${language === 'ar' ? 'right' : 'left'} duration-300 overflow-y-auto`}>
+                    <div className={`absolute top-0 ${language === 'ar' ? 'right-0' : 'left-0'} h-full w-[85%] max-w-sm bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl shadow-2xl animate-in slide-in-from-${language === 'ar' ? 'right' : 'left'} duration-300 overflow-y-auto border-r border-white/20 dark:border-white/10`}>
                         <div className="p-6 space-y-8 pb-20">
                             {/* Close & Logo */}
                             <div className="flex items-center justify-between">

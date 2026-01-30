@@ -221,7 +221,7 @@ export default function AdCard({
 
     // Render Functions
     const renderStandardFace = () => (
-        <div className={`w-full h-full flex bg-white dark:bg-[#1a1a1a] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
+        <div className={`w-full h-full flex bg-white/70 dark:bg-[#1a1a1a]/70 backdrop-blur-xl border border-white/20 dark:border-white/10 ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
             <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-20") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
@@ -345,7 +345,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col backdrop-blur-xl border border-white/20 dark:border-white/10 ${isFeatured ? "bg-[#fffce8]/70 dark:bg-[#2a2610]/70" : "bg-white/70 dark:bg-[#1a1a1a]/70"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -415,7 +415,7 @@ export default function AdCard({
 
     const renderDetailsMoreFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col backdrop-blur-xl border border-white/20 dark:border-white/10 ${isFeatured ? "bg-[#fffce8]/70 dark:bg-[#2a2610]/70" : "bg-white/70 dark:bg-[#1a1a1a]/70"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -458,7 +458,7 @@ export default function AdCard({
 
     const renderContactFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center ${isFeatured ? "bg-[#fffce8] dark:bg-[#2a2610]" : "bg-white dark:bg-[#1a1a1a]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center backdrop-blur-xl border border-white/20 dark:border-white/10 ${isFeatured ? "bg-[#fffce8]/70 dark:bg-[#2a2610]/70" : "bg-white/70 dark:bg-[#1a1a1a]/70"}`}
             onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();

@@ -274,14 +274,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     if (!mounted) return null;
 
     if (loading) return (
-        <div className="flex flex-col h-[500px] bg-white border border-gray-200 rounded-sm items-center justify-center">
+        <div className="flex flex-col h-[500px] bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-sm items-center justify-center">
             <Loader2 className="animate-spin text-primary" size={32} />
             <span className="text-[10px] font-black uppercase tracking-widest mt-4 opacity-40">Connecting to Saha Link...</span>
         </div>
     );
 
     return (
-        <div className="flex flex-col h-[600px] bg-white border border-gray-200 rounded-sm shadow-2xl overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="flex flex-col h-[600px] bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-sm shadow-2xl overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Header - High Density */}
             <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <div className="flex items-center gap-3">
