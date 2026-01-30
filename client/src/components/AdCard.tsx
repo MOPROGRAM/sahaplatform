@@ -10,6 +10,9 @@ import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
+import ChatWindow from "@/components/ChatWindow";
+import { conversationsService } from "@/lib/conversations";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface AdCardProps {
     id: string;
@@ -81,6 +84,9 @@ export default function AdCard({
     const [peel, setPeel] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [faceIndex, setFaceIndex] = useState(0);
     const [backPeelY, setBackPeelY] = useState(0);
+    const [showChat, setShowChat] = useState(false);
+    const [conversationId, setConversationId] = useState<string | null>(null);
+    const { user } = useAuthStore();
     const cornerMax = 96;
     const peelY = Math.max(0, Math.min(cornerMax, peel.y));
 
@@ -188,6 +194,29 @@ export default function AdCard({
             default: return null;
         }
     }
+
+    const handleStartChat = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
+        if (user.id === authorId) {
+            alert(contextLanguage === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
+            return;
+        }
+
+        try {
+            const conversation = await conversationsService.createOrGetConversation(id, authorId || '');
+            setConversationId(conversation.id);
+            setShowChat(true);
+        } catch (error) {
+            console.error("Failed to start conversation:", error);
+        }
+    };
 
 
     // Render Functions
@@ -466,7 +495,7 @@ export default function AdCard({
 
                 <div className="flex flex-col gap-1.5 w-full px-1">
                     <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/messages?adId=${id}&receiverId=${authorId}`); }}
+                        onClick={handleStartChat}
                         className="flex items-center justify-center gap-2 w-full py-1.5 bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-colors shadow-sm"
                     >
                         <MessageCircle size={10} />
@@ -584,6 +613,11 @@ export default function AdCard({
                     </div>
                 </motion.div>
             </div>
+            {showChat && conversationId && (
+                <div className="fixed bottom-0 right-10 w-80 sm:w-96 z-[1000] animate-in slide-in-from-bottom-5">
+                    <ChatWindow conversationId={conversationId} onClose={() => setShowChat(false)} />
+                </div>
+            )}
         </Link>
     );
 }
