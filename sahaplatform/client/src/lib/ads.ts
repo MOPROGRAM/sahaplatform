@@ -353,5 +353,62 @@ export const adsService = {
             throw new Error(data.error || 'Failed to promote ad');
         }
         return data;
+    },
+
+    // Favorites
+    async toggleFavorite(adId: string): Promise<boolean> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        // Check if already favorite
+        const { data: existing } = await supabase
+            .from('favorites')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('ad_id', adId)
+            .single();
+
+        if (existing) {
+            // Remove
+            const { error } = await supabase
+                .from('favorites')
+                .delete()
+                .eq('user_id', user.id)
+                .eq('ad_id', adId);
+            
+            if (error) throw error;
+            return false; // Not favorite anymore
+        } else {
+            // Add
+            const { error } = await supabase
+                .from('favorites')
+                .insert({ user_id: user.id, ad_id: adId });
+            
+            if (error) throw error;
+            return true; // Is favorite now
+        }
+    },
+
+    async getFavorites(): Promise<Ad[]> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        const { data, error } = await supabase
+            .from('favorites')
+            .select(`
+                ad:ads!favorites_ad_id_fkey (
+                    *,
+                    author:users!ads_author_id_fkey(id, name, email),
+                    city:cities!city_id(id, name, name_ar, name_en),
+                    currency:currencies!currency_id(id, code, symbol, name)
+                )
+            `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        // Extract ads from the join result
+        return (data || []).map((item: any) => item.ad) as Ad[];
     }
 };

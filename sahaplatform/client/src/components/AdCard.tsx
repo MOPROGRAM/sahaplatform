@@ -123,33 +123,48 @@ export default function AdCard({
         setFaceIndex(nextImage);
     };
 
-    const handleFavoriteClick = (e: React.MouseEvent) => {
+    const handleFavoriteClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        const next = !isFavorite;
-        setIsFavorite(next);
-        try {
-            const key = 'saha:favorites';
-            const raw = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
-            const list = raw ? JSON.parse(raw) as any[] : [];
-            if (next) {
-                const fav = {
-                    id,
-                    title: currentTitle,
-                    price,
-                    currency: currencyCode,
-                    location: location || '',
-                    image: images[0] || '',
-                    createdAt
-                };
-                const exists = list.some(a => a.id === id);
-                const updated = exists ? list.map(a => a.id === id ? fav : a) : [...list, fav];
-                window.localStorage.setItem(key, JSON.stringify(updated));
-            } else {
-                const updated = list.filter(a => a.id !== id);
-                window.localStorage.setItem(key, JSON.stringify(updated));
+        
+        if (user) {
+            // Handle DB favorite
+            const next = !isFavorite;
+            setIsFavorite(next); // Optimistic update
+            try {
+                const result = await adsService.toggleFavorite(id);
+                setIsFavorite(result); // Revert if different
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                setIsFavorite(!next); // Revert on error
             }
-        } catch {}
+        } else {
+            // Handle localStorage favorite
+            const next = !isFavorite;
+            setIsFavorite(next);
+            try {
+                const key = 'saha:favorites';
+                const raw = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
+                const list = raw ? JSON.parse(raw) as any[] : [];
+                if (next) {
+                    const fav = {
+                        id,
+                        title: currentTitle,
+                        price,
+                        currency: currencyCode,
+                        location: location || '',
+                        image: images[0] || '',
+                        createdAt
+                    };
+                    const exists = list.some(a => a.id === id);
+                    const updated = exists ? list.map(a => a.id === id ? fav : a) : [...list, fav];
+                    window.localStorage.setItem(key, JSON.stringify(updated));
+                } else {
+                    const updated = list.filter(a => a.id !== id);
+                    window.localStorage.setItem(key, JSON.stringify(updated));
+                }
+            } catch {}
+        }
     };
 
     const getCategoryIcon = (catKey?: string) => {

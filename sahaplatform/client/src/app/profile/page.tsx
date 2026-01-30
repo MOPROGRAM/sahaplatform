@@ -406,59 +406,37 @@ export default function ProfilePage() {
                         </div>
                     )}
 
-                    {/* Favorites Tab (for seekers) */}
+                    {/* Favorites Tab */}
                     {activeTab === 'favorites' && (
-                        <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <Heart size={18} className="text-primary" />
-                                    <h3 className="text-[12px] font-black uppercase tracking-widest text-secondary">
-                                        {language === 'ar' ? 'المفضلة' : 'Favorites'}
-                                    </h3>
-                                </div>
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{favorites.length}</span>
+                        <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+                            <div className="px-4 py-3 bg-card border-b border-border-color flex items-center gap-2">
+                                <Heart size={14} className="text-red-500" />
+                                <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">
+                                    {language === 'ar' ? 'المفضلة' : 'Favorites'}
+                                </h3>
                             </div>
-                            {favorites.length === 0 ? (
-                                <div className="text-center">
-                                    <Heart size={48} className="text-gray-300 mx-auto mb-4" />
-                                    <p className="text-[12px] text-gray-500 mt-2">
-                                        {language === 'ar' ? 'لم تقم بإضافة أي إعلانات للمفضلة بعد' : "You haven't added any favorites yet"}
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {favorites.map((fav) => (
-                                        <div key={fav.id} className="relative">
-                                            <button
-                                                onClick={() => {
-                                                    try {
-                                                        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
-                                                        const list = raw ? JSON.parse(raw) : [];
-                                                        const updated = Array.isArray(list) ? list.filter((a: any) => a.id !== fav.id) : [];
-                                                        if (typeof window !== 'undefined') window.localStorage.setItem('saha:favorites', JSON.stringify(updated));
-                                                        setFavorites(updated);
-                                                    } catch {}
-                                                }}
-                                                className="absolute top-2 left-2 z-10 px-2 py-1 text-[10px] font-black uppercase tracking-widest bg-red-600 text-white rounded-xs shadow hover:bg-red-700 transition-all"
-                                            >
-                                                {language === 'ar' ? 'إزالة' : 'Remove'}
-                                            </button>
-                                            <AdCard
-                                                id={fav.id}
-                                                title={fav.title}
-                                                price={fav.price}
-                                                currency={fav.currency}
-                                                location={fav.location}
-                                                images={fav.image ? [fav.image] : []}
-                                                createdAt={fav.createdAt}
-                                                language={language}
-                                                layout="vertical"
-                                                imageHeight="h-[120px]"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            
+                            <div className="p-4">
+                                {loading ? (
+                                    <div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={24} /></div>
+                                ) : favorites.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {favorites.map((ad: any) => (
+                                            <AdCard key={ad.id} {...ad} language={language} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12">
+                                        <Heart size={48} className="mx-auto text-gray-200 mb-4" />
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                            {language === 'ar' ? 'لا توجد مفضلة' : 'No Favorites'}
+                                        </h3>
+                                        <p className="text-gray-500 text-sm">
+                                            {language === 'ar' ? 'لم تقم بإضافة أي إعلانات للمفضلة بعد' : 'You have not added any ads to favorites yet'}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
 
