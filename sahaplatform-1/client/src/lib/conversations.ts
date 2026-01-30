@@ -172,6 +172,7 @@ export const conversationsService = {
             throw new Error('User not authenticated');
         }
 
+        // الحصول على معرفات المحادثات التي يشارك فيها المستخدم الحالي
         const { data: myParticipations } = await (supabase as any)
             .from('_ConversationParticipants')
             .select('A')
@@ -180,19 +181,49 @@ export const conversationsService = {
         const myConvIds = myParticipations?.map((p: any) => p.A) || [];
 
         if (myConvIds.length > 0) {
-            const { data: existingConv } = await (supabase as any)
+            // أولاً: البحث عن محادثة موجودة لهذا الإعلان تحديداً
+            const { data: existingAdConv } = await (supabase as any)
                 .from('Conversation')
                 .select('id')
                 .eq('adId', adId)
                 .in('id', myConvIds)
                 .single();
 
-            if (existingConv) {
-                const fullConv = await this.getConversation(existingConv.id);
+            if (existingAdConv) {
+                const fullConv = await this.getConversation(existingAdConv.id);
                 if (fullConv) return fullConv.conversation;
+            }
+
+            // ثانياً: البحث عن محادثة موجودة مع نفس المعلن (لأي إعلان)
+            // الحصول على معرفات المحادثات التي يشارك فيها المعلن
+            const { data: advertiserParticipations } = await (supabase as any)
+                .from('_ConversationParticipants')
+                .select('A')
+                .eq('B', participantId);
+
+            const advertiserConvIds = advertiserParticipations?.map((p: any) => p.A) || [];
+
+            // البحث عن تقاطع المحادثات المشتركة بين المستخدم والمعلن
+            const commonConvIds = myConvIds.filter(id => advertiserConvIds.includes(id));
+
+            if (commonConvIds.length > 0) {
+                // استخدام أول محادثة مشتركة موجودة
+                const { data: existingConv } = await (supabase as any)
+                    .from('Conversation')
+                    .select('id, adId')
+                    .in('id', commonConvIds)
+                    .order('updatedAt', { ascending: false }) // الأحدث أولاً
+                    .limit(1)
+                    .single();
+
+                if (existingConv) {
+                    const fullConv = await this.getConversation(existingConv.id);
+                    if (fullConv) return fullConv.conversation;
+                }
             }
         }
 
+        // إذا لم توجد محادثة موجودة، إنشاء محادثة جديدة
         const { data: newConversation, error: createError } = await (supabase as any)
             .from('Conversation')
             .insert({ adId: adId })
