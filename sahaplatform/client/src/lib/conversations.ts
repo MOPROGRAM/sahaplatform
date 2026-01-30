@@ -177,6 +177,25 @@ export const conversationsService = {
             throw new Error('User not authenticated');
         }
 
+        // محاولة استخدام RPC لإنشاء المحادثة بشكل ذري (Atomic)
+        try {
+            const { data: convId, error: rpcError } = await (supabase as any)
+                .rpc('create_new_conversation', {
+                    p_ad_id: adId,
+                    p_other_user_id: participantId
+                });
+
+            if (!rpcError && convId) {
+                const fullConv = await this.getConversation(convId);
+                if (fullConv) return fullConv.conversation;
+            } else {
+                 console.warn('RPC create_new_conversation failed or not found, falling back to manual logic:', rpcError);
+            }
+        } catch (e) {
+            console.warn('Error calling create_new_conversation RPC:', e);
+        }
+
+        // Fallback: المنطق اليدوي (للتوافق في حال لم يتم تشغيل SQL RPC)
         const { data: myParticipations } = await (supabase as any)
             .from('conversation_participants')
             .select('conversation_id')
@@ -206,12 +225,20 @@ export const conversationsService = {
 
         if (createError) throw new Error('Failed to create conversation');
 
-        await (supabase as any)
+        // إضافة المشاركين فوراً
+        const { error: participantsError } = await (supabase as any)
             .from('conversation_participants')
             .insert([
                 { conversation_id: newConversation.id, user_id: user.id },
                 { conversation_id: newConversation.id, user_id: participantId }
             ]);
+            
+        if (participantsError) {
+             console.error('Failed to add participants, rolling back conversation:', participantsError);
+             // محاولة حذف المحادثة الفارغة لتجنب المشاكل
+             await (supabase as any).from('conversations').delete().eq('id', newConversation.id);
+             throw new Error('Failed to add participants to conversation');
+        }
 
         const finalConv = await this.getConversation(newConversation.id);
         if (!finalConv) throw new Error('Failed to retrieve conversation');
