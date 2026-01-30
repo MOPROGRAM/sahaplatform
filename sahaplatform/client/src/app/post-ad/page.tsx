@@ -64,7 +64,17 @@ export default function PostAdPage() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type, checked } = e.target as any;
-        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+        
+        setFormData(prev => {
+            const newData = { ...prev, [name]: type === 'checkbox' ? checked : value };
+            
+            // Reset subCategory when category changes
+            if (name === 'category') {
+                newData.subCategory = "";
+            }
+            
+            return newData;
+        });
     };
 
     const handleLocationSelect = (lat: number, lng: number, address?: string) => {
