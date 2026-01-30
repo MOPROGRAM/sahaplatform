@@ -182,15 +182,16 @@ export const conversationsService = {
 
         if (myConvIds.length > 0) {
             // البحث عن محادثة موجودة لهذا الإعلان تحديداً فقط
-            const { data: existingAdConv } = await (supabase as any)
+            const { data: existingAdConv, error: convError } = await (supabase as any)
                 .from('Conversation')
                 .select('id')
                 .eq('adId', adId)
-                .in('id', myConvIds)
-                .single();
+                .in('id', myConvIds);
 
-            if (existingAdConv) {
-                const fullConv = await this.getConversation(existingAdConv.id);
+            // التحقق مما إذا وُجدت محادثة (بدون استخدام single() لتجنب الأخطاء)
+            if (existingAdConv && existingAdConv.length > 0) {
+                const conversationId = existingAdConv[0].id;
+                const fullConv = await this.getConversation(conversationId);
                 if (fullConv) return fullConv.conversation;
             }
         }
