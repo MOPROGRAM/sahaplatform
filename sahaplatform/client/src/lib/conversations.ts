@@ -179,6 +179,7 @@ export const conversationsService = {
 
         // محاولة استخدام RPC لإنشاء المحادثة بشكل ذري (Atomic)
         try {
+            console.log(`Attempting to create conversation via RPC for ad ${adId} with user ${participantId}`);
             const { data: convId, error: rpcError } = await (supabase as any)
                 .rpc('create_new_conversation', {
                     p_ad_id: adId,
@@ -186,6 +187,7 @@ export const conversationsService = {
                 });
 
             if (!rpcError && convId) {
+                console.log(`Conversation created/found via RPC: ${convId}`);
                 const fullConv = await this.getConversation(convId);
                 if (fullConv) return fullConv.conversation;
             } else {
@@ -265,15 +267,35 @@ export const conversationsService = {
 
         if (!user) throw new Error('User not authenticated');
 
-        const { data: participants } = await (supabase as any)
+        console.log(`Sending message to conversation ${conversationId} from ${user.id}`);
+
+        const { data: participants, error: participantsError } = await (supabase as any)
             .from('conversation_participants')
             .select('user_id')
             .eq('conversation_id', conversationId)
             .neq('user_id', user.id);
 
-        if (!participants?.length) throw new Error('Invalid conversation');
+        if (participantsError) {
+            console.error('Error fetching participants:', participantsError);
+            throw new Error('Failed to fetch conversation participants');
+        }
+
+        if (!participants || participants.length === 0) {
+            console.error(`No other participants found in conversation ${conversationId}`);
+            
+            // محاولة التحقق مما إذا كان هناك أي مشاركين على الإطلاق (للتشخيص)
+            const { count } = await (supabase as any)
+                .from('conversation_participants')
+                .select('*', { count: 'exact', head: true })
+                .eq('conversation_id', conversationId);
+                
+            console.log(`Total participants in conversation: ${count}`);
+            
+            throw new Error('Invalid conversation: No other participants found');
+        }
 
         const receiverId = participants[0].user_id;
+        console.log(`Resolved receiverId: ${receiverId}`);
 
         const { data: message, error: messageError } = await (supabase as any)
             .from('messages')
@@ -290,7 +312,10 @@ export const conversationsService = {
             `)
             .single();
 
-        if (messageError) throw new Error('Failed to send message');
+        if (messageError) {
+            console.error('Error inserting message:', messageError);
+            throw new Error(`Failed to send message: ${messageError.message}`);
+        }
 
         await (supabase as any)
             .from('conversations')
