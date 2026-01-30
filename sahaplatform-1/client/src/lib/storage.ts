@@ -156,12 +156,13 @@ export const storageService = {
     validateGeneralFile(file: File): boolean {
         const allowedTypes = [
             'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
+            'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska',
             'application/pdf',
             'text/plain',
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ];
-        const maxSizeMB = 10; // 10MB للملفات
+        const maxSizeMB = 50; // 50MB للملفات العامة
 
         return this.validateFileType(file, allowedTypes) && this.validateFileSize(file, maxSizeMB);
     }

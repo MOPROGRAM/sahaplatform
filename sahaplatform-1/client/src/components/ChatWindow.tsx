@@ -13,7 +13,7 @@ interface Message {
     id: string;
     senderId: string;
     content: string;
-    messageType: 'text' | 'image' | 'file' | 'voice' | 'location';
+    messageType: 'text' | 'image' | 'file' | 'video' | 'voice' | 'location';
     fileUrl?: string;
     fileName?: string;
     createdAt: string;
@@ -122,7 +122,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' = 'text', content?: string, fileData?: any) => {
+    const handleSend = async (type: 'text' | 'image' | 'file' | 'video' | 'voice' | 'location' = 'text', content?: string, fileData?: any) => {
         const messageContent = content || input;
         if (!messageContent.trim() && type === 'text') return;
 
@@ -293,6 +293,24 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 </div>
                             )}
 
+                            {msg.messageType === 'video' && (
+                                <div className="space-y-2">
+                                    <div className="text-[10px] font-black text-text-muted mb-1">
+                                        {language === 'ar' ? 'فيديو مشارك' : 'shared video'}
+                                    </div>
+                                    <video 
+                                        controls
+                                        className="rounded-xs max-w-full max-h-[200px] border border-gray-200"
+                                        onError={(e) => {
+                                            console.error('Video loading error:', e);
+                                        }}
+                                    >
+                                        <source src={msg.fileUrl} type="video/mp4" />
+                                        {language === 'ar' ? 'متصفحك لا يدعم تشغيل الفيديو' : 'Your browser does not support video playback'}
+                                    </video>
+                                </div>
+                            )}
+
                             <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-text-muted'}`}>
                                 {(() => {
                                     const date = new Date(msg.createdAt);
@@ -318,6 +336,18 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             const uploadData = await handleFileUpload(file, 'image');
                             if (uploadData) {
                                 handleSend('image', `Shared image: ${file.name}`, uploadData);
+                            }
+                        }
+                    }} />
+                </label>
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                    <FileText size={12} /> {language === 'ar' ? 'إرسال فيديو' : 'send video'}
+                    <input type="file" accept="video/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            const uploadData = await handleFileUpload(file, 'file');
+                            if (uploadData) {
+                                handleSend('video', `Shared video: ${file.name}`, uploadData);
                             }
                         }
                     }} />
