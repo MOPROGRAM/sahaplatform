@@ -251,15 +251,53 @@ export const conversationsService = {
 
         if (!user) throw new Error('User not authenticated');
 
-        const { data: participants } = await (supabase as any)
+        // البحث عن المشاركين في المحادثة بطرق مختلفة
+        let participants: any[] = [];
+        
+        // الطريقة الأولى: البحث المباشر
+        const { data: directParticipants } = await (supabase as any)
             .from('_ConversationParticipants')
             .select('B')
             .eq('A', conversationId)
             .neq('B', user.id);
 
-        if (!participants?.length) throw new Error('Invalid conversation');
+        if (directParticipants?.length) {
+            participants = directParticipants;
+        } else {
+            // الطريقة الثانية: البحث العكسي
+            const { data: reverseParticipants } = await (supabase as any)
+                .from('_ConversationParticipants')
+                .select('A')
+                .eq('B', conversationId)
+                .neq('A', user.id);
 
-        const receiverId = participants[0].B;
+            if (reverseParticipants?.length) {
+                participants = reverseParticipants;
+            } else {
+                // الطريقة الثالثة: الحصول على جميع المشاركين والتصفية
+                const { data: allParticipants } = await (supabase as any)
+                    .from('_ConversationParticipants')
+                    .select('*');
+                
+                // البحث عن المحادثة في جميع السجلات
+                const conversationRecords = allParticipants?.filter(
+                    (record: any) => record.A === conversationId || record.B === conversationId
+                ) || [];
+                
+                // استخراج المشاركين الآخرين
+                participants = conversationRecords
+                    .map((record: any) => record.A === conversationId ? record.B : record.A)
+                    .filter((id: string) => id !== user.id && id !== conversationId);
+            }
+        }
+
+        if (!participants?.length) {
+            console.error('No participants found for conversation:', conversationId);
+            console.error('User ID:', user.id);
+            throw new Error('Invalid conversation - no participants found');
+        }
+
+        const receiverId = participants[0];
 
         const { data: message, error: messageError } = await (supabase as any)
             .from('Message')
@@ -276,7 +314,10 @@ export const conversationsService = {
             `)
             .single();
 
-        if (messageError) throw new Error('Failed to send message');
+        if (messageError) {
+            console.error('Message send error:', messageError);
+            throw new Error('Failed to send message');
+        }
 
         await (supabase as any)
             .from('Conversation')
