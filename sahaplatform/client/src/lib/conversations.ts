@@ -280,21 +280,74 @@ export const conversationsService = {
             throw new Error('Failed to fetch conversation participants');
         }
 
-        if (!participants || participants.length === 0) {
-            console.error(`No other participants found in conversation ${conversationId}`);
+        let receiverId: string | null = null;
+
+        if (participants && participants.length > 0) {
+            receiverId = participants[0].user_id;
+        } else {
+            console.warn(`No other participants found in conversation ${conversationId}. Attempting to resolve receiver...`);
             
-            // محاولة التحقق مما إذا كان هناك أي مشاركين على الإطلاق (للتشخيص)
+            // محاولة إصلاح المحادثة باستنتاج المستقبل
+            try {
+                // 1. جلب تفاصيل المحادثة لمعرفة الإعلان
+                const { data: conversation } = await (supabase as any)
+                    .from('conversations')
+                    .select('ad_id')
+                    .eq('id', conversationId)
+                    .single();
+
+                if (conversation && conversation.ad_id) {
+                    // 2. جلب تفاصيل الإعلان لمعرفة صاحب الإعلان
+                    const { data: ad } = await (supabase as any)
+                        .from('ads')
+                        .select('author_id')
+                        .eq('id', conversation.ad_id)
+                        .single();
+
+                    if (ad) {
+                        if (user.id !== ad.author_id) {
+                            // إذا لم أكن صاحب الإعلان، فالمستقبل هو صاحب الإعلان
+                            receiverId = ad.author_id;
+                        } else {
+                            // إذا كنت صاحب الإعلان، نبحث عن رسالة سابقة لمعرفة الطرف الآخر
+                            const { data: lastMsg } = await (supabase as any)
+                                .from('messages')
+                                .select('sender_id')
+                                .eq('conversation_id', conversationId)
+                                .neq('sender_id', user.id)
+                                .order('created_at', { ascending: false })
+                                .limit(1)
+                                .single();
+                            
+                            if (lastMsg) {
+                                receiverId = lastMsg.sender_id;
+                            }
+                        }
+                    }
+                }
+
+                if (receiverId) {
+                    console.log(`Resolved missing receiverId: ${receiverId}. Repairing conversation...`);
+                    // إضافة المشارك المفقود إلى المحادثة
+                    await (supabase as any)
+                        .from('conversation_participants')
+                        .insert({ conversation_id: conversationId, user_id: receiverId });
+                }
+            } catch (err) {
+                console.error('Error resolving receiver:', err);
+            }
+        }
+
+        if (!receiverId) {
+            console.error(`No other participants found in conversation ${conversationId}`);
             const { count } = await (supabase as any)
                 .from('conversation_participants')
                 .select('*', { count: 'exact', head: true })
                 .eq('conversation_id', conversationId);
-                
             console.log(`Total participants in conversation: ${count}`);
-            
             throw new Error('Invalid conversation: No other participants found');
         }
 
-        const receiverId = participants[0].user_id;
         console.log(`Resolved receiverId: ${receiverId}`);
 
         const { data: message, error: messageError } = await (supabase as any)

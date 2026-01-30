@@ -49,6 +49,7 @@ interface Ad {
     is_boosted?: boolean;
     author_id: string;
     author?: {
+        id?: string;
         name?: string;
     };
     city?: {
@@ -216,6 +217,8 @@ export default function HomePage() {
                                         category={ad.category}
                                         language={language}
                                         isFeatured={ad.is_boosted || false}
+                                        authorName={ad.author?.name}
+                                        authorId={ad.author_id || ad.author?.id}
                                     />
                                 </div>
                             ))}

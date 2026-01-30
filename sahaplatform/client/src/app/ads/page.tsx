@@ -39,7 +39,8 @@ interface Ad {
     images: string;
     created_at: string;
     views?: number;
-    author?: { name?: string };
+    author_id?: string;
+    author?: { id?: string; name?: string };
     is_boosted?: boolean;
     currency?: string | { code: string; symbol: string; };
 }
@@ -275,6 +276,7 @@ function AdsContent() {
                                 language={language}
                                 isFeatured={ad.is_boosted || false}
                                 authorName={ad.author?.name}
+                                authorId={ad.author_id || ad.author?.id}
                                 description={ad.description}
                                 descriptionAr={ad.descriptionAr}
                                 descriptionEn={ad.descriptionEn}

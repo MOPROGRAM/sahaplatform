@@ -9,6 +9,8 @@ import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as Br
 import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useAuthStore } from "@/store/useAuthStore";
+import { conversationsService } from "@/lib/conversations";
 
 interface AdCardProps {
     id: string;
@@ -19,6 +21,7 @@ interface AdCardProps {
     images?: string[];
     createdAt: string;
     authorName?: string;
+    authorId?: string;
     category?: string;
     subCategory?: string;
     titleAr?: string;
@@ -61,10 +64,12 @@ export default function AdCard({
     isHighlighted = false,
     layout = 'vertical',
     imageHeight,
-    authorName // Added to destructuring
+    authorName, // Added to destructuring
+    authorId // Added to destructuring
 }: AdCardProps) {
     const { t } = useLanguage();
     const router = useRouter();
+    const { user } = useAuthStore();
     const [isFavorite, setIsFavorite] = useState(false);
     const [peel, setPeel] = useState<{x: number; y: number}>({ x: 0, y: 0 });
     const [faceIndex, setFaceIndex] = useState(0);
@@ -84,7 +89,7 @@ export default function AdCard({
     }, [id]);
 
     // Faces configuration
-    const faces = isFeatured ? ['image', 'details', 'contact'] : ['image', 'details'];
+    const faces = ['image', 'details', 'contact'];
     
     // Helpers to determine content for physical sides
     const getFrontContent = () => {
@@ -385,7 +390,7 @@ export default function AdCard({
                         className={`px-2 py-1 text-[10px] font-black rounded transition-colors ${isFeatured ? "bg-[#ffd700]/20 text-black hover:bg-[#ffd700]/30" : "bg-gray-100 dark:bg-white/10 text-text-main hover:bg-primary/10"}`}
                         onClick={handleNextFace}
                     >
-                        {isFeatured ? t("contact") : t("back")}
+                        {t("contact")}
                     </button>
                     <span className="text-[9px] text-text-muted">
                         اسحب للإغلاق
@@ -394,6 +399,34 @@ export default function AdCard({
             </div>
         </div>
     );
+
+    const handleStartChat = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
+        if (user.id === authorId) {
+            alert(language === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
+            return;
+        }
+
+        if (!authorId) {
+             console.error("No author ID found");
+             return;
+        }
+
+        try {
+            const conversation = await conversationsService.createOrGetConversation(id, authorId);
+            router.push(`/profile?tab=messages&conversationId=${conversation.id}`);
+        } catch (error) {
+            console.error("Failed to start conversation:", error);
+            alert(language === 'ar' ? 'حدث خطأ أثناء بدء المحادثة' : 'Failed to start conversation');
+        }
+    };
 
     const renderContactFace = () => (
          <div
@@ -423,9 +456,12 @@ export default function AdCard({
                         <Phone size={12} />
                         {t("call")}
                     </button>
-                    <button className="flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors">
+                    <button 
+                        onClick={handleStartChat}
+                        className="flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors"
+                    >
                         <MessageCircle size={12} />
-                        {t("whatsapp")}
+                        {language === 'ar' ? 'محادثة فورية' : 'Chat'}
                     </button>
                  </div>
 
