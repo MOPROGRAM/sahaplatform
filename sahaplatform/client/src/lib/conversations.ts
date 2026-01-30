@@ -297,6 +297,7 @@ export const conversationsService = {
                     .single();
 
                 if (conversation && conversation.ad_id) {
+                    console.log(`Found conversation ad_id: ${conversation.ad_id}`);
                     // 2. جلب تفاصيل الإعلان لمعرفة صاحب الإعلان
                     const { data: ad } = await (supabase as any)
                         .from('ads')
@@ -305,6 +306,7 @@ export const conversationsService = {
                         .single();
 
                     if (ad) {
+                        console.log(`Found ad author_id: ${ad.author_id}`);
                         if (user.id !== ad.author_id) {
                             // إذا لم أكن صاحب الإعلان، فالمستقبل هو صاحب الإعلان
                             receiverId = ad.author_id;
@@ -323,15 +325,40 @@ export const conversationsService = {
                                 receiverId = lastMsg.sender_id;
                             }
                         }
+                    } else {
+                        console.warn(`Ad not found for id: ${conversation.ad_id}`);
                     }
+                } else {
+                    console.warn(`Conversation or ad_id not found for conversation: ${conversationId}`);
+                }
+
+                // محاولة أخيرة: البحث عن أي رسالة من طرف آخر
+                if (!receiverId) {
+                     const { data: anyMsg } = await (supabase as any)
+                        .from('messages')
+                        .select('sender_id')
+                        .eq('conversation_id', conversationId)
+                        .neq('sender_id', user.id)
+                        .limit(1)
+                        .maybeSingle();
+                     
+                     if (anyMsg) {
+                         console.log(`Found receiver from existing messages: ${anyMsg.sender_id}`);
+                         receiverId = anyMsg.sender_id;
+                     }
                 }
 
                 if (receiverId) {
                     console.log(`Resolved missing receiverId: ${receiverId}. Repairing conversation...`);
                     // إضافة المشارك المفقود إلى المحادثة
-                    await (supabase as any)
+                    const { error: insertError } = await (supabase as any)
                         .from('conversation_participants')
                         .insert({ conversation_id: conversationId, user_id: receiverId });
+                    
+                    if (insertError) {
+                        console.error('Error inserting participant during repair:', insertError);
+                        // Even if insert fails (e.g. RLS), we proceed if we have receiverId
+                    }
                 }
             } catch (err) {
                 console.error('Error resolving receiver:', err);
@@ -345,7 +372,7 @@ export const conversationsService = {
                 .select('*', { count: 'exact', head: true })
                 .eq('conversation_id', conversationId);
             console.log(`Total participants in conversation: ${count}`);
-            throw new Error('Invalid conversation: No other participants found');
+            throw new Error('Invalid conversation: No other participants found. Please try creating a new conversation.');
         }
 
         console.log(`Resolved receiverId: ${receiverId}`);
