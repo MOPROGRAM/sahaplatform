@@ -264,6 +264,13 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             <span className="text-[9px] font-black text-secondary truncate max-w-[100px] uppercase italic">{adInfo.title}</span>
                         </div>
                     )}
+                    <button 
+                        onClick={() => setIsRatingOpen(true)} 
+                        className="p-1.5 hover:bg-yellow-50 text-text-muted hover:text-yellow-500 transition-all rounded-xs"
+                        title={language === 'ar' ? 'تقييم المعلن' : 'Rate User'}
+                    >
+                        <Star size={16} />
+                    </button>
                     <button onClick={onClose} className="p-1.5 hover:bg-red-50 text-text-muted hover:text-red-500 transition-all rounded-xs"><X size={16} /></button>
                 </div>
             </div>
