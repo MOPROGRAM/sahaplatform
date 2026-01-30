@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
 import ChatWindow from "@/components/ChatWindow";
 import { conversationsService } from "@/lib/conversations";
 import { useAuthStore } from "@/store/useAuthStore";
+import ClientPortal from "@/components/ClientPortal";
 
 interface AdCardProps {
     id: string;
@@ -614,9 +615,17 @@ export default function AdCard({
                 </motion.div>
             </div>
             {showChat && conversationId && (
-                <div className="fixed bottom-0 right-10 w-80 sm:w-96 z-[1000] animate-in slide-in-from-bottom-5">
-                    <ChatWindow conversationId={conversationId} onClose={() => setShowChat(false)} />
-                </div>
+                <ClientPortal>
+                    <div
+                        className="fixed bottom-0 right-4 w-80 sm:w-96 z-[9999] animate-in slide-in-from-bottom-5 shadow-2xl rounded-t-xl overflow-hidden"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                    >
+                        <ChatWindow conversationId={conversationId} onClose={() => setShowChat(false)} />
+                    </div>
+                </ClientPortal>
             )}
         </Link>
     );

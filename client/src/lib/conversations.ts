@@ -53,7 +53,7 @@ export const conversationsService = {
 
             // استخدام أسماء الأعمدة الفعلية من قاعدة البيانات
             const { data: participantData, error: participantError } = await (supabase as any)
-                .from('conversation_participants') 
+                .from('conversation_participants')
                 .select('conversation_id')
                 .eq('user_id', user.id);
 
@@ -185,14 +185,18 @@ export const conversationsService = {
         const myConvIds = myParticipations?.map((p: any) => p.conversation_id) || [];
 
         if (myConvIds.length > 0) {
-            const { data: existingConv } = await (supabase as any)
+            // Fix: Check if adId exists to avoid bad requests
+            if (!adId) throw new Error('Ad ID is required');
+
+            // Find conversation for this ad that I am a participant in
+            const { data: existingConv, error: findError } = await (supabase as any)
                 .from('conversations')
                 .select('id')
                 .eq('ad_id', adId)
                 .in('id', myConvIds)
-                .single();
+                .maybeSingle(); // Use maybeSingle to avoid 406 on no rows
 
-            if (existingConv) {
+            if (!findError && existingConv) {
                 const fullConv = await this.getConversation(existingConv.id);
                 if (fullConv) return fullConv.conversation;
             }
@@ -280,11 +284,11 @@ export const conversationsService = {
     subscribeToConversation(conversationId: string, callback: (payload: any) => void): RealtimeChannel {
         return supabase
             .channel(`conversation-${conversationId}`)
-            .on('postgres_changes', { 
-                event: '*', 
-                schema: 'public', 
-                table: 'messages', 
-                filter: `conversation_id=eq.${conversationId}` 
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'messages',
+                filter: `conversation_id=eq.${conversationId}`
             }, callback)
             .subscribe();
     },

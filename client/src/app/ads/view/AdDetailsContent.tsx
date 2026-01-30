@@ -6,7 +6,16 @@ import {
     X,
     Flag,
     AlertTriangle,
-    CheckCircle2
+    CheckCircle2,
+    ChevronLeft,
+    Calendar,
+    Eye,
+    MapPin,
+    Share2,
+    Phone,
+    MessageCircle,
+    ShieldCheck,
+    Loader2
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import ChatWindow from "@/components/ChatWindow";
@@ -397,7 +406,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                     {showReportModal && (
                         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                            <div className="bg-white dark:bg-[#1a1a1a] w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-border-color animate-in zoom-in-95 duration-300">
+                            <div className="bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-xl w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-white/10 animate-in zoom-in-95 duration-300">
                                 <div className="p-6">
                                     <div className="flex justify-between items-center mb-6">
                                         <h3 className="text-xl font-black text-text-main flex items-center gap-2">
