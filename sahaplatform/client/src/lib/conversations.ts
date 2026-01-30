@@ -204,16 +204,29 @@ export const conversationsService = {
         const myConvIds = myParticipations?.map((p: any) => p.conversation_id) || [];
 
         if (myConvIds.length > 0) {
-            const { data: existingConv } = await (supabase as any)
+            // البحث عن محادثات لنفس الإعلان أنا مشارك فيها
+            const { data: candidates } = await (supabase as any)
                 .from('conversations')
                 .select('id')
                 .eq('ad_id', adId)
-                .in('id', myConvIds)
-                .single();
+                .in('id', myConvIds);
 
-            if (existingConv) {
-                const fullConv = await this.getConversation(existingConv.id);
-                if (fullConv) return fullConv.conversation;
+            if (candidates && candidates.length > 0) {
+                const candidateIds = candidates.map((c: any) => c.id);
+                
+                // التحقق من أن الطرف الآخر مشارك أيضاً في إحدى هذه المحادثات
+                const { data: common } = await (supabase as any)
+                    .from('conversation_participants')
+                    .select('conversation_id')
+                    .eq('user_id', participantId)
+                    .in('conversation_id', candidateIds)
+                    .limit(1)
+                    .maybeSingle();
+
+                if (common) {
+                    const fullConv = await this.getConversation(common.conversation_id);
+                    if (fullConv) return fullConv.conversation;
+                }
             }
         }
 

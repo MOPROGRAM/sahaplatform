@@ -121,14 +121,22 @@ export default function AdDetailsContent({ id }: { id: string }) {
             router.push('/login');
             return;
         }
-        if (user.id === ad?.author_id) {
+        
+        const authorId = ad?.user_id || ad?.author?.id;
+        
+        if (user.id === authorId) {
             alert(language === 'ar' ? 'هذا إعلانك الخاص!' : 'This is your own ad!');
             return;
         }
 
+        if (!authorId) {
+             console.error("No author ID found");
+             return;
+        }
+
         try {
             // Check or create conversation for this ad
-            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', ad?.author_id || '');
+            const conversation = await conversationsService.createOrGetConversation(ad?.id || '', authorId);
             setConversationId(conversation.id);
             setShowChat(true);
         } catch (error) {
