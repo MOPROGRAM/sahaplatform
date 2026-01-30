@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Mic, Phone } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -13,9 +13,10 @@ interface Message {
     id: string;
     senderId: string;
     content: string;
-    messageType: 'text' | 'image' | 'file' | 'video' | 'voice' | 'location';
+    messageType: 'text' | 'image' | 'file' | 'video' | 'audio' | 'voice' | 'call' | 'location';
     fileUrl?: string;
     fileName?: string;
+    duration?: number; // for audio messages
     createdAt: string;
     sender: {
         name: string;
@@ -37,6 +38,11 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [sending, setSending] = useState(false);
     const [participants, setParticipants] = useState<any[]>([]);
     const [adInfo, setAdInfo] = useState<any>(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+    const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+    const [recordingTime, setRecordingTime] = useState(0);
+    const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     // const socketRef = useRef<any>(null);
 
@@ -122,7 +128,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const handleSend = async (type: 'text' | 'image' | 'file' | 'video' | 'voice' | 'location' = 'text', content?: string, fileData?: any) => {
+    const handleSend = async (type: 'text' | 'image' | 'file' | 'video' | 'audio' | 'voice' | 'call' | 'location' = 'text', content?: string, fileData?: any) => {
         const messageContent = content || input;
         if (!messageContent.trim() && type === 'text') return;
 
@@ -192,6 +198,76 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             return null;
         }
     };
+
+    // وظائف التسجيل الصوتي
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const recorder = new MediaRecorder(stream);
+            const chunks: Blob[] = [];
+            
+            recorder.ondataavailable = (e) => {
+                chunks.push(e.data);
+            };
+            
+            recorder.onstop = async () => {
+                const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+                const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: 'audio/webm' });
+                
+                // رفع الملف الصوتي
+                const uploadData = await handleFileUpload(audioFile, 'file');
+                if (uploadData) {
+                    const duration = Math.floor(recordingTime);
+                    handleSend('audio', `Voice message (${duration}s)`, { 
+                        ...uploadData, 
+                        duration 
+                    });
+                }
+                
+                // إيقاف جميع المسارات الصوتية
+                stream.getTracks().forEach(track => track.stop());
+            };
+            
+            setMediaRecorder(recorder);
+            setAudioChunks(chunks);
+            setIsRecording(true);
+            setRecordingTime(0);
+            
+            // بدء المؤقت
+            recordingTimerRef.current = setInterval(() => {
+                setRecordingTime(prev => prev + 1);
+            }, 1000);
+            
+            recorder.start();
+        } catch (error) {
+            console.error('Error starting recording:', error);
+            alert(language === 'ar' ? 'فشل في بدء التسجيل الصوتي' : 'Failed to start audio recording');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            setIsRecording(false);
+            
+            if (recordingTimerRef.current) {
+                clearInterval(recordingTimerRef.current);
+                recordingTimerRef.current = null;
+            }
+        }
+    };
+
+    // تنظيف عند إلغاء التركيب
+    useEffect(() => {
+        return () => {
+            if (recordingTimerRef.current) {
+                clearInterval(recordingTimerRef.current);
+            }
+            if (mediaRecorder) {
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, [mediaRecorder]);
 
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
 
@@ -311,6 +387,31 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 </div>
                             )}
 
+                            {msg.messageType === 'audio' && (
+                                <div className="space-y-2 max-w-[250px]">
+                                    <div className="text-[10px] font-black text-text-muted mb-1">
+                                        {language === 'ar' ? 'رسالة صوتية' : 'voice message'}
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-card p-2 rounded-xs border border-gray-200">
+                                        <audio 
+                                            controls 
+                                            className="flex-1 h-8"
+                                            onError={(e) => {
+                                                console.error('Audio loading error:', e);
+                                            }}
+                                        >
+                                            <source src={msg.fileUrl} type="audio/webm" />
+                                            {language === 'ar' ? 'متصفحك لا يدعم تشغيل الصوت' : 'Your browser does not support audio playback'}
+                                        </audio>
+                                        {msg.duration && (
+                                            <span className="text-[9px] font-black text-text-muted whitespace-nowrap">
+                                                {msg.duration}s
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                             <span className={`text-[8px] font-black mt-1.5 block uppercase tracking-tighter ${msg.senderId === user?.id ? 'text-white/60' : 'text-text-muted'}`}>
                                 {(() => {
                                     const date = new Date(msg.createdAt);
@@ -364,6 +465,16 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         }
                     }} />
                 </label>
+                <button 
+                    className={`flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border-color rounded-sm text-[9px] font-black transition-all whitespace-nowrap shadow-sm active:scale-95 ${isRecording ? 'bg-red-500 text-white border-red-500 hover:bg-red-600' : 'text-gray-500 hover:text-primary hover:border-primary'}`}
+                    onClick={isRecording ? stopRecording : startRecording}
+                >
+                    <Mic size={12} /> 
+                    {isRecording ? 
+                        `${language === 'ar' ? 'إيقاف' : 'stop'} (${recordingTime}s)` : 
+                        (language === 'ar' ? 'تسجيل صوتي' : 'voice record')
+                    }
+                </button>
             </div>
 
             {/* Input Main */}

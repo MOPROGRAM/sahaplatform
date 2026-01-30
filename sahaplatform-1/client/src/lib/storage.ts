@@ -157,6 +157,7 @@ export const storageService = {
         const allowedTypes = [
             'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
             'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska',
+            'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm',
             'application/pdf',
             'text/plain',
             'application/msword',
