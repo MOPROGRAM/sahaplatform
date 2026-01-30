@@ -151,7 +151,7 @@ export default function MyAdsPage() {
                                     language={language}
                                     authorName={user?.name}
                                     authorId={user?.id}
-                                    phoneNumber={ad.phone || user?.phone}
+                                    phoneNumber={ad.phone}
                                 />
                                 <div className="mt-2 flex justify-end gap-2 px-2">
                                     <button

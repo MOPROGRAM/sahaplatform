@@ -426,7 +426,7 @@ export default function ProfilePage() {
                                                 key={ad.id} 
                                                 {...ad} 
                                                 language={language}
-                                                phoneNumber={ad.phone || ad.author?.phone}
+                                                phoneNumber={ad.phone}
                                             />
                                         ))}
                                     </div>

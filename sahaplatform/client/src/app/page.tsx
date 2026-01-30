@@ -221,7 +221,7 @@ export default function HomePage() {
                                         isFeatured={ad.is_boosted || false}
                                         authorName={ad.author?.name}
                                         authorId={ad.author_id || ad.author?.id}
-                                        phoneNumber={ad.phone || ad.author?.phone}
+                                        phoneNumber={ad.phone}
                                     />
                                 </div>
                             ))}
