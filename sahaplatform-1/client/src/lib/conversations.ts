@@ -50,11 +50,11 @@ export const conversationsService = {
             throw new Error('User not authenticated');
         }
 
-        // استخدام أسماء الأعمدة الفعلية من قاعدة البيانات (Prisma uses A/B for implicit M-N)
+        // استخدام الجدول الصحيح conversation_participants
         const { data: participantData, error: participantError } = await (supabase as any)
-            .from('_ConversationParticipants') 
-            .select('A')
-            .eq('B', user.id);
+            .from('conversation_participants') 
+            .select('conversation_id')
+            .eq('user_id', user.id);
 
         if (participantError) {
             console.error('Error fetching conversation participants:', participantError);
@@ -65,16 +65,16 @@ export const conversationsService = {
             return [];
         }
 
-        const conversationIds = participantData.map((p: any) => p.A);
+        const conversationIds = participantData.map((p: any) => p.conversation_id);
 
         // الحصول على المحادثات مع المشاركين
         const { data: conversations, error: conversationsError } = await (supabase as any)
-            .from('Conversation')
+            .from('conversations')
             .select(`
                 *,
-                ad:Ad(id, title, images),
-                participants:_ConversationParticipants(
-                    user:User(id, name, email)
+                ad:ads(id, title, images),
+                participants:conversation_participants(
+                    user:users(id, name, email)
                 )
             `)
             .in('id', conversationIds)
@@ -87,7 +87,7 @@ export const conversationsService = {
 
         return (conversations || []).map(conv => ({
             ...conv,
-            last_message: conv.lastMessage, // Map camelCase to expected interface
+            last_message: conv.lastMessage,
             last_message_time: conv.lastMessageTime,
             created_at: conv.createdAt,
             updated_at: conv.updatedAt,
@@ -105,10 +105,10 @@ export const conversationsService = {
 
         // الحصول على المحادثة مع الإعلان والمشاركين
         const { data: conversation, error: conversationError } = await (supabase as any)
-            .from('Conversation') // Changed from 'conversations' to 'Conversation'
+            .from('conversations')
             .select(`
                 *,
-                ad:Ad(id, title, images)
+                ad:ads(id, title, images)
             `)
             .eq('id', id)
             .single();
@@ -120,17 +120,17 @@ export const conversationsService = {
 
         // الحصول على المشاركين يدوياً لضمان الدقة
         const { data: participantIds, error: pError } = await (supabase as any)
-            .from('_ConversationParticipants')
-            .select('B')
-            .eq('A', id);
+            .from('conversation_participants')
+            .select('user_id')
+            .eq('conversation_id', id);
 
         // جلب معلومات المستخدمين
-        const userIds = participantIds?.map((p: any) => p.B) || [];
+        const userIds = participantIds?.map((p: any) => p.user_id) || [];
         let transformedParticipants: any[] = [];
         
         if (userIds.length > 0) {
             const { data: usersData, error: usersError } = await (supabase as any)
-                .from('User')
+                .from('users')
                 .select('id, name, email')
                 .in('id', userIds);
                 
@@ -139,10 +139,10 @@ export const conversationsService = {
 
         // الحصول على الرسائل
         const { data: messages, error: messagesError } = await (supabase as any)
-            .from('Message')
+            .from('messages')
             .select(`
                 *,
-                sender:User!messages_sender_id_fkey(id, name, email)
+                sender:users!messages_sender_id_fkey(id, name, email)
             `)
             .eq('conversationId', id)
             .order('createdAt', { ascending: true });
@@ -185,16 +185,16 @@ export const conversationsService = {
 
         // الحصول على معرفات المحادثات التي يشارك فيها المستخدم الحالي
         const { data: myParticipations } = await (supabase as any)
-            .from('_ConversationParticipants')
-            .select('A')
-            .eq('B', user.id);
+            .from('conversation_participants')
+            .select('conversation_id')
+            .eq('user_id', user.id);
 
-        const myConvIds = myParticipations?.map((p: any) => p.A) || [];
+        const myConvIds = myParticipations?.map((p: any) => p.conversation_id) || [];
 
         if (myConvIds.length > 0) {
             // البحث عن محادثة موجودة لهذا الإعلان تحديداً فقط
             const { data: existingAdConv, error: convError } = await (supabase as any)
-                .from('Conversation')
+                .from('conversations')
                 .select('id')
                 .eq('adId', adId)
                 .in('id', myConvIds);
@@ -209,7 +209,7 @@ export const conversationsService = {
 
         // إذا لم توجد محادثة موجودة لهذا الإعلان، إنشاء محادثة جديدة
         const { data: newConversation, error: createError } = await (supabase as any)
-            .from('Conversation')
+            .from('conversations')
             .insert({ adId: adId })
             .select()
             .single();
@@ -217,10 +217,10 @@ export const conversationsService = {
         if (createError) throw new Error('Failed to create conversation');
 
         await (supabase as any)
-            .from('_ConversationParticipants')
+            .from('conversation_participants')
             .insert([
-                { A: newConversation.id, B: user.id },
-                { A: newConversation.id, B: participantId }
+                { conversation_id: newConversation.id, user_id: user.id },
+                { conversation_id: newConversation.id, user_id: participantId }
             ]);
 
         const finalConv = await this.getConversation(newConversation.id);
@@ -237,17 +237,17 @@ export const conversationsService = {
 
         // الحصول على المشاركين يدوياً لضمان الدقة
         const { data: participantIds } = await (supabase as any)
-            .from('_ConversationParticipants')
-            .select('B')
-            .eq('A', conversationId);
+            .from('conversation_participants')
+            .select('user_id')
+            .eq('conversation_id', conversationId);
 
         // جلب معلومات المستخدمين
-        const userIds = participantIds?.map((p: any) => p.B) || [];
+        const userIds = participantIds?.map((p: any) => p.user_id) || [];
         let participants: any[] = [];
         
         if (userIds.length > 0) {
             const { data: usersData } = await (supabase as any)
-                .from('User')
+                .from('users')
                 .select('id, name, email')
                 .in('id', userIds);
                 
@@ -260,10 +260,10 @@ export const conversationsService = {
             throw new Error('Invalid conversation - no participants found');
         }
 
-        const receiverId = participants[0];
+        const receiverId = participants[0].id;
 
         const { data: message, error: messageError } = await (supabase as any)
-            .from('Message')
+            .from('messages')
             .insert({
                 content,
                 messageType: messageType,
@@ -273,7 +273,7 @@ export const conversationsService = {
             })
             .select(`
                 *,
-                sender:User!messages_sender_id_fkey(id, name, email)
+                sender:users!messages_sender_id_fkey(id, name, email)
             `)
             .single();
 
@@ -283,7 +283,7 @@ export const conversationsService = {
         }
 
         await (supabase as any)
-            .from('Conversation')
+            .from('conversations')
             .update({
                 lastMessage: content,
                 lastMessageTime: new Date().toISOString(),
@@ -305,16 +305,12 @@ export const conversationsService = {
 
     // الاشتراك في التحديثات
     subscribeToConversation(conversationId: string, callback: (payload: any) => void): RealtimeChannel {
-        // We subscribe to the table 'Message' and filter client-side if needed, 
-        // or rely on the server-side filter if it works with the specific column casing.
-        // Given mixed-case issues, we'll try to filter by the exact column name 'conversationId' 
-        // but the callback in ChatWindow also double-checks.
         return supabase
             .channel(`conversation-${conversationId}`)
             .on('postgres_changes', { 
                 event: 'INSERT', 
                 schema: 'public', 
-                table: 'Message', 
+                table: 'messages', 
                 filter: `conversationId=eq.${conversationId}` 
             }, callback)
             .subscribe();
