@@ -594,9 +594,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar" ref={scrollRef}>
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === user?.id;
-                    const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)$/i.test(msg.file_url));
-                    const isVideo = msg.message_type === 'video';
-                    const isVoice = msg.message_type === 'voice';
+                    const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(msg.file_url));
+                    const isVideo = msg.message_type === 'video' || (msg.file_url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(msg.file_url));
+                    const isVoice = msg.message_type === 'voice' || (msg.file_url && /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(msg.file_url) && !isVideo);
                     
                     return (
                         <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>

@@ -167,11 +167,13 @@ export const conversationsService = {
 
         // Generate Signed URL (valid for 1 year = 31536000 seconds)
         // Since we want these links to be persistent in the chat history
-        const { data: { signedUrl } } = await supabase.storage
+        const { data } = await supabase.storage
             .from('chat_vault')
             .createSignedUrl(filePath, 31536000, {
                 download: file.name
             });
+
+        const signedUrl = data?.signedUrl;
 
         if (!signedUrl) throw new Error('Failed to generate signed URL');
 
