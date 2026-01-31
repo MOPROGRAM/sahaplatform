@@ -169,7 +169,9 @@ export const conversationsService = {
         // Since we want these links to be persistent in the chat history
         const { data: { signedUrl } } = await supabase.storage
             .from('chat_vault')
-            .createSignedUrl(filePath, 31536000);
+            .createSignedUrl(filePath, 31536000, {
+                download: file.name
+            });
 
         if (!signedUrl) throw new Error('Failed to generate signed URL');
 
