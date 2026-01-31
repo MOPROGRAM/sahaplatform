@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -12,9 +12,11 @@ interface Message {
     id: string;
     sender_id: string;
     content: string;
-    message_type: 'text' | 'image' | 'file' | 'voice' | 'location';
+    message_type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video';
     file_url?: string;
     file_name?: string;
+    file_size?: number;
+    duration?: number;
     is_read?: boolean;
     created_at: string;
     sender?: {
@@ -46,6 +48,15 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [ratingValue, setRatingValue] = useState(0);
     const [ratingComment, setRatingComment] = useState("");
     const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+    
+    // File & Recording State
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingTime, setRecordingTime] = useState(0);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [showAttachments, setShowAttachments] = useState(false);
     
     // const socketRef = useRef<any>(null);
 
@@ -113,23 +124,85 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 conversationsService.unsubscribe(channel);
             }
         };
-    }, [conversationId]); // Removed fetchChatData from deps to avoid loop if it changes
+    }, [conversationId]);
+    
+    // Recording Logic
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                const audioFile = new File([audioBlob], `voice-note-${Date.now()}.webm`, { type: 'audio/webm' });
+                
+                // Upload and send
+                const uploadData = await handleFileUpload(audioFile, 'voice');
+                if (uploadData) {
+                    handleSend('voice', 'Voice Note', { ...uploadData, duration: recordingTime });
+                }
+                
+                // Cleanup
+                stream.getTracks().forEach(track => track.stop());
+                setRecordingTime(0);
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+            
+            // Timer
+            recordingTimerRef.current = setInterval(() => {
+                setRecordingTime(prev => prev + 1);
+            }, 1000);
+
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+            alert('Could not access microphone');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            if (recordingTimerRef.current) {
+                clearInterval(recordingTimerRef.current);
+            }
+        }
+    };
+
+    const cancelRecording = () => {
+         if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop(); // This triggers onstop, but we might want to prevent upload
+            // Hack: clear chunks so onstop uploads nothing or handle "cancelled" state
+            // Better: just stop tracks and reset state without processing
+            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+            setIsRecording(false);
+            if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+            setRecordingTime(0);
+            audioChunksRef.current = [];
+            mediaRecorderRef.current = null; // Prevent onstop logic if possible or handle checks
+         }
+    };
+    
+    // Helper to format duration
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
-
-    // Socket functionality disabled for now
-    // const setupSocket = () => {
-    //     const socketUrl = process.env.NEXT_PUBLIC_API_URL || '';
-    //     socketRef.current = io(socketUrl);
-
-    //     socketRef.current.on('receive_message', (message: Message) => {
-    //         if (message.id && !messages.find(m => m.id === message.id)) {
-    //             setMessages(prev => [...prev, message]);
-    //         }
-    //     });
-    // };
 
     const fetchChatData = useCallback(async () => {
         setLoading(true);
@@ -158,7 +231,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     }, [conversationId]);
 
-    const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' = 'text', content?: string, fileData?: any) => {
+    const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video' = 'text', content?: string, fileData?: any) => {
         const messageContent = content || input;
         if (!messageContent.trim() && type === 'text') return;
 
@@ -169,7 +242,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 messageType: type,
                 ...fileData
             };
-            const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
+            const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType, fileData);
 
             // Normalize returned fields (snake_case)
             const id = sentMessage.id;
@@ -185,7 +258,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 content: contentResp,
                 message_type: messageType as any,
                 created_at: createdAt,
-                sender: { name: user?.name || 'You' }
+                sender: { name: user?.name || 'You' },
+                ...fileData
             };
             setMessages(prev => [...prev, newMessage]);
 
@@ -208,9 +282,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
-    const handleFileUpload = async (file: File, type: 'file' | 'image') => {
-        const fileName = `${Date.now()}-${file.name}`;
-        const bucket = type === 'image' ? 'chat-images' : 'chat-files';
+    const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice' | 'video') => {
+        const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+        const bucket = 'chat-attachments';
         const { error } = await supabase.storage
             .from(bucket)
             .upload(fileName, file);
@@ -224,8 +298,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             .from(bucket)
             .getPublicUrl(fileName);
 
-        return { fileUrl: urlData.publicUrl, fileName: file.name, fileSize: file.size };
+        return { file_url: urlData.publicUrl, file_name: file.name, file_size: file.size, file_type: file.type };
     };
+
 
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
 
@@ -328,10 +403,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             </div>
 
             {/* Messages Area - High Density */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar" ref={scrollRef}>
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === user?.id;
                     const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)$/i.test(msg.file_url));
+                    const isVideo = msg.message_type === 'video';
+                    const isVoice = msg.message_type === 'voice';
                     
                     return (
                         <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
@@ -354,9 +431,6 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                                     e.currentTarget.onerror = null; // Prevent loop
                                                 }}
                                             />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                                                <Download className="text-white opacity-80" size={24} />
-                                            </div>
                                         </div>
                                         <a 
                                             href={msg.file_url} 
@@ -366,6 +440,32 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                         >
                                             <Download size={10} /> {language === 'ar' ? 'تحميل الصورة' : 'Download Image'}
                                         </a>
+                                    </div>
+                                )}
+
+                                {isVideo && msg.file_url && (
+                                    <div className="mb-1 min-w-[200px]">
+                                        <video controls className="max-w-full rounded-lg border border-black/10">
+                                            <source src={msg.file_url} type={msg.file_type || 'video/mp4'} />
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        <a 
+                                            href={msg.file_url} 
+                                            download 
+                                            target="_blank" 
+                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
+                                        >
+                                            <Download size={10} /> {language === 'ar' ? 'تحميل الفيديو' : 'Download Video'}
+                                        </a>
+                                    </div>
+                                )}
+
+                                {isVoice && msg.file_url && (
+                                    <div className="flex items-center gap-2 min-w-[200px] py-1">
+                                        <audio controls className="h-8 w-full max-w-[250px]">
+                                            <source src={msg.file_url} type="audio/webm" />
+                                            Your browser does not support the audio element.
+                                        </audio>
                                     </div>
                                 )}
 
@@ -384,7 +484,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                     </div>
                                 )}
 
-                                {msg.message_type === 'file' && !isImage && (
+                                {msg.message_type === 'file' && !isImage && !isVideo && !isVoice && (
                                     <div className={`flex items-center gap-3 p-2 rounded-lg ${isMe ? 'bg-black/5' : 'bg-gray-100'}`}>
                                         <FileText size={24} className={'text-primary'} />
                                         <div className="flex flex-col min-w-0">
@@ -416,43 +516,101 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 <div ref={scrollRef} />
             </div>
 
-            {/* Input Tools - Compressed */}
-            <div className="p-2 bg-card border-t border-[#2a2d3a] flex gap-2 overflow-x-auto no-scrollbar">
-                <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
-                    <MapPin size={12} /> SHARE LOCATION
-                </button>
-                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
-                    <Paperclip size={12} /> ATTACH DOCUMENT
-                    <input type="file" className="hidden" onChange={async (e) => {
+            {/* Input Area */}
+            <div className="p-3 bg-white border-t border-gray-100 relative">
+                {/* Hidden File Input */}
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    onChange={async (e) => {
                         const file = e.target.files?.[0];
-                        if (file) {
-                            const uploadData = await handleFileUpload(file, 'file');
-                            if (uploadData) {
-                                handleSend('file', `Attached: ${file.name}`, uploadData);
-                            }
-                        }
-                    }} />
-                </label>
-            </div>
+                        if (!file) return;
+                        
+                        let type: any = 'file';
+                        if (file.type.startsWith('image/')) type = 'image';
+                        else if (file.type.startsWith('video/')) type = 'video';
+                        else if (file.type.startsWith('audio/')) type = 'voice';
 
-            {/* Input Main */}
-            <div className="p-3 bg-white">
-                <div className="flex gap-2">
-                    <input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                        placeholder={language === 'ar' ? `اكتب رسالة لـ ${otherMember.name}...` : `Message ${otherMember.name}...`}
-                        className="flex-1 bg-gray-50 border border-gray-100 outline-none px-4 py-2.5 rounded-sm text-[11px] font-bold focus:border-primary transition-all placeholder:font-black placeholder:uppercase placeholder:text-[9px] placeholder:tracking-widest"
-                    />
-                    <button
-                        onClick={() => handleSend()}
-                        disabled={sending || !input.trim()}
-                        className="bg-primary text-white p-2.5 rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-all shadow-lg shadow-primary/20 active:scale-90"
-                    >
-                        {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
-                    </button>
-                </div>
+                        const uploadData = await handleFileUpload(file, type);
+                        if (uploadData) {
+                             let content = `Attached: ${file.name}`;
+                             if (type === 'image') content = 'Image Attachment';
+                             if (type === 'video') content = 'Video Attachment';
+                             
+                             handleSend(type, content, uploadData);
+                        }
+                        // Reset input
+                        if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                            fileInputRef.current.accept = ''; // Reset accept
+                        }
+                    }} 
+                />
+
+                {isRecording ? (
+                    <div className="flex items-center gap-3 bg-red-50 p-2 rounded-lg animate-pulse border border-red-100">
+                        <div className="w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                        <span className="text-xs font-bold text-red-500 flex-1">{language === 'ar' ? 'جاري التسجيل...' : 'Recording...'} {formatTime(recordingTime)}</span>
+                        <button onClick={cancelRecording} className="p-2 text-gray-500 hover:text-red-500 transition-colors"><Trash size={18} /></button>
+                        <button onClick={stopRecording} className="p-2 bg-red-500 text-white rounded-full shadow-lg shadow-red-500/30 hover:bg-red-600 transition-all"><Send size={18} className={language === 'ar' ? 'rotate-180' : ''} /></button>
+                    </div>
+                ) : (
+                    <div className="flex gap-2 items-end">
+                         {/* Attachments Menu */}
+                        <div className="relative">
+                            <button 
+                                onClick={() => setShowAttachments(!showAttachments)}
+                                className={`p-2.5 rounded-sm transition-all ${showAttachments ? 'bg-primary/10 text-primary' : 'bg-gray-50 text-gray-400 hover:text-gray-600'}`}
+                            >
+                                <Paperclip size={18} />
+                            </button>
+                            
+                            {showAttachments && (
+                                <div className="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-xl border border-gray-100 p-2 flex flex-col gap-1 min-w-[150px] z-50 animate-in fade-in zoom-in duration-200">
+                                    <button onClick={() => { setShowAttachments(false); fileInputRef.current?.click(); }} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded text-xs font-bold text-gray-600 w-full text-left">
+                                        <FileText size={14} className="text-blue-500" /> {language === 'ar' ? 'مستند / ملف' : 'Document/File'}
+                                    </button>
+                                    <button onClick={() => { setShowAttachments(false); if(fileInputRef.current) { fileInputRef.current.accept = 'image/*'; fileInputRef.current.click(); } }} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded text-xs font-bold text-gray-600 w-full text-left">
+                                        <ImageIcon size={14} className="text-purple-500" /> {language === 'ar' ? 'صورة' : 'Image'}
+                                    </button>
+                                     <button onClick={() => { setShowAttachments(false); if(fileInputRef.current) { fileInputRef.current.accept = 'video/*'; fileInputRef.current.click(); } }} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded text-xs font-bold text-gray-600 w-full text-left">
+                                        <Video size={14} className="text-red-500" /> {language === 'ar' ? 'فيديو' : 'Video'}
+                                    </button>
+                                    <button onClick={() => { setShowAttachments(false); shareLocation(); }} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded text-xs font-bold text-gray-600 w-full text-left">
+                                        <MapPin size={14} className="text-green-500" /> {language === 'ar' ? 'موقع' : 'Location'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <input
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                            placeholder={language === 'ar' ? `اكتب رسالة لـ ${otherMember.name}...` : `Message ${otherMember.name}...`}
+                            className="flex-1 bg-gray-50 border border-gray-100 outline-none px-4 py-2.5 rounded-sm text-[11px] font-bold focus:border-primary transition-all placeholder:font-black placeholder:uppercase placeholder:text-[9px] placeholder:tracking-widest"
+                        />
+                        
+                        {input.trim() ? (
+                            <button
+                                onClick={() => handleSend()}
+                                disabled={sending}
+                                className="bg-primary text-white p-2.5 rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-all shadow-lg shadow-primary/20 active:scale-90"
+                            >
+                                {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={startRecording}
+                                className="bg-gray-50 text-gray-400 p-2.5 rounded-sm hover:bg-red-50 hover:text-red-500 transition-all active:scale-90"
+                                title={language === 'ar' ? 'تسجيل صوتي' : 'Record Voice'}
+                            >
+                                <Mic size={18} />
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

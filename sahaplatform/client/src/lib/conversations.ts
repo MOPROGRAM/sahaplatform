@@ -262,7 +262,7 @@ export const conversationsService = {
     },
 
     // إرسال رسالة
-    async sendMessage(conversationId: string, content: string, messageType: string = 'text'): Promise<Message> {
+    async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}): Promise<Message> {
         let { data: { user }, error: authError } = await supabase.auth.getUser();
 
         // Check for "Session issued in the future" or other auth errors and try to refresh
@@ -421,6 +421,7 @@ export const conversationsService = {
                 sender_id: user.id,
                 receiver_id: receiverId,
                 conversation_id: conversationId,
+                ...metadata
             })
             .select(`
                 *,

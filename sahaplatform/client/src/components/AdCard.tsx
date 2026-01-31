@@ -462,7 +462,7 @@ export default function AdCard({
                         <>
                             <a 
                                 href={`tel:${phoneNumber}`}
-                                className="flex items-center justify-center gap-2 w-2/3 py-1 bg-primary text-white rounded-full text-[10px] font-bold hover:bg-primary/90 transition-colors"
+                                className="flex items-center justify-center gap-2 w-1/2 py-1 bg-primary text-white rounded-full text-[10px] font-bold hover:bg-primary/90 transition-colors"
                             >
                                 <Phone size={12} className="text-white" />
                                 {t("call")}
@@ -472,7 +472,7 @@ export default function AdCard({
                                 href={`https://wa.me/${phoneNumber}`} 
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center gap-2 w-2/3 py-1 bg-[#25D366] text-white rounded-full text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors"
+                                className="flex items-center justify-center gap-2 w-1/2 py-1 bg-[#25D366] text-white rounded-full text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors"
                             >
                                 <MessageCircle size={12} className="text-white" />
                                 {t("whatsapp") || "WhatsApp"}
@@ -483,7 +483,7 @@ export default function AdCard({
                     {email && (
                         <a 
                             href={`mailto:${email}`}
-                            className="flex items-center justify-center gap-2 w-2/3 py-1 bg-gray-600 text-white rounded-full text-[10px] font-bold hover:bg-gray-700 transition-colors"
+                            className="flex items-center justify-center gap-2 w-1/2 py-1 bg-gray-600 text-white rounded-full text-[10px] font-bold hover:bg-gray-700 transition-colors"
                         >
                             <Mail size={12} className="text-white" />
                             {language === 'ar' ? 'البريد' : 'Email'}
@@ -492,10 +492,10 @@ export default function AdCard({
 
                     <button 
                         onClick={handleStartChat}
-                        className="flex items-center justify-center gap-2 w-2/3 py-1 bg-blue-600 text-white rounded-full text-[10px] font-bold hover:bg-blue-700 transition-colors"
+                        className="flex items-center justify-center gap-2 w-1/2 py-1 bg-secondary text-white rounded-full text-[10px] font-bold hover:bg-secondary/90 transition-colors"
                     >
-                        <MessageCircle size={12} className="text-white" />
-                        {language === 'ar' ? 'محادثة داخلية' : 'Internal Chat'}
+                        <MessageSquare size={12} className="text-white" />
+                        {t("chat") || "Chat"}
                     </button>
                  </div>
 
