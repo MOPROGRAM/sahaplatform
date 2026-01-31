@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, Maximize2, Plus, Minus } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -70,6 +70,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [incomingCall, setIncomingCall] = useState<{ id: string, caller_id: string, call_type: 'video' | 'audio' } | null>(null);
     const [callType, setCallType] = useState<'video' | 'audio'>('video');
     const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+    const [selectedMedia, setSelectedMedia] = useState<{ url: string, type: 'image' | 'video' } | null>(null);
+    const [zoom, setZoom] = useState(1);
+    const isSendingRef = useRef(false);
 
     // const socketRef = useRef<any>(null);
 
@@ -661,7 +664,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                                 src={msg.file_url} 
                                                 alt="Attachment" 
                                                 className="max-w-[250px] max-h-[250px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
-                                                onClick={() => window.open(msg.file_url, '_blank')}
+                                                onClick={() => setSelectedMedia({ url: msg.file_url!, type: 'image' })}
                                                 onError={(e) => {
                                                     (e.target as HTMLImageElement).src = '/placeholder-image.png';
                                                 }}
@@ -671,32 +674,23 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 )}
 
                                 {isVideo && msg.file_url && (
-                                    <div className="mb-1">
+                                    <div className="mb-1 relative group">
                                         <video 
                                             src={msg.file_url} 
                                             controls 
                                             className="max-w-[250px] max-h-[250px] rounded-lg border border-black/10"
                                         />
+                                        <button 
+                                            onClick={() => setSelectedMedia({ url: msg.file_url!, type: 'video' })}
+                                            className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                                            title={language === 'ar' ? 'تكبير' : 'Expand'}
+                                        >
+                                            <Maximize2 size={14} /> 
+                                        </button>
                                     </div>
                                 )}
 
-                                {isVoice && msg.file_url && (
-                                    <div className="flex items-center gap-2 min-w-[150px] mb-1">
-                                        <div className="p-2 bg-primary/10 rounded-full text-primary">
-                                            <Play size={16} className="fill-current" />
-                                        </div>
-                                        <div className="flex flex-col flex-1">
-                                            <div className="h-1 bg-gray-200 rounded-full w-full overflow-hidden">
-                                                <div className="h-full bg-primary w-1/3"></div>
-                                            </div>
-                                            <span className="text-[9px] text-gray-500 font-mono mt-1">
-                                                {msg.duration ? formatTime(msg.duration) : '0:00'}
-                                            </span>
-                                        </div>
-                                        {/* Audio Element for playback */}
-                                        <audio src={msg.file_url} controls className="hidden" />
-                                    </div>
-                                )}
+
 
                                 {msg.file_url && !isImage && !isVideo && !isVoice && (
                                     <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600 mb-1">
@@ -726,18 +720,27 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
                                 {isVoice && msg.file_url && (
                                     <div className="flex flex-col gap-1 min-w-[200px] py-1">
-                                        <audio controls className="h-8 w-full max-w-[250px]">
-                                            <source src={msg.file_url} type="audio/webm" />
-                                            Your browser does not support the audio element.
-                                        </audio>
-                                        <a 
-                                            href={msg.file_url} 
-                                            download 
-                                            target="_blank" 
-                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
-                                        >
-                                            <Download size={10} /> {language === 'ar' ? 'تحميل التسجيل' : 'Download Audio'}
-                                        </a>
+                                        <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-1 border border-gray-200 dark:border-gray-600">
+                                            <audio controls className="h-8 w-full max-w-[250px] outline-none" key={msg.file_url}>
+                                                <source src={msg.file_url} type="audio/webm" />
+                                                <source src={msg.file_url} type="audio/mp3" />
+                                                <source src={msg.file_url} type="audio/wav" />
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        </div>
+                                        <div className="flex justify-between items-center px-1">
+                                            <span className="text-[9px] text-gray-500 font-mono">
+                                                {msg.duration ? formatTime(msg.duration) : ''}
+                                            </span>
+                                            <a 
+                                                href={msg.file_url} 
+                                                download 
+                                                target="_blank" 
+                                                className={`flex items-center gap-1 text-[9px] font-black hover:underline text-primary`}
+                                            >
+                                                <Download size={10} /> {language === 'ar' ? 'تحميل' : 'Download'}
+                                            </a>
+                                        </div>
                                     </div>
                                 )}
 
@@ -898,6 +901,60 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     </div>
                 )}
             </div>
+            {/* Lightbox Modal */}
+            {selectedMedia && (
+                <div className="absolute inset-0 z-50 bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    {/* Controls */}
+                    <div className="absolute top-4 right-4 flex items-center gap-2 z-50">
+                        {selectedMedia.type === 'image' && (
+                            <>
+                                <button 
+                                    onClick={() => setZoom(prev => Math.min(prev + 0.5, 3))}
+                                    className="text-white/70 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+                                >
+                                    <Plus size={24} />
+                                </button>
+                                <button 
+                                    onClick={() => setZoom(prev => Math.max(prev - 0.5, 1))}
+                                    className="text-white/70 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+                                >
+                                    <Minus size={24} />
+                                </button>
+                            </>
+                        )}
+                        <button 
+                            onClick={() => { setSelectedMedia(null); setZoom(1); }}
+                            className="text-white/70 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    {selectedMedia.type === 'image' ? (
+                        <div 
+                            className="w-full h-full flex items-center justify-center overflow-hidden"
+                            onWheel={(e) => {
+                                // Optional: Handle wheel zoom if needed, but keeping it simple for now
+                            }}
+                        >
+                            <img 
+                                src={selectedMedia.url} 
+                                alt="Full preview" 
+                                className="max-w-full max-h-full object-contain rounded-sm shadow-2xl transition-transform duration-200 ease-out"
+                                style={{ transform: `scale(${zoom})`, cursor: zoom > 1 ? 'grab' : 'zoom-in' }}
+                                onClick={() => setZoom(prev => prev === 1 ? 2 : 1)}
+                            />
+                        </div>
+                    ) : (
+                        <video 
+                            src={selectedMedia.url} 
+                            controls 
+                            autoPlay
+                            className="max-w-full max-h-full rounded-sm shadow-2xl"
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
