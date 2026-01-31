@@ -306,7 +306,15 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     messageType: type,
                     ...fileData
                 };
-                const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType, fileData);
+                
+                const targetUser = participants.find(p => p.id !== user?.id);
+                const sentMessage = await conversationsService.sendMessage(
+                    conversationId, 
+                    payload.content, 
+                    payload.messageType, 
+                    fileData,
+                    targetUser?.id
+                );
     
                 // Normalize returned fields (snake_case)
                 const id = sentMessage.id;

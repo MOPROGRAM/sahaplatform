@@ -2,9 +2,9 @@
 
 export const runtime = 'edge';
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import {
     User,
@@ -36,10 +36,11 @@ import { formatRelativeTime } from "@/lib/utils";
 
 
 
-export default function ProfilePage() {
+function ProfileContent() {
     const { user, logout } = useAuthStore();
     const { language, t } = useLanguage();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('overview');
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,12 +65,11 @@ export default function ProfilePage() {
     const [messagesLoading, setMessagesLoading] = useState(false);
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const tab = params.get('tab');
-        const convId = params.get('conversationId');
+        const tab = searchParams.get('tab');
+        const convId = searchParams.get('conversationId');
         if (tab) setActiveTab(tab);
         if (convId) setSelectedConversationId(convId);
-    }, []);
+    }, [searchParams]);
 
     useEffect(() => {
         if (activeTab === 'messages' && user) {
@@ -600,24 +600,16 @@ export default function ProfilePage() {
                                 {loading ? (
                                     <div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={24} /></div>
                                 ) : favorites.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {favorites.map((ad: any) => (
-                                            <AdCard 
-                                                key={ad.id} 
-                                                {...ad} 
-                                                language={language}
-                                                phoneNumber={ad.phone}
-                                            />
+                                            <AdCard key={ad.id} ad={ad} />
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-12">
-                                        <Heart size={48} className="mx-auto text-gray-200 mb-4" />
-                                        <h3 className="text-lg font-bold text-gray-900 mb-1">
-                                            {language === 'ar' ? 'لا توجد مفضلة' : 'No Favorites'}
-                                        </h3>
-                                        <p className="text-gray-500 text-sm">
-                                            {language === 'ar' ? 'لم تقم بإضافة أي إعلانات للمفضلة بعد' : 'You have not added any ads to favorites yet'}
+                                    <div className="flex flex-col items-center justify-center h-64 text-text-muted">
+                                        <Heart size={48} className="opacity-10 mb-4" />
+                                        <p className="text-sm font-bold">
+                                            {language === 'ar' ? 'لا توجد إعلانات مفضلة' : 'No favorite listings'}
                                         </p>
                                     </div>
                                 )}
@@ -627,182 +619,132 @@ export default function ProfilePage() {
 
                     {/* Settings Tab */}
                     {activeTab === 'settings' && (
-                        <div className="space-y-4">
-                            <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
-                                <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">
-                                    {language === 'ar' ? 'تحديث الملف الشخصي' : 'Update Profile'}
-                                </h3>
+                        <div className="bg-card border border-border-color p-6 rounded-sm shadow-sm">
+                            <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-6">
+                                {language === 'ar' ? 'تحديث المعلومات' : 'Update Profile'}
+                            </h3>
+                            <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-lg">
+                                <div>
+                                    <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
+                                        {language === 'ar' ? 'الاسم' : 'Name'}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={profileData.name}
+                                        onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                                        className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xs text-sm focus:border-primary focus:ring-0 transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
+                                        {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={profileData.email}
+                                        onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                        className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xs text-sm focus:border-primary focus:ring-0 transition-colors"
+                                    />
+                                </div>
+
+                                <div className="pt-4 border-t border-gray-100">
+                                    <h4 className="text-sm font-bold text-secondary mb-4">
+                                        {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
+                                    </h4>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
+                                                {language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}
+                                            </label>
+                                            <input
+                                                type="password"
+                                                value={profileData.currentPassword}
+                                                onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
+                                                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xs text-sm focus:border-primary focus:ring-0 transition-colors"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
+                                                {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
+                                            </label>
+                                            <input
+                                                type="password"
+                                                value={profileData.newPassword}
+                                                onChange={(e) => setProfileData({ ...profileData, newPassword: e.target.value })}
+                                                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xs text-sm focus:border-primary focus:ring-0 transition-colors"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
+                                                {language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                            </label>
+                                            <input
+                                                type="password"
+                                                value={profileData.confirmPassword}
+                                                onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })}
+                                                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xs text-sm focus:border-primary focus:ring-0 transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {updateMessage && (
-                                    <div className={`p-3 rounded-sm mb-4 text-[12px] font-bold ${updateMessage.includes('successfully') || updateMessage.includes('نجاح') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                    <div className={`p-3 rounded-xs text-xs font-bold ${updateMessage.includes('success') || updateMessage.includes('بنجاح') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                                         {updateMessage}
                                     </div>
                                 )}
 
-                                <form onSubmit={handleUpdateProfile} className="space-y-4">
-                                    <div>
-                                        <label className="block text-[12px] font-black text-gray-600 uppercase tracking-widest mb-2">
-                                            {language === 'ar' ? 'الاسم' : 'Name'}
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={profileData.name}
-                                            onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-[12px] font-black text-gray-600 uppercase tracking-widest mb-2">
-                                            {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
-                                        </label>
-                                        <input
-                                            type="email"
-                                            value={profileData.email}
-                                            onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div className="border-t border-gray-200 pt-4">
-                                        <h4 className="font-black text-secondary text-[14px] mb-4">
-                                            {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
-                                        </h4>
-
-                                        <div className="space-y-3">
-                                            <div>
-                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                                                    {language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}
-                                                </label>
-                                                <input
-                                                    type="password"
-                                                    value={profileData.currentPassword}
-                                                    onChange={(e) => setProfileData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                                    className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                                                    {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
-                                                </label>
-                                                <input
-                                                    type="password"
-                                                    value={profileData.newPassword}
-                                                    onChange={(e) => setProfileData(prev => ({ ...prev, newPassword: e.target.value }))}
-                                                    className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
-                                                    {language === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}
-                                                </label>
-                                                <input
-                                                    type="password"
-                                                    value={profileData.confirmPassword}
-                                                    onChange={(e) => setProfileData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                                    className="w-full px-3 py-2 border border-gray-200 rounded-sm text-[14px] focus:border-primary focus:outline-none"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
+                                <div className="flex gap-4 pt-4">
                                     <button
                                         type="submit"
                                         disabled={updating}
-                                        className="w-full bg-primary text-white py-3 rounded-sm font-black text-[12px] uppercase tracking-widest hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex-1 bg-primary text-white py-2.5 rounded-xs font-black uppercase tracking-widest hover:bg-primary-hover disabled:opacity-50 transition-colors"
                                     >
-                                        {updating ? (language === 'ar' ? 'جارٍ التحديث...' : 'Updating...') : (language === 'ar' ? 'تحديث الملف الشخصي' : 'Update Profile')}
+                                        {updating ? (
+                                            <Loader2 className="animate-spin mx-auto" size={16} />
+                                        ) : (
+                                            language === 'ar' ? 'حفظ التغييرات' : 'Save Changes'
+                                        )}
                                     </button>
-                                </form>
-                            </div>
-
-                            <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
-                                <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">
-                                    {language === 'ar' ? 'إعدادات الحساب' : 'Account Settings'}
-                                </h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-sm">
-                                        <div>
-                                            <h4 className="font-black text-secondary text-[14px]">
-                                                {language === 'ar' ? 'الإشعارات' : 'Notifications'}
-                                            </h4>
-                                            <p className="text-[10px] text-gray-500">
-                                                {language === 'ar' ? 'تلقي إشعارات حول الإعلانات والرسائل' : 'Receive notifications about ads and messages'}
-                                            </p>
-                                        </div>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" className="sr-only peer" defaultChecked />
-                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                        </label>
-                                    </div>
-
-                                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-sm">
-                                        <div>
-                                            <h4 className="font-black text-secondary text-[14px]">
-                                                {language === 'ar' ? 'الخصوصية' : 'Privacy'}
-                                            </h4>
-                                            <p className="text-[10px] text-gray-500">
-                                                {language === 'ar' ? 'إظهار معلومات الاتصال للجميع' : 'Show contact information to everyone'}
-                                            </p>
-                                        </div>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" className="sr-only peer" />
-                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                        </label>
-                                    </div>
                                 </div>
-                            </div>
+                            </form>
 
-                            <div className="bg-red-50 border border-red-200 p-6 rounded-sm">
-                                <h3 className="text-lg font-black text-red-600 uppercase tracking-tight mb-4 flex items-center gap-2">
-                                    <AlertTriangle size={20} />
-                                    {language === 'ar' ? 'منطقة خطرة' : 'Danger Zone'}
-                                </h3>
-                                <p className="text-[12px] text-red-600 mb-4">
-                                    {language === 'ar'
-                                        ? 'حذف الحساب سيؤدي إلى حذف جميع بياناتك نهائياً ولا يمكن التراجع عنه.'
-                                        : 'Deleting your account will permanently delete all your data and cannot be undone.'
-                                    }
+                            <div className="mt-12 pt-8 border-t border-border-color">
+                                <h4 className="text-sm font-bold text-red-600 mb-2">
+                                    {language === 'ar' ? 'منطقة الخطر' : 'Danger Zone'}
+                                </h4>
+                                <p className="text-xs text-text-muted mb-4">
+                                    {language === 'ar' 
+                                        ? 'حذف الحساب هو إجراء نهائي لا يمكن التراجع عنه. سيتم حذف جميع بياناتك وإعلاناتك.' 
+                                        : 'Deleting your account is permanent. All your data and listings will be removed.'}
                                 </p>
                                 <button
                                     onClick={handleDeleteAccount}
                                     disabled={deleting}
-                                    className={`px-4 py-2 rounded-sm text-[12px] font-black uppercase tracking-widest transition-all ${deleteConfirm
-                                        ? 'bg-red-600 text-white hover:bg-red-700'
-                                        : 'bg-red-100 text-red-600 hover:bg-red-200'
-                                        }`}
+                                    className="px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-xs text-xs font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all"
                                 >
                                     {deleting ? (
                                         <Loader2 className="animate-spin" size={14} />
-                                    ) : deleteConfirm ? (
-                                        <>
-                                            <CheckCircle size={14} className="inline mr-2" />
-                                            {language === 'ar' ? 'تأكيد الحذف' : 'Confirm Delete'}
-                                        </>
                                     ) : (
-                                        <>
-                                            <Trash2 size={14} className="inline mr-2" />
-                                            {language === 'ar' ? 'حذف الحساب' : 'Delete Account'}
-                                        </>
+                                        deleteConfirm 
+                                            ? (language === 'ar' ? 'تأكيد الحذف النهائي' : 'Confirm Permanent Deletion') 
+                                            : (language === 'ar' ? 'حذف الحساب' : 'Delete Account')
                                     )}
                                 </button>
-                                {deleteConfirm && !deleting && (
-                                    <button
-                                        onClick={() => setDeleteConfirm(false)}
-                                        className="ml-4 px-4 py-2 bg-gray-100 text-gray-600 rounded-sm text-[12px] font-black uppercase tracking-widest hover:bg-gray-200 transition-all"
-                                    >
-                                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
-                                    </button>
-                                )}
                             </div>
                         </div>
                     )}
                 </main>
             </div>
-
             <Footer />
         </div>
+    );
+}
+
+export default function ProfilePage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={32} /></div>}>
+            <ProfileContent />
+        </Suspense>
     );
 }

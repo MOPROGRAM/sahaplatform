@@ -154,32 +154,39 @@ export const conversationsService = {
     },
 
     // Send Message with File Handling
-    async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}): Promise<Message> {
+    async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}, receiverId?: string): Promise<Message> {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('User not authenticated');
 
-        const messageData = {
-            conversation_id: conversationId,
-            sender_id: session.user.id,
-            content,
-            message_type: messageType,
-            file_url: metadata.file_url,
-            file_name: metadata.file_name,
-            file_size: metadata.file_size,
-            file_type: metadata.file_type,
-            duration: metadata.duration,
-            created_at: new Date().toISOString(),
-            is_read: false
-        };
+        // Use API route to bypass RLS and ensure reliability
+        const response = await fetch('/api/conversations/message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+                conversationId,
+                content,
+                messageType,
+                metadata,
+                receiverId
+            })
+        });
 
-        const { data, error } = await supabase
-            .from('messages')
-            .insert(messageData)
-            .select()
-            .single();
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = 'Failed to send message';
+            try {
+                const errorJson = JSON.parse(errorText);
+                errorMessage = errorJson.error || errorMessage;
+            } catch (e) {
+                errorMessage = errorText;
+            }
+            throw new Error(errorMessage);
+        }
 
-        if (error) throw error;
-        return data;
+        return await response.json();
     },
 
     // Upload File to Supabase Storage (with 25MB Limit)
