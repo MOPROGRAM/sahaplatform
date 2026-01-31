@@ -123,13 +123,22 @@ export const conversationsService = {
             return null;
         }
 
-        // الحصول على المشاركين يدوياً لضمان الدقة
-        const { data: participants, error: pError } = await (supabase as any)
-            .from('conversation_participants')
-            .select('user:users!user_id(id, name, email)')
-            .eq('conversation_id', id);
 
-        const transformedParticipants = participants?.map((p: any) => p.user) || [];
+        // الحصول على المشاركين يدوياً لضمان الدقة (باستخدام RPC لتجاوز RLS)
+        const { data: participantRows, error: pError } = await (supabase as any)
+            .rpc('get_conversation_participants', { p_conversation_id: id });
+
+        let transformedParticipants: any[] = [];
+
+        if (participantRows && participantRows.length > 0) {
+            const userIds = participantRows.map((p: any) => p.user_id);
+            const { data: usersData } = await (supabase as any)
+                .from('users')
+                .select('id, name, email')
+                .in('id', userIds);
+            
+            transformedParticipants = usersData || [];
+        }
 
         // الحصول على الرسائل
         const { data: messages, error: messagesError } = await (supabase as any)

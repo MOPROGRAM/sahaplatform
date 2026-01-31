@@ -302,7 +302,36 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     };
 
 
+
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
+
+    const submitRating = async () => {
+        if (!user || !otherMember.id || ratingValue === 0) return;
+        
+        setIsSubmittingRating(true);
+        try {
+            const { error } = await supabase
+                .from('ratings')
+                .insert({
+                    rater_id: user.id,
+                    rated_user_id: otherMember.id,
+                    rating: ratingValue,
+                    comment: ratingComment
+                });
+                
+            if (error) throw error;
+            
+            setIsRatingOpen(false);
+            setRatingValue(0);
+            setRatingComment("");
+            alert(language === 'ar' ? 'تم إرسال تقييمك بنجاح' : 'Rating submitted successfully');
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+            alert(language === 'ar' ? 'حدث خطأ أثناء إرسال التقييم' : 'Error submitting rating');
+        } finally {
+            setIsSubmittingRating(false);
+        }
+    };
 
     if (!mounted) return null;
 
