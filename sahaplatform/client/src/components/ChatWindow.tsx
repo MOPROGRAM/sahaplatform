@@ -282,7 +282,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
-    const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice' | 'video') => {
+    const handleFileUpload = async (file: File, _type: 'file' | 'image' | 'voice' | 'video') => {
         const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
         const bucket = 'chat-attachments';
         const { error } = await supabase.storage

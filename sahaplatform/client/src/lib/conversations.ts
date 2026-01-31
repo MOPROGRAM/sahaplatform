@@ -272,7 +272,8 @@ export const conversationsService = {
 
     // إرسال رسالة
     async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}): Promise<Message> {
-        let { data: { user }, error: authError } = await supabase.auth.getUser();
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+        let user = authData.user;
 
         // Check for "Session issued in the future" or other auth errors and try to refresh
         if (authError && (authError.message.includes('future') || authError.status === 403)) {
