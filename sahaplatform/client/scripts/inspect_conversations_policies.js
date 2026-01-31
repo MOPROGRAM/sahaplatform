@@ -21,29 +21,29 @@ try {
 
 const client = new Client({ connectionString });
 
-async function checkBrokenConversations() {
+async function inspectConversationsPolicies() {
     try {
         await client.connect();
-        console.log('Checking for broken conversations (participants < 2)...');
+        console.log('Connected to database');
 
         const res = await client.query(`
-            SELECT c.id, c.ad_id, count(cp.user_id) as participant_count
-            FROM conversations c
-            LEFT JOIN conversation_participants cp ON c.id = cp.conversation_id
-            GROUP BY c.id, c.ad_id
-            HAVING count(cp.user_id) < 2;
+            SELECT schemaname, tablename, policyname, cmd, qual, with_check
+            FROM pg_policies
+            WHERE tablename = 'conversations';
         `);
 
-        console.log(`Found ${res.rowCount} broken conversations.`);
-        if (res.rowCount > 0) {
-            console.log(res.rows);
-        }
+        console.log('Policies on conversations:');
+        res.rows.forEach(row => {
+            console.log(`\nPolicy: ${row.policyname}`);
+            console.log(`  Command: ${row.cmd}`);
+            console.log(`  USING: ${row.qual}`);
+        });
 
     } catch (err) {
-        console.error('Check failed:', err);
+        console.error('Inspect failed:', err);
     } finally {
         await client.end();
     }
 }
 
-checkBrokenConversations();
+inspectConversationsPolicies();

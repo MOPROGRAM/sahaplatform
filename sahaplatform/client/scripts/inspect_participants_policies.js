@@ -2,51 +2,49 @@ const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-// Read .env.local manually
 const envPath = path.resolve(__dirname, '../.env.local');
 let connectionString = '';
 
 try {
     const envContent = fs.readFileSync(envPath, 'utf8');
     const dbUrlMatch = envContent.match(/DATABASE_URL=(.+)/);
-    
     if (dbUrlMatch) {
         connectionString = dbUrlMatch[1].trim();
-        // Handle quotes if present
         if (connectionString.startsWith('"') && connectionString.endsWith('"')) {
             connectionString = connectionString.slice(1, -1);
         }
-    } else {
-        console.error('DATABASE_URL not found in .env.local');
-        process.exit(1);
     }
 } catch (e) {
     console.error('Could not read .env.local', e);
     process.exit(1);
 }
 
-const client = new Client({
-  connectionString: connectionString,
-});
+const client = new Client({ connectionString });
 
-async function runMigration() {
+async function inspectPolicies() {
     try {
         await client.connect();
         console.log('Connected to database');
-        
-        const sqlPath = path.resolve(__dirname, 'fix_participants_insert_policy.sql');
-        const sql = fs.readFileSync(sqlPath, 'utf8');
-        
-        console.log('Running migration from fix_participants_insert_policy.sql...');
-        await client.query(sql);
-        console.log('Migration completed successfully!');
+
+        const res = await client.query(`
+            SELECT schemaname, tablename, policyname, cmd, qual, with_check
+            FROM pg_policies
+            WHERE tablename = 'conversation_participants';
+        `);
+
+        console.log('Policies on conversation_participants:');
+        res.rows.forEach(row => {
+            console.log(`\nPolicy: ${row.policyname}`);
+            console.log(`  Command: ${row.cmd}`);
+            console.log(`  USING: ${row.qual}`);
+            console.log(`  WITH CHECK: ${row.with_check}`);
+        });
 
     } catch (err) {
-        console.error('Migration failed:', err);
-        process.exit(1);
+        console.error('Inspect failed:', err);
     } finally {
         await client.end();
     }
 }
 
-runMigration();
+inspectPolicies();
