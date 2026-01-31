@@ -490,11 +490,19 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 )}
 
                                 {isVoice && msg.file_url && (
-                                    <div className="flex items-center gap-2 min-w-[200px] py-1">
+                                    <div className="flex flex-col gap-1 min-w-[200px] py-1">
                                         <audio controls className="h-8 w-full max-w-[250px]">
                                             <source src={msg.file_url} type="audio/webm" />
                                             Your browser does not support the audio element.
                                         </audio>
+                                        <a 
+                                            href={msg.file_url} 
+                                            download 
+                                            target="_blank" 
+                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
+                                        >
+                                            <Download size={10} /> {language === 'ar' ? 'تحميل التسجيل' : 'Download Audio'}
+                                        </a>
                                     </div>
                                 )}
 
