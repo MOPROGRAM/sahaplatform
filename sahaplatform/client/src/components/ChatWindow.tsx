@@ -68,23 +68,21 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         let channel: any;
         if (conversationId) {
             // Validate session before starting
-            supabase.auth.getSession().then(({ data: { session } }) => {
-                if (!session) {
-                    // Try to refresh or warn
-                     supabase.auth.refreshSession().then(({ data: { session: newSession }, error }) => {
-                        if (!newSession || error) {
-                            console.error('Session expired in ChatWindow');
-                            // Optionally redirect or show error state
-                            return;
-                        }
-                        fetchChatData();
-                        setupSubscription();
-                     });
-                } else {
-                    fetchChatData();
-                    setupSubscription();
+            (async () => {
+                try {
+                     // Force refresh session first as requested
+                     const { data: { session }, error } = await supabase.auth.refreshSession();
+                     if (error || !session) {
+                         console.error('Session expired or invalid:', error);
+                         return;
+                     }
+                     
+                     fetchChatData();
+                     setupSubscription();
+                } catch (e) {
+                    console.error("Auth check failed", e);
                 }
-            });
+            })();
 
             const setupSubscription = () => {
                  // Subscribe to new messages
