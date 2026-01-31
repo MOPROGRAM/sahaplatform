@@ -615,38 +615,66 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                                 className="max-w-[250px] max-h-[250px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
                                                 onClick={() => window.open(msg.file_url, '_blank')}
                                                 onError={(e) => {
-                                                    e.currentTarget.src = '/placeholder-image.png'; // Fallback
-                                                    e.currentTarget.onerror = null; // Prevent loop
+                                                    (e.target as HTMLImageElement).src = '/placeholder-image.png';
                                                 }}
                                             />
                                         </div>
-                                        <a 
-                                            href={msg.file_url} 
-                                            download 
-                                            target="_blank" 
-                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
-                                        >
-                                            <Download size={10} /> {language === 'ar' ? 'تحميل الصورة' : 'Download Image'}
-                                        </a>
                                     </div>
                                 )}
 
                                 {isVideo && msg.file_url && (
-                                    <div className="mb-1 min-w-[200px]">
-                                        <video controls className="max-w-full rounded-lg border border-black/10">
-                                            <source src={msg.file_url} type={msg.file_type || 'video/mp4'} />
-                                            Your browser does not support the video tag.
-                                        </video>
+                                    <div className="mb-1">
+                                        <video 
+                                            src={msg.file_url} 
+                                            controls 
+                                            className="max-w-[250px] max-h-[250px] rounded-lg border border-black/10"
+                                        />
+                                    </div>
+                                )}
+
+                                {isVoice && msg.file_url && (
+                                    <div className="flex items-center gap-2 min-w-[150px] mb-1">
+                                        <div className="p-2 bg-primary/10 rounded-full text-primary">
+                                            <Play size={16} className="fill-current" />
+                                        </div>
+                                        <div className="flex flex-col flex-1">
+                                            <div className="h-1 bg-gray-200 rounded-full w-full overflow-hidden">
+                                                <div className="h-full bg-primary w-1/3"></div>
+                                            </div>
+                                            <span className="text-[9px] text-gray-500 font-mono mt-1">
+                                                {msg.duration ? formatTime(msg.duration) : '0:00'}
+                                            </span>
+                                        </div>
+                                        {/* Audio Element for playback */}
+                                        <audio src={msg.file_url} controls className="hidden" />
+                                    </div>
+                                )}
+
+                                {msg.file_url && !isImage && !isVideo && !isVoice && (
+                                    <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600 mb-1">
+                                        <div className="p-2 bg-white dark:bg-gray-600 rounded-md shadow-sm">
+                                            <FileText size={20} className="text-primary" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-bold text-gray-700 dark:text-gray-200 truncate max-w-[150px]">
+                                                {msg.file_name || 'Attachment'}
+                                            </span>
+                                            <span className="text-[9px] text-gray-400">
+                                                {msg.file_size ? `${(msg.file_size / 1024).toFixed(1)} KB` : 'File'}
+                                            </span>
+                                        </div>
                                         <a 
                                             href={msg.file_url} 
-                                            download 
+                                            download={msg.file_name || "download"} 
                                             target="_blank" 
-                                            className={`flex items-center gap-1 mt-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
+                                            rel="noopener noreferrer"
+                                            className="ml-2 p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-gray-500 transition-colors"
                                         >
-                                            <Download size={10} /> {language === 'ar' ? 'تحميل الفيديو' : 'Download Video'}
+                                            <Download size={14} />
                                         </a>
                                     </div>
                                 )}
+
 
                                 {isVoice && msg.file_url && (
                                     <div className="flex flex-col gap-1 min-w-[200px] py-1">
