@@ -408,11 +408,32 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
     const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice' | 'video') => {
         try {
+            // Start progress simulation
+            setUploadProgress(10);
+            const interval = setInterval(() => {
+                setUploadProgress(prev => {
+                    if (prev >= 90) {
+                        clearInterval(interval);
+                        return 90;
+                    }
+                    return prev + 10;
+                });
+            }, 300);
+
             // Upload via service (which uses Supabase storage)
             const uploadResult = await conversationsService.uploadFile(file, conversationId);
+            
+            // Complete progress
+            clearInterval(interval);
+            setUploadProgress(100);
+            
+            // Reset after delay
+            setTimeout(() => setUploadProgress(0), 1000);
+            
             return uploadResult;
         } catch (error) {
             console.error('Error uploading file:', error);
+            setUploadProgress(0);
             alert(language === 'ar' ? 'فشل رفع الملف' : 'Failed to upload file');
             return null;
         }

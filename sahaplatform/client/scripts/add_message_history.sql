@@ -13,6 +13,7 @@ ALTER TABLE message_edits ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can view edits for messages they are part of (sender or receiver)
 -- This requires a join with messages and conversation_participants, which might be expensive.
 -- For simplicity, let's allow participants of the conversation to view edits.
+DROP POLICY IF EXISTS "Participants can view edit history" ON message_edits;
 CREATE POLICY "Participants can view edit history" ON message_edits
     FOR SELECT
     USING (
