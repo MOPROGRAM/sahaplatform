@@ -7,6 +7,7 @@ import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
 // import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
+import VideoCall from "./VideoCall";
 
 interface Message {
     id: string;
@@ -58,6 +59,12 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [showAttachments, setShowAttachments] = useState(false);
     
+    // Video Call State
+    const [isInCall, setIsInCall] = useState(false);
+    const [currentCallId, setCurrentCallId] = useState<string | null>(null);
+    const [isCaller, setIsCaller] = useState(false);
+    const [incomingCall, setIncomingCall] = useState<{ id: string, caller_id: string } | null>(null);
+
     // const socketRef = useRef<any>(null);
 
     useEffect(() => {
@@ -66,6 +73,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
     useEffect(() => {
         let channel: any;
+        let callChannel: any;
         if (conversationId) {
             // Validate session before starting
             (async () => {
@@ -79,10 +87,22 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                      
                      fetchChatData();
                      setupSubscription();
+                     setupCallSubscription();
                 } catch (e) {
                     console.error("Auth check failed", e);
                 }
             })();
+
+            const setupCallSubscription = () => {
+                 // Listen for incoming calls
+                 callChannel = supabase.channel(`calls:${conversationId}`)
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'calls', filter: `receiver_id=eq.${user?.id}` }, (payload) => {
+                         if (payload.new.status === 'pending') {
+                             setIncomingCall({ id: payload.new.id, caller_id: payload.new.caller_id });
+                         }
+                    })
+                    .subscribe();
+            };
 
             const setupSubscription = () => {
                  // Subscribe to new messages
@@ -139,6 +159,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         return () => {
             if (channel) {
                 conversationsService.unsubscribe(channel);
+            }
+            if (callChannel) {
+                supabase.removeChannel(callChannel);
             }
         };
     }, [conversationId]);
@@ -301,17 +324,45 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
     const handleVideoCall = async () => {
         try {
-            // Check permissions first
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            // Stop immediately as we just want to check permission/capability for this demo
-            stream.getTracks().forEach(track => track.stop());
-            
-            // Send call message
-            handleSend('call', language === 'ar' ? '📞 مكالمة فيديو فائتة' : '📞 Video Call (Missed)');
-            // In a real app, this would trigger a WebRTC offer/signaling
+            // Create a new call record
+            const { data: callData, error } = await supabase
+                .from('calls')
+                .insert({
+                    conversation_id: conversationId,
+                    caller_id: user?.id,
+                    receiver_id: otherMember.id,
+                    status: 'pending'
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            setCurrentCallId(callData.id);
+            setIsCaller(true);
+            setIsInCall(true);
+
+            // Send call message notification
+            handleSend('call', language === 'ar' ? '📞 مكالمة فيديو' : '📞 Video Call');
         } catch (error) {
-            console.error('Camera access denied:', error);
-            alert(language === 'ar' ? 'يرجى السماح بالوصول للكاميرا والميكروفون' : 'Please allow camera and microphone access');
+            console.error('Failed to start call:', error);
+            alert(language === 'ar' ? 'فشل بدء المكالمة' : 'Failed to start call');
+        }
+    };
+
+    const acceptCall = () => {
+        if (incomingCall) {
+            setCurrentCallId(incomingCall.id);
+            setIsCaller(false);
+            setIsInCall(true);
+            setIncomingCall(null);
+        }
+    };
+
+    const rejectCall = async () => {
+        if (incomingCall) {
+             await supabase.from('calls').update({ status: 'rejected' }).eq('id', incomingCall.id);
+             setIncomingCall(null);
         }
     };
 
@@ -370,6 +421,50 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
     return (
         <div className="flex flex-col h-[600px] bg-white border border-gray-200 rounded-sm shadow-2xl overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            
+            {/* Video Call Overlay */}
+            {isInCall && currentCallId && (
+                <VideoCall 
+                    callId={currentCallId} 
+                    isCaller={isCaller} 
+                    conversationId={conversationId} 
+                    otherMemberId={otherMember.id}
+                    onEnd={() => {
+                        setIsInCall(false);
+                        setCurrentCallId(null);
+                    }}
+                />
+            )}
+
+            {/* Incoming Call Notification */}
+            {incomingCall && !isInCall && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-black/80 text-white px-6 py-4 rounded-full flex items-center gap-6 shadow-2xl animate-in slide-in-from-top-4 border border-white/10">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-500 rounded-full animate-pulse">
+                            <Video size={20} className="text-white" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-bold">{otherMember.name}</span>
+                            <span className="text-[10px] opacity-70 uppercase tracking-widest">{language === 'ar' ? 'يتصل بك...' : 'Incoming Call...'}</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                         <button 
+                            onClick={rejectCall}
+                            className="p-3 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+                        >
+                            <PhoneOff size={20} />
+                        </button>
+                        <button 
+                            onClick={acceptCall}
+                            className="p-3 bg-green-500 rounded-full hover:bg-green-600 transition-colors"
+                        >
+                            <Phone size={20} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Header - High Density */}
             <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <div className="flex items-center gap-3">
