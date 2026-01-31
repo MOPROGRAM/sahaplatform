@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -63,7 +63,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [isInCall, setIsInCall] = useState(false);
     const [currentCallId, setCurrentCallId] = useState<string | null>(null);
     const [isCaller, setIsCaller] = useState(false);
-    const [incomingCall, setIncomingCall] = useState<{ id: string, caller_id: string } | null>(null);
+    const [incomingCall, setIncomingCall] = useState<{ id: string, caller_id: string, call_type: 'video' | 'audio' } | null>(null);
+    const [callType, setCallType] = useState<'video' | 'audio'>('video');
 
     // const socketRef = useRef<any>(null);
 
@@ -98,7 +99,11 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                  callChannel = supabase.channel(`calls:${conversationId}`)
                     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'calls', filter: `receiver_id=eq.${user?.id}` }, (payload) => {
                          if (payload.new.status === 'pending') {
-                             setIncomingCall({ id: payload.new.id, caller_id: payload.new.caller_id });
+                             setIncomingCall({ 
+                                id: payload.new.id, 
+                                caller_id: payload.new.caller_id,
+                                call_type: payload.new.call_type || 'video' 
+                             });
                          }
                     })
                     .subscribe();
@@ -323,6 +328,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     };
 
     const handleVideoCall = async () => {
+        startCall('video');
+    };
+
+    const handleVoiceCall = async () => {
+        startCall('audio');
+    };
+
+    const startCall = async (type: 'video' | 'audio') => {
         try {
             // Create a new call record
             const { data: callData, error } = await supabase
@@ -331,7 +344,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     conversation_id: conversationId,
                     caller_id: user?.id,
                     receiver_id: otherMember.id,
-                    status: 'pending'
+                    status: 'pending',
+                    call_type: type
                 })
                 .select()
                 .single();
@@ -339,11 +353,15 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             if (error) throw error;
 
             setCurrentCallId(callData.id);
+            setCallType(type);
             setIsCaller(true);
             setIsInCall(true);
 
             // Send call message notification
-            handleSend('call', language === 'ar' ? '📞 مكالمة فيديو' : '📞 Video Call');
+            const messageText = type === 'video' 
+                ? (language === 'ar' ? '📞 مكالمة فيديو' : '📞 Video Call')
+                : (language === 'ar' ? '📞 مكالمة صوتية' : '📞 Voice Call');
+            handleSend('call', messageText);
         } catch (error) {
             console.error('Failed to start call:', error);
             alert(language === 'ar' ? 'فشل بدء المكالمة' : 'Failed to start call');
@@ -353,6 +371,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const acceptCall = () => {
         if (incomingCall) {
             setCurrentCallId(incomingCall.id);
+            setCallType(incomingCall.call_type);
             setIsCaller(false);
             setIsInCall(true);
             setIncomingCall(null);
@@ -429,6 +448,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     isCaller={isCaller} 
                     conversationId={conversationId} 
                     otherMemberId={otherMember.id}
+                    callType={callType}
                     onEnd={() => {
                         setIsInCall(false);
                         setCurrentCallId(null);
@@ -441,11 +461,15 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-black/80 text-white px-6 py-4 rounded-full flex items-center gap-6 shadow-2xl animate-in slide-in-from-top-4 border border-white/10">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-green-500 rounded-full animate-pulse">
-                            <Video size={20} className="text-white" />
+                            {incomingCall.call_type === 'video' ? <Video size={20} className="text-white" /> : <Phone size={20} className="text-white" />}
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm font-bold">{otherMember.name}</span>
-                            <span className="text-[10px] opacity-70 uppercase tracking-widest">{language === 'ar' ? 'يتصل بك...' : 'Incoming Call...'}</span>
+                            <span className="text-[10px] opacity-70 uppercase tracking-widest">
+                                {language === 'ar' 
+                                    ? (incomingCall.call_type === 'video' ? 'يتصل بك فيديو...' : 'يتصل بك صوتي...') 
+                                    : (incomingCall.call_type === 'video' ? 'Incoming Video Call...' : 'Incoming Voice Call...')}
+                            </span>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -489,6 +513,13 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             <span className="text-[9px] font-black text-secondary truncate max-w-[100px] uppercase italic">{adInfo.title}</span>
                         </div>
                     )}
+                    <button 
+                        onClick={handleVoiceCall} 
+                        className="p-1.5 hover:bg-blue-50 text-text-muted hover:text-blue-500 transition-all rounded-xs"
+                        title={language === 'ar' ? 'مكالمة صوتية' : 'Voice Call'}
+                    >
+                        <Phone size={16} />
+                    </button>
                     <button 
                         onClick={handleVideoCall} 
                         className="p-1.5 hover:bg-blue-50 text-text-muted hover:text-blue-500 transition-all rounded-xs"

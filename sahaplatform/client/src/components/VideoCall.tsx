@@ -9,6 +9,7 @@ interface VideoCallProps {
     isCaller: boolean;
     conversationId: string;
     otherMemberId: string;
+    callType?: 'video' | 'audio';
     onEnd: () => void;
 }
 
@@ -21,12 +22,12 @@ const SERVERS = {
     iceCandidatePoolSize: 10,
 };
 
-export default function VideoCall({ callId, isCaller, conversationId, otherMemberId, onEnd }: VideoCallProps) {
+export default function VideoCall({ callId, isCaller, conversationId, otherMemberId, callType = 'video', onEnd }: VideoCallProps) {
     const { language } = useLanguage();
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
     const [isMuted, setIsMuted] = useState(false);
-    const [isVideoOff, setIsVideoOff] = useState(false);
+    const [isVideoOff, setIsVideoOff] = useState(callType === 'audio');
     const [status, setStatus] = useState<'connecting' | 'connected' | 'ended'>('connecting');
     
     const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -51,9 +52,14 @@ export default function VideoCall({ callId, isCaller, conversationId, otherMembe
 
     const setupCall = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const constraints = {
+                video: callType === 'video',
+                audio: true
+            };
+            
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
             setLocalStream(stream);
-            if (localVideoRef.current) {
+            if (localVideoRef.current && callType === 'video') {
                 localVideoRef.current.srcObject = stream;
             }
 
@@ -183,7 +189,9 @@ export default function VideoCall({ callId, isCaller, conversationId, otherMembe
     };
 
     const toggleVideo = () => {
-        if (localStream) {
+        // Only allow toggling video if it was a video call to start with, or we upgrade logic (later)
+        // For now, if audio-only, video toggle might enable camera but let's keep it simple.
+        if (localStream && callType === 'video') {
             localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
             setIsVideoOff(!isVideoOff);
         }
@@ -193,7 +201,7 @@ export default function VideoCall({ callId, isCaller, conversationId, otherMembe
         <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center">
             <div className="relative w-full h-full flex items-center justify-center p-4">
                  {/* Remote Video (Main) */}
-                {remoteStream ? (
+                {remoteStream && callType === 'video' ? (
                     <video
                         ref={remoteVideoRef}
                         autoPlay
@@ -202,46 +210,51 @@ export default function VideoCall({ callId, isCaller, conversationId, otherMembe
                     />
                 ) : (
                     <div className="flex flex-col items-center justify-center text-white">
-                        <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                            <Video size={40} className="text-gray-400" />
+                        <div className="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                            {callType === 'video' ? <Video size={64} className="text-gray-400" /> : <Mic size={64} className="text-gray-400" />}
                         </div>
-                        <p>{status === 'connecting' ? (language === 'ar' ? 'جاري الاتصال...' : 'Connecting...') : (language === 'ar' ? 'متصل' : 'Connected')}</p>
+                        <h3 className="text-2xl font-bold mb-2">{language === 'ar' ? 'متصل' : 'Connected'}</h3>
+                        <p className="opacity-70">{status === 'connecting' ? (language === 'ar' ? 'جاري الاتصال...' : 'Connecting...') : (language === 'ar' ? 'مكالمة جارية' : 'Call in progress')}</p>
                     </div>
                 )}
 
                 {/* Local Video (PiP) */}
-                <div className="absolute top-4 right-4 w-32 h-48 bg-black border border-gray-700 rounded-lg overflow-hidden shadow-2xl">
-                     <video
-                        ref={localVideoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className={`w-full h-full object-cover ${isVideoOff ? 'hidden' : ''}`}
-                    />
-                    {isVideoOff && (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white">
-                            <VideoOff size={24} />
-                        </div>
-                    )}
-                </div>
+                {callType === 'video' && (
+                    <div className="absolute top-4 right-4 w-32 h-48 bg-black border border-gray-700 rounded-lg overflow-hidden shadow-2xl">
+                        <video
+                            ref={localVideoRef}
+                            autoPlay
+                            playsInline
+                            muted
+                            className={`w-full h-full object-cover ${isVideoOff ? 'hidden' : ''}`}
+                        />
+                        {isVideoOff && (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white">
+                                <VideoOff size={24} />
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Controls */}
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-gray-900/80 p-4 rounded-full backdrop-blur-sm border border-white/10">
                     <button
                         onClick={toggleMute}
-                        className={`p-3 rounded-full transition-all ${isMuted ? 'bg-red-500 text-white' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
+                        className={`p-4 rounded-full transition-all ${isMuted ? 'bg-red-500 text-white' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
                     >
                         {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
                     </button>
-                    <button
-                        onClick={toggleVideo}
-                        className={`p-3 rounded-full transition-all ${isVideoOff ? 'bg-red-500 text-white' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
-                    >
-                        {isVideoOff ? <VideoOff size={24} /> : <Video size={24} />}
-                    </button>
+                    {callType === 'video' && (
+                        <button
+                            onClick={toggleVideo}
+                            className={`p-4 rounded-full transition-all ${isVideoOff ? 'bg-red-500 text-white' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
+                        >
+                            {isVideoOff ? <VideoOff size={24} /> : <Video size={24} />}
+                        </button>
+                    )}
                     <button
                         onClick={endCall}
-                        className="p-3 rounded-full bg-red-600 text-white hover:bg-red-700 transition-all shadow-lg shadow-red-600/30"
+                        className="p-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition-all shadow-lg shadow-red-600/30"
                     >
                         <PhoneOff size={24} />
                     </button>
