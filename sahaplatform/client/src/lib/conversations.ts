@@ -123,6 +123,9 @@ export const conversationsService = {
 
     // Create or Get Conversation (Smart Routing with RPC)
     async createOrGetConversation(adId: string, participantId: string): Promise<Conversation> {
+        // Refresh session to avoid "Session issued in the future" error
+        await supabase.auth.refreshSession();
+        
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('User not authenticated');
         
@@ -204,14 +207,26 @@ export const conversationsService = {
         const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const filePath = `${conversationId}/${Date.now()}-${safeFileName}`;
         
-        const { error: uploadError } = await supabase.storage
-            .from('chat_vault')
+        // Use 'chat-media' bucket if available, otherwise fallback to 'chat_vault'
+        // Ideally we should check which bucket exists, but let's default to the new standard 'chat-media'
+        // If upload fails, we might want to try 'chat_vault' as fallback
+        let bucketName = 'chat-media';
+        
+        let { error: uploadError } = await supabase.storage
+            .from(bucketName)
             .upload(filePath, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+             console.warn(`Upload to ${bucketName} failed, trying chat_vault`, uploadError);
+             bucketName = 'chat_vault';
+             const { error: retryError } = await supabase.storage
+                .from(bucketName)
+                .upload(filePath, file);
+             if (retryError) throw retryError;
+        }
 
         const { data } = await supabase.storage
-            .from('chat_vault')
+            .from(bucketName)
             .createSignedUrl(filePath, 31536000, {
                 download: file.name
             });
@@ -243,8 +258,17 @@ export const conversationsService = {
         if (error) throw error;
     },
 
-    // Edit Message
-    async editMessage(messageId: string, newContent: string): Promise<void> {
+    // Edit Message (with 30 min limit)
+    async editMessage(messageId: string, newContent: string, createdAt: string): Promise<void> {
+        // Check 30 min limit
+        const created = new Date(createdAt).getTime();
+        const now = new Date().getTime();
+        const diffMinutes = (now - created) / 60000;
+        
+        if (diffMinutes > 30) {
+            throw new Error(document.documentElement.lang === 'ar' ? 'لا يمكن تعديل الرسالة بعد مرور 30 دقيقة' : 'Cannot edit message after 30 minutes');
+        }
+
         const { error } = await supabase.rpc('edit_message', { 
             p_message_id: messageId, 
             p_new_content: newContent 
@@ -252,8 +276,17 @@ export const conversationsService = {
         if (error) throw error;
     },
 
-    // Delete Message
-    async deleteMessage(messageId: string): Promise<void> {
+    // Delete Message (with 30 min limit)
+    async deleteMessage(messageId: string, createdAt: string): Promise<void> {
+        // Check 30 min limit
+        const created = new Date(createdAt).getTime();
+        const now = new Date().getTime();
+        const diffMinutes = (now - created) / 60000;
+
+        if (diffMinutes > 30) {
+            throw new Error(document.documentElement.lang === 'ar' ? 'لا يمكن حذف الرسالة بعد مرور 30 دقيقة' : 'Cannot delete message after 30 minutes');
+        }
+
         const { error } = await supabase.rpc('delete_message', { p_message_id: messageId });
         if (error) throw error;
     },

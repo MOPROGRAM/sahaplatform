@@ -1,13 +1,54 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, Maximize2, Plus, Minus } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, Maximize2, Plus, Minus, AlertTriangle } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
 // import { io } from "socket.io-client";
 import { useLanguage } from "@/lib/language-context";
 import VideoCall from "./VideoCall";
+
+// Error Boundary Component
+class ChatErrorBoundary extends React.Component<{children: React.ReactNode, language: string}, {hasError: boolean}> {
+  constructor(props: {children: React.ReactNode, language: string}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("Chat Window Error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col h-[600px] items-center justify-center bg-red-50 border border-red-100 rounded-sm p-6 text-center" dir={this.props.language === 'ar' ? 'rtl' : 'ltr'}>
+            <AlertTriangle className="text-red-500 mb-4" size={48} />
+            <h3 className="text-lg font-bold text-red-700 mb-2">
+                {this.props.language === 'ar' ? 'حدث خطأ غير متوقع' : 'Something went wrong'}
+            </h3>
+            <p className="text-xs text-red-600 mb-6 max-w-xs mx-auto">
+                {this.props.language === 'ar' 
+                    ? 'نواجه مشكلة في تحميل المحادثة. حاول تحديث الصفحة.' 
+                    : 'We encountered an issue loading the chat. Please try refreshing.'}
+            </p>
+            <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-red-600 text-white rounded-full text-xs font-bold hover:bg-red-700 transition-colors"
+            >
+                {this.props.language === 'ar' ? 'تحديث الصفحة' : 'Refresh Page'}
+            </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 interface Message {
     id: string;
@@ -36,7 +77,7 @@ interface ChatWindowProps {
     onClose?: () => void;
 }
 
-export default function ChatWindow({ conversationId, onClose }: ChatWindowProps) {
+function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
     const { user } = useAuthStore();
     const { language } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
@@ -994,5 +1035,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 </div>
             )}
         </div>
+    );
+}
+
+export default function ChatWindow(props: ChatWindowProps) {
+    const { language } = useLanguage();
+    return (
+        <ChatErrorBoundary language={language}>
+            <ChatWindowContent {...props} />
+        </ChatErrorBoundary>
     );
 }

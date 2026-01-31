@@ -21,30 +21,24 @@ try {
 
 const client = new Client({ connectionString });
 
-async function inspectPolicies() {
+async function runSchemaFix() {
     try {
         await client.connect();
         console.log('Connected to database');
-
-        const res = await client.query(`
-            SELECT schemaname, tablename, policyname, cmd, qual, with_check
-            FROM pg_policies
-            WHERE tablename = 'conversation_participants';
-        `);
-
-        console.log('Policies on conversation_participants:');
-        res.rows.forEach(row => {
-            console.log(`\nPolicy: ${row.policyname}`);
-            console.log(`  Command: ${row.cmd}`);
-            console.log(`  USING: ${row.qual}`);
-            console.log(`  WITH CHECK: ${row.with_check}`);
-        });
+        
+        const sqlPath = path.resolve(__dirname, 'fix_messaging_schema_only.sql');
+        const sql = fs.readFileSync(sqlPath, 'utf8');
+        
+        console.log('Running messaging schema fix (FKs, Columns)...');
+        await client.query(sql);
+        console.log('Schema fix applied successfully!');
 
     } catch (err) {
-        console.error('Inspect failed:', err);
+        console.error('Fix failed:', err);
+        process.exit(1);
     } finally {
         await client.end();
     }
 }
 
-inspectPolicies();
+runSchemaFix();

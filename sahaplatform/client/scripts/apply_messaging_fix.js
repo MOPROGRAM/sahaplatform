@@ -21,17 +21,17 @@ try {
 
 const client = new Client({ connectionString });
 
-async function runFix() {
+async function runFullFix() {
     try {
         await client.connect();
         console.log('Connected to database');
         
-        const sqlPath = path.resolve(__dirname, 'fix_recursion_final.sql');
+        const sqlPath = path.resolve(__dirname, 'fix_messaging_full.sql');
         const sql = fs.readFileSync(sqlPath, 'utf8');
         
-        console.log('Running recursion fix...');
+        console.log('Running full messaging fix (FKs, Columns, Storage)...');
         await client.query(sql);
-        console.log('Fix applied successfully!');
+        console.log('Full fix applied successfully!');
 
     } catch (err) {
         console.error('Fix failed:', err);
@@ -41,4 +41,4 @@ async function runFix() {
     }
 }
 
-runFix();
+runFullFix();
