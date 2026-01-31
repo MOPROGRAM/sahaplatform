@@ -24,7 +24,7 @@ async function runMigration() {
         await client.connect();
         console.log('Connected to database');
 
-        const sqlPath = path.resolve(__dirname, 'rebuild_chat_schema.sql');
+        const sqlPath = path.resolve(__dirname, 'fix_chat_rls.sql');
         const sql = fs.readFileSync(sqlPath, 'utf8');
 
         console.log('Running migration...');

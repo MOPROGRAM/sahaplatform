@@ -301,6 +301,22 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
+    const handleVideoCall = async () => {
+        try {
+            // Check permissions first
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            // Stop immediately as we just want to check permission/capability for this demo
+            stream.getTracks().forEach(track => track.stop());
+            
+            // Send call message
+            handleSend('call', language === 'ar' ? '📞 مكالمة فيديو فائتة' : '📞 Video Call (Missed)');
+            // In a real app, this would trigger a WebRTC offer/signaling
+        } catch (error) {
+            console.error('Camera access denied:', error);
+            alert(language === 'ar' ? 'يرجى السماح بالوصول للكاميرا والميكروفون' : 'Please allow camera and microphone access');
+        }
+    };
+
     const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice' | 'video') => {
         try {
             // Upload via service (which uses Supabase storage)
@@ -381,7 +397,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         </div>
                     )}
                     <button 
-                        onClick={() => alert(language === 'ar' ? 'المكالمات قريبا' : 'Calls coming soon')} 
+                        onClick={handleVideoCall} 
                         className="p-1.5 hover:bg-blue-50 text-text-muted hover:text-blue-500 transition-all rounded-xs"
                         title={language === 'ar' ? 'مكالمة فيديو' : 'Video Call'}
                     >
@@ -522,6 +538,20 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                         >
                                             <Download size={10} /> {language === 'ar' ? 'تحميل التسجيل' : 'Download Audio'}
                                         </a>
+                                    </div>
+                                )}
+
+                                {msg.message_type === 'call' && (
+                                    <div className={`flex items-center gap-3 p-3 rounded-lg border ${isMe ? 'bg-white/10 border-white/20' : 'bg-gray-50 border-gray-100'}`}>
+                                        <div className={`p-2 rounded-full ${isMe ? 'bg-white/20 text-white' : 'bg-red-100 text-red-500'}`}>
+                                            <Video size={20} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={`text-xs font-bold ${isMe ? 'text-white' : 'text-gray-800'}`}>{msg.content}</span>
+                                            <span className={`text-[9px] ${isMe ? 'text-white/70' : 'text-gray-400'}`}>
+                                                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
 
