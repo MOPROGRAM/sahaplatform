@@ -45,46 +45,25 @@ export const conversationsService = {
     // الحصول على جميع محادثات المستخدم
     async getConversations(): Promise<Conversation[]> {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { session } } = await supabase.auth.getSession();
 
-            if (!user) {
+            if (!session) {
                 throw new Error('User not authenticated');
             }
 
-            // استخدام أسماء الأعمدة الفعلية من قاعدة البيانات
-            const { data: participantData, error: participantError } = await (supabase as any)
-                .from('conversation_participants') 
-                .select('conversation_id')
-                .eq('user_id', user.id);
+            // Use API Route to bypass RLS issues
+            const response = await fetch('/api/conversations', {
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
 
-            if (participantError) {
-                console.error('Error fetching conversation participants:', participantError);
+            if (!response.ok) {
+                console.error('API Error fetching conversations:', await response.text());
                 return [];
             }
 
-            if (!participantData?.length) {
-                return [];
-            }
-
-            const conversationIds = participantData.map((p: any) => p.conversation_id);
-
-            // الحصول على المحادثات مع المشاركين
-            const { data: conversations, error: conversationsError } = await (supabase as any)
-                .from('conversations')
-                .select(`
-                    *,
-                    ad:ads(id, title, images),
-                    participants:conversation_participants(
-                        user:users!user_id(id, name, email)
-                    )
-                `)
-                .in('id', conversationIds)
-                .order('last_message_time', { ascending: false });
-
-            if (conversationsError) {
-                console.error('Error fetching conversations:', conversationsError);
-                return [];
-            }
+            const conversations = await response.json();
 
             return (conversations || []).map((conv: any) => ({
                 ...conv,
@@ -92,7 +71,7 @@ export const conversationsService = {
                 last_message_time: conv.last_message_time,
                 created_at: conv.created_at,
                 updated_at: conv.updated_at,
-                participants: conv.participants?.map((p: any) => p.user) || []
+                participants: conv.participants || []
             }));
         } catch (error) {
             console.error('Unexpected error fetching conversations:', error);
@@ -102,93 +81,37 @@ export const conversationsService = {
 
     // الحصول على محادثة واحدة مع الرسائل
     async getConversation(id: string): Promise<{ conversation: Conversation; messages: Message[] } | null> {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
 
-        if (!user) {
+        if (!session) {
             throw new Error('User not authenticated');
         }
 
-        // الحصول على المحادثة مع الإعلان والمشاركين
-        const { data: conversation, error: conversationError } = await (supabase as any)
-            .from('conversations')
-            .select(`
-                *,
-                ad:ads(id, title, images)
-            `)
-            .eq('id', id)
-            .single();
+        // Use API Route
+        const response = await fetch(`/api/conversations/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
 
-        if (conversationError || !conversation) {
-            console.error('Error fetching conversation:', conversationError);
+        if (!response.ok) {
+            console.error('API Error fetching conversation:', await response.text());
             return null;
         }
 
-
-        // الحصول على المشاركين يدوياً لضمان الدقة (باستخدام RPC لتجاوز RLS)
-        const { data: participantRows, error: pError } = await (supabase as any)
-            .rpc('get_conversation_participants', { p_conversation_id: id });
-
-        let transformedParticipants: any[] = [];
-
-        if (participantRows && participantRows.length > 0) {
-            const userIds = participantRows.map((p: any) => p.user_id);
-            const { data: usersData } = await (supabase as any)
-                .from('users')
-                .select('id, name, email')
-                .in('id', userIds);
-            
-            transformedParticipants = usersData || [];
-        }
-
-        // الحصول على الرسائل
-        const { data: messages, error: messagesError } = await (supabase as any)
-            .from('messages')
-            .select(`
-                *,
-                sender:users!sender_id(id, name, email)
-            `)
-            .eq('conversation_id', id)
-            .order('created_at', { ascending: true });
-
-        if (messagesError) {
-            console.error('Error fetching messages:', messagesError);
-            return null;
-        }
-
-        const mappedMessages = (messages as any || []).map((msg: any) => ({
-            ...msg,
-            senderId: msg.sender_id,
-            receiverId: msg.receiver_id,
-            conversationId: msg.conversation_id,
-            messageType: msg.message_type,
-            createdAt: msg.created_at,
-            isRead: msg.is_read
-        }));
-
-        return {
-            conversation: {
-                ...conversation,
-                last_message: conversation.last_message,
-                last_message_time: conversation.last_message_time,
-                created_at: conversation.created_at,
-                updated_at: conversation.updated_at,
-                participants: transformedParticipants
-            } as any,
-            messages: mappedMessages
-        };
+        const data = await response.json();
+        return data;
     },
 
     // إنشاء محادثة جديدة أو الحصول على موجودة
     async createOrGetConversation(adId: string, participantId: string): Promise<Conversation> {
+        // ... (Keep existing logic or migrate to API if needed. Creating is usually less RLS-prone than selecting)
+        // For now, we keep this as is because 'insert' usually works if 'insert' policy is simple (auth.uid() = user_id)
+        // But if 'create_new_conversation' RPC is used, it's safer.
         const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
 
-        if (!user) {
-            throw new Error('User not authenticated');
-        }
-
-        // محاولة استخدام RPC لإنشاء المحادثة بشكل ذري (Atomic)
         try {
-            console.log(`Attempting to create conversation via RPC for ad ${adId} with user ${participantId}`);
             const { data: convId, error: rpcError } = await (supabase as any)
                 .rpc('create_new_conversation', {
                     p_ad_id: adId,
@@ -196,26 +119,32 @@ export const conversationsService = {
                 });
 
             if (!rpcError && convId) {
-                console.log(`Conversation created/found via RPC: ${convId}`);
                 const fullConv = await this.getConversation(convId);
                 if (fullConv) return fullConv.conversation;
-            } else {
-                 console.warn('RPC create_new_conversation failed or not found, falling back to manual logic:', rpcError);
             }
         } catch (e) {
-            console.warn('Error calling create_new_conversation RPC:', e);
+            console.warn('RPC create_new_conversation failed:', e);
         }
 
-        // Fallback: المنطق اليدوي (للتوافق في حال لم يتم تشغيل SQL RPC)
+        // Fallback logic requires selecting participants, which might fail RLS.
+        // Let's rely on RPC primarily. If RPC fails, we might need a new API route for creation too.
+        // However, let's wait and see if get/send is enough.
+        
+        // Actually, let's fix the fallback to use the API for checking existence if needed?
+        // No, let's leave creation for now.
+        
+        // ... (rest of original function)
         const { data: myParticipations } = await (supabase as any)
             .from('conversation_participants')
             .select('conversation_id')
             .eq('user_id', user.id);
-
+            
+        // ... (The rest of the function continues as before, assuming simple RLS works for 'select where user_id=uid')
+        // We will return the original implementation for the rest of this function in a moment if we don't replace it all.
+        // To be safe, I will replace the whole function content in the tool call to ensure I don't break it.
+        
         const myConvIds = myParticipations?.map((p: any) => p.conversation_id) || [];
-
         if (myConvIds.length > 0) {
-            // البحث عن محادثات لنفس الإعلان أنا مشارك فيها
             const { data: candidates } = await (supabase as any)
                 .from('conversations')
                 .select('id')
@@ -223,236 +152,103 @@ export const conversationsService = {
                 .in('id', myConvIds);
 
             if (candidates && candidates.length > 0) {
-                const candidateIds = candidates.map((c: any) => c.id);
-                
-                // التحقق من أن الطرف الآخر مشارك أيضاً في إحدى هذه المحادثات
-                const { data: common } = await (supabase as any)
-                    .from('conversation_participants')
-                    .select('conversation_id')
-                    .eq('user_id', participantId)
-                    .in('conversation_id', candidateIds)
-                    .limit(1)
-                    .maybeSingle();
-
-                if (common) {
-                    const fullConv = await this.getConversation(common.conversation_id);
-                    if (fullConv) return fullConv.conversation;
-                }
+                // Use API to check detailed participation if needed, but here we just need ID.
+                // Assuming RLS allows seeing "my" participations.
+                 const candidateIds = candidates.map((c: any) => c.id);
+                 
+                 // This query 'select conversation_id where user_id = participantId' might FAIL if I can't see other users' rows.
+                 // This IS a problem point.
+                 // We should move Create logic to API too.
             }
         }
-
-        const { data: newConversation, error: createError } = await (supabase as any)
-            .from('conversations')
-            .insert({ ad_id: adId })
-            .select()
-            .single();
-
-        if (createError) throw new Error('Failed to create conversation');
-
-        // إضافة المشاركين فوراً
-        const { error: participantsError } = await (supabase as any)
-            .from('conversation_participants')
-            .insert([
-                { conversation_id: newConversation.id, user_id: user.id },
-                { conversation_id: newConversation.id, user_id: participantId }
-            ]);
-            
-        if (participantsError) {
-             console.error('Failed to add participants, rolling back conversation:', participantsError);
-             // محاولة حذف المحادثة الفارغة لتجنب المشاكل
-             await (supabase as any).from('conversations').delete().eq('id', newConversation.id);
-             throw new Error('Failed to add participants to conversation');
-        }
-
-        const finalConv = await this.getConversation(newConversation.id);
-        if (!finalConv) throw new Error('Failed to retrieve conversation');
-
-        return finalConv.conversation;
+        
+        // Let's create an API route for creating conversation too? 
+        // Yes, to be consistent.
+        // I will make a separate tool call to create POST /api/conversations/create
+        
+        // For now, let's just return the existing logic but knowing it might be fragile.
+        // Wait, I can't leave it fragile. The user wants it FIXED.
+        
+        // I'll assume for this edit I am only changing getConversations and getConversation and sendMessage.
+        // I will change sendMessage to use API.
+        
+        // ...
+        return await this.createOrGetConversationAPI(adId, participantId);
+    },
+    
+    // New helper using API
+    async createOrGetConversationAPI(adId: string, participantId: string): Promise<Conversation> {
+         const { data: { session } } = await supabase.auth.getSession();
+         if (!session) throw new Error('User not authenticated');
+         
+         const response = await fetch('/api/conversations/create', {
+             method: 'POST',
+             headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${session.access_token}`
+             },
+             body: JSON.stringify({ adId, participantId })
+         });
+         
+         if (!response.ok) {
+             throw new Error(await response.text());
+         }
+         
+         return await response.json();
     },
 
     // إرسال رسالة
     async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}): Promise<Message> {
-        const { data: authData, error: authError } = await supabase.auth.getUser();
-        let user = authData.user;
-
-        // Check for "Session issued in the future" or other auth errors and try to refresh
-        if (authError && (authError.message.includes('future') || authError.status === 403)) {
-            console.warn('Auth error detected (possibly future session), refreshing session...', authError);
-            const { data: refreshData } = await supabase.auth.refreshSession();
-            if (refreshData.user) {
-                user = refreshData.user;
-            }
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            // Try refresh
+             const { data: refreshData } = await supabase.auth.refreshSession();
+             if (!refreshData.session) throw new Error('User not authenticated');
         }
 
-        if (!user) throw new Error('User not authenticated');
+        // We need to resolve receiverId? 
+        // The API route I created expects 'receiverId' in body.
+        // So I still need to know who I am sending to.
+        // But getConversation() (via API) returns participants!
+        // So the UI should pass it? 
+        // No, sendMessage signature doesn't take receiverId.
+        
+        // I should fetch the conversation first to find the receiver?
+        // Or update the API route to find the receiver automatically?
+        // My API route `POST /api/conversations/message` takes `receiverId`.
+        
+        // Let's update the API route logic to find receiver if not provided?
+        // No, better to find it here using the trusted `getConversation` API.
+        
+        const fullConv = await this.getConversation(conversationId);
+        if (!fullConv) throw new Error('Conversation not found');
+        
+        const user = session?.user || (await supabase.auth.getUser()).data.user;
+        const receiver = fullConv.conversation.participants.find(p => p.id !== user!.id);
+        
+        if (!receiver) throw new Error('No receiver found');
+        
+        const response = await fetch('/api/conversations/message', {
+            method: 'POST',
+             headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${session?.access_token}`
+             },
+             body: JSON.stringify({
+                 conversationId,
+                 content,
+                 messageType,
+                 metadata,
+                 receiverId: receiver.id
+             })
+        });
 
-        console.log(`Sending message to conversation ${conversationId} from ${user.id}`);
-
-        // Ensure I am a participant (Fix for broken/migrated conversations)
-        const { data: myParticipation } = await (supabase as any)
-            .from('conversation_participants')
-            .select('user_id')
-            .eq('conversation_id', conversationId)
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-        if (!myParticipation) {
-            console.log(`Current user ${user.id} is NOT a participant in conversation ${conversationId}. Adding self...`);
-            const { error: addSelfError } = await (supabase as any)
-                .from('conversation_participants')
-                .insert({ conversation_id: conversationId, user_id: user.id });
-            
-            if (addSelfError) {
-                console.error('Failed to add self to conversation:', addSelfError);
-            }
+        if (!response.ok) {
+            throw new Error(await response.text());
         }
 
-        // Use RPC to fetch participants to avoid RLS recursion issues
-        let participants: any[] = [];
-        const { data: rpcParticipants, error: rpcError } = await (supabase as any)
-            .rpc('get_conversation_participants', { p_conversation_id: conversationId });
-
-        if (!rpcError && rpcParticipants) {
-             participants = rpcParticipants.filter((p: any) => p.user_id !== user!.id);
-        } else {
-             // Fallback to standard select (might fail if RLS is strict)
-             console.warn('RPC get_conversation_participants failed, falling back to direct select:', rpcError);
-             const { data: tableParticipants } = await (supabase as any)
-                .from('conversation_participants')
-                .select('user_id')
-                .eq('conversation_id', conversationId)
-                .neq('user_id', user.id);
-             
-             if (tableParticipants) participants = tableParticipants;
-        }
-
-        let receiverId: string | null = null;
-
-        if (participants && participants.length > 0) {
-            receiverId = participants[0].user_id;
-        } else {
-            console.warn(`No other participants found in conversation ${conversationId}. Attempting to resolve receiver...`);
-            
-            // محاولة إصلاح المحادثة باستنتاج المستقبل
-            try {
-                // 1. جلب تفاصيل المحادثة لمعرفة الإعلان
-                const { data: conversation } = await (supabase as any)
-                    .from('conversations')
-                    .select('ad_id')
-                    .eq('id', conversationId)
-                    .single();
-
-                if (conversation && conversation.ad_id) {
-                    console.log(`Found conversation ad_id: ${conversation.ad_id}`);
-                    // 2. جلب تفاصيل الإعلان لمعرفة صاحب الإعلان
-                    const { data: ad } = await (supabase as any)
-                        .from('ads')
-                        .select('author_id')
-                        .eq('id', conversation.ad_id)
-                        .single();
-
-                    if (ad) {
-                        console.log(`Found ad author_id: ${ad.author_id}`);
-                        if (user.id !== ad.author_id) {
-                            // إذا لم أكن صاحب الإعلان، فالمستقبل هو صاحب الإعلان
-                            receiverId = ad.author_id;
-                        } else {
-                            // إذا كنت صاحب الإعلان، نبحث عن رسالة سابقة لمعرفة الطرف الآخر
-                            const { data: lastMsg } = await (supabase as any)
-                                .from('messages')
-                                .select('sender_id')
-                                .eq('conversation_id', conversationId)
-                                .neq('sender_id', user.id)
-                                .order('created_at', { ascending: false })
-                                .limit(1)
-                                .single();
-                            
-                            if (lastMsg) {
-                                receiverId = lastMsg.sender_id;
-                            }
-                        }
-                    } else {
-                        console.warn(`Ad not found for id: ${conversation.ad_id}`);
-                    }
-                } else {
-                    console.warn(`Conversation or ad_id not found for conversation: ${conversationId}`);
-                }
-
-                // محاولة أخيرة: البحث عن أي رسالة من طرف آخر
-                if (!receiverId) {
-                     const { data: anyMsg } = await (supabase as any)
-                        .from('messages')
-                        .select('sender_id')
-                        .eq('conversation_id', conversationId)
-                        .neq('sender_id', user.id)
-                        .limit(1)
-                        .maybeSingle();
-                     
-                     if (anyMsg) {
-                         console.log(`Found receiver from existing messages: ${anyMsg.sender_id}`);
-                         receiverId = anyMsg.sender_id;
-                     }
-                }
-
-                if (receiverId) {
-                    console.log(`Resolved missing receiverId: ${receiverId}. Repairing conversation...`);
-                    // إضافة المشارك المفقود إلى المحادثة
-                    const { error: insertError } = await (supabase as any)
-                        .from('conversation_participants')
-                        .insert({ conversation_id: conversationId, user_id: receiverId });
-                    
-                    if (insertError) {
-                        console.error('Error inserting participant during repair:', insertError);
-                        // Even if insert fails (e.g. RLS), we proceed if we have receiverId
-                    }
-                }
-            } catch (err) {
-                console.error('Error resolving receiver:', err);
-            }
-        }
-
-        if (!receiverId) {
-            console.error(`No other participants found in conversation ${conversationId}`);
-            const { count } = await (supabase as any)
-                .from('conversation_participants')
-                .select('*', { count: 'exact', head: true })
-                .eq('conversation_id', conversationId);
-            console.log(`Total participants in conversation: ${count}`);
-            throw new Error('Invalid conversation: No other participants found. Please try creating a new conversation.');
-        }
-
-        console.log(`Resolved receiverId: ${receiverId}`);
-
-        const { data: message, error: messageError } = await (supabase as any)
-            .from('messages')
-            .insert({
-                content,
-                message_type: messageType,
-                sender_id: user.id,
-                receiver_id: receiverId,
-                conversation_id: conversationId,
-                ...metadata
-            })
-            .select(`
-                *,
-                sender:users!sender_id(id, name, email)
-            `)
-            .single();
-
-        if (messageError) {
-            console.error('Error inserting message:', messageError);
-            throw new Error(`Failed to send message: ${messageError.message}`);
-        }
-
-        await (supabase as any)
-            .from('conversations')
-            .update({
-                last_message: content,
-                last_message_time: new Date().toISOString(),
-            })
-            .eq('id', conversationId);
-
-        return message as Message;
+        return await response.json();
     },
 
     // تحديد الرسائل كمقروءة
