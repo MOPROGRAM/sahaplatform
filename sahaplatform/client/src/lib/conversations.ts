@@ -44,12 +44,12 @@ export interface Message {
 // Service using API Routes to bypass RLS
 export const conversationsService = {
     // Get all conversations
-    async getConversations(): Promise<Conversation[]> {
+    async getConversations(showDeleted: boolean = false): Promise<Conversation[]> {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) throw new Error('User not authenticated');
 
-            const response = await fetch('/api/conversations', {
+            const response = await fetch(`/api/conversations?deleted=${showDeleted}`, {
                 headers: {
                     'Authorization': `Bearer ${session.access_token}`
                 }
@@ -80,75 +80,115 @@ export const conversationsService = {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('User not authenticated');
 
-        const response = await fetch(`/api/conversations/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${session.access_token}`
-            }
-        });
+        // Check if using API route or direct Supabase
+        // Falling back to direct Supabase for reliability with new columns
+        const { data: conversation, error: convError } = await supabase
+            .from('conversations')
+            .select(`
+                *,
+                ad:ads(id, title, images),
+                participants:conversation_participants(
+                    user:users(id, name, email)
+                )
+            `)
+            .eq('id', id)
+            .single();
 
-        if (!response.ok) {
-            console.error('API Error fetching conversation:', await response.text());
-            return null;
+        if (convError) {
+             // Fallback to API if RLS fails direct access
+             const response = await fetch(`/api/conversations/${id}`, {
+                headers: { 'Authorization': `Bearer ${session.access_token}` }
+            });
+            if (!response.ok) return null;
+            return await response.json();
         }
 
-        return await response.json();
+        // Fetch messages including new fields
+        const { data: messages, error: msgError } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', id)
+            .order('created_at', { ascending: true });
+
+        if (msgError) return null;
+
+        // Transform participants structure
+        const formattedConversation = {
+            ...conversation,
+            participants: conversation.participants.map((p: any) => p.user)
+        };
+
+        return { conversation: formattedConversation, messages: messages || [] };
     },
 
-    // Create or Get Conversation (Smart Routing)
+    // Create or Get Conversation (Smart Routing with RPC)
     async createOrGetConversation(adId: string, participantId: string): Promise<Conversation> {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('User not authenticated');
         
-        const response = await fetch('/api/conversations/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.access_token}`
-            },
-            body: JSON.stringify({ adId, participantId })
+        // Use the new RPC to prevent duplicates atomically
+        const { data, error } = await supabase.rpc('get_or_create_conversation', {
+            p_ad_id: adId,
+            p_user_id: session.user.id,
+            p_other_user_id: participantId
         });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to create/get conversation: ${errorText}`);
+
+        if (error) {
+            console.error('RPC Error:', error);
+            // Fallback to old API method if RPC fails
+            const response = await fetch('/api/conversations/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ adId, participantId })
+            });
+            if (!response.ok) throw new Error(await response.text());
+            return await response.json();
         }
-        
-        return await response.json();
+
+        // Fetch the full conversation details
+        const { conversation } = await this.getConversation(data.id) as any;
+        return conversation;
     },
 
-    // Send Message
+    // Send Message with File Handling
     async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}): Promise<Message> {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-             // Try to refresh session
-             const { data: { session: newSession }, error } = await supabase.auth.refreshSession();
-             if (error || !newSession) throw new Error('User not authenticated');
-        }
-        const currentSession = (await supabase.auth.getSession()).data.session;
+        if (!session) throw new Error('User not authenticated');
 
-        const response = await fetch('/api/conversations/message', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentSession?.access_token}`
-            },
-            body: JSON.stringify({
-                conversationId,
-                content,
-                messageType,
-                metadata
-            })
-        });
+        const messageData = {
+            conversation_id: conversationId,
+            sender_id: session.user.id,
+            content,
+            message_type: messageType,
+            file_url: metadata.file_url,
+            file_name: metadata.file_name,
+            file_size: metadata.file_size,
+            file_type: metadata.file_type,
+            duration: metadata.duration,
+            created_at: new Date().toISOString(),
+            is_read: false
+        };
 
-        if (!response.ok) {
-            throw new Error(await response.text());
-        }
+        const { data, error } = await supabase
+            .from('messages')
+            .insert(messageData)
+            .select()
+            .single();
 
-        return await response.json();
+        if (error) throw error;
+        return data;
     },
 
-    // Upload File to Supabase Storage
+    // Upload File to Supabase Storage (with 25MB Limit)
     async uploadFile(file: File, conversationId: string): Promise<{ file_url: string; file_name: string; file_size: number; file_type: string }> {
+        // 25MB Limit Check
+        if (file.size > 25 * 1024 * 1024) {
+            throw new Error(document.documentElement.lang === 'ar' ? 'حجم الملف يتجاوز 25 ميجابايت' : 'File size exceeds 25MB');
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('User not authenticated');
 
@@ -161,40 +201,54 @@ export const conversationsService = {
             .from('chat_vault')
             .upload(filePath, file);
 
-        if (uploadError) {
-            throw uploadError;
-        }
+        if (uploadError) throw uploadError;
 
-        // Generate Signed URL (valid for 1 year = 31536000 seconds)
-        // Since we want these links to be persistent in the chat history
         const { data } = await supabase.storage
             .from('chat_vault')
             .createSignedUrl(filePath, 31536000, {
                 download: file.name
             });
 
-        const signedUrl = data?.signedUrl;
-
-        if (!signedUrl) throw new Error('Failed to generate signed URL');
+        if (!data?.signedUrl) throw new Error('Failed to generate signed URL');
 
         return {
-            file_url: signedUrl,
+            file_url: data.signedUrl,
             file_name: file.name,
             file_size: file.size,
             file_type: file.type
         };
     },
 
-    // Mark as Read
+    // Mark as Read (RPC)
     async markAsRead(conversationId: string): Promise<void> {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
+        await supabase.rpc('mark_messages_read', { p_conversation_id: conversationId });
+    },
 
-        await supabase
-            .from('messages')
-            .update({ is_read: true })
-            .eq('conversation_id', conversationId)
-            .neq('sender_id', session.user.id);
+    // Soft Delete Conversation
+    async deleteConversation(conversationId: string): Promise<void> {
+        const { error } = await supabase.rpc('soft_delete_conversation', { p_conversation_id: conversationId });
+        if (error) throw error;
+    },
+
+    // Restore Conversation
+    async restoreConversation(conversationId: string): Promise<void> {
+        const { error } = await supabase.rpc('restore_conversation', { p_conversation_id: conversationId });
+        if (error) throw error;
+    },
+
+    // Edit Message
+    async editMessage(messageId: string, newContent: string): Promise<void> {
+        const { error } = await supabase.rpc('edit_message', { 
+            p_message_id: messageId, 
+            p_new_content: newContent 
+        });
+        if (error) throw error;
+    },
+
+    // Delete Message
+    async deleteMessage(messageId: string): Promise<void> {
+        const { error } = await supabase.rpc('delete_message', { p_message_id: messageId });
+        if (error) throw error;
     },
 
     // Realtime Subscription

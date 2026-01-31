@@ -13,12 +13,15 @@ interface Message {
     id: string;
     sender_id: string;
     content: string;
-    message_type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video';
+    message_type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video' | 'call';
     file_url?: string;
     file_name?: string;
     file_size?: number;
     duration?: number;
     is_read?: boolean;
+    read_at?: string;
+    is_edited?: boolean;
+    deleted_at?: string;
     created_at: string;
     sender?: {
         id?: string;
@@ -40,6 +43,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [participants, setParticipants] = useState<any[]>([]);
     const [adInfo, setAdInfo] = useState<any>(null);
     const [mounted, setMounted] = useState(false);
@@ -65,6 +69,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [isCaller, setIsCaller] = useState(false);
     const [incomingCall, setIncomingCall] = useState<{ id: string, caller_id: string, call_type: 'video' | 'audio' } | null>(null);
     const [callType, setCallType] = useState<'video' | 'audio'>('video');
+    const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
 
     // const socketRef = useRef<any>(null);
 
@@ -126,6 +131,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             content: newMessage.content,
                             message_type: (newMessage.messageType || newMessage.message_type || 'text') as any,
                             is_read: newMessage.is_read !== undefined ? newMessage.is_read : (newMessage.isRead !== undefined ? newMessage.isRead : false),
+                            read_at: newMessage.read_at,
+                            is_edited: newMessage.is_edited,
+                            deleted_at: newMessage.deleted_at,
                             created_at: newMessage.createdAt || newMessage.created_at || new Date().toISOString(),
                             sender: { name: '...' } // Temporary placeholder
                         };
@@ -277,42 +285,52 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     }, [conversationId]);
 
     const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video' = 'text', content?: string, fileData?: any) => {
+        if (sending) return; // Prevent duplicate sends
+
         const messageContent = content || input;
         if (!messageContent.trim() && type === 'text') return;
 
         setSending(true);
         try {
-            const payload = {
-                content: messageContent,
-                messageType: type,
-                ...fileData
-            };
-            const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType, fileData);
-
-            // Normalize returned fields (snake_case)
-            const id = sentMessage.id;
-            const contentResp = sentMessage.content;
-            const messageType = sentMessage.message_type || type;
-            const createdAt = sentMessage.created_at || new Date().toISOString();
-            const senderId = sentMessage.sender_id || user?.id;
-
-            // Add message locally immediately
-            const newMessage: Message = {
-                id: id,
-                sender_id: senderId,
-                content: contentResp,
-                message_type: messageType as any,
-                created_at: createdAt,
-                sender: { name: user?.name || 'You' },
-                ...fileData
-            };
-            setMessages(prev => [...prev, newMessage]);
-
-            if (type === 'text') setInput("");
+            if (editingMessageId && type === 'text') {
+                 await conversationsService.editMessage(editingMessageId, messageContent);
+                 setMessages(prev => prev.map(m => m.id === editingMessageId ? { ...m, content: messageContent, is_edited: true } : m));
+                 setEditingMessageId(null);
+                 setInput("");
+            } else {
+                const payload = {
+                    content: messageContent,
+                    messageType: type,
+                    ...fileData
+                };
+                const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType, fileData);
+    
+                // Normalize returned fields (snake_case)
+                const id = sentMessage.id;
+                const contentResp = sentMessage.content;
+                const messageType = sentMessage.message_type || type;
+                const createdAt = sentMessage.created_at || new Date().toISOString();
+                const senderId = sentMessage.sender_id || user?.id;
+    
+                // Add message locally immediately
+                const newMessage: Message = {
+                    id: id,
+                    sender_id: senderId,
+                    content: contentResp,
+                    message_type: messageType as any,
+                    created_at: createdAt,
+                    sender: { name: user?.name || 'You' },
+                    ...fileData
+                };
+                setMessages(prev => [...prev, newMessage]);
+    
+                if (type === 'text') setInput("");
+            }
         } catch (error: any) {
             console.error("Failed to send message:", error);
             alert((error && error.message) ? error.message : (language === 'ar' ? 'فشل في إرسال الرسالة' : 'Failed to send message'));
         } finally {
+            isSendingRef.current = false;
             setSending(false);
         }
     };
@@ -604,7 +622,37 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                 ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-gray-900 dark:text-white rounded-2xl rounded-tr-none'
                                 : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-none'}`}>
 
-                                {msg.message_type === 'text' && <p className="text-[11px] font-bold leading-relaxed whitespace-pre-wrap">{msg.content}</p>}
+                                {msg.message_type === 'text' && (
+                                    <p className={`text-[11px] font-bold leading-relaxed whitespace-pre-wrap ${msg.deleted_at ? 'italic opacity-60' : ''}`}>
+                                        {msg.content}
+                                        {msg.is_edited && !msg.deleted_at && <span className="text-[8px] opacity-50 mx-1">(edited)</span>}
+                                    </p>
+                                )}
+
+                                {isMe && !msg.deleted_at && (
+                                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="relative group/menu">
+                                            <MoreVertical size={12} className="text-gray-400 cursor-pointer" />
+                                            <div className="absolute right-0 top-full bg-white shadow-md rounded-md p-1 hidden group-hover/menu:block z-10 min-w-[80px]">
+                                                <button 
+                                                    onClick={() => {
+                                                        setEditingMessageId(msg.id);
+                                                        setInput(msg.content);
+                                                    }}
+                                                    className="block w-full text-left px-2 py-1 text-[10px] hover:bg-gray-100 text-blue-600"
+                                                >
+                                                    {language === 'ar' ? 'تعديل' : 'Edit'}
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDeleteMessage(msg.id)}
+                                                    className="block w-full text-left px-2 py-1 text-[10px] hover:bg-gray-100 text-red-600"
+                                                >
+                                                    {language === 'ar' ? 'حذف' : 'Delete'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {isImage && msg.file_url && (
                                     <div className="mb-1">

@@ -19,13 +19,20 @@ import {
     Calendar,
     Loader2,
     CheckCircle,
-    AlertTriangle
+    AlertTriangle,
+    RefreshCcw,
+    Clock,
+    Search,
+    ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
 import { adsService, Ad } from "@/lib/ads";
+import { conversationsService, Conversation } from "@/lib/conversations";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AdCard from "@/components/AdCard";
+import ChatWindow from "@/components/ChatWindow";
+import { formatRelativeTime } from "@/lib/utils";
 
 
 
@@ -49,6 +56,69 @@ export default function ProfilePage() {
     const [updateMessage, setUpdateMessage] = useState('');
     const [favorites, setFavorites] = useState<any[]>([]);
     const [mounted, setMounted] = useState(false);
+
+    // Messages State
+    const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+    const [showDeletedConversations, setShowDeletedConversations] = useState(false);
+    const [messagesLoading, setMessagesLoading] = useState(false);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        const convId = params.get('conversationId');
+        if (tab) setActiveTab(tab);
+        if (convId) setSelectedConversationId(convId);
+    }, []);
+
+    useEffect(() => {
+        if (activeTab === 'messages' && user) {
+            fetchConversations();
+        }
+    }, [activeTab, showDeletedConversations, user]);
+
+    const fetchConversations = async () => {
+        setMessagesLoading(true);
+        try {
+            const data = await conversationsService.getConversations(showDeletedConversations);
+            setConversations(data);
+        } catch (error) {
+            console.error('Failed to fetch conversations:', error);
+        } finally {
+            setMessagesLoading(false);
+        }
+    };
+
+    const handleDeleteConversation = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        // First Confirmation
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذه المحادثة؟ ستتمكن من استعادتها خلال 30 يوم.' : 'Are you sure you want to delete this conversation? You can restore it within 30 days.')) {
+            return;
+        }
+        // Second Confirmation (Double Check)
+        if (!confirm(language === 'ar' ? 'تأكيد نهائي: هل تريد حقاً حذف المحادثة؟' : 'Final Confirmation: Do you really want to delete this conversation?')) {
+            return;
+        }
+        try {
+            await conversationsService.deleteConversation(id);
+            fetchConversations();
+        } catch (error) {
+            console.error('Failed to delete conversation:', error);
+            alert(language === 'ar' ? 'فشل حذف المحادثة' : 'Failed to delete conversation');
+        }
+    };
+
+    const handleRestoreConversation = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            await conversationsService.restoreConversation(id);
+            fetchConversations();
+            alert(language === 'ar' ? 'تم استعادة المحادثة' : 'Conversation restored');
+        } catch (error) {
+            console.error('Failed to restore conversation:', error);
+            alert(language === 'ar' ? 'فشل استعادة المحادثة' : 'Failed to restore conversation');
+        }
+    };
 
     useEffect(() => {
         setMounted(true);
@@ -179,6 +249,7 @@ export default function ProfilePage() {
     const tabs = [
         { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'Overview', icon: <User size={14} /> },
         { id: 'listings', label: language === 'ar' ? 'إعلاناتي' : 'My Listings', icon: <Package size={14} /> },
+        { id: 'messages', label: language === 'ar' ? 'الرسائل' : 'Messages', icon: <MessageSquare size={14} /> },
         { id: 'favorites', label: language === 'ar' ? 'المفضلة' : 'Favorites', icon: <Heart size={14} /> },
         { id: 'settings', label: language === 'ar' ? 'الإعدادات' : 'Settings', icon: <Settings size={14} /> },
     ];
@@ -403,6 +474,115 @@ export default function ProfilePage() {
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    )}
+
+                    {/* Messages Tab */}
+                    {activeTab === 'messages' && (
+                        <div className="h-[600px] bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex flex-col">
+                            {selectedConversationId ? (
+                                <div className="flex-1 flex flex-col h-full relative">
+                                    <button 
+                                        onClick={() => setSelectedConversationId(null)}
+                                        className="absolute top-2 left-2 z-10 p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-gray-100 md:hidden"
+                                    >
+                                        <ArrowLeft size={20} className={language === 'ar' ? 'rotate-180' : ''} />
+                                    </button>
+                                    <ChatWindow 
+                                        conversationId={selectedConversationId} 
+                                        onClose={() => setSelectedConversationId(null)} 
+                                    />
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="px-4 py-3 bg-card border-b border-border-color flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <MessageSquare size={14} className="text-primary" />
+                                            <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">
+                                                {language === 'ar' ? 'الرسائل' : 'Messages'}
+                                            </h3>
+                                        </div>
+                                        <button 
+                                            onClick={() => setShowDeletedConversations(!showDeletedConversations)}
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-xs text-[9px] font-black uppercase tracking-widest transition-all ${showDeletedConversations ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100'}`}
+                                        >
+                                            <Trash2 size={12} />
+                                            {showDeletedConversations 
+                                                ? (language === 'ar' ? 'إخفاء المحذوفات' : 'Hide Deleted')
+                                                : (language === 'ar' ? 'عرض المحذوفات' : 'Show Deleted')
+                                            }
+                                        </button>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                                        {messagesLoading ? (
+                                            <div className="flex items-center justify-center h-48">
+                                                <Loader2 className="animate-spin text-primary" size={24} />
+                                            </div>
+                                        ) : conversations.length > 0 ? (
+                                            conversations.map(conv => (
+                                                <div 
+                                                    key={conv.id}
+                                                    onClick={() => setSelectedConversationId(conv.id)}
+                                                    className="flex items-center gap-3 p-3 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-gray-800 rounded-lg hover:border-primary/30 hover:bg-primary/[0.02] cursor-pointer transition-all group"
+                                                >
+                                                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center shrink-0">
+                                                        {conv.ad?.images ? (
+                                                            <img src={JSON.parse(conv.ad.images)[0]} alt={conv.ad.title} className="w-full h-full object-cover rounded-full" />
+                                                        ) : (
+                                                            <User size={20} className="text-gray-400" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <h4 className="font-bold text-sm text-text-main truncate">
+                                                                {conv.participants.find(p => p.id !== user.id)?.name || (language === 'ar' ? 'مستخدم' : 'User')}
+                                                            </h4>
+                                                            <span className="text-[10px] text-text-muted flex items-center gap-1">
+                                                                <Clock size={10} />
+                                                                {formatRelativeTime(conv.last_message_time || conv.created_at, language)}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-text-muted truncate">
+                                                            {conv.ad?.title}
+                                                        </p>
+                                                        {conv.last_message && (
+                                                            <p className="text-[11px] text-gray-400 mt-1 truncate max-w-[80%]">
+                                                                {conv.last_message}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        {showDeletedConversations ? (
+                                                            <button 
+                                                                onClick={(e) => handleRestoreConversation(conv.id, e)}
+                                                                className="p-1.5 bg-green-50 text-green-600 rounded-full hover:bg-green-100"
+                                                                title={language === 'ar' ? 'استعادة' : 'Restore'}
+                                                            >
+                                                                <RefreshCcw size={14} />
+                                                            </button>
+                                                        ) : (
+                                                            <button 
+                                                                onClick={(e) => handleDeleteConversation(conv.id, e)}
+                                                                className="p-1.5 bg-red-50 text-red-600 rounded-full hover:bg-red-100"
+                                                                title={language === 'ar' ? 'حذف' : 'Delete'}
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-64 text-text-muted">
+                                                <MessageSquare size={48} className="opacity-10 mb-4" />
+                                                <p className="text-sm font-bold">
+                                                    {language === 'ar' ? 'لا توجد محادثات' : 'No conversations found'}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
 

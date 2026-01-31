@@ -13,7 +13,9 @@ import {
     ShieldCheck, 
     Inbox,
     PlusCircle,
-    Loader2
+    Loader2,
+    Trash2,
+    RefreshCw
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -29,23 +31,34 @@ export default function MessagesPage() {
     const [loading, setLoading] = useState(true);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [showDeleted, setShowDeleted] = useState(false);
 
     const fetchConversations = useCallback(async () => {
         try {
-            const data = await conversationsService.getConversations();
+            const data = await conversationsService.getConversations(showDeleted);
             setConversations(data);
         } catch (error) {
             console.error("Failed to fetch conversations:", error);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [showDeleted]);
 
     useEffect(() => {
         if (user) {
             fetchConversations();
         }
     }, [user, fetchConversations]);
+
+    const handleRestore = async (e: React.MouseEvent, conversationId: string) => {
+        e.stopPropagation();
+        try {
+            await conversationsService.restoreConversation(conversationId);
+            fetchConversations();
+        } catch (error) {
+            console.error('Failed to restore:', error);
+        }
+    };
 
     const filteredConversations = conversations.filter(conv => {
         const otherMember = conv.participants.find(p => p.id !== user?.id);
@@ -122,6 +135,15 @@ export default function MessagesPage() {
                                                 <p className="text-[10px] font-bold text-text-muted truncate">
                                                     {conv.last_message || (language === 'ar' ? 'لا توجد رسائل بعد' : 'no messages yet')}
                                                 </p>
+                                                {showDeleted && (
+                                                    <button 
+                                                        onClick={(e) => handleRestore(e, conv.id)}
+                                                        className="p-1 hover:bg-green-50 text-green-500 rounded transition-colors"
+                                                        title={language === 'ar' ? 'استرجاع' : 'Restore'}
+                                                    >
+                                                        <RefreshCw size={12} />
+                                                    </button>
+                                                )}
                                                 {/* (conv as any).unread && <span className="w-2 h-2 bg-primary rounded-full shadow-[0_0_5px_rgba(var(--primary-rgb),0.5)]"></span> */}
                                             </div>
                                         </div>

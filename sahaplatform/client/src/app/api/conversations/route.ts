@@ -34,11 +34,22 @@ export async function GET(request: Request) {
 
         // Now use Admin Client to fetch data bypassing RLS
         
+        const url = new URL(request.url);
+        const showDeleted = url.searchParams.get('deleted') === 'true';
+
         // 1. Get Conversation IDs for this user
-        const { data: participations, error: partError } = await supabaseAdmin
+        let query = supabaseAdmin
             .from('conversation_participants')
             .select('conversation_id')
             .eq('user_id', user.id);
+
+        if (showDeleted) {
+            query = query.not('deleted_at', 'is', null);
+        } else {
+            query = query.is('deleted_at', null);
+        }
+
+        const { data: participations, error: partError } = await query;
 
         if (partError) throw partError;
         

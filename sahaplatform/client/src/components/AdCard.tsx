@@ -5,7 +5,7 @@ import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, MessageSquare } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, MessageSquare, Heart, MessageCircle, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -462,17 +462,16 @@ export default function AdCard({
                         <>
                             <a 
                                 href={`tel:${phoneNumber}`}
-                                className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-primary text-primary rounded-full text-[10px] font-bold hover:bg-primary/10 transition-colors"
+                                className="flex items-center justify-center gap-2 w-1/2 py-1 bg-white border border-green-600 text-green-600 rounded-full text-[10px] font-bold hover:bg-green-50 transition-colors"
                             >
-                                <Phone size={12} className="text-primary" />
-                                {t("call")}
+                                <Phone size={12} className="text-green-600" />
+                                {t("call") || "Call"}
                             </a>
-                            
                             <a 
                                 href={`https://wa.me/${phoneNumber}`} 
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-[#25D366] text-[#25D366] rounded-full text-[10px] font-bold hover:bg-[#25D366]/10 transition-colors"
+                                className="flex items-center justify-center gap-2 w-1/2 py-1 bg-white border border-[#25D366] text-[#25D366] rounded-full text-[10px] font-bold hover:bg-[#25D366]/10 transition-colors"
                             >
                                 <MessageCircle size={12} className="text-[#25D366]" />
                                 {t("whatsapp") || "WhatsApp"}
@@ -483,7 +482,7 @@ export default function AdCard({
                     {email && (
                         <a 
                             href={`mailto:${email}`}
-                            className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-gray-600 text-gray-600 rounded-full text-[10px] font-bold hover:bg-gray-600/10 transition-colors"
+                            className="flex items-center justify-center gap-2 w-1/2 py-1 bg-white border border-gray-600 text-gray-600 rounded-full text-[10px] font-bold hover:bg-gray-50 transition-colors"
                         >
                             <Mail size={12} className="text-gray-600" />
                             {language === 'ar' ? 'البريد' : 'Email'}
@@ -492,17 +491,10 @@ export default function AdCard({
 
                     <button 
                         onClick={handleStartChat}
-                        disabled={isStartingChat}
-                        className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-secondary text-secondary rounded-full text-[10px] font-bold hover:bg-secondary/10 transition-colors disabled:opacity-70 disabled:cursor-wait"
+                        className="flex items-center justify-center gap-2 w-1/2 py-1 bg-white border border-secondary text-secondary rounded-full text-[10px] font-bold hover:bg-secondary/10 transition-colors"
                     >
-                        {isStartingChat ? (
-                            <Loader2 size={12} className="animate-spin text-secondary" />
-                        ) : (
-                            <MessageSquare size={12} className="text-secondary" />
-                        )}
-                        {isStartingChat 
-                            ? (language === 'ar' ? 'جارٍ الفتح...' : 'Opening...') 
-                            : (t("chat") || "Chat")}
+                        <MessageSquare size={12} className="text-secondary" />
+                        {t("chat") || "Chat"}
                     </button>
                  </div>
 
