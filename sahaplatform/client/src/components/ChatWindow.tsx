@@ -807,6 +807,15 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
 
             {/* Input Area */}
             <div className="p-3 bg-white border-t border-gray-100 relative">
+                {/* Upload Progress Bar */}
+                {uploadProgress > 0 && (
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
+                        <div 
+                            className="h-full bg-primary transition-all duration-300 ease-out"
+                            style={{ width: `${uploadProgress}%` }}
+                        />
+                    </div>
+                )}
                 {/* Hidden File Input */}
                 <input 
                     type="file" 
