@@ -5,7 +5,7 @@ import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, User, Phone, MessageCircle, Mail, MessageSquare } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, MessageSquare } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -492,10 +492,17 @@ export default function AdCard({
 
                     <button 
                         onClick={handleStartChat}
-                        className="flex items-center justify-center gap-2 w-1/2 py-1 bg-secondary text-white rounded-full text-[10px] font-bold hover:bg-secondary/90 transition-colors"
+                        disabled={isStartingChat}
+                        className="flex items-center justify-center gap-2 w-1/2 py-1 bg-secondary text-white rounded-full text-[10px] font-bold hover:bg-secondary/90 transition-colors disabled:opacity-70 disabled:cursor-wait"
                     >
-                        <MessageSquare size={12} className="text-white" />
-                        {t("chat") || "Chat"}
+                        {isStartingChat ? (
+                            <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                            <MessageSquare size={12} className="text-white" />
+                        )}
+                        {isStartingChat 
+                            ? (language === 'ar' ? 'جارٍ الفتح...' : 'Opening...') 
+                            : (t("chat") || "Chat")}
                     </button>
                  </div>
 
