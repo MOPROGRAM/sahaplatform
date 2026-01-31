@@ -462,9 +462,9 @@ export default function AdCard({
                         <>
                             <a 
                                 href={`tel:${phoneNumber}`}
-                                className="flex items-center justify-center gap-2 w-1/2 py-1 bg-primary text-white rounded-full text-[10px] font-bold hover:bg-primary/90 transition-colors"
+                                className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-primary text-primary rounded-full text-[10px] font-bold hover:bg-primary/10 transition-colors"
                             >
-                                <Phone size={12} className="text-white" />
+                                <Phone size={12} className="text-primary" />
                                 {t("call")}
                             </a>
                             
@@ -472,9 +472,9 @@ export default function AdCard({
                                 href={`https://wa.me/${phoneNumber}`} 
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center gap-2 w-1/2 py-1 bg-[#25D366] text-white rounded-full text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors"
+                                className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-[#25D366] text-[#25D366] rounded-full text-[10px] font-bold hover:bg-[#25D366]/10 transition-colors"
                             >
-                                <MessageCircle size={12} className="text-white" />
+                                <MessageCircle size={12} className="text-[#25D366]" />
                                 {t("whatsapp") || "WhatsApp"}
                             </a>
                         </>
@@ -483,9 +483,9 @@ export default function AdCard({
                     {email && (
                         <a 
                             href={`mailto:${email}`}
-                            className="flex items-center justify-center gap-2 w-1/2 py-1 bg-gray-600 text-white rounded-full text-[10px] font-bold hover:bg-gray-700 transition-colors"
+                            className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-gray-600 text-gray-600 rounded-full text-[10px] font-bold hover:bg-gray-600/10 transition-colors"
                         >
-                            <Mail size={12} className="text-white" />
+                            <Mail size={12} className="text-gray-600" />
                             {language === 'ar' ? 'البريد' : 'Email'}
                         </a>
                     )}
@@ -493,12 +493,12 @@ export default function AdCard({
                     <button 
                         onClick={handleStartChat}
                         disabled={isStartingChat}
-                        className="flex items-center justify-center gap-2 w-1/2 py-1 bg-secondary text-white rounded-full text-[10px] font-bold hover:bg-secondary/90 transition-colors disabled:opacity-70 disabled:cursor-wait"
+                        className="flex items-center justify-center gap-2 w-1/3 py-1 bg-white border border-secondary text-secondary rounded-full text-[10px] font-bold hover:bg-secondary/10 transition-colors disabled:opacity-70 disabled:cursor-wait"
                     >
                         {isStartingChat ? (
-                            <Loader2 size={12} className="animate-spin" />
+                            <Loader2 size={12} className="animate-spin text-secondary" />
                         ) : (
-                            <MessageSquare size={12} className="text-white" />
+                            <MessageSquare size={12} className="text-secondary" />
                         )}
                         {isStartingChat 
                             ? (language === 'ar' ? 'جارٍ الفتح...' : 'Opening...') 
