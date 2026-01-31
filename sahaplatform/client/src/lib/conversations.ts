@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
-// أنواع البيانات للمحادثات والرسائل
+// Types
 export interface Conversation {
     id: string;
     last_message?: string;
@@ -28,6 +28,7 @@ export interface Message {
     file_url?: string;
     file_name?: string;
     file_size?: number;
+    duration?: number;
     sender_id: string;
     receiver_id: string;
     conversation_id: string;
@@ -40,18 +41,14 @@ export interface Message {
     };
 }
 
-// خدمة إدارة المحادثات باستخدام Supabase مباشرة والـ Realtime
+// Service using API Routes to bypass RLS
 export const conversationsService = {
-    // الحصول على جميع محادثات المستخدم
+    // Get all conversations
     async getConversations(): Promise<Conversation[]> {
         try {
             const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error('User not authenticated');
 
-            if (!session) {
-                throw new Error('User not authenticated');
-            }
-
-            // Use API Route to bypass RLS issues
             const response = await fetch('/api/conversations', {
                 headers: {
                     'Authorization': `Bearer ${session.access_token}`
@@ -64,7 +61,6 @@ export const conversationsService = {
             }
 
             const conversations = await response.json();
-
             return (conversations || []).map((conv: any) => ({
                 ...conv,
                 last_message: conv.last_message,
@@ -79,15 +75,11 @@ export const conversationsService = {
         }
     },
 
-    // الحصول على محادثة واحدة مع الرسائل
+    // Get single conversation
     async getConversation(id: string): Promise<{ conversation: Conversation; messages: Message[] } | null> {
         const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('User not authenticated');
 
-        if (!session) {
-            throw new Error('User not authenticated');
-        }
-
-        // Use API Route
         const response = await fetch(`/api/conversations/${id}`, {
             headers: {
                 'Authorization': `Bearer ${session.access_token}`
@@ -99,149 +91,53 @@ export const conversationsService = {
             return null;
         }
 
-        const data = await response.json();
-        return data;
+        return await response.json();
     },
 
-    // إنشاء محادثة جديدة أو الحصول على موجودة
+    // Create or Get Conversation (Smart Routing)
     async createOrGetConversation(adId: string, participantId: string): Promise<Conversation> {
-        // ... (Keep existing logic or migrate to API if needed. Creating is usually less RLS-prone than selecting)
-        // For now, we keep this as is because 'insert' usually works if 'insert' policy is simple (auth.uid() = user_id)
-        // But if 'create_new_conversation' RPC is used, it's safer.
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('User not authenticated');
-
-        try {
-            const { data: convId, error: rpcError } = await (supabase as any)
-                .rpc('create_new_conversation', {
-                    p_ad_id: adId,
-                    p_other_user_id: participantId
-                });
-
-            if (!rpcError && convId) {
-                const fullConv = await this.getConversation(convId);
-                if (fullConv) return fullConv.conversation;
-            }
-        } catch (e) {
-            console.warn('RPC create_new_conversation failed:', e);
-        }
-
-        // Fallback logic requires selecting participants, which might fail RLS.
-        // Let's rely on RPC primarily. If RPC fails, we might need a new API route for creation too.
-        // However, let's wait and see if get/send is enough.
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('User not authenticated');
         
-        // Actually, let's fix the fallback to use the API for checking existence if needed?
-        // No, let's leave creation for now.
+        const response = await fetch('/api/conversations/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({ adId, participantId })
+        });
         
-        // ... (rest of original function)
-        const { data: myParticipations } = await (supabase as any)
-            .from('conversation_participants')
-            .select('conversation_id')
-            .eq('user_id', user.id);
-            
-        // ... (The rest of the function continues as before, assuming simple RLS works for 'select where user_id=uid')
-        // We will return the original implementation for the rest of this function in a moment if we don't replace it all.
-        // To be safe, I will replace the whole function content in the tool call to ensure I don't break it.
-        
-        const myConvIds = myParticipations?.map((p: any) => p.conversation_id) || [];
-        if (myConvIds.length > 0) {
-            const { data: candidates } = await (supabase as any)
-                .from('conversations')
-                .select('id')
-                .eq('ad_id', adId)
-                .in('id', myConvIds);
-
-            if (candidates && candidates.length > 0) {
-                // Use API to check detailed participation if needed, but here we just need ID.
-                // Assuming RLS allows seeing "my" participations.
-                 const candidateIds = candidates.map((c: any) => c.id);
-                 
-                 // This query 'select conversation_id where user_id = participantId' might FAIL if I can't see other users' rows.
-                 // This IS a problem point.
-                 // We should move Create logic to API too.
-            }
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to create/get conversation: ${errorText}`);
         }
         
-        // Let's create an API route for creating conversation too? 
-        // Yes, to be consistent.
-        // I will make a separate tool call to create POST /api/conversations/create
-        
-        // For now, let's just return the existing logic but knowing it might be fragile.
-        // Wait, I can't leave it fragile. The user wants it FIXED.
-        
-        // I'll assume for this edit I am only changing getConversations and getConversation and sendMessage.
-        // I will change sendMessage to use API.
-        
-        // ...
-        return await this.createOrGetConversationAPI(adId, participantId);
-    },
-    
-    // New helper using API
-    async createOrGetConversationAPI(adId: string, participantId: string): Promise<Conversation> {
-         const { data: { session } } = await supabase.auth.getSession();
-         if (!session) throw new Error('User not authenticated');
-         
-         const response = await fetch('/api/conversations/create', {
-             method: 'POST',
-             headers: {
-                 'Content-Type': 'application/json',
-                 'Authorization': `Bearer ${session.access_token}`
-             },
-             body: JSON.stringify({ adId, participantId })
-         });
-         
-         if (!response.ok) {
-             throw new Error(await response.text());
-         }
-         
-         return await response.json();
+        return await response.json();
     },
 
-    // إرسال رسالة
+    // Send Message
     async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}): Promise<Message> {
         const { data: { session } } = await supabase.auth.getSession();
-        
         if (!session) {
-            // Try refresh
-             const { data: refreshData } = await supabase.auth.refreshSession();
-             if (!refreshData.session) throw new Error('User not authenticated');
+             // Try to refresh session
+             const { data: { session: newSession }, error } = await supabase.auth.refreshSession();
+             if (error || !newSession) throw new Error('User not authenticated');
         }
+        const currentSession = (await supabase.auth.getSession()).data.session;
 
-        // We need to resolve receiverId? 
-        // The API route I created expects 'receiverId' in body.
-        // So I still need to know who I am sending to.
-        // But getConversation() (via API) returns participants!
-        // So the UI should pass it? 
-        // No, sendMessage signature doesn't take receiverId.
-        
-        // I should fetch the conversation first to find the receiver?
-        // Or update the API route to find the receiver automatically?
-        // My API route `POST /api/conversations/message` takes `receiverId`.
-        
-        // Let's update the API route logic to find receiver if not provided?
-        // No, better to find it here using the trusted `getConversation` API.
-        
-        const fullConv = await this.getConversation(conversationId);
-        if (!fullConv) throw new Error('Conversation not found');
-        
-        const user = session?.user || (await supabase.auth.getUser()).data.user;
-        const receiver = fullConv.conversation.participants.find(p => p.id !== user!.id);
-        
-        if (!receiver) throw new Error('No receiver found');
-        
         const response = await fetch('/api/conversations/message', {
             method: 'POST',
-             headers: {
-                 'Content-Type': 'application/json',
-                 'Authorization': `Bearer ${session?.access_token}`
-             },
-             body: JSON.stringify({
-                 conversationId,
-                 content,
-                 messageType,
-                 metadata,
-                 receiverId: receiver.id
-             })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentSession?.access_token}`
+            },
+            body: JSON.stringify({
+                conversationId,
+                content,
+                messageType,
+                metadata
+            })
         });
 
         if (!response.ok) {
@@ -251,33 +147,66 @@ export const conversationsService = {
         return await response.json();
     },
 
-    // تحديد الرسائل كمقروءة
-    async markAsRead(conversationId: string): Promise<void> {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+    // Upload File to Supabase Storage
+    async uploadFile(file: File, conversationId: string): Promise<{ file_url: string; file_name: string; file_size: number; file_type: string }> {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('User not authenticated');
 
-        await (supabase as any)
+        // Sanitize filename
+        const fileExt = file.name.split('.').pop();
+        const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const filePath = `${conversationId}/${Date.now()}-${safeFileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+            .from('chat_vault')
+            .upload(filePath, file);
+
+        if (uploadError) {
+            throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('chat_vault')
+            .getPublicUrl(filePath);
+
+        return {
+            file_url: publicUrl,
+            file_name: file.name,
+            file_size: file.size,
+            file_type: file.type
+        };
+    },
+
+    // Mark as Read
+    async markAsRead(conversationId: string): Promise<void> {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        await supabase
             .from('messages')
             .update({ is_read: true })
             .eq('conversation_id', conversationId)
-            .eq('receiver_id', user.id)
-            .eq('is_read', false);
+            .neq('sender_id', session.user.id);
     },
 
-    // الاشتراك في التحديثات
-    subscribeToConversation(conversationId: string, callback: (payload: any) => void): RealtimeChannel {
+    // Realtime Subscription
+    subscribeToConversation(conversationId: string, callback: (payload: any) => void) {
         return supabase
-            .channel(`conversation-${conversationId}`)
-            .on('postgres_changes', { 
-                event: '*', 
-                schema: 'public', 
-                table: 'messages', 
-                filter: `conversation_id=eq.${conversationId}` 
-            }, callback)
+            .channel(`conversation:${conversationId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `conversation_id=eq.${conversationId}`
+                },
+                callback
+            )
             .subscribe();
     },
 
-    unsubscribe(channel: RealtimeChannel): void {
+    unsubscribe(channel: RealtimeChannel) {
         supabase.removeChannel(channel);
     }
 };

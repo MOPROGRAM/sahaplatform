@@ -1,7 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 // Initialize Supabase Admin Client (Service Role)
 const supabaseAdmin = createClient(

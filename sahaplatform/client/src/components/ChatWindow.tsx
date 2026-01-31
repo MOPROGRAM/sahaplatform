@@ -67,57 +67,76 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     useEffect(() => {
         let channel: any;
         if (conversationId) {
-            fetchChatData();
-
-            // Subscribe to new messages
-            channel = conversationsService.subscribeToConversation(conversationId, (payload) => {
-                // Handle both snake_case (Postgres standard) and camelCase (Prisma) payload keys
-                const newItem = payload.new;
-                const newItemConversationId = newItem.conversationId || newItem.conversation_id;
-
-                if (payload.eventType === 'INSERT' && newItemConversationId === conversationId) {
-                    const newMessage = newItem;
-
-                    // Transform raw DB fields to UI interface
-                    const processedMessage: Message = {
-                        id: newMessage.id,
-                        sender_id: newMessage.senderId || newMessage.sender_id,
-                        content: newMessage.content,
-                        message_type: (newMessage.messageType || newMessage.message_type || 'text') as any,
-                        is_read: newMessage.is_read !== undefined ? newMessage.is_read : (newMessage.isRead !== undefined ? newMessage.isRead : false),
-                        created_at: newMessage.createdAt || newMessage.created_at || new Date().toISOString(),
-                        sender: { name: '...' } // Temporary placeholder
-                    };
-
-                    // Optimistically add message
-                    setMessages(prev => {
-                        if (prev.find(m => m.id === processedMessage.id)) return prev;
-                        return [...prev, processedMessage];
-                    });
-
-                    // Fetch sender name immediately
-                    supabase
-                        .from('users')
-                        .select('name')
-                        .eq('id', processedMessage.sender_id)
-                        .single()
-                        .then(({ data: userData }) => {
-                            if (userData) {
-                                setMessages(prev => prev.map(m => 
-                                    m.id === processedMessage.id 
-                                        ? { ...m, sender: { name: userData.name } }
-                                        : m
-                                ));
-                            }
-                        });
-                } else if (payload.eventType === 'UPDATE' && newItemConversationId === conversationId) {
-                    setMessages(prev => prev.map(m => 
-                        m.id === newItem.id 
-                            ? { ...m, is_read: newItem.is_read }
-                            : m
-                    ));
+            // Validate session before starting
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                if (!session) {
+                    // Try to refresh or warn
+                     supabase.auth.refreshSession().then(({ data: { session: newSession }, error }) => {
+                        if (!newSession || error) {
+                            console.error('Session expired in ChatWindow');
+                            // Optionally redirect or show error state
+                            return;
+                        }
+                        fetchChatData();
+                        setupSubscription();
+                     });
+                } else {
+                    fetchChatData();
+                    setupSubscription();
                 }
             });
+
+            const setupSubscription = () => {
+                 // Subscribe to new messages
+                channel = conversationsService.subscribeToConversation(conversationId, (payload) => {
+                    // Handle both snake_case (Postgres standard) and camelCase (Prisma) payload keys
+                    const newItem = payload.new;
+                    const newItemConversationId = newItem.conversationId || newItem.conversation_id;
+    
+                    if (payload.eventType === 'INSERT' && newItemConversationId === conversationId) {
+                        const newMessage = newItem;
+    
+                        // Transform raw DB fields to UI interface
+                        const processedMessage: Message = {
+                            id: newMessage.id,
+                            sender_id: newMessage.senderId || newMessage.sender_id,
+                            content: newMessage.content,
+                            message_type: (newMessage.messageType || newMessage.message_type || 'text') as any,
+                            is_read: newMessage.is_read !== undefined ? newMessage.is_read : (newMessage.isRead !== undefined ? newMessage.isRead : false),
+                            created_at: newMessage.createdAt || newMessage.created_at || new Date().toISOString(),
+                            sender: { name: '...' } // Temporary placeholder
+                        };
+    
+                        // Optimistically add message
+                        setMessages(prev => {
+                            if (prev.find(m => m.id === processedMessage.id)) return prev;
+                            return [...prev, processedMessage];
+                        });
+    
+                        // Fetch sender name immediately
+                        supabase
+                            .from('users')
+                            .select('name')
+                            .eq('id', processedMessage.sender_id)
+                            .single()
+                            .then(({ data: userData }) => {
+                                if (userData) {
+                                    setMessages(prev => prev.map(m => 
+                                        m.id === processedMessage.id 
+                                            ? { ...m, sender: { name: userData.name } }
+                                            : m
+                                    ));
+                                }
+                            });
+                    } else if (payload.eventType === 'UPDATE' && newItemConversationId === conversationId) {
+                        setMessages(prev => prev.map(m => 
+                            m.id === newItem.id 
+                                ? { ...m, is_read: newItem.is_read }
+                                : m
+                        ));
+                    }
+                });
+            };
         }
         return () => {
             if (channel) {
@@ -282,23 +301,16 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
-    const handleFileUpload = async (file: File, _type: 'file' | 'image' | 'voice' | 'video') => {
-        const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
-        const bucket = 'chat-attachments';
-        const { error } = await supabase.storage
-            .from(bucket)
-            .upload(fileName, file);
-
-        if (error) {
+    const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice' | 'video') => {
+        try {
+            // Upload via service (which uses Supabase storage)
+            const uploadResult = await conversationsService.uploadFile(file, conversationId);
+            return uploadResult;
+        } catch (error) {
             console.error('Error uploading file:', error);
+            alert(language === 'ar' ? 'فشل رفع الملف' : 'Failed to upload file');
             return null;
         }
-
-        const { data: urlData } = supabase.storage
-            .from(bucket)
-            .getPublicUrl(fileName);
-
-        return { file_url: urlData.publicUrl, file_name: file.name, file_size: file.size, file_type: file.type };
     };
 
 
@@ -368,6 +380,13 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             <span className="text-[9px] font-black text-secondary truncate max-w-[100px] uppercase italic">{adInfo.title}</span>
                         </div>
                     )}
+                    <button 
+                        onClick={() => alert(language === 'ar' ? 'المكالمات قريبا' : 'Calls coming soon')} 
+                        className="p-1.5 hover:bg-blue-50 text-text-muted hover:text-blue-500 transition-all rounded-xs"
+                        title={language === 'ar' ? 'مكالمة فيديو' : 'Video Call'}
+                    >
+                        <Video size={16} />
+                    </button>
                     <button 
                         onClick={() => setIsRatingOpen(true)} 
                         className="p-1.5 hover:bg-yellow-50 text-text-muted hover:text-yellow-500 transition-all rounded-xs"
