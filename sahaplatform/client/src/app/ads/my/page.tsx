@@ -152,6 +152,7 @@ export default function MyAdsPage() {
                                     authorName={user?.name}
                                     authorId={user?.id}
                                     phoneNumber={ad.phone}
+                                    email={ad.email || user?.email} // Added
                                 />
                                 <div className="mt-2 flex justify-end gap-2 px-2">
                                     <button

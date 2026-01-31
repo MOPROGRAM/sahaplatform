@@ -263,7 +263,16 @@ export const conversationsService = {
 
     // إرسال رسالة
     async sendMessage(conversationId: string, content: string, messageType: string = 'text'): Promise<Message> {
-        const { data: { user } } = await supabase.auth.getUser();
+        let { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        // Check for "Session issued in the future" or other auth errors and try to refresh
+        if (authError && (authError.message.includes('future') || authError.status === 403)) {
+            console.warn('Auth error detected (possibly future session), refreshing session...', authError);
+            const { data: refreshData } = await supabase.auth.refreshSession();
+            if (refreshData.user) {
+                user = refreshData.user;
+            }
+        }
 
         if (!user) throw new Error('User not authenticated');
 
@@ -288,15 +297,23 @@ export const conversationsService = {
             }
         }
 
-        const { data: participants, error: participantsError } = await (supabase as any)
-            .from('conversation_participants')
-            .select('user_id')
-            .eq('conversation_id', conversationId)
-            .neq('user_id', user.id);
+        // Use RPC to fetch participants to avoid RLS recursion issues
+        let participants: any[] = [];
+        const { data: rpcParticipants, error: rpcError } = await (supabase as any)
+            .rpc('get_conversation_participants', { p_conversation_id: conversationId });
 
-        if (participantsError) {
-            console.error('Error fetching participants:', participantsError);
-            throw new Error('Failed to fetch conversation participants');
+        if (!rpcError && rpcParticipants) {
+             participants = rpcParticipants.filter((p: any) => p.user_id !== user!.id);
+        } else {
+             // Fallback to standard select (might fail if RLS is strict)
+             console.warn('RPC get_conversation_participants failed, falling back to direct select:', rpcError);
+             const { data: tableParticipants } = await (supabase as any)
+                .from('conversation_participants')
+                .select('user_id')
+                .eq('conversation_id', conversationId)
+                .neq('user_id', user.id);
+             
+             if (tableParticipants) participants = tableParticipants;
         }
 
         let receiverId: string | null = null;

@@ -40,10 +40,11 @@ interface Ad {
     created_at: string;
     views?: number;
     author_id?: string;
-    author?: { id?: string; name?: string; phone?: string; };
+    author?: { id?: string; name?: string; phone?: string; email?: string; }; // Added email
     is_boosted?: boolean;
     currency?: string | { code: string; symbol: string; };
     phone?: string;
+    email?: string; // Added
 }
 
 const AdsSkeleton = () => (
@@ -279,6 +280,7 @@ function AdsContent() {
                                 authorName={ad.author?.name}
                                 authorId={ad.author_id || ad.author?.id}
                                 phoneNumber={ad.phone}
+                                email={ad.email || ad.author?.email} // Added
                                 description={ad.description}
                                 descriptionAr={ad.descriptionAr}
                                 descriptionEn={ad.descriptionEn}

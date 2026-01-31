@@ -5,7 +5,7 @@ import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, Phone, MessageCircle, User } from "lucide-react";
+import { Heart, Clock, MapPin, Home as HomeIcon, Car as CarIcon, Briefcase as BriefcaseIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, Building as BuildingIcon, Wrench, User, Phone, MessageCircle, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -39,6 +39,7 @@ interface AdCardProps {
     layout?: 'vertical' | 'horizontal';
     imageHeight?: string;
     phoneNumber?: string; // Added
+    email?: string; // Added
 }
 
 export default function AdCard({
@@ -67,7 +68,8 @@ export default function AdCard({
     imageHeight,
     authorName, // Added to destructuring
     authorId, // Added to destructuring
-    phoneNumber // Added to destructuring
+    phoneNumber, // Added to destructuring
+    email // Added to destructuring
 }: AdCardProps) {
     const { t } = useLanguage();
     const router = useRouter();
@@ -161,7 +163,9 @@ export default function AdCard({
                         currency: currencyCode,
                         location: location || '',
                         image: images[0] || '',
-                        createdAt
+                        createdAt,
+                        phone: phoneNumber,
+                        email
                     };
                     const exists = list.some(a => a.id === id);
                     const updated = exists ? list.map(a => a.id === id ? fav : a) : [...list, fav];
@@ -453,30 +457,44 @@ export default function AdCard({
                  </div>
                  <h3 className="text-[11px] font-bold text-text-main mb-2">{authorName || t("seller")}</h3>
                  
-                 <div className="flex flex-col gap-2 w-full px-2">
-                    <a 
-                        href={`tel:${phoneNumber}`}
-                        className={`flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded text-[10px] font-bold hover:bg-primary/90 transition-colors ${!phoneNumber ? 'pointer-events-none opacity-50' : ''}`}
-                    >
-                        <Phone size={12} />
-                        {t("call")}
-                    </a>
-                    
-                    <a 
-                        href={`https://wa.me/${phoneNumber}`} 
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors ${!phoneNumber ? 'pointer-events-none opacity-50' : ''}`}
-                    >
-                        <MessageCircle size={12} />
-                        {t("whatsapp") || "WhatsApp"}
-                    </a>
+                 <div className="flex flex-col gap-2 w-full px-2 items-center">
+                    {phoneNumber && (
+                        <>
+                            <a 
+                                href={`tel:${phoneNumber}`}
+                                className="flex items-center justify-center gap-2 w-2/3 py-1 bg-primary text-white rounded-full text-[10px] font-bold hover:bg-primary/90 transition-colors"
+                            >
+                                <Phone size={12} className="text-white" />
+                                {t("call")}
+                            </a>
+                            
+                            <a 
+                                href={`https://wa.me/${phoneNumber}`} 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 w-2/3 py-1 bg-[#25D366] text-white rounded-full text-[10px] font-bold hover:bg-[#25D366]/90 transition-colors"
+                            >
+                                <MessageCircle size={12} className="text-white" />
+                                {t("whatsapp") || "WhatsApp"}
+                            </a>
+                        </>
+                    )}
+
+                    {email && (
+                        <a 
+                            href={`mailto:${email}`}
+                            className="flex items-center justify-center gap-2 w-2/3 py-1 bg-gray-600 text-white rounded-full text-[10px] font-bold hover:bg-gray-700 transition-colors"
+                        >
+                            <Mail size={12} className="text-white" />
+                            {language === 'ar' ? 'البريد' : 'Email'}
+                        </a>
+                    )}
 
                     <button 
                         onClick={handleStartChat}
-                        className="flex items-center justify-center gap-2 w-full py-1.5 bg-blue-600 text-white rounded text-[10px] font-bold hover:bg-blue-700 transition-colors"
+                        className="flex items-center justify-center gap-2 w-2/3 py-1 bg-blue-600 text-white rounded-full text-[10px] font-bold hover:bg-blue-700 transition-colors"
                     >
-                        <MessageCircle size={12} />
+                        <MessageCircle size={12} className="text-white" />
                         {language === 'ar' ? 'محادثة داخلية' : 'Internal Chat'}
                     </button>
                  </div>

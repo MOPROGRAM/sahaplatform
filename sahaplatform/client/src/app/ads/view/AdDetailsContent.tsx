@@ -338,10 +338,10 @@ export default function AdDetailsContent({ id }: { id: string }) {
                             </div>
                         )}
 
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 items-center">
                             <button
                                 onClick={handleStartChat}
-                                className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 uppercase tracking-widest"
+                                className="w-1/3 bg-primary hover:bg-primary-hover text-white py-3 rounded-full text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 uppercase tracking-widest"
                             >
                                 <MessageCircle size={16} />
                                 {language === 'ar' ? 'بدء محادثة فورية' : 'START REAL-TIME CHAT'}
@@ -349,7 +349,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
                             {ad.author?.phone && (
                                 <button
                                     onClick={() => setShowPhone(!showPhone)}
-                                    className="w-full bg-secondary text-white py-3 rounded-xl text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
+                                    className="w-1/3 bg-secondary text-white py-3 rounded-full text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
                                 >
                                     <Phone size={16} />
                                     {showPhone ? ad.author.phone : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}

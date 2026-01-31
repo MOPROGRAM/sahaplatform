@@ -84,6 +84,7 @@ export default function PromotedBanner() {
                                         isFeatured={true}
                                         language={language}
                                         phoneNumber={ad.phone}
+                                        email={ad.email || ad.author?.email} // Added
                                     />
                                 </div>
                             );

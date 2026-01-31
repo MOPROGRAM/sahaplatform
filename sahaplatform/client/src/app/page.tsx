@@ -49,10 +49,12 @@ interface Ad {
     is_boosted?: boolean;
     author_id: string;
     phone?: string;
+    email?: string; // Added
     author?: {
         id?: string;
         name?: string;
         phone?: string;
+        email?: string; // Added
     };
     city?: {
         name: string;
@@ -222,6 +224,7 @@ export default function HomePage() {
                                         authorName={ad.author?.name}
                                         authorId={ad.author_id || ad.author?.id}
                                         phoneNumber={ad.phone}
+                                        email={ad.email || ad.author?.email} // Added
                                     />
                                 </div>
                             ))}
