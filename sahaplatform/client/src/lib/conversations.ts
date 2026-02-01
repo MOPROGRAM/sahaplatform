@@ -158,6 +158,11 @@ export const conversationsService = {
 
     // Send Message with File Handling
     async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}, receiverId?: string): Promise<Message> {
+        // Fix 1: Validate conversationId
+        if (!conversationId) throw new Error('Invalid conversation ID');
+
+        // Fix 2: Refresh Session
+        await supabase.auth.refreshSession();
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('User not authenticated');
 

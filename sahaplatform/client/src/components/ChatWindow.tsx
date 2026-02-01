@@ -328,6 +328,21 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
         }
     }, [conversationId]);
 
+    const handleDeleteMessage = async (messageId: string) => {
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذه الرسالة؟' : 'Are you sure you want to delete this message?')) return;
+        
+        const message = messages.find(m => m.id === messageId);
+        if (!message) return;
+
+        try {
+            await conversationsService.deleteMessage(messageId, message.created_at);
+            setMessages(prev => prev.map(m => m.id === messageId ? { ...m, deleted_at: new Date().toISOString(), content: 'This message was deleted' } : m));
+        } catch (error: any) {
+            console.error("Failed to delete message:", error);
+            alert((error && error.message) ? error.message : (language === 'ar' ? 'فشل حذف الرسالة' : 'Failed to delete message'));
+        }
+    };
+
     const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video' = 'text', content?: string, fileData?: any) => {
         if (sending) return; // Prevent duplicate sends
 
@@ -337,8 +352,11 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
         setSending(true);
         try {
             if (editingMessageId && type === 'text') {
-                 await conversationsService.editMessage(editingMessageId, messageContent);
-                 setMessages(prev => prev.map(m => m.id === editingMessageId ? { ...m, content: messageContent, is_edited: true } : m));
+                 const message = messages.find(m => m.id === editingMessageId);
+                 if (message) {
+                    await conversationsService.editMessage(editingMessageId, messageContent, message.created_at);
+                    setMessages(prev => prev.map(m => m.id === editingMessageId ? { ...m, content: messageContent, is_edited: true } : m));
+                 }
                  setEditingMessageId(null);
                  setInput("");
             } else {
