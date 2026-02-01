@@ -86,9 +86,9 @@ export const conversationsService = {
             .from('conversations')
             .select(`
                 *,
-                ad:ads(id, title, images),
+                ad:ads!ad_id(id, title, images),
                 participants:conversation_participants(
-                    user:users(id, name, email)
+                    user:users!user_id(id, name, email)
                 )
             `)
             .eq('id', id)
@@ -106,7 +106,7 @@ export const conversationsService = {
         // Fetch messages including new fields
         const { data: messages, error: msgError } = await supabase
             .from('messages')
-            .select('*')
+            .select('*, sender:users!sender_id(id, name, email)')
             .eq('conversation_id', id)
             .order('created_at', { ascending: true });
 

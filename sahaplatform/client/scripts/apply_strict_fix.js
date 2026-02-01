@@ -36,10 +36,10 @@ async function runSchemaFix() {
     await client.connect();
     console.log('Connected to database');
     
-    const sqlPath = path.resolve(__dirname, 'fix_messaging_strict.sql');
+    const sqlPath = path.resolve(__dirname, 'fix_messaging_structural.sql');
     const sql = fs.readFileSync(sqlPath, 'utf8');
     
-    console.log('Running STRICT messaging schema fix (referencing auth.users)...');
+    console.log('Running STRUCTURAL messaging schema fix (referencing public.users)...');
     console.log(sql);
     
     await client.query(sql);

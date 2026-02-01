@@ -64,7 +64,7 @@ export async function GET(request: Request) {
             .from('conversations')
             .select(`
                 *,
-                ad:ads(id, title, images),
+                ad:ads!ad_id(id, title, images),
                 participants:conversation_participants(
                     user:users!user_id(id, name, email)
                 )

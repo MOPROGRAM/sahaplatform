@@ -42,7 +42,7 @@ export async function GET(
             .from('conversations')
             .select(`
                 *,
-                ad:ads(id, title, images)
+                ad:ads!ad_id(id, title, images)
             `)
             .eq('id', id)
             .single();
