@@ -100,7 +100,7 @@ export async function POST(request: Request) {
             .from('conversations')
             .select(`
                 *,
-                ad:ads(id, title, images)
+                ad:ads!fk_ad(id, title, images)
             `)
             .eq('id', conversationId)
             .single();
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
 
         const { data: participants } = await supabaseAdmin
             .from('conversation_participants')
-            .select('user:users!user_id(id, name, email)')
+            .select('user:users!fk_user(id, name, email)')
             .eq('conversation_id', conversationId);
 
         return NextResponse.json({
