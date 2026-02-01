@@ -42,7 +42,7 @@ export async function GET(
             .from('conversations')
             .select(`
                 *,
-                ad:ads!ad_id(id, title, images)
+                ad:ads!fk_ad(id, title, images)
             `)
             .eq('id', id)
             .single();
@@ -52,7 +52,7 @@ export async function GET(
         // Fetch Participants
         const { data: participants, error: partError } = await supabaseAdmin
             .from('conversation_participants')
-            .select('user:users!user_id(id, name, email)')
+            .select('user:users!fk_user(id, name, email)')
             .eq('conversation_id', id);
 
         if (partError) throw partError;
@@ -62,7 +62,7 @@ export async function GET(
             .from('messages')
             .select(`
                 *,
-                sender:users!sender_id(id, name, email)
+                sender:users!fk_sender(id, name, email)
             `)
             .eq('conversation_id', id)
             .order('created_at', { ascending: true });

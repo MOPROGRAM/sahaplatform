@@ -36,10 +36,10 @@ async function runSchemaFix() {
     await client.connect();
     console.log('Connected to database');
     
-    const sqlPath = path.resolve(__dirname, 'fix_messaging_final.sql');
+    const sqlPath = path.resolve(__dirname, 'cleanup_constraints.sql');
 const sql = fs.readFileSync(sqlPath, 'utf8');
 
-console.log('Running FINAL messaging schema fix (referencing public.users to support frontend joins)...');
+console.log('Running cleanup of duplicate/conflicting constraints...');
     console.log(sql);
     
     await client.query(sql);
