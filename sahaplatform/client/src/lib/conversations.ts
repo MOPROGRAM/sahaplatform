@@ -219,7 +219,17 @@ export const conversationsService = {
         
         let { error: uploadError } = await supabase.storage
             .from(bucketName)
-            .upload(filePath, file);
+            .upload(filePath, file, {
+                contentType: file.type || (fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' 
+                    : fileExt === 'png' ? 'image/png'
+                    : fileExt === 'gif' ? 'image/gif'
+                    : fileExt === 'webp' ? 'image/webp'
+                    : fileExt === 'mp4' ? 'video/mp4'
+                    : fileExt === 'webm' ? 'video/webm'
+                    : fileExt === 'mp3' ? 'audio/mpeg'
+                    : fileExt === 'wav' ? 'audio/wav'
+                    : 'application/octet-stream')
+            });
 
         if (uploadError) {
              console.warn(`Upload to ${bucketName} failed, trying chat_vault`, uploadError);
@@ -232,9 +242,7 @@ export const conversationsService = {
 
         const { data } = await supabase.storage
             .from(bucketName)
-            .createSignedUrl(filePath, 31536000, {
-                download: file.name
-            });
+            .createSignedUrl(filePath, 31536000);
 
         if (!data?.signedUrl) throw new Error('Failed to generate signed URL');
 

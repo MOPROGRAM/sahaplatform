@@ -114,6 +114,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
     const [selectedMedia, setSelectedMedia] = useState<{ url: string, type: 'image' | 'video' } | null>(null);
     const [zoom, setZoom] = useState(1);
     const isSendingRef = useRef(false);
+    const messageIdsRef = useRef<Set<string>>(new Set());
 
     // const socketRef = useRef<any>(null);
 
@@ -184,8 +185,12 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
     
                         // Optimistically add message
                         setMessages(prev => {
-                            if (prev.find(m => m.id === processedMessage.id)) return prev;
-                            return [...prev, processedMessage];
+                            const exists = prev.some(m => m.id === processedMessage.id);
+                            const next = exists 
+                                ? prev.map(m => m.id === processedMessage.id ? { ...m, ...processedMessage } : m)
+                                : [...prev, processedMessage];
+                            messageIdsRef.current.add(processedMessage.id);
+                            return next;
                         });
     
                         // Fetch sender name immediately
@@ -315,6 +320,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                     sender: msg.sender || { name: 'Unknown' }
                 }));
                 setMessages(processedMessages);
+                messageIdsRef.current = new Set(processedMessages.map((m: any) => m.id));
                 setParticipants(data.conversation.participants || []);
                 setAdInfo(data.conversation.ad);
                 
@@ -392,7 +398,14 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                     sender: { name: user?.name || 'You' },
                     ...fileData
                 };
-                setMessages(prev => [...prev, newMessage]);
+                setMessages(prev => {
+                    const exists = prev.some(m => m.id === newMessage.id);
+                    const next = exists 
+                        ? prev.map(m => m.id === newMessage.id ? { ...m, ...newMessage } : m)
+                        : [...prev, newMessage];
+                    messageIdsRef.current.add(newMessage.id);
+                    return next;
+                });
     
                 if (type === 'text') setInput("");
             }
