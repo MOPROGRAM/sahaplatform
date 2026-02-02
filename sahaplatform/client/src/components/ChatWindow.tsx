@@ -1188,6 +1188,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
     );
 }
 
+
 export default function ChatWindow(props: ChatWindowProps) {
     const { language } = useLanguage();
     return (
