@@ -268,16 +268,9 @@ export const conversationsService = {
         await supabase.rpc('mark_messages_read', { p_conversation_id: conversationId });
     },
 
-    // Permanently Hide Conversation (remove from participants)
+    // Permanently Hide Conversation (Soft delete for user)
     async hideConversation(conversationId: string): Promise<void> {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Not authenticated');
-
-        const { error } = await supabase
-            .from('_conversation_participants')
-            .delete()
-            .match({ a: conversationId, b: user.id });
-
+        const { error } = await supabase.rpc('soft_delete_conversation', { p_conversation_id: conversationId });
         if (error) throw error;
     },
 

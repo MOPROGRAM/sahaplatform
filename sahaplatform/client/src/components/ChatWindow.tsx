@@ -30,18 +30,18 @@ class ChatErrorBoundary extends React.Component<{children: React.ReactNode, lang
         <div className="flex flex-col h-[600px] items-center justify-center bg-red-50 border border-red-100 rounded-sm p-6 text-center" dir={this.props.language === 'ar' ? 'rtl' : 'ltr'}>
             <AlertTriangle className="text-red-500 mb-4" size={48} />
             <h3 className="text-lg font-bold text-red-700 mb-2">
-                {this.props.language === 'ar' ? 'ط·آ­ط·آ¯ط·آ« ط·آ®ط·آ·ط·آ£ ط·ط›ط¸ظ¹ط·آ± ط¸â€¦ط·ع¾ط¸ث†ط¸â€ڑط·آ¹' : 'Something went wrong'}
+                {this.props.language === 'ar' ? 'حدث خطأ غير متوقع' : 'Something went wrong'}
             </h3>
             <p className="text-xs text-red-600 mb-6 max-w-xs mx-auto">
                 {this.props.language === 'ar' 
-                    ? 'ط¸â€ ط¸ث†ط·آ§ط·آ¬ط¸â€، ط¸â€¦ط·آ´ط¸ئ’ط¸â€‍ط·آ© ط¸ظ¾ط¸ظ¹ ط·ع¾ط·آ­ط¸â€¦ط¸ظ¹ط¸â€‍ ط·آ§ط¸â€‍ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ©. ط·آ­ط·آ§ط¸ث†ط¸â€‍ ط·ع¾ط·آ­ط·آ¯ط¸ظ¹ط·آ« ط·آ§ط¸â€‍ط·آµط¸ظ¾ط·آ­ط·آ©.' 
+                    ? 'نواجه مشكلة في تحميل المحادثة. حاول تحديث الصفحة.' 
                     : 'We encountered an issue loading the chat. Please try refreshing.'}
             </p>
             <button 
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 bg-red-600 text-white rounded-full text-xs font-bold hover:bg-red-700 transition-colors"
             >
-                {this.props.language === 'ar' ? 'ط·ع¾ط·آ­ط·آ¯ط¸ظ¹ط·آ« ط·آ§ط¸â€‍ط·آµط¸ظ¾ط·آ­ط·آ©' : 'Refresh Page'}
+                {this.props.language === 'ar' ? 'تحديث الصفحة' : 'Refresh Page'}
             </button>
         </div>
       );
@@ -297,7 +297,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
 
         } catch (error) {
             console.error('Error accessing microphone:', error);
-            alert(language === 'ar' ? 'ط¸ظ¾ط·آ´ط¸â€‍ ط·آ§ط¸â€‍ط¸ث†ط·آµط¸ث†ط¸â€‍ ط¸â€‍ط¸â€‍ط¸â€¦ط¸ظ¹ط¸ئ’ط·آ±ط¸ث†ط¸ظ¾ط¸ث†ط¸â€ ' : 'Could not access microphone');
+            alert(language === 'ar' ? 'فشل الوصول للميكروفون' : 'Could not access microphone');
         }
     };
 
@@ -365,7 +365,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
     }, [conversationId]);
 
     const handleDeleteMessage = async (messageId: string) => {
-        if (!confirm(language === 'ar' ? 'ط¸â€،ط¸â€‍ ط·آ£ط¸â€ ط·ع¾ ط¸â€¦ط·ع¾ط·آ£ط¸ئ’ط·آ¯ ط¸â€¦ط¸â€  ط·آ­ط·آ°ط¸ظ¾ ط¸â€،ط·آ°ط¸â€، ط·آ§ط¸â€‍ط·آ±ط·آ³ط·آ§ط¸â€‍ط·آ©ط·ع؛' : 'Are you sure you want to delete this message?')) return;
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذه الرسالة؟' : 'Are you sure you want to delete this message?')) return;
         
         const message = messages.find(m => m.id === messageId);
         if (!message) return;
@@ -375,7 +375,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
             setMessages(prev => prev.map(m => m.id === messageId ? { ...m, deleted_at: new Date().toISOString(), content: 'This message was deleted' } : m));
         } catch (error: any) {
             console.error("Failed to delete message:", error);
-            alert((error && error.message) ? error.message : (language === 'ar' ? 'ط¸ظ¾ط·آ´ط¸â€‍ ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط·آ±ط·آ³ط·آ§ط¸â€‍ط·آ©' : 'Failed to delete message'));
+            alert((error && error.message) ? error.message : (language === 'ar' ? 'فشل حذف الرسالة' : 'Failed to delete message'));
         }
     };
 
@@ -481,7 +481,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
             }
         } catch (error: any) {
             console.error("Failed to send message:", error);
-            alert((error && error.message) ? error.message : (language === 'ar' ? 'ط¸ظ¾ط·آ´ط¸â€‍ ط¸ظ¾ط¸ظ¹ ط·آ¥ط·آ±ط·آ³ط·آ§ط¸â€‍ ط·آ§ط¸â€‍ط·آ±ط·آ³ط·آ§ط¸â€‍ط·آ©' : 'Failed to send message'));
+            alert((error && error.message) ? error.message : (language === 'ar' ? 'فشل في إرسال الرسالة' : 'Failed to send message'));
         } finally {
             isSendingRef.current = false;
             setSending(false);
@@ -530,12 +530,12 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
 
             // Send call message notification
             const messageText = type === 'video' 
-                ? (language === 'ar' ? 'ظ‹ع؛â€œâ€چ ط¸â€¦ط¸ئ’ط·آ§ط¸â€‍ط¸â€¦ط·آ© ط¸ظ¾ط¸ظ¹ط·آ¯ط¸ظ¹ط¸ث†' : 'ظ‹ع؛â€œâ€چ Video Call')
-                : (language === 'ar' ? 'ظ‹ع؛â€œâ€چ ط¸â€¦ط¸ئ’ط·آ§ط¸â€‍ط¸â€¦ط·آ© ط·آµط¸ث†ط·ع¾ط¸ظ¹ط·آ©' : 'ظ‹ع؛â€œâ€چ Voice Call');
+                ? (language === 'ar' ? '📞 مكالمة فيديو' : '📞 Video Call')
+                : (language === 'ar' ? '📞 مكالمة صوتية' : '📞 Voice Call');
             handleSend('call', messageText);
         } catch (error) {
             console.error('Failed to start call:', error);
-            alert(language === 'ar' ? 'ط¸ظ¾ط·آ´ط¸â€‍ ط·آ¨ط·آ¯ط·طŒ ط·آ§ط¸â€‍ط¸â€¦ط¸ئ’ط·آ§ط¸â€‍ط¸â€¦ط·آ©' : 'Failed to start call');
+            alert(language === 'ar' ? 'فشل بدء المكالمة' : 'Failed to start call');
         }
     };
 
@@ -584,7 +584,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
         } catch (error) {
             console.error('Error uploading file:', error);
             setUploadProgress(0);
-            alert(language === 'ar' ? 'ط¸ظ¾ط·آ´ط¸â€‍ ط·آ±ط¸ظ¾ط·آ¹ ط·آ§ط¸â€‍ط¸â€¦ط¸â€‍ط¸ظ¾' : 'Failed to upload file');
+            alert(language === 'ar' ? 'فشل رفع الملف' : 'Failed to upload file');
             return null;
         }
     };
@@ -612,12 +612,31 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
             setIsRatingOpen(false);
             setRatingValue(0);
             setRatingComment("");
-            alert(language === 'ar' ? 'ط·ع¾ط¸â€¦ ط·آ¥ط·آ±ط·آ³ط·آ§ط¸â€‍ ط·ع¾ط¸â€ڑط¸ظ¹ط¸ظ¹ط¸â€¦ط¸ئ’ ط·آ¨ط¸â€ ط·آ¬ط·آ§ط·آ­' : 'Rating submitted successfully');
+            alert(language === 'ar' ? 'تم إرسال تقييمك بنجاح' : 'Rating submitted successfully');
         } catch (error) {
             console.error('Error submitting rating:', error);
-            alert(language === 'ar' ? 'ط·آ­ط·آ¯ط·آ« ط·آ®ط·آ·ط·آ£ ط·آ£ط·آ«ط¸â€ ط·آ§ط·طŒ ط·آ¥ط·آ±ط·آ³ط·آ§ط¸â€‍ ط·آ§ط¸â€‍ط·ع¾ط¸â€ڑط¸ظ¹ط¸ظ¹ط¸â€¦' : 'Error submitting rating');
+            alert(language === 'ar' ? 'حدث خطأ أثناء إرسال التقييم' : 'Error submitting rating');
         } finally {
             setIsSubmittingRating(false);
+        }
+    };
+
+    const handleFileDownload = async (url: string, fileName: string) => {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = fileName || 'download';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error("Download failed:", error);
+            // Fallback to simple link
+            window.open(url, '_blank');
         }
     };
 
@@ -659,7 +678,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                             <span className="text-sm font-bold">{otherMember.name}</span>
                             <span className="text-[10px] opacity-70 uppercase tracking-widest">
                                 {language === 'ar' 
-                                    ? (incomingCall.call_type === 'video' ? 'ط¸ظ¹ط·ع¾ط·آµط¸â€‍ ط·آ¨ط¸ئ’ ط¸ظ¾ط¸ظ¹ط·آ¯ط¸ظ¹ط¸ث†...' : 'ط¸ظ¹ط·ع¾ط·آµط¸â€‍ ط·آ¨ط¸ئ’ ط·آµط¸ث†ط·ع¾ط¸ظ¹...') 
+                                    ? (incomingCall.call_type === 'video' ? 'يتصل بك فيديو...' : 'يتصل بك صوتياً...') 
                                     : (incomingCall.call_type === 'video' ? 'Incoming Video Call...' : 'Incoming Voice Call...')}
                             </span>
                         </div>
@@ -708,28 +727,28 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                     <button 
                         onClick={handleVoiceCall} 
                         className="p-1.5 hover:bg-blue-50 text-text-muted hover:text-blue-500 transition-all rounded-xs"
-                        title={language === 'ar' ? 'ط¸â€¦ط¸ئ’ط·آ§ط¸â€‍ط¸â€¦ط·آ© ط·آµط¸ث†ط·ع¾ط¸ظ¹ط·آ©' : 'Voice Call'}
+                        title={language === 'ar' ? 'مكالمة صوتية' : 'Voice Call'}
                     >
                         <Phone size={16} />
                     </button>
                     <button 
                         onClick={() => setPreventDuplicates(!preventDuplicates)} 
                         className={`p-1.5 transition-all rounded-xs ${preventDuplicates ? 'bg-primary/10 text-primary' : 'hover:bg-gray-50 text-text-muted'}`}
-                        title={language === 'ar' ? 'ط¸â€¦ط¸â€ ط·آ¹ ط·آ§ط¸â€‍ط·ع¾ط¸ئ’ط·آ±ط·آ§ط·آ±' : 'Deduplication'}
+                        title={language === 'ar' ? 'منع التكرار' : 'Deduplication'}
                     >
                         <ShieldCheck size={16} />
                     </button>
                     <button 
                         onClick={handleVideoCall} 
                         className="p-1.5 hover:bg-blue-50 text-text-muted hover:text-blue-500 transition-all rounded-xs"
-                        title={language === 'ar' ? 'ط¸â€¦ط¸ئ’ط·آ§ط¸â€‍ط¸â€¦ط·آ© ط¸ظ¾ط¸ظ¹ط·آ¯ط¸ظ¹ط¸ث†' : 'Video Call'}
+                        title={language === 'ar' ? 'مكالمة فيديو' : 'Video Call'}
                     >
                         <Video size={16} />
                     </button>
                     <button 
                         onClick={() => setIsRatingOpen(true)} 
                         className="p-1.5 hover:bg-yellow-50 text-text-muted hover:text-yellow-500 transition-all rounded-xs"
-                        title={language === 'ar' ? 'ط·ع¾ط¸â€ڑط¸ظ¹ط¸ظ¹ط¸â€¦ ط·آ§ط¸â€‍ط¸â€¦ط·آ¹ط¸â€‍ط¸â€ ' : 'Rate User'}
+                        title={language === 'ar' ? 'تقييم المعلن' : 'Rate User'}
                     >
                         <Star size={16} />
                     </button>
@@ -749,7 +768,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                         </button>
                         
                         <h3 className="text-lg font-black text-secondary mb-4 text-center">
-                            {language === 'ar' ? 'ط·ع¾ط¸â€ڑط¸ظ¹ط¸ظ¹ط¸â€¦ ط·آ§ط¸â€‍ط·ع¾ط·آ¬ط·آ±ط·آ¨ط·آ©' : 'Rate Experience'}
+                            {language === 'ar' ? 'تقييم التجربة' : 'Rate Experience'}
                         </h3>
                         
                         <div className="flex justify-center gap-2 mb-6">
@@ -767,7 +786,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                         <textarea
                             value={ratingComment}
                             onChange={(e) => setRatingComment(e.target.value)}
-                            placeholder={language === 'ar' ? 'ط·آ§ط¸ئ’ط·ع¾ط·آ¨ ط·ع¾ط·آ¹ط¸â€‍ط¸ظ¹ط¸â€ڑط¸ئ’ ط¸â€،ط¸â€ ط·آ§...' : 'Write your comment here...'}
+                            placeholder={language === 'ar' ? 'اكتب تعليقك هنا...' : 'Write your comment here...'}
                             className="w-full h-24 p-3 border border-gray-200 rounded-md text-sm mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
                         
@@ -777,7 +796,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                             className="w-full py-2.5 bg-primary text-white rounded-md font-bold text-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {isSubmittingRating && <Loader2 size={16} className="animate-spin" />}
-                            {language === 'ar' ? 'ط·آ¥ط·آ±ط·آ³ط·آ§ط¸â€‍ ط·آ§ط¸â€‍ط·ع¾ط¸â€ڑط¸ظ¹ط¸ظ¹ط¸â€¦' : 'Submit Rating'}
+                            {language === 'ar' ? 'إرسال التقييم' : 'Submit Rating'}
                         </button>
                     </div>
                 </div>
@@ -859,6 +878,13 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                                     (e.target as HTMLImageElement).src = '/placeholder-image.png';
                                                 }}
                                             />
+                                            <button 
+                                                onClick={() => handleFileDownload(msg.file_url!, msg.file_name || 'image.jpg')}
+                                                className="absolute bottom-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                                                title={language === 'ar' ? 'تحميل' : 'Download'}
+                                            >
+                                                <Download size={14} />
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -870,13 +896,22 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                             controls 
                                             className="max-w-[250px] max-h-[250px] rounded-lg border border-black/10"
                                         />
-                                        <button 
-                                            onClick={() => setSelectedMedia({ url: msg.file_url!, type: 'video' })}
-                                            className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
-                                            title={language === 'ar' ? 'تكبير' : 'Expand'}
-                                        >
-                                            <Maximize2 size={14} /> 
-                                        </button>
+                                        <div className="absolute top-2 right-2 flex flex-col gap-2">
+                                            <button 
+                                                onClick={() => setSelectedMedia({ url: msg.file_url!, type: 'video' })}
+                                                className="p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                                                title={language === 'ar' ? 'تكبير' : 'Expand'}
+                                            >
+                                                <Maximize2 size={14} /> 
+                                            </button>
+                                            <button 
+                                                onClick={() => handleFileDownload(msg.file_url!, msg.file_name || 'video.mp4')}
+                                                className="p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                                                title={language === 'ar' ? 'تحميل' : 'Download'}
+                                            >
+                                                <Download size={14} /> 
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
 
@@ -904,14 +939,13 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                                 <span className="text-[9px] text-gray-500 font-mono">
                                                     {msg.duration ? formatTime(msg.duration) : '0:00'}
                                                 </span>
-                                                <a 
-                                                    href={msg.file_url} 
-                                                    download 
-                                                    target="_blank" 
+                                                <button 
+                                                    onClick={() => handleFileDownload(msg.file_url!, msg.file_name || 'voice-note.webm')}
                                                     className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-400 hover:text-primary"
+                                                    title={language === 'ar' ? 'تحميل' : 'Download'}
                                                 >
                                                     <Download size={12} />
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -950,15 +984,13 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                                 {msg.file_size ? `${(msg.file_size / 1024).toFixed(1)} KB` : 'File'}
                                             </span>
                                         </div>
-                                        <a 
-                                            href={msg.file_url} 
-                                            download={msg.file_name || "download"} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
+                                        <button 
+                                            onClick={() => handleFileDownload(msg.file_url!, msg.file_name || 'download')}
                                             className="ml-2 p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-gray-500 transition-colors"
+                                            title={language === 'ar' ? 'تحميل' : 'Download'}
                                         >
                                             <Download size={14} />
-                                        </a>
+                                        </button>
                                     </div>
                                 )}
 
@@ -996,9 +1028,12 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                         <FileText size={24} className={'text-primary'} />
                                         <div className="flex flex-col min-w-0">
                                             <span className="text-[10px] font-black truncate max-w-[150px]">{msg.file_name || 'Attached File'}</span>
-                                            <a href={msg.file_url} download target="_blank" className={`flex items-center gap-1 text-[9px] font-black hover:underline text-primary`}>
+                                            <button 
+                                                onClick={() => handleFileDownload(msg.file_url!, msg.file_name || 'download')}
+                                                className={`flex items-center gap-1 text-[9px] font-black hover:underline text-primary`}
+                                            >
                                                 <Download size={10} /> {language === 'ar' ? 'تحميل' : 'DOWNLOAD NOW'}
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 )}
