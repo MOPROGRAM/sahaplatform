@@ -150,8 +150,6 @@ function ProfileContent() {
         }
     }, [user, mounted]);
 
-    if (!mounted) return <div className="min-h-screen bg-background"></div>;
-
     useEffect(() => {
         if (activeTab !== 'favorites') return;
         try {
@@ -162,6 +160,9 @@ function ProfileContent() {
             setFavorites([]);
         }
     }, [activeTab]);
+
+    if (!mounted) return <div className="min-h-screen bg-background"></div>;
+    if (!user) return null;
 
     const fetchUserAds = async () => {
         try {
@@ -246,8 +247,6 @@ function ProfileContent() {
             alert(language === 'ar' ? 'فشل في حذف الإعلان' : 'Failed to delete ad');
         }
     };
-
-    if (!user) return null;
 
     const tabs = [
         { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'Overview', icon: <User size={14} /> },
