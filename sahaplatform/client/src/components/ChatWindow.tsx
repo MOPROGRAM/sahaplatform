@@ -370,7 +370,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
         }
     };
 
-    const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video' = 'text', content?: string, fileData?: any) => {
+    const handleSend = async (type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video' | 'audio' | 'call' = 'text', content?: string, fileData?: any) => {
         if (sending) return; // Prevent duplicate sends
 
         const messageContent = content || input;
@@ -534,7 +534,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
         }
     };
 
-    const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice' | 'video') => {
+    const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice' | 'video' | 'audio') => {
         try {
             // Start progress simulation
             setUploadProgress(10);
