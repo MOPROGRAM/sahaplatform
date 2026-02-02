@@ -1,7 +1,0 @@
-# Page snapshot
-
-```yaml
-- generic [active] [ref=e1]:
-  - main [ref=e4]
-  - alert [ref=e5]
-```
