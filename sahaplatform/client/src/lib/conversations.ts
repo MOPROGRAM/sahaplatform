@@ -212,31 +212,36 @@ export const conversationsService = {
         const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const filePath = `${conversationId}/${Date.now()}-${safeFileName}`;
         
-        // Use 'chat-media' bucket if available, otherwise fallback to 'chat_vault'
-        // Ideally we should check which bucket exists, but let's default to the new standard 'chat-media'
-        // If upload fails, we might want to try 'chat_vault' as fallback
-        let bucketName = 'chat-media';
+        // Use 'chat_vault' as primary bucket, fallback to 'chat-media' if needed
+        let bucketName = 'chat_vault';
         
+        // Ensure contentType is set correctly
+        const contentType = file.type || (fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' 
+            : fileExt === 'png' ? 'image/png'
+            : fileExt === 'gif' ? 'image/gif'
+            : fileExt === 'webp' ? 'image/webp'
+            : fileExt === 'mp4' ? 'video/mp4'
+            : fileExt === 'webm' ? 'video/webm'
+            : fileExt === 'mp3' ? 'audio/mpeg'
+            : fileExt === 'wav' ? 'audio/wav'
+            : 'application/octet-stream');
+
         let { error: uploadError } = await supabase.storage
             .from(bucketName)
             .upload(filePath, file, {
-                contentType: file.type || (fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' 
-                    : fileExt === 'png' ? 'image/png'
-                    : fileExt === 'gif' ? 'image/gif'
-                    : fileExt === 'webp' ? 'image/webp'
-                    : fileExt === 'mp4' ? 'video/mp4'
-                    : fileExt === 'webm' ? 'video/webm'
-                    : fileExt === 'mp3' ? 'audio/mpeg'
-                    : fileExt === 'wav' ? 'audio/wav'
-                    : 'application/octet-stream')
+                contentType,
+                upsert: true
             });
 
         if (uploadError) {
-             console.warn(`Upload to ${bucketName} failed, trying chat_vault`, uploadError);
-             bucketName = 'chat_vault';
+             console.warn(`Upload to ${bucketName} failed, trying chat-media`, uploadError);
+             bucketName = 'chat-media';
              const { error: retryError } = await supabase.storage
                 .from(bucketName)
-                .upload(filePath, file);
+                .upload(filePath, file, {
+                    contentType,
+                    upsert: true
+                });
              if (retryError) throw retryError;
         }
 
