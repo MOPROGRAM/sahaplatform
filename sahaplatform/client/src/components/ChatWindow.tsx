@@ -115,6 +115,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
     const [zoom, setZoom] = useState(1);
     const isSendingRef = useRef(false);
     const messageIdsRef = useRef<Set<string>>(new Set());
+    const pendingSigRef = useRef<Map<string, string>>(new Map());
 
     // const socketRef = useRef<any>(null);
 
@@ -183,12 +184,32 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                             sender: { name: '...' } // Temporary placeholder
                         };
     
+                        // Compute signature to match optimistic message
+                        const sig = [
+                            processedMessage.sender_id || '',
+                            processedMessage.message_type || '',
+                            processedMessage.content || '',
+                            (newMessage.file_url || '')
+                        ].join('|').slice(0, 512);
+
                         // Optimistically add message
                         setMessages(prev => {
-                            const exists = prev.some(m => m.id === processedMessage.id);
-                            const next = exists 
-                                ? prev.map(m => m.id === processedMessage.id ? { ...m, ...processedMessage } : m)
-                                : [...prev, processedMessage];
+                            const existsById = prev.some(m => m.id === processedMessage.id);
+                            if (existsById) {
+                                messageIdsRef.current.add(processedMessage.id);
+                                return prev.map(m => m.id === processedMessage.id ? { ...m, ...processedMessage } : m);
+                            }
+
+                            // Try to find an optimistic message by signature
+                            const optimisticId = pendingSigRef.current.get(sig);
+                            if (optimisticId) {
+                                messageIdsRef.current.add(processedMessage.id);
+                                pendingSigRef.current.delete(sig);
+                                return prev.map(m => m.id === optimisticId ? { ...processedMessage } : m);
+                            }
+
+                            // Fallback: append if unique
+                            const next = [...prev, processedMessage];
                             messageIdsRef.current.add(processedMessage.id);
                             return next;
                         });
@@ -373,38 +394,65 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                 };
                 
                 const targetUser = participants.find(p => p.id !== user?.id);
-                const sentMessage = await conversationsService.sendMessage(
-                    conversationId, 
-                    payload.content, 
-                    payload.messageType, 
-                    fileData,
-                    targetUser?.id
-                );
-    
-                // Normalize returned fields (snake_case)
-                const id = sentMessage.id;
-                const contentResp = sentMessage.content;
-                const messageType = sentMessage.message_type || type;
-                const createdAt = sentMessage.created_at || new Date().toISOString();
-                const senderId = sentMessage.sender_id || user?.id;
-    
-                // Add message locally immediately
-                const newMessage: Message = {
-                    id: id,
+                // Build an optimistic message with a temporary id
+                const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const senderId = user?.id || '';
+                const optimisticMessage: Message = {
+                    id: tempId,
                     sender_id: senderId,
-                    content: contentResp,
-                    message_type: messageType as any,
-                    created_at: createdAt,
+                    content: payload.content,
+                    message_type: payload.messageType as any,
+                    created_at: new Date().toISOString(),
                     sender: { name: user?.name || 'You' },
                     ...fileData
                 };
+
+                // Signature used to reconcile realtime insert and server response
+                const sig = [
+                    senderId,
+                    payload.messageType || '',
+                    payload.content || '',
+                    (fileData?.file_url || '')
+                ].join('|').slice(0, 512);
+                pendingSigRef.current.set(sig, tempId);
+
+                // Add optimistic message
+                setMessages(prev => [...prev, optimisticMessage]);
+
+                // Send to server
+                const sentMessage = await conversationsService.sendMessage(
+                    conversationId,
+                    payload.content,
+                    payload.messageType,
+                    fileData,
+                    targetUser?.id
+                );
+
+                // Normalize server fields
+                const serverMessage: Message = {
+                    id: sentMessage.id,
+                    sender_id: sentMessage.sender_id || senderId,
+                    content: sentMessage.content,
+                    message_type: (sentMessage.message_type || payload.messageType) as any,
+                    created_at: sentMessage.created_at || optimisticMessage.created_at,
+                    sender: { name: user?.name || 'You' },
+                    ...fileData
+                };
+
+                // Reconcile optimistic with server response (avoid duplicate)
                 setMessages(prev => {
-                    const exists = prev.some(m => m.id === newMessage.id);
-                    const next = exists 
-                        ? prev.map(m => m.id === newMessage.id ? { ...m, ...newMessage } : m)
-                        : [...prev, newMessage];
-                    messageIdsRef.current.add(newMessage.id);
-                    return next;
+                    const optimisticId = pendingSigRef.current.get(sig);
+                    if (optimisticId) {
+                        pendingSigRef.current.delete(sig);
+                        messageIdsRef.current.add(serverMessage.id);
+                        return prev.map(m => m.id === optimisticId ? { ...serverMessage } : m);
+                    }
+                    // If not found, ensure we don't duplicate by id
+                    const existsById = prev.some(m => m.id === serverMessage.id);
+                    if (existsById) {
+                        return prev.map(m => m.id === serverMessage.id ? { ...m, ...serverMessage } : m);
+                    }
+                    return [...prev, serverMessage];
                 });
     
                 if (type === 'text') setInput("");

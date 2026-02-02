@@ -242,7 +242,11 @@ export const conversationsService = {
 
         const { data } = await supabase.storage
             .from(bucketName)
-            .createSignedUrl(filePath, 31536000);
+            .createSignedUrl(filePath, 31536000, {
+                transform: {
+                    download: false
+                }
+            } as any);
 
         if (!data?.signedUrl) throw new Error('Failed to generate signed URL');
 
