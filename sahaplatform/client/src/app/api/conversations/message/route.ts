@@ -37,7 +37,7 @@ export async function POST(request: Request) {
             })
             .select(`
                 *,
-                sender:users!sender_id(id, name, email)
+                sender:users!fk_sender(id, name, email)
             `)
             .single();
 

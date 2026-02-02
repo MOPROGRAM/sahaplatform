@@ -76,8 +76,8 @@ export const adsService = {
                 .select(`
                     *,
                     author:users!ads_author_id_fkey(id, name, email, phone),
-                    city:cities!city_id(id, name, name_ar, name_en),
-                    currency:currencies!currency_id(id, code, symbol, name)
+                    city:cities!ads_city_id_fkey(id, name, name_ar, name_en),
+                    currency:currencies!ads_currency_id_fkey(id, code, symbol, name)
                 `)
                 .eq('is_active', true);
 
@@ -162,8 +162,8 @@ export const adsService = {
                 .select(`
                     *,
                     author:users!ads_author_id_fkey(id, name, email),
-                    city:cities!city_id(id, name, name_ar, name_en),
-                    currency:currencies!currency_id(id, code, symbol, name)
+                    city:cities!ads_city_id_fkey(id, name, name_ar, name_en),
+                    currency:currencies!ads_currency_id_fkey(id, code, symbol, name)
                 `)
                 .eq('id', id);
 
@@ -198,8 +198,8 @@ export const adsService = {
             .select(`
                 *,
                 author:users!ads_author_id_fkey(id, name, email, phone),
-                city:cities!city_id(id, name, name_ar, name_en),
-                currency:currencies!currency_id(id, code, symbol, name)
+                city:cities!ads_city_id_fkey(id, name, name_ar, name_en),
+                currency:currencies!ads_currency_id_fkey(id, code, symbol, name)
             `)
             .eq('author_id', user.id)
             .order('created_at', { ascending: false });
@@ -247,8 +247,8 @@ export const adsService = {
             .select(`
                 *,
                 author:users!ads_author_id_fkey(id, name, email, phone),
-                city:cities!city_id(id, name, name_ar, name_en),
-                currency:currencies!currency_id(id, code, symbol, name)
+                city:cities!ads_city_id_fkey(id, name, name_ar, name_en),
+                currency:currencies!ads_currency_id_fkey(id, code, symbol, name)
             `)
             .single();
 
@@ -296,8 +296,8 @@ export const adsService = {
             .select(`
                 *,
                 author:users!ads_author_id_fkey(id, name, email, phone),
-                city:cities!city_id(id, name, name_ar, name_en),
-                currency:currencies!currency_id(id, code, symbol, name)
+                city:cities!ads_city_id_fkey(id, name, name_ar, name_en),
+                currency:currencies!ads_currency_id_fkey(id, code, symbol, name)
             `)
             .single();
 
@@ -399,8 +399,8 @@ export const adsService = {
                 ad:ads!favorites_ad_id_fkey (
                     *,
                     author:users!ads_author_id_fkey(id, name, email),
-                    city:cities!city_id(id, name, name_ar, name_en),
-                    currency:currencies!currency_id(id, code, symbol, name)
+                    city:cities!ads_city_id_fkey(id, name, name_ar, name_en),
+                    currency:currencies!ads_currency_id_fkey(id, code, symbol, name)
                 )
             `)
             .eq('user_id', user.id)

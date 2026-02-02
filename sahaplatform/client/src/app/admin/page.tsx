@@ -116,7 +116,7 @@ export default function AdminDashboard() {
                     .select(`
                         *,
                         participants:conversation_participants(
-                            user:users!user_id(id, name, email)
+                            user:users!fk_user(id, name, email)
                         )
                     `)
                     .is('ad_id', null)
