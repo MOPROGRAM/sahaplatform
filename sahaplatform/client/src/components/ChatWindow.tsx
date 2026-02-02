@@ -54,7 +54,7 @@ interface Message {
     id: string;
     sender_id: string;
     content: string;
-    message_type: 'text' | 'image' | 'file' | 'voice' | 'location' | 'video' | 'call';
+    message_type: 'text' | 'image' | 'file' | 'voice' | 'audio' | 'location' | 'video' | 'call';
     file_url?: string;
     file_name?: string;
     file_size?: number;
@@ -268,9 +268,9 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                 const audioFile = new File([audioBlob], `voice-note-${Date.now()}.webm`, { type: 'audio/webm' });
                 
                 // Upload and send
-                const uploadData = await handleFileUpload(audioFile, 'voice');
+                const uploadData = await handleFileUpload(audioFile, 'audio');
                 if (uploadData) {
-                    handleSend('voice', 'Voice Note', { ...uploadData, duration: recordingTime });
+                    handleSend('audio', 'Voice Note', { ...uploadData, duration: recordingTime });
                 }
                 
                 // Cleanup
@@ -766,7 +766,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                     const isMe = msg.sender_id === user?.id;
                     const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(msg.file_url));
                     const isVideo = msg.message_type === 'video' || (msg.file_url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(msg.file_url));
-                    const isVoice = msg.message_type === 'voice' || (msg.file_url && /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(msg.file_url) && !isVideo);
+                    const isVoice = msg.message_type === 'voice' || msg.message_type === 'audio' || (msg.file_url && /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(msg.file_url) && !isVideo);
                     
                     return (
                         <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
@@ -977,7 +977,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                         let type: any = 'file';
                         if (file.type.startsWith('image/')) type = 'image';
                         else if (file.type.startsWith('video/')) type = 'video';
-                        else if (file.type.startsWith('audio/')) type = 'voice';
+                        else if (file.type.startsWith('audio/')) type = 'audio';
 
                         const uploadData = await handleFileUpload(file, type);
                         if (uploadData) {

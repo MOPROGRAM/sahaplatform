@@ -212,8 +212,8 @@ export const conversationsService = {
         const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const filePath = `${conversationId}/${Date.now()}-${safeFileName}`;
         
-        // Use 'chat_vault' as primary bucket, fallback to 'chat-media' if needed
-        let bucketName = 'chat_vault';
+        // Use 'chat-media' as primary bucket, fallback to 'chat_vault' if needed
+        let bucketName = 'chat-media';
         
         // Ensure contentType is set correctly
         const contentType = file.type || (fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' 
@@ -234,8 +234,8 @@ export const conversationsService = {
             });
 
         if (uploadError) {
-             console.warn(`Upload to ${bucketName} failed, trying chat-media`, uploadError);
-             bucketName = 'chat-media';
+             console.warn(`Upload to ${bucketName} failed, trying chat_vault`, uploadError);
+             bucketName = 'chat_vault';
              const { error: retryError } = await supabase.storage
                 .from(bucketName)
                 .upload(filePath, file, {
