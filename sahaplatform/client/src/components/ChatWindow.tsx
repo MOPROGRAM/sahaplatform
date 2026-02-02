@@ -264,8 +264,10 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
             };
 
             mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-                const audioFile = new File([audioBlob], `voice-note-${Date.now()}.webm`, { type: 'audio/webm' });
+                const mimeType = mediaRecorder.mimeType || 'audio/webm';
+                const ext = mimeType.split('/')[1]?.split(';')[0] || 'webm';
+                const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+                const audioFile = new File([audioBlob], `voice-note-${Date.now()}.${ext}`, { type: mimeType });
                 
                 // Upload and send
                 const uploadData = await handleFileUpload(audioFile, 'audio');
