@@ -91,20 +91,23 @@ function ProfileContent() {
 
     const handleDeleteConversation = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        // First Confirmation
-        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذه المحادثة؟ ستتمكن من استعادتها خلال 30 يوم.' : 'Are you sure you want to delete this conversation? You can restore it within 30 days.')) {
-            return;
-        }
-        // Second Confirmation (Double Check)
-        if (!confirm(language === 'ar' ? 'تأكيد نهائي: هل تريد حقاً حذف المحادثة؟' : 'Final Confirmation: Do you really want to delete this conversation?')) {
-            return;
-        }
+        
+        // Confirmation (Pop-up)
+        const isAr = language === 'ar';
+        const confirmMsg = isAr 
+            ? 'هل أنت متأكد من حذف هذه المحادثة؟ سيتم حذفها من قائمتك فقط ولن تختفي عند الطرف الآخر.' 
+            : 'Are you sure you want to delete this conversation? It will be removed from your list only and will remain for the other party.';
+            
+        if (!confirm(confirmMsg)) return;
+
         try {
-            await conversationsService.deleteConversation(id);
-            fetchConversations();
+            await conversationsService.hideConversation(id);
+            // Immediate UI update
+            setConversations(prev => prev.filter(c => c.id !== id));
+            if (selectedConversationId === id) setSelectedConversationId(null);
         } catch (error) {
             console.error('Failed to delete conversation:', error);
-            alert(language === 'ar' ? 'فشل حذف المحادثة' : 'Failed to delete conversation');
+            alert(isAr ? 'فشل حذف المحادثة' : 'Failed to delete conversation');
         }
     };
 
@@ -502,16 +505,6 @@ function ProfileContent() {
                                                 {language === 'ar' ? 'الرسائل' : 'Messages'}
                                             </h3>
                                         </div>
-                                        <button 
-                                            onClick={() => setShowDeletedConversations(!showDeletedConversations)}
-                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-xs text-[9px] font-black uppercase tracking-widest transition-all ${showDeletedConversations ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100'}`}
-                                        >
-                                            <Trash2 size={12} />
-                                            {showDeletedConversations 
-                                                ? (language === 'ar' ? 'إخفاء المحذوفات' : 'Hide Deleted')
-                                                : (language === 'ar' ? 'عرض المحذوفات' : 'Show Deleted')
-                                            }
-                                        </button>
                                     </div>
                                     <div className="flex-1 overflow-y-auto p-2 space-y-2">
                                         {messagesLoading ? (
@@ -552,23 +545,13 @@ function ProfileContent() {
                                                         )}
                                                     </div>
                                                     <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        {showDeletedConversations ? (
-                                                            <button 
-                                                                onClick={(e) => handleRestoreConversation(conv.id, e)}
-                                                                className="p-1.5 bg-green-50 text-green-600 rounded-full hover:bg-green-100"
-                                                                title={language === 'ar' ? 'استعادة' : 'Restore'}
-                                                            >
-                                                                <RefreshCcw size={14} />
-                                                            </button>
-                                                        ) : (
-                                                            <button 
-                                                                onClick={(e) => handleDeleteConversation(conv.id, e)}
-                                                                className="p-1.5 bg-red-50 text-red-600 rounded-full hover:bg-red-100"
-                                                                title={language === 'ar' ? 'حذف' : 'Delete'}
-                                                            >
-                                                                <Trash2 size={14} />
-                                                            </button>
-                                                        )}
+                                                        <button 
+                                                            onClick={(e) => handleDeleteConversation(conv.id, e)}
+                                                            className="p-1.5 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition-colors"
+                                                            title={language === 'ar' ? 'حذف المحادثة' : 'Delete Conversation'}
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
                                                     </div>
                                                 </div>
                                             ))

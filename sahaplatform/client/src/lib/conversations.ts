@@ -264,6 +264,19 @@ export const conversationsService = {
         await supabase.rpc('mark_messages_read', { p_conversation_id: conversationId });
     },
 
+    // Permanently Hide Conversation (remove from participants)
+    async hideConversation(conversationId: string): Promise<void> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
+
+        const { error } = await supabase
+            .from('_conversation_participants')
+            .delete()
+            .match({ a: conversationId, b: user.id });
+
+        if (error) throw error;
+    },
+
     // Soft Delete Conversation
     async deleteConversation(conversationId: string): Promise<void> {
         const { error } = await supabase.rpc('soft_delete_conversation', { p_conversation_id: conversationId });
@@ -283,8 +296,8 @@ export const conversationsService = {
         const now = new Date().getTime();
         const diffMinutes = (now - created) / 60000;
         
-        if (diffMinutes > 30) {
-            throw new Error(document.documentElement.lang === 'ar' ? 'لا يمكن تعديل الرسالة بعد مرور 30 دقيقة' : 'Cannot edit message after 30 minutes');
+        if (diffMinutes > 60) {
+            throw new Error(document.documentElement.lang === 'ar' ? 'لا يمكن تعديل الرسالة بعد مرور 60 دقيقة' : 'Cannot edit message after 60 minutes');
         }
 
         const { error } = await supabase.rpc('edit_message', { 
@@ -301,8 +314,8 @@ export const conversationsService = {
         const now = new Date().getTime();
         const diffMinutes = (now - created) / 60000;
 
-        if (diffMinutes > 30) {
-            throw new Error(document.documentElement.lang === 'ar' ? 'لا يمكن حذف الرسالة بعد مرور 30 دقيقة' : 'Cannot delete message after 30 minutes');
+        if (diffMinutes > 60) {
+            throw new Error(document.documentElement.lang === 'ar' ? 'لا يمكن حذف الرسالة بعد مرور 60 دقيقة' : 'Cannot delete message after 60 minutes');
         }
 
         const { error } = await supabase.rpc('delete_message', { p_message_id: messageId });

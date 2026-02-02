@@ -8,7 +8,8 @@
     "export": "npx @cloudflare/next-on-pages@1",
     "start": "next start",
     "lhci": "lhci autorun --upload.target=temporary-public-storage",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:audit": "npx playwright test tests/complete-audit.spec.ts --headed"
   },
   "dependencies": {
     "@react-email/components": "^1.0.6",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@lhci/cli": "^0.8.0",
+    "@playwright/test": "^1.58.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

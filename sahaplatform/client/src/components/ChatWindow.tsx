@@ -290,7 +290,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
 
         } catch (error) {
             console.error('Error accessing microphone:', error);
-            alert('Could not access microphone');
+            alert(language === 'ar' ? 'فشل الوصول للميكروفون' : 'Could not access microphone');
         }
     };
 
@@ -766,12 +766,13 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar" ref={scrollRef}>
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === user?.id;
+                    const canManage = isMe && !msg.deleted_at && (new Date().getTime() - new Date(msg.created_at).getTime()) / 60000 <= 60;
                     const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(msg.file_url));
                     const isVideo = msg.message_type === 'video' || (msg.message_type !== 'audio' && msg.message_type !== 'voice' && msg.file_url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(msg.file_url));
                     const isVoice = msg.message_type === 'voice' || msg.message_type === 'audio' || (msg.file_url && /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(msg.file_url) && !isVideo);
                     
                     return (
-                        <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                        <div key={msg.id || idx} className={`flex flex-col group ${isMe ? 'items-end' : 'items-start'}`}>
                             <div className={`relative max-w-[75%] px-3 py-2 shadow-sm transition-all hover:shadow-md ${isMe
                                 ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-gray-900 dark:text-white rounded-2xl rounded-tr-none'
                                 : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-none'}`}>
@@ -779,11 +780,11 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                 {msg.message_type === 'text' && (
                                     <p className={`text-[11px] font-bold leading-relaxed whitespace-pre-wrap ${msg.deleted_at ? 'italic opacity-60' : ''}`}>
                                         {msg.content}
-                                        {msg.is_edited && !msg.deleted_at && <span className="text-[8px] opacity-50 mx-1">(edited)</span>}
+                                        {msg.is_edited && !msg.deleted_at && <span className="text-[8px] opacity-50 mx-1">{language === 'ar' ? '(معدلة)' : '(edited)'}</span>}
                                     </p>
                                 )}
 
-                                {isMe && !msg.deleted_at && (
+                                {canManage && (
                                     <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <div className="relative group/menu">
                                             <MoreVertical size={12} className="text-gray-400 cursor-pointer" />
@@ -870,30 +871,66 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
 
 
                                 {isVoice && msg.file_url && (
-                                    <div className="flex flex-col gap-1 min-w-[200px] py-1">
-                                        <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-1 border border-gray-200 dark:border-gray-600">
-                                            <audio 
-                                                controls 
-                                                className="h-8 w-full max-w-[250px] outline-none" 
-                                                src={msg.file_url}
-                                                preload="metadata"
-                                            >
-                                                Your browser does not support the audio element.
-                                            </audio>
+                                    <div className="flex items-center gap-3 min-w-[200px] py-1">
+                                        <button 
+                                            onClick={(e) => {
+                                                const audio = (e.currentTarget.parentElement?.querySelector('audio') as HTMLAudioElement);
+                                                if (audio.paused) {
+                                                    audio.play();
+                                                } else {
+                                                    audio.pause();
+                                                }
+                                            }}
+                                            className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center shadow-md hover:bg-primary/90 transition-all active:scale-95 shrink-0"
+                                        >
+                                            <Play size={18} fill="currentColor" />
+                                        </button>
+                                        
+                                        <div className="flex-1 flex flex-col gap-1">
+                                            <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative">
+                                                <div className="absolute inset-0 bg-primary/30 w-full" />
+                                                <div className="absolute inset-y-0 left-0 bg-primary w-0 transition-all duration-100" />
+                                            </div>
+                                            
+                                            <div className="flex justify-between items-center px-0.5">
+                                                <span className="text-[9px] text-gray-500 font-mono">
+                                                    {msg.duration ? formatTime(msg.duration) : '0:00'}
+                                                </span>
+                                                <a 
+                                                    href={msg.file_url} 
+                                                    download 
+                                                    target="_blank" 
+                                                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-400 hover:text-primary"
+                                                >
+                                                    <Download size={12} />
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between items-center px-1">
-                                            <span className="text-[9px] text-gray-500 font-mono">
-                                                {msg.duration ? formatTime(msg.duration) : ''}
-                                            </span>
-                                            <a 
-                                                href={msg.file_url} 
-                                                download 
-                                                target="_blank" 
-                                                className={`flex items-center gap-1 text-[9px] font-black hover:underline text-primary`}
-                                            >
-                                                <Download size={10} /> {language === 'ar' ? 'تحميل' : 'Download'}
-                                            </a>
-                                        </div>
+
+                                        <audio 
+                                            src={msg.file_url}
+                                            preload="metadata"
+                                            className="hidden"
+                                            onTimeUpdate={(e) => {
+                                                const audio = e.currentTarget;
+                                                const progress = (audio.currentTime / audio.duration) * 100;
+                                                const bar = audio.parentElement?.querySelector('.bg-primary.w-0') as HTMLElement;
+                                                if (bar) bar.style.width = `${progress}%`;
+                                            }}
+                                            onPlay={(e) => {
+                                                const btn = e.currentTarget.parentElement?.querySelector('button');
+                                                if (btn) btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+                                            }}
+                                            onPause={(e) => {
+                                                const btn = e.currentTarget.parentElement?.querySelector('button');
+                                                if (btn) btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+                                            }}
+                                            onEnded={(e) => {
+                                                const audio = e.currentTarget;
+                                                const bar = audio.parentElement?.querySelector('.bg-primary.w-0') as HTMLElement;
+                                                if (bar) bar.style.width = '0%';
+                                            }}
+                                        />
                                     </div>
                                 )}
 
