@@ -60,6 +60,20 @@ export default function MessagesPage() {
         }
     };
 
+    const handleDeleteConversation = async (e: React.MouseEvent, conversationId: string) => {
+        e.stopPropagation();
+        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذه المحادثة؟' : 'Are you sure you want to delete this conversation?')) return;
+        
+        try {
+            await conversationsService.deleteConversation(conversationId);
+            if (selectedId === conversationId) setSelectedId(null);
+            fetchConversations();
+        } catch (error) {
+            console.error('Failed to delete conversation:', error);
+            alert(language === 'ar' ? 'فشل حذف المحادثة' : 'Failed to delete conversation');
+        }
+    };
+
     const filteredConversations = conversations.filter(conv => {
         const otherMember = conv.participants.find(p => p.id !== user?.id);
         return otherMember?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -135,16 +149,25 @@ export default function MessagesPage() {
                                                 <p className="text-[10px] font-bold text-text-muted truncate">
                                                     {conv.last_message || (language === 'ar' ? 'لا توجد رسائل بعد' : 'no messages yet')}
                                                 </p>
-                                                {showDeleted && (
-                                                    <button 
-                                                        onClick={(e) => handleRestore(e, conv.id)}
-                                                        className="p-1 hover:bg-green-50 text-green-500 rounded transition-colors"
-                                                        title={language === 'ar' ? 'استرجاع' : 'Restore'}
-                                                    >
-                                                        <RefreshCw size={12} />
-                                                    </button>
-                                                )}
-                                                {/* (conv as any).unread && <span className="w-2 h-2 bg-primary rounded-full shadow-[0_0_5px_rgba(var(--primary-rgb),0.5)]"></span> */}
+                                                <div className="flex items-center gap-2">
+                                                    {showDeleted ? (
+                                                        <button 
+                                                            onClick={(e) => handleRestore(e, conv.id)}
+                                                            className="p-1 hover:bg-green-50 text-green-500 rounded transition-colors"
+                                                            title={language === 'ar' ? 'استرجاع' : 'Restore'}
+                                                        >
+                                                            <RefreshCw size={12} />
+                                                        </button>
+                                                    ) : (
+                                                        <button 
+                                                            onClick={(e) => handleDeleteConversation(e, conv.id)}
+                                                            className="p-1.5 opacity-0 group-hover:opacity-100 hover:text-red-600 hover:bg-red-50 text-text-muted rounded-full transition-all duration-200"
+                                                            title={language === 'ar' ? 'حذف' : 'Delete'}
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </button>

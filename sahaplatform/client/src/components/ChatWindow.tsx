@@ -194,6 +194,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
 
                         // Optimistically add message
                         setMessages(prev => {
+                            // Deduplication: Prevent adding if ID already exists
                             const existsById = prev.some(m => m.id === processedMessage.id);
                             if (existsById) {
                                 messageIdsRef.current.add(processedMessage.id);
@@ -201,12 +202,17 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                             }
 
                             // Try to find an optimistic message by signature
-                        const optimisticId = pendingSigRef.current.get(sig);
-                        if (optimisticId) {
-                            messageIdsRef.current.add(processedMessage.id);
-                            // Do not delete from ref inside updater to avoid Strict Mode side effects
-                            return prev.map(m => m.id === optimisticId ? { ...processedMessage } : m);
-                        }
+                            const optimisticId = pendingSigRef.current.get(sig);
+                            if (optimisticId) {
+                                messageIdsRef.current.add(processedMessage.id);
+                                // Do not delete from ref inside updater to avoid Strict Mode side effects
+                                return prev.map(m => m.id === optimisticId ? { ...processedMessage } : m);
+                            }
+
+                            // Double check with messageIdsRef for extra safety
+                            if (messageIdsRef.current.has(processedMessage.id)) {
+                                return prev;
+                            }
 
                             // Fallback: append if unique
                             const next = [...prev, processedMessage];
@@ -766,7 +772,8 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar" ref={scrollRef}>
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === user?.id;
-                    const canManage = isMe && !msg.deleted_at && (new Date().getTime() - new Date(msg.created_at).getTime()) / 60000 <= 60;
+                    const canEdit = isMe && !msg.deleted_at && (Date.now() - new Date(msg.created_at).getTime() < 3600000);
+                    const canManage = isMe && !msg.deleted_at; // This covers deletion, edit check is separate now
                     const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(msg.file_url));
                     const isVideo = msg.message_type === 'video' || (msg.message_type !== 'audio' && msg.message_type !== 'voice' && msg.file_url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(msg.file_url));
                     const isVoice = msg.message_type === 'voice' || msg.message_type === 'audio' || (msg.file_url && /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(msg.file_url) && !isVideo);
@@ -789,15 +796,17 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                         <div className="relative group/menu">
                                             <MoreVertical size={12} className="text-gray-400 cursor-pointer" />
                                             <div className="absolute right-0 top-full bg-white shadow-md rounded-md p-1 hidden group-hover/menu:block z-10 min-w-[80px]">
-                                                <button 
-                                                    onClick={() => {
-                                                        setEditingMessageId(msg.id);
-                                                        setInput(msg.content);
-                                                    }}
-                                                    className="block w-full text-left px-2 py-1 text-[10px] hover:bg-gray-100 text-blue-600"
-                                                >
-                                                    {language === 'ar' ? 'تعديل' : 'Edit'}
-                                                </button>
+                                                {canEdit && (
+                                                    <button 
+                                                        onClick={() => {
+                                                            setEditingMessageId(msg.id);
+                                                            setInput(msg.content);
+                                                        }}
+                                                        className="block w-full text-left px-2 py-1 text-[10px] hover:bg-gray-100 text-blue-600"
+                                                    >
+                                                        {language === 'ar' ? 'تعديل' : 'Edit'}
+                                                    </button>
+                                                )}
                                                 <button 
                                                     onClick={() => handleDeleteMessage(msg.id)}
                                                     className="block w-full text-left px-2 py-1 text-[10px] hover:bg-gray-100 text-red-600"
@@ -843,6 +852,27 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                 )}
 
 
+
+                                {isVoice && msg.file_url && (
+                                    <div className="mb-1 w-full min-w-[200px] p-2 bg-black/5 rounded-lg border border-black/5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-primary rounded-full text-white">
+                                                <Mic size={14} />
+                                            </div>
+                                            <audio controls className="w-full h-8 accent-primary">
+                                                <source src={msg.file_url} type="audio/mpeg" />
+                                                <source src={msg.file_url} type="audio/wav" />
+                                                <source src={msg.file_url} type="audio/webm" />
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        </div>
+                                        {msg.duration && (
+                                            <div className="mt-1 flex justify-end">
+                                                <span className="text-[8px] opacity-50 font-mono tracking-tighter">{formatTime(msg.duration)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
                                 {msg.file_url && !isImage && !isVideo && !isVoice && (
                                     <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600 mb-1">
