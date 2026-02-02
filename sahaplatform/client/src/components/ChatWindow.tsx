@@ -765,7 +765,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === user?.id;
                     const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(msg.file_url));
-                    const isVideo = msg.message_type === 'video' || (msg.file_url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(msg.file_url));
+                    const isVideo = msg.message_type === 'video' || (msg.message_type !== 'audio' && msg.message_type !== 'voice' && msg.file_url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(msg.file_url));
                     const isVoice = msg.message_type === 'voice' || msg.message_type === 'audio' || (msg.file_url && /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(msg.file_url) && !isVideo);
                     
                     return (
@@ -870,10 +870,12 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                 {isVoice && msg.file_url && (
                                     <div className="flex flex-col gap-1 min-w-[200px] py-1">
                                         <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-1 border border-gray-200 dark:border-gray-600">
-                                            <audio controls className="h-8 w-full max-w-[250px] outline-none" key={msg.file_url}>
-                                                <source src={msg.file_url} type="audio/webm" />
-                                                <source src={msg.file_url} type="audio/mp3" />
-                                                <source src={msg.file_url} type="audio/wav" />
+                                            <audio 
+                                                controls 
+                                                className="h-8 w-full max-w-[250px] outline-none" 
+                                                src={msg.file_url}
+                                                preload="metadata"
+                                            >
                                                 Your browser does not support the audio element.
                                             </audio>
                                         </div>
