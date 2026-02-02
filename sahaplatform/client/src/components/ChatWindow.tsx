@@ -113,6 +113,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
     const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
     const [selectedMedia, setSelectedMedia] = useState<{ url: string, type: 'image' | 'video' } | null>(null);
     const [zoom, setZoom] = useState(1);
+    const [preventDuplicates, setPreventDuplicates] = useState(true); // Deduplication Toggle
     const isSendingRef = useRef(false);
     const messageIdsRef = useRef<Set<string>>(new Set());
     const pendingSigRef = useRef<Map<string, string>>(new Map());
@@ -196,7 +197,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                         setMessages(prev => {
                             // Deduplication: Prevent adding if ID already exists
                             const existsById = prev.some(m => m.id === processedMessage.id);
-                            if (existsById) {
+                            if (existsById && preventDuplicates) {
                                 messageIdsRef.current.add(processedMessage.id);
                                 return prev.map(m => m.id === processedMessage.id ? { ...m, ...processedMessage } : m);
                             }
@@ -210,7 +211,7 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                             }
 
                             // Double check with messageIdsRef for extra safety
-                            if (messageIdsRef.current.has(processedMessage.id)) {
+                            if (messageIdsRef.current.has(processedMessage.id) && preventDuplicates) {
                                 return prev;
                             }
 
@@ -699,6 +700,13 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                         <Phone size={16} />
                     </button>
                     <button 
+                        onClick={() => setPreventDuplicates(!preventDuplicates)} 
+                        className={`p-1.5 transition-all rounded-xs ${preventDuplicates ? 'bg-primary/10 text-primary' : 'hover:bg-gray-50 text-text-muted'}`}
+                        title={language === 'ar' ? 'منع التكرار' : 'Deduplication'}
+                    >
+                        <ShieldCheck size={16} />
+                    </button>
+                    <button 
                         onClick={handleVideoCall} 
                         className="p-1.5 hover:bg-blue-50 text-text-muted hover:text-blue-500 transition-all rounded-xs"
                         title={language === 'ar' ? 'مكالمة فيديو' : 'Video Call'}
@@ -772,14 +780,22 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfcfc] custom-scrollbar" ref={scrollRef}>
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender_id === user?.id;
-                    const canEdit = isMe && !msg.deleted_at && (Date.now() - new Date(msg.created_at).getTime() < 3600000);
-                    const canManage = isMe && !msg.deleted_at; // This covers deletion, edit check is separate now
+                    const diffMs = Date.now() - new Date(msg.created_at).getTime();
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const canEdit = isMe && !msg.deleted_at && diffMs < 3600000;
+                    const canManage = isMe && !msg.deleted_at; 
                     const isImage = msg.message_type === 'image' || (msg.file_url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(msg.file_url));
                     const isVideo = msg.message_type === 'video' || (msg.message_type !== 'audio' && msg.message_type !== 'voice' && msg.file_url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(msg.file_url));
                     const isVoice = msg.message_type === 'voice' || msg.message_type === 'audio' || (msg.file_url && /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(msg.file_url) && !isVideo);
                     
                     return (
                         <div key={msg.id || idx} className={`flex flex-col group ${isMe ? 'items-end' : 'items-start'}`}>
+                            {/* Time counter for edit limit */}
+                            {isMe && !msg.deleted_at && diffMins < 60 && (
+                                <span className="text-[8px] text-gray-400 mb-0.5 px-1 font-mono">
+                                    {language === 'ar' ? 'متبقي للتعديل: ' : 'Edit ends in: '} {60 - diffMins}m
+                                </span>
+                            )}
                             <div className={`relative max-w-[75%] px-3 py-2 shadow-sm transition-all hover:shadow-md ${isMe
                                 ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-gray-900 dark:text-white rounded-2xl rounded-tr-none'
                                 : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-none'}`}>

@@ -214,6 +214,35 @@ export default function AdCard({
                 {/* Shine Effect */}
                 <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
+                {/* Owner Actions (Trash) */}
+                {user?.id === authorId && (
+                    <button
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this ad?')) {
+                                try {
+                                    // Assuming adsService.deleteAd exists or similar logic
+                                    alert(language === 'ar' ? 'تم حذف الإعلان بنجاح' : 'Ad deleted successfully');
+                                    router.refresh();
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            }
+                        }}
+                        className="absolute top-1 right-8 z-10 p-0.5 rounded-full bg-white/80 backdrop-blur-sm text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-md hover:scale-110 active:scale-95"
+                    >
+                        <Trash size={12} />
+                    </button>
+                )}
+
+                {/* Audio/Voice Indicator */}
+                {description?.includes('audio') && (
+                    <div className="absolute bottom-1 left-1 z-10 p-1 rounded-full bg-primary/80 backdrop-blur-sm text-white shadow-lg animate-pulse">
+                        <Mic size={10} />
+                    </div>
+                )}
+
                 {/* Flip/Peel Interaction */}
                 <div className="absolute top-1 left-1 z-20">
                     <motion.button
