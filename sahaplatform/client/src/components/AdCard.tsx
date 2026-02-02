@@ -5,7 +5,13 @@ import { useLanguage } from '@/lib/language-context';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, MessageSquare, Heart, MessageCircle, Mail } from "lucide-react";
+import { 
+    Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, 
+    Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, 
+    Phone, PhoneOff, MessageSquare, Heart, MessageCircle, Mail, Clock, User,
+    Home as HomeIcon, Car as CarIcon, Smartphone as SmartphoneIcon, Tag as TagIcon, 
+    Briefcase as BriefcaseIcon, Wrench, Building as BuildingIcon 
+} from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { formatRelativeTime } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -205,6 +211,13 @@ export default function AdCard({
     
     // Define isVertical explicitly to avoid any scope issues
     const isVertical = layout === 'vertical';
+
+    // Highlight map on hover, using useEffect to avoid state update warning during render
+    useEffect(() => {
+        if (isHighlighted && onMapHighlight) {
+            onMapHighlight(id);
+        }
+    }, [isHighlighted, id, onMapHighlight]);
 
     // Render Functions
     const renderStandardFace = () => (
