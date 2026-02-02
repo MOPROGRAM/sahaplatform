@@ -23,7 +23,8 @@ import {
     RefreshCcw,
     Clock,
     Search,
-    ArrowLeft
+    ArrowLeft,
+    X
 } from "lucide-react";
 import Link from "next/link";
 import { adsService, Ad } from "@/lib/ads";
@@ -63,6 +64,7 @@ function ProfileContent() {
     const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
     const [showDeletedConversations, setShowDeletedConversations] = useState(false);
     const [messagesLoading, setMessagesLoading] = useState(false);
+    const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         const tab = searchParams.get('tab');
@@ -89,25 +91,22 @@ function ProfileContent() {
         }
     };
 
-    const handleDeleteConversation = async (id: string, e: React.MouseEvent) => {
+    const handleDeleteConversation = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        
-        // Confirmation (Pop-up)
-        const isAr = language === 'ar';
-        const confirmMsg = isAr 
-            ? 'هل أنت متأكد من حذف هذه المحادثة؟ سيتم حذفها من قائمتك فقط ولن تختفي عند الطرف الآخر.' 
-            : 'Are you sure you want to delete this conversation? It will be removed from your list only and will remain for the other party.';
-            
-        if (!confirm(confirmMsg)) return;
+        setConversationToDelete(id);
+    };
 
+    const confirmDeleteConversation = async () => {
+        if (!conversationToDelete) return;
+        
         try {
-            await conversationsService.hideConversation(id);
-            // Immediate UI update
-            setConversations(prev => prev.filter(c => c.id !== id));
-            if (selectedConversationId === id) setSelectedConversationId(null);
+            await conversationsService.hideConversation(conversationToDelete);
+            setConversations(prev => prev.filter(c => c.id !== conversationToDelete));
+            if (selectedConversationId === conversationToDelete) setSelectedConversationId(null);
+            setConversationToDelete(null);
         } catch (error) {
             console.error('Failed to delete conversation:', error);
-            alert(isAr ? 'فشل حذف المحادثة' : 'Failed to delete conversation');
+            alert(language === 'ar' ? 'فشل حذف المحادثة' : 'Failed to delete conversation');
         }
     };
 
@@ -719,6 +718,51 @@ function ProfileContent() {
                 </main>
             </div>
             <Footer />
+            
+            {/* Conversation Delete Confirmation Modal */}
+            {conversationToDelete && (
+                <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6 relative animate-in zoom-in duration-200">
+                        <button 
+                            onClick={() => setConversationToDelete(null)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        >
+                            <X size={20} />
+                        </button>
+                        
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
+                                <Trash2 size={32} className="text-red-500" />
+                            </div>
+                            
+                            <h3 className="text-lg font-black text-secondary dark:text-white mb-2 uppercase tracking-tight">
+                                {language === 'ar' ? 'حذف المحادثة' : 'Delete Conversation'}
+                            </h3>
+                            
+                            <p className="text-xs text-text-muted dark:text-gray-400 mb-6 leading-relaxed">
+                                {language === 'ar' 
+                                    ? 'هل أنت متأكد من حذف هذه المحادثة؟ سيتم حذفها من قائمتك فقط ولن تختفي عند الطرف الآخر.' 
+                                    : 'Are you sure you want to delete this conversation? It will be removed from your list only and will remain for the other party.'}
+                            </p>
+                            
+                            <div className="flex w-full gap-3">
+                                <button
+                                    onClick={() => setConversationToDelete(null)}
+                                    className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 rounded-md font-bold text-[10px] uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                >
+                                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                </button>
+                                <button
+                                    onClick={confirmDeleteConversation}
+                                    className="flex-1 py-2.5 bg-red-600 text-white rounded-md font-bold text-[10px] uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all active:scale-95"
+                                >
+                                    {language === 'ar' ? 'حذف الآن' : 'Delete Now'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

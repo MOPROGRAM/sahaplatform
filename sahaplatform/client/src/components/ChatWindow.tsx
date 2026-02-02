@@ -195,27 +195,27 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
 
                         // Optimistically add message
                         setMessages(prev => {
-                            // Deduplication: Prevent adding if ID already exists
+                            // 1. Deduplication: Prevent adding if ID already exists
                             const existsById = prev.some(m => m.id === processedMessage.id);
                             if (existsById && preventDuplicates) {
                                 messageIdsRef.current.add(processedMessage.id);
                                 return prev.map(m => m.id === processedMessage.id ? { ...m, ...processedMessage } : m);
                             }
 
-                            // Try to find an optimistic message by signature
+                            // 2. Try to find an optimistic message by signature to replace it
                             const optimisticId = pendingSigRef.current.get(sig);
                             if (optimisticId) {
                                 messageIdsRef.current.add(processedMessage.id);
-                                // Do not delete from ref inside updater to avoid Strict Mode side effects
+                                pendingSigRef.current.delete(sig); // Clear signature after match
                                 return prev.map(m => m.id === optimisticId ? { ...processedMessage } : m);
                             }
 
-                            // Double check with messageIdsRef for extra safety
+                            // 3. Double check with messageIdsRef for extra safety (last resort)
                             if (messageIdsRef.current.has(processedMessage.id) && preventDuplicates) {
                                 return prev;
                             }
 
-                            // Fallback: append if unique
+                            // 4. Fallback: append if unique
                             const next = [...prev, processedMessage];
                             messageIdsRef.current.add(processedMessage.id);
                             return next;
@@ -883,53 +883,6 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
 
 
                                 {isVoice && msg.file_url && (
-                                    <div className="mb-1 w-full min-w-[200px] p-2 bg-black/5 rounded-lg border border-black/5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-primary rounded-full text-white">
-                                                <Mic size={14} />
-                                            </div>
-                                            <audio controls className="w-full h-8 accent-primary">
-                                                <source src={msg.file_url} type="audio/mpeg" />
-                                                <source src={msg.file_url} type="audio/wav" />
-                                                <source src={msg.file_url} type="audio/webm" />
-                                                Your browser does not support the audio element.
-                                            </audio>
-                                        </div>
-                                        {msg.duration && (
-                                            <div className="mt-1 flex justify-end">
-                                                <span className="text-[8px] opacity-50 font-mono tracking-tighter">{formatTime(msg.duration)}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                                {msg.file_url && !isImage && !isVideo && !isVoice && (
-                                    <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600 mb-1">
-                                        <div className="p-2 bg-white dark:bg-gray-600 rounded-md shadow-sm">
-                                            <FileText size={20} className="text-primary" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold text-gray-700 dark:text-gray-200 truncate max-w-[150px]">
-                                                {msg.file_name || 'Attachment'}
-                                            </span>
-                                            <span className="text-[9px] text-gray-400">
-                                                {msg.file_size ? `${(msg.file_size / 1024).toFixed(1)} KB` : 'File'}
-                                            </span>
-                                        </div>
-                                        <a 
-                                            href={msg.file_url} 
-                                            download={msg.file_name || "download"} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="ml-2 p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-gray-500 transition-colors"
-                                        >
-                                            <Download size={14} />
-                                        </a>
-                                    </div>
-                                )}
-
-
-                                {isVoice && msg.file_url && (
                                     <div className="flex items-center gap-3 min-w-[200px] py-1">
                                         <button 
                                             onClick={(e) => {
@@ -981,6 +934,31 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                                 if (bar) bar.style.width = '0%';
                                             }}
                                         />
+                                    </div>
+                                )}
+
+                                {msg.file_url && !isImage && !isVideo && !isVoice && (
+                                    <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600 mb-1">
+                                        <div className="p-2 bg-white dark:bg-gray-600 rounded-md shadow-sm">
+                                            <FileText size={20} className="text-primary" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-bold text-gray-700 dark:text-gray-200 truncate max-w-[150px]">
+                                                {msg.file_name || 'Attachment'}
+                                            </span>
+                                            <span className="text-[9px] text-gray-400">
+                                                {msg.file_size ? `${(msg.file_size / 1024).toFixed(1)} KB` : 'File'}
+                                            </span>
+                                        </div>
+                                        <a 
+                                            href={msg.file_url} 
+                                            download={msg.file_name || "download"} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="ml-2 p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-gray-500 transition-colors"
+                                        >
+                                            <Download size={14} />
+                                        </a>
                                     </div>
                                 )}
 

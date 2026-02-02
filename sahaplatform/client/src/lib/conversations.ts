@@ -208,29 +208,32 @@ export const conversationsService = {
         if (!session) throw new Error('User not authenticated');
 
         // Sanitize filename
-        const fileExt = file.name.split('.').pop();
+        const fileExt = file.name.split('.').pop()?.toLowerCase();
         const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const filePath = `${conversationId}/${Date.now()}-${safeFileName}`;
         
-        // Use 'chat-media' as primary bucket, fallback to 'chat_vault' if needed
+        // Use 'chat-media' as primary bucket
         let bucketName = 'chat-media';
         
         // Ensure contentType is set correctly
-        const contentType = file.type || (fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' 
+        const contentType = file.type || (
+              fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' 
             : fileExt === 'png' ? 'image/png'
             : fileExt === 'gif' ? 'image/gif'
             : fileExt === 'webp' ? 'image/webp'
             : fileExt === 'mp4' ? 'video/mp4'
             : fileExt === 'webm' ? 'video/webm'
             : fileExt === 'mp3' ? 'audio/mpeg'
+            : fileExt === 'm4a' ? 'audio/mp4'
             : fileExt === 'wav' ? 'audio/wav'
             : 'application/octet-stream');
 
-        let { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
             .from(bucketName)
             .upload(filePath, file, {
                 contentType,
-                upsert: true
+                upsert: true,
+                cacheControl: '3600'
             });
 
         if (uploadError) {
@@ -245,17 +248,18 @@ export const conversationsService = {
              if (retryError) throw retryError;
         }
 
-        const { data } = await supabase.storage
+        // Get Public URL for direct <img> tag support
+        const { data: { publicUrl } } = supabase.storage
             .from(bucketName)
-            .createSignedUrl(filePath, 31536000);
+            .getPublicUrl(filePath);
 
-        if (!data?.signedUrl) throw new Error('Failed to generate signed URL');
+        if (!publicUrl) throw new Error('Failed to generate public URL');
 
         return {
-            file_url: data.signedUrl,
+            file_url: publicUrl,
             file_name: file.name,
             file_size: file.size,
-            file_type: file.type
+            file_type: contentType
         };
     },
 
@@ -289,9 +293,9 @@ export const conversationsService = {
         if (error) throw error;
     },
 
-    // Edit Message (with 30 min limit)
+    // Edit Message (with 60 min limit)
     async editMessage(messageId: string, newContent: string, createdAt: string): Promise<void> {
-        // Check 30 min limit
+        // Check 60 min limit
         const created = new Date(createdAt).getTime();
         const now = new Date().getTime();
         const diffMinutes = (now - created) / 60000;
@@ -307,9 +311,9 @@ export const conversationsService = {
         if (error) throw error;
     },
 
-    // Delete Message (with 30 min limit)
+    // Delete Message (with 60 min limit)
     async deleteMessage(messageId: string, createdAt: string): Promise<void> {
-        // Check 30 min limit
+        // Check 60 min limit
         const created = new Date(createdAt).getTime();
         const now = new Date().getTime();
         const diffMinutes = (now - created) / 60000;
