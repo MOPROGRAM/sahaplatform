@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 
 // Force dynamic rendering where necessary
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 // Helper to translate categories for Title/Keywords
 const getCategoryName = (cat: string) => {

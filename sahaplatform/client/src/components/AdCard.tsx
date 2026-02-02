@@ -81,6 +81,7 @@ export default function AdCard({
     const router = useRouter();
     const { user } = useAuthStore();
     const [isFavorite, setIsFavorite] = useState(false);
+    const [imgError, setImgError] = useState(false);
     const [peel, setPeel] = useState<{x: number; y: number}>({ x: 0, y: 0 });
     const [faceIndex, setFaceIndex] = useState(0);
     const [backPeelY, setBackPeelY] = useState(0);
@@ -307,7 +308,7 @@ export default function AdCard({
                     />
                 </button>
 
-                {images.length > 0 ? (
+                {images.length > 0 && !imgError ? (
                     <Image
                         src={images[0]}
                         alt={title}
@@ -315,6 +316,7 @@ export default function AdCard({
                         priority={isFeatured}
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        onError={() => setImgError(true)}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-white/5 select-none group-hover:bg-gray-100 dark:group-hover:bg-white/10 transition-colors">
@@ -527,7 +529,7 @@ export default function AdCard({
                             className="flex items-center justify-center gap-2 w-1/2 py-1 bg-white border border-gray-600 text-gray-600 rounded-full text-[10px] font-bold hover:bg-gray-50 transition-colors"
                         >
                             <Mail size={12} className="text-gray-600" />
-                            {language === 'ar' ? 'البريد' : 'Email'}
+                            {language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ¨ط·آ±ط¸ظ¹ط·آ¯' : 'Email'}
                         </a>
                     )}
 
@@ -545,7 +547,7 @@ export default function AdCard({
                         className="px-2 py-1 text-[10px] font-black rounded bg-gray-100 text-text-main hover:bg-gray-200"
                         onClick={handleNextFace}
                     >
-                        الصورة
+                        ط·آ§ط¸â€‍ط·آµط¸ث†ط·آ±ط·آ©
                     </button>
                 </div>
             </div>

@@ -48,7 +48,7 @@ export default function SubscriptionCard({
 
             <div className="card-footer">
                 <button className="btn-subscribe" onClick={onSubscribe}>
-                    {language === 'ar' ? 'اشترك الآن' : 'subscribe now'}
+                    {language === 'ar' ? 'ط·آ§ط·آ´ط·ع¾ط·آ±ط¸ئ’ ط·آ§ط¸â€‍ط·آ¢ط¸â€ ' : 'subscribe now'}
                 </button>
             </div>
         </div>

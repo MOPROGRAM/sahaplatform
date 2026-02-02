@@ -10,6 +10,7 @@ import {
     MessageCircle,
     Phone,
     Loader2,
+    ImageIcon,
     Share2,
     Maximize2
 } from "lucide-react";
@@ -58,6 +59,7 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
     const [ad, setAd] = useState<Ad | null>(null);
     const [loading, setLoading] = useState(true);
+    const [imgError, setImgError] = useState(false);
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [showChat, setShowChat] = useState(false);
     const [showPhone, setShowPhone] = useState(false);
@@ -225,9 +227,9 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                             <div className="space-y-4">
                                 <h3 className="text-[14px] font-black uppercase text-text-main border-b-2 border-primary w-fit pb-1">{t('description')}</h3>
-                                <p className="text-[12px] font-medium leading-relaxed text-text-main bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-border-color italic">
+                                <div className="text-[12px] font-medium leading-relaxed text-text-main bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-border-color italic whitespace-pre-wrap">
                                     {ad.description}
-                                </p> 
+                                </div> 
                             </div>
                         </div>
                     </div>
@@ -244,13 +246,22 @@ export default function AdDetailsContent({ id }: { id: string }) {
 
                                 {(() => {
                                     const images = ad.images || [];
-                                    return images.length > 0 ? (
+                                    return images.length > 0 && !imgError ? (
                                         <div className="relative z-10 w-full h-full">
-                                            <Image src={images[0]} alt={ad.title} fill style={{ objectFit: 'contain' }} className="shadow-2xl" />
+                                            <Image 
+                                                src={images[0]} 
+                                                alt={ad.title} 
+                                                fill 
+                                                style={{ objectFit: 'contain' }} 
+                                                className="shadow-2xl" 
+                                                onError={() => setImgError(true)}
+                                            />
                                         </div>
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-white/5 italic font-black text-text-muted text-6xl">
-                                            {t('siteName')}
+                                        <div className="relative z-10 w-full h-full flex items-center justify-center">
+                                            <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20">
+                                                <ImageIcon size={64} className="text-primary opacity-50" />
+                                            </div>
                                         </div>
                                     );
                                 })()}
@@ -341,18 +352,18 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         <div className="flex flex-col gap-2 items-center">
                             <button
                                 onClick={handleStartChat}
-                                className="w-1/3 bg-primary hover:bg-primary-hover text-white py-3 rounded-full text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 uppercase tracking-widest"
+                                className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-full text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 uppercase tracking-widest"
                             >
                                 <MessageCircle size={16} />
                                 {language === 'ar' ? 'بدء محادثة فورية' : 'START REAL-TIME CHAT'}
                             </button>
-                            {ad.author?.phone && (
+                            {(ad.author?.phone || ad.phone) && (
                                 <button
                                     onClick={() => setShowPhone(!showPhone)}
-                                    className="w-1/3 bg-secondary text-white py-3 rounded-full text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
+                                    className="w-full bg-secondary text-white py-3 rounded-full text-[11px] font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 uppercase tracking-widest"
                                 >
                                     <Phone size={16} />
-                                    {showPhone ? ad.author.phone : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
+                                    {showPhone ? (ad.phone || ad.author?.phone) : (language === 'ar' ? 'إظهار رقم الجوال' : 'REVEAL PHONE NUMBER')}
                                 </button>
                             )}
                         </div>

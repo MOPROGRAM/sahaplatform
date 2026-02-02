@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 import { useState, useEffect, useCallback } from "react";
 import { 
@@ -62,7 +62,7 @@ export default function MessagesPage() {
 
     const handleDeleteConversation = async (e: React.MouseEvent, conversationId: string) => {
         e.stopPropagation();
-        if (!confirm(language === 'ar' ? 'هل أنت متأكد من حذف هذه المحادثة؟' : 'Are you sure you want to delete this conversation?')) return;
+        if (!confirm(language === 'ar' ? 'ط¸â€،ط¸â€‍ ط·آ£ط¸â€ ط·ع¾ ط¸â€¦ط·ع¾ط·آ£ط¸ئ’ط·آ¯ ط¸â€¦ط¸â€  ط·آ­ط·آ°ط¸ظ¾ ط¸â€،ط·آ°ط¸â€، ط·آ§ط¸â€‍ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ©ط·ع؛' : 'Are you sure you want to delete this conversation?')) return;
         
         try {
             await conversationsService.deleteConversation(conversationId);
@@ -70,7 +70,7 @@ export default function MessagesPage() {
             fetchConversations();
         } catch (error) {
             console.error('Failed to delete conversation:', error);
-            alert(language === 'ar' ? 'فشل حذف المحادثة' : 'Failed to delete conversation');
+            alert(language === 'ar' ? 'ط¸ظ¾ط·آ´ط¸â€‍ ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ©' : 'Failed to delete conversation');
         }
     };
 
@@ -92,7 +92,7 @@ export default function MessagesPage() {
                     <div className="bento-card p-4 flex items-center justify-between bg-white dark:bg-[#1a1a1a]">
                         <h2 className="text-[12px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
                             <Inbox size={16} className="text-primary" />
-                            {language === 'ar' ? 'صندوق الرسائل' : 'hub inbox'}
+                            {language === 'ar' ? 'ط·آµط¸â€ ط·آ¯ط¸ث†ط¸â€ڑ ط·آ§ط¸â€‍ط·آ±ط·آ³ط·آ§ط·آ¦ط¸â€‍' : 'hub inbox'}
                         </h2>
                     </div>
 
@@ -100,7 +100,7 @@ export default function MessagesPage() {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors" size={16} />
                         <input 
                             type="text"
-                            placeholder={language === 'ar' ? 'بحث في المحادثات...' : 'filter conversations...'}
+                            placeholder={language === 'ar' ? 'ط·آ¨ط·آ­ط·آ« ط¸ظ¾ط¸ظ¹ ط·آ§ط¸â€‍ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ§ط·ع¾...' : 'filter conversations...'}
                             className="bento-input pl-12 bg-white dark:bg-[#1a1a1a]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -141,20 +141,20 @@ export default function MessagesPage() {
                                                 ) : (
                                                     <span className="text-[9px] font-bold text-blue-500 bg-blue-500/10 px-1.5 py-0.5 rounded flex items-center gap-1">
                                                         <ShieldCheck size={8} />
-                                                        {language === 'ar' ? 'دعم فني' : 'SUPPORT'}
+                                                        {language === 'ar' ? 'ط·آ¯ط·آ¹ط¸â€¦ ط¸ظ¾ط¸â€ ط¸ظ¹' : 'SUPPORT'}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="flex justify-between items-center mt-1">
                                                 <p className="text-[10px] font-bold text-text-muted truncate">
-                                                    {conv.last_message || (language === 'ar' ? 'لا توجد رسائل بعد' : 'no messages yet')}
+                                                    {conv.last_message || (language === 'ar' ? 'ط¸â€‍ط·آ§ ط·ع¾ط¸ث†ط·آ¬ط·آ¯ ط·آ±ط·آ³ط·آ§ط·آ¦ط¸â€‍ ط·آ¨ط·آ¹ط·آ¯' : 'no messages yet')}
                                                 </p>
                                                 <div className="flex items-center gap-2">
                                                     {showDeleted ? (
                                                         <button 
                                                             onClick={(e) => handleRestore(e, conv.id)}
                                                             className="p-1 hover:bg-green-50 text-green-500 rounded transition-colors"
-                                                            title={language === 'ar' ? 'استرجاع' : 'Restore'}
+                                                            title={language === 'ar' ? 'ط·آ§ط·آ³ط·ع¾ط·آ±ط·آ¬ط·آ§ط·آ¹' : 'Restore'}
                                                         >
                                                             <RefreshCw size={12} />
                                                         </button>
@@ -162,7 +162,7 @@ export default function MessagesPage() {
                                                         <button 
                                                             onClick={(e) => handleDeleteConversation(e, conv.id)}
                                                             className="p-1.5 opacity-0 group-hover:opacity-100 hover:text-red-600 hover:bg-red-50 text-text-muted rounded-full transition-all duration-200"
-                                                            title={language === 'ar' ? 'حذف' : 'Delete'}
+                                                            title={language === 'ar' ? 'ط·آ­ط·آ°ط¸ظ¾' : 'Delete'}
                                                         >
                                                             <Trash2 size={14} />
                                                         </button>
@@ -176,7 +176,7 @@ export default function MessagesPage() {
                         ) : (
                             <div className="p-12 text-center flex flex-col items-center gap-3 opacity-30">
                                 <MessageSquare size={32} />
-                                <span className="text-[10px] font-black uppercase tracking-widest">{language === 'ar' ? 'لا توجد محادثات' : 'archive empty'}</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest">{language === 'ar' ? 'ط¸â€‍ط·آ§ ط·ع¾ط¸ث†ط·آ¬ط·آ¯ ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ§ط·ع¾' : 'archive empty'}</span>
                             </div>
                         )}
                     </div>
@@ -192,10 +192,10 @@ export default function MessagesPage() {
                                 <MessageSquare size={48} />
                             </div>
                             <h3 className="text-xl font-black text-text-main uppercase tracking-tighter mb-2 italic">
-                                {language === 'ar' ? 'بوابة التواصل المشفرة' : 'secured communications portal'}
+                                {language === 'ar' ? 'ط·آ¨ط¸ث†ط·آ§ط·آ¨ط·آ© ط·آ§ط¸â€‍ط·ع¾ط¸ث†ط·آ§ط·آµط¸â€‍ ط·آ§ط¸â€‍ط¸â€¦ط·آ´ط¸ظ¾ط·آ±ط·آ©' : 'secured communications portal'}
                             </h3>
                             <p className="text-text-muted font-bold text-xs uppercase tracking-widest max-w-xs">
-                                {language === 'ar' ? 'اختر محادثة من القائمة للبدء في المراسلة الفورية.' : 'select a terminal from the left to initialize real-time synchronization.'}
+                                {language === 'ar' ? 'ط·آ§ط·آ®ط·ع¾ط·آ± ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ© ط¸â€¦ط¸â€  ط·آ§ط¸â€‍ط¸â€ڑط·آ§ط·آ¦ط¸â€¦ط·آ© ط¸â€‍ط¸â€‍ط·آ¨ط·آ¯ط·طŒ ط¸ظ¾ط¸ظ¹ ط·آ§ط¸â€‍ط¸â€¦ط·آ±ط·آ§ط·آ³ط¸â€‍ط·آ© ط·آ§ط¸â€‍ط¸ظ¾ط¸ث†ط·آ±ط¸ظ¹ط·آ©.' : 'select a terminal from the left to initialize real-time synchronization.'}
                             </p>
                         </div>
                     )}

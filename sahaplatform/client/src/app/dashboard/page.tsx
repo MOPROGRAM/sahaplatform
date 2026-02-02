@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 import { useAuthStore } from "@/store/useAuthStore";
 import { useState, useEffect, useCallback } from "react";
@@ -85,7 +85,7 @@ export default function DashboardPage() {
             points: 100,
             price: '70 SAR',
             description: t('pointsPack2Desc'),
-            features: [`100 ${t('points')}`, language === 'ar' ? 'خصم 7%' : '7% Discount', t('detailedAnalytics')],
+            features: [`100 ${t('points')}`, language === 'ar' ? 'ط·آ®ط·آµط¸â€¦ 7%' : '7% Discount', t('detailedAnalytics')],
             popular: true,
             color: 'bg-purple-600'
         },
@@ -94,7 +94,7 @@ export default function DashboardPage() {
             points: 500,
             price: '300 SAR',
             description: t('pointsPack3Desc'),
-            features: [`500 ${t('points')}`, language === 'ar' ? 'خصم 20%' : '20% Discount', t('dedicatedSupport')],
+            features: [`500 ${t('points')}`, language === 'ar' ? 'ط·آ®ط·آµط¸â€¦ 20%' : '20% Discount', t('dedicatedSupport')],
             color: 'bg-amber-500'
         }
     ];
@@ -172,10 +172,10 @@ export default function DashboardPage() {
 
     const handleManualRequest = () => {
         setSelectedPlan({
-            name: language === 'ar' ? 'طلب شراء نقاط يدوياً' : 'Manual Points Purchase',
-            price: language === 'ar' ? 'حسب الاتفاق' : 'TBD',
+            name: language === 'ar' ? 'ط·آ·ط¸â€‍ط·آ¨ ط·آ´ط·آ±ط·آ§ط·طŒ ط¸â€ ط¸â€ڑط·آ§ط·آ· ط¸ظ¹ط·آ¯ط¸ث†ط¸ظ¹ط·آ§ط¸â€¹' : 'Manual Points Purchase',
+            price: language === 'ar' ? 'ط·آ­ط·آ³ط·آ¨ ط·آ§ط¸â€‍ط·آ§ط·ع¾ط¸ظ¾ط·آ§ط¸â€ڑ' : 'TBD',
             points: 0,
-            description: language === 'ar' ? 'تواصل معنا لتحديد الباقة المناسبة' : 'Contact us to determine the suitable package',
+            description: language === 'ar' ? 'ط·ع¾ط¸ث†ط·آ§ط·آµط¸â€‍ ط¸â€¦ط·آ¹ط¸â€ ط·آ§ ط¸â€‍ط·ع¾ط·آ­ط·آ¯ط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط·آ¨ط·آ§ط¸â€ڑط·آ© ط·آ§ط¸â€‍ط¸â€¦ط¸â€ ط·آ§ط·آ³ط·آ¨ط·آ©' : 'Contact us to determine the suitable package',
             features: [],
             manual: true
         });
@@ -207,10 +207,10 @@ export default function DashboardPage() {
             const activeAds = activeAdsOnly.length;
 
             setStats([
-                { label: language === 'ar' ? "رصيد النقاط" : "Points Balance", value: (user?.points || 0).toString(), icon: <Zap size={12} />, color: "text-yellow-500" },
-                { label: language === 'ar' ? "المشاهدات" : "Views", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
-                { label: language === 'ar' ? "الإعلانات" : "Listings", value: activeAds.toString(), icon: <Package size={12} />, color: "text-primary" },
-                { label: language === 'ar' ? "النمو" : "Growth", value: "+12%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
+                { label: language === 'ar' ? "ط·آ±ط·آµط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط¸â€ ط¸â€ڑط·آ§ط·آ·" : "Points Balance", value: (user?.points || 0).toString(), icon: <Zap size={12} />, color: "text-yellow-500" },
+                { label: language === 'ar' ? "ط·آ§ط¸â€‍ط¸â€¦ط·آ´ط·آ§ط¸â€،ط·آ¯ط·آ§ط·ع¾" : "Views", value: totalViews.toString(), icon: <Eye size={12} />, color: "text-blue-500" },
+                { label: language === 'ar' ? "ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾" : "Listings", value: activeAds.toString(), icon: <Package size={12} />, color: "text-primary" },
+                { label: language === 'ar' ? "ط·آ§ط¸â€‍ط¸â€ ط¸â€¦ط¸ث†" : "Growth", value: "+12%", icon: <TrendingUp size={12} />, color: "text-purple-500" },
             ]);
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
@@ -247,7 +247,7 @@ export default function DashboardPage() {
             router.push(`/messages?id=${data.conversationId}`);
         } catch (error: any) {
             console.error("Support chat error:", error);
-            alert(language === 'ar' ? 'عذراً، حدث خطأ أثناء الاتصال بالدعم' : 'Error connecting to support');
+            alert(language === 'ar' ? 'ط·آ¹ط·آ°ط·آ±ط·آ§ط¸â€¹ط·إ’ ط·آ­ط·آ¯ط·آ« ط·آ®ط·آ·ط·آ£ ط·آ£ط·آ«ط¸â€ ط·آ§ط·طŒ ط·آ§ط¸â€‍ط·آ§ط·ع¾ط·آµط·آ§ط¸â€‍ ط·آ¨ط·آ§ط¸â€‍ط·آ¯ط·آ¹ط¸â€¦' : 'Error connecting to support');
         } finally {
             setProcessing(false);
         }
@@ -260,7 +260,7 @@ export default function DashboardPage() {
             setDeleteModal({ open: false, adId: null, adTitle: '' });
         } catch (error) {
             console.error("Failed to delete ad:", error);
-            alert(language === 'ar' ? 'فشل في حذف الإعلان' : 'Failed to delete ad');
+            alert(language === 'ar' ? 'ط¸ظ¾ط·آ´ط¸â€‍ ط¸ظ¾ط¸ظ¹ ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ' : 'Failed to delete ad');
         }
     };
 
@@ -275,7 +275,7 @@ export default function DashboardPage() {
             if (checkUser) await checkUser();
             
             setPromoteModal({ open: false, adId: null, adTitle: '', days: 1 });
-            alert(language === 'ar' ? 'تم ترويج الإعلان بنجاح' : 'Ad promoted successfully');
+            alert(language === 'ar' ? 'ط·ع¾ط¸â€¦ ط·ع¾ط·آ±ط¸ث†ط¸ظ¹ط·آ¬ ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€  ط·آ¨ط¸â€ ط·آ¬ط·آ§ط·آ­' : 'Ad promoted successfully');
         } catch (error: any) {
             alert(error.message);
         } finally {
@@ -325,7 +325,7 @@ export default function DashboardPage() {
                     {(user.role === 'ADMIN' || user.email === 'motwasel@yahoo.com') && (
                         <Link href="/admin" className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 transition-all rounded-sm shadow-lg mb-2">
                             <Settings size={14} />
-                            <span>{language === 'ar' ? 'لوحة المسؤول' : 'Admin Panel'}</span>
+                            <span>{language === 'ar' ? 'ط¸â€‍ط¸ث†ط·آ­ط·آ© ط·آ§ط¸â€‍ط¸â€¦ط·آ³ط·آ¤ط¸ث†ط¸â€‍' : 'Admin Panel'}</span>
                         </Link>
                     )}
 
@@ -350,7 +350,7 @@ export default function DashboardPage() {
                         className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-blue-500 bg-card hover:bg-blue-50 transition-all border border-blue-100 rounded-sm mb-2"
                     >
                         {processing ? <Loader2 size={14} className="animate-spin" /> : <Headphones size={14} />}
-                        <span>{language === 'ar' ? 'تواصل مع الدعم' : 'Contact Support'}</span>
+                        <span>{language === 'ar' ? 'ط·ع¾ط¸ث†ط·آ§ط·آµط¸â€‍ ط¸â€¦ط·آ¹ ط·آ§ط¸â€‍ط·آ¯ط·آ¹ط¸â€¦' : 'Contact Support'}</span>
                     </button>
 
                     <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-card hover:bg-red-50 transition-all border border-red-100 rounded-sm">
@@ -388,7 +388,7 @@ export default function DashboardPage() {
                                             onClick={openBuyPoints} 
                                             className="bg-yellow-500 text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-yellow-600 shadow-lg active:scale-95 transition-all"
                                         >
-                                            <Zap size={12} /> {language === 'ar' ? 'شراء نقاط' : 'Buy Points'}
+                                            <Zap size={12} /> {language === 'ar' ? 'ط·آ´ط·آ±ط·آ§ط·طŒ ط¸â€ ط¸â€ڑط·آ§ط·آ·' : 'Buy Points'}
                                         </button>
                                         <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
                                             <PlusCircle size={12} /> ADD UNIT
@@ -431,7 +431,7 @@ export default function DashboardPage() {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <Clock size={12} />
-                                                            {ad.created_at ? getRelativeTime(ad.created_at) : (language === 'ar' ? 'غير متوفر' : 'N/A')}
+                                                            {ad.created_at ? getRelativeTime(ad.created_at) : (language === 'ar' ? 'ط·ط›ط¸ظ¹ط·آ± ط¸â€¦ط·ع¾ط¸ث†ط¸ظ¾ط·آ±' : 'N/A')}
                                                         </span>
                                                     </div>
                                                     <div className="flex gap-2">
@@ -567,7 +567,7 @@ export default function DashboardPage() {
                                 {t('messages')}
                             </h3>
                             <p className="text-[12px] text-gray-500 mt-2">
-                                {language === 'ar' ? 'لا توجد رسائل جديدة' : 'no new messages'}
+                                {language === 'ar' ? 'ط¸â€‍ط·آ§ ط·ع¾ط¸ث†ط·آ¬ط·آ¯ ط·آ±ط·آ³ط·آ§ط·آ¦ط¸â€‍ ط·آ¬ط·آ¯ط¸ظ¹ط·آ¯ط·آ©' : 'no new messages'}
                             </p>
                         </div>
                     )}
@@ -586,7 +586,7 @@ export default function DashboardPage() {
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between mb-1">
                                             <h4 className="font-bold text-text-main text-sm">
-                                                {language === 'ar' ? 'هدية الترحيب' : 'Welcome Gift'}
+                                                {language === 'ar' ? 'ط¸â€،ط·آ¯ط¸ظ¹ط·آ© ط·آ§ط¸â€‍ط·ع¾ط·آ±ط·آ­ط¸ظ¹ط·آ¨' : 'Welcome Gift'}
                                             </h4>
                                             <span className="text-[10px] text-text-muted">
                                                 {user.created_at ? getRelativeTime(user.created_at) : ''}
@@ -594,7 +594,7 @@ export default function DashboardPage() {
                                         </div>
                                         <p className="text-xs text-text-muted leading-relaxed">
                                             {language === 'ar' 
-                                                ? 'مبروك! لقد حصلت على 10 نقاط مجانية بمناسبة تسجيلك معنا. استمتع بترويج إعلاناتك!' 
+                                                ? 'ط¸â€¦ط·آ¨ط·آ±ط¸ث†ط¸ئ’! ط¸â€‍ط¸â€ڑط·آ¯ ط·آ­ط·آµط¸â€‍ط·ع¾ ط·آ¹ط¸â€‍ط¸â€° 10 ط¸â€ ط¸â€ڑط·آ§ط·آ· ط¸â€¦ط·آ¬ط·آ§ط¸â€ ط¸ظ¹ط·آ© ط·آ¨ط¸â€¦ط¸â€ ط·آ§ط·آ³ط·آ¨ط·آ© ط·ع¾ط·آ³ط·آ¬ط¸ظ¹ط¸â€‍ط¸ئ’ ط¸â€¦ط·آ¹ط¸â€ ط·آ§. ط·آ§ط·آ³ط·ع¾ط¸â€¦ط·ع¾ط·آ¹ ط·آ¨ط·ع¾ط·آ±ط¸ث†ط¸ظ¹ط·آ¬ ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾ط¸ئ’!' 
                                                 : 'Congratulations! You have received 10 free points for registering with us. Enjoy promoting your ads!'}
                                         </p>
                                     </div>
@@ -608,15 +608,15 @@ export default function DashboardPage() {
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between mb-1">
                                             <h4 className="font-bold text-text-main text-sm">
-                                                {language === 'ar' ? 'رصيد النقاط الحالي' : 'Current Points Balance'}
+                                                {language === 'ar' ? 'ط·آ±ط·آµط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط¸â€ ط¸â€ڑط·آ§ط·آ· ط·آ§ط¸â€‍ط·آ­ط·آ§ط¸â€‍ط¸ظ¹' : 'Current Points Balance'}
                                             </h4>
                                             <span className="text-[10px] text-text-muted">
-                                                {language === 'ar' ? 'الآن' : 'Just now'}
+                                                {language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ¢ط¸â€ ' : 'Just now'}
                                             </span>
                                         </div>
                                         <p className="text-xs text-text-muted leading-relaxed">
                                             {language === 'ar'
-                                                ? `لديك حالياً ${user.points || 0} نقطة في رصيدك. يمكنك استخدامها لترويج إعلاناتك.`
+                                                ? `ط¸â€‍ط·آ¯ط¸ظ¹ط¸ئ’ ط·آ­ط·آ§ط¸â€‍ط¸ظ¹ط·آ§ط¸â€¹ ${user.points || 0} ط¸â€ ط¸â€ڑط·آ·ط·آ© ط¸ظ¾ط¸ظ¹ ط·آ±ط·آµط¸ظ¹ط·آ¯ط¸ئ’. ط¸ظ¹ط¸â€¦ط¸ئ’ط¸â€ ط¸ئ’ ط·آ§ط·آ³ط·ع¾ط·آ®ط·آ¯ط·آ§ط¸â€¦ط¸â€،ط·آ§ ط¸â€‍ط·ع¾ط·آ±ط¸ث†ط¸ظ¹ط·آ¬ ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾ط¸ئ’.`
                                                 : `You currently have ${user.points || 0} points in your balance. You can use them to promote your ads.`}
                                         </p>
                                     </div>
@@ -638,7 +638,7 @@ export default function DashboardPage() {
                                                 {t('notifications')}
                                             </h4>
                                             <p className="text-[10px] text-gray-500">
-                                                {language === 'ar' ? 'تلقي إشعارات حول الإعلانات والرسائل' : 'receive notifications about ads and messages'}
+                                                {language === 'ar' ? 'ط·ع¾ط¸â€‍ط¸â€ڑط¸ظ¹ ط·آ¥ط·آ´ط·آ¹ط·آ§ط·آ±ط·آ§ط·ع¾ ط·آ­ط¸ث†ط¸â€‍ ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾ ط¸ث†ط·آ§ط¸â€‍ط·آ±ط·آ³ط·آ§ط·آ¦ط¸â€‍' : 'receive notifications about ads and messages'}
                                             </p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -650,10 +650,10 @@ export default function DashboardPage() {
                                     <div className="flex items-center justify-between p-4 border border-border-color rounded-sm">
                                         <div>
                                             <h4 className="font-black text-text-main text-[14px]">
-                                                {language === 'ar' ? 'الخصوصية' : 'privacy'}
+                                                {language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ®ط·آµط¸ث†ط·آµط¸ظ¹ط·آ©' : 'privacy'}
                                             </h4>
                                             <p className="text-[10px] text-gray-500">
-                                                {language === 'ar' ? 'إظهار معلومات الاتصال للجميع' : 'show contact information to everyone'}
+                                                {language === 'ar' ? 'ط·آ¥ط·آ¸ط¸â€،ط·آ§ط·آ± ط¸â€¦ط·آ¹ط¸â€‍ط¸ث†ط¸â€¦ط·آ§ط·ع¾ ط·آ§ط¸â€‍ط·آ§ط·ع¾ط·آµط·آ§ط¸â€‍ ط¸â€‍ط¸â€‍ط·آ¬ط¸â€¦ط¸ظ¹ط·آ¹' : 'show contact information to everyone'}
                                             </p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -704,10 +704,10 @@ export default function DashboardPage() {
                                             onClick={handleManualRequest}
                                             className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-text-main rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all text-sm"
                                         >
-                                            {language === 'ar' ? 'طلب شراء نقاط يدوياً' : 'Request Manual Points Purchase'}
+                                            {language === 'ar' ? 'ط·آ·ط¸â€‍ط·آ¨ ط·آ´ط·آ±ط·آ§ط·طŒ ط¸â€ ط¸â€ڑط·آ§ط·آ· ط¸ظ¹ط·آ¯ط¸ث†ط¸ظ¹ط·آ§ط¸â€¹' : 'Request Manual Points Purchase'}
                                         </button>
                                         <p className="text-[10px] text-center text-text-muted mt-2">
-                                            {language === 'ar' ? 'سيقوم فريقنا بالتواصل معك لإتمام العملية' : 'Our team will contact you to complete the process'}
+                                            {language === 'ar' ? 'ط·آ³ط¸ظ¹ط¸â€ڑط¸ث†ط¸â€¦ ط¸ظ¾ط·آ±ط¸ظ¹ط¸â€ڑط¸â€ ط·آ§ ط·آ¨ط·آ§ط¸â€‍ط·ع¾ط¸ث†ط·آ§ط·آµط¸â€‍ ط¸â€¦ط·آ¹ط¸ئ’ ط¸â€‍ط·آ¥ط·ع¾ط¸â€¦ط·آ§ط¸â€¦ ط·آ§ط¸â€‍ط·آ¹ط¸â€¦ط¸â€‍ط¸ظ¹ط·آ©' : 'Our team will contact you to complete the process'}
                                         </p>
                                     </div>
                                 </div>
@@ -748,7 +748,7 @@ export default function DashboardPage() {
                                             {t('back')}
                                         </button>
                                         <button type="submit" className="flex-1 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all">
-                                            {language === 'ar' ? 'متابعة للدفع' : 'Proceed to Payment'}
+                                            {language === 'ar' ? 'ط¸â€¦ط·ع¾ط·آ§ط·آ¨ط·آ¹ط·آ© ط¸â€‍ط¸â€‍ط·آ¯ط¸ظ¾ط·آ¹' : 'Proceed to Payment'}
                                         </button>
                                     </div>
                                 </form>
@@ -757,7 +757,7 @@ export default function DashboardPage() {
                                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl flex items-center gap-3 mb-6">
                                         <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                         <p className="text-xs text-blue-800 dark:text-blue-200 font-medium">
-                                            {language === 'ar' ? 'بيانات الدفع مشفرة وآمنة 100%' : 'Payment data is 100% encrypted and secure'}
+                                            {language === 'ar' ? 'ط·آ¨ط¸ظ¹ط·آ§ط¸â€ ط·آ§ط·ع¾ ط·آ§ط¸â€‍ط·آ¯ط¸ظ¾ط·آ¹ ط¸â€¦ط·آ´ط¸ظ¾ط·آ±ط·آ© ط¸ث†ط·آ¢ط¸â€¦ط¸â€ ط·آ© 100%' : 'Payment data is 100% encrypted and secure'}
                                         </p>
                                     </div>
 
@@ -767,14 +767,14 @@ export default function DashboardPage() {
                                             onClick={() => setPaymentMethod('card')}
                                             className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${paymentMethod === 'card' ? 'bg-white dark:bg-[#1a1a1a] text-primary shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                                         >
-                                            {language === 'ar' ? 'بطاقة ائتمان' : 'Credit Card'}
+                                            {language === 'ar' ? 'ط·آ¨ط·آ·ط·آ§ط¸â€ڑط·آ© ط·آ§ط·آ¦ط·ع¾ط¸â€¦ط·آ§ط¸â€ ' : 'Credit Card'}
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setPaymentMethod('email')}
                                             className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${paymentMethod === 'email' ? 'bg-white dark:bg-[#1a1a1a] text-primary shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                                         >
-                                            {language === 'ar' ? 'طلب عبر البريد' : 'Email Request'}
+                                            {language === 'ar' ? 'ط·آ·ط¸â€‍ط·آ¨ ط·آ¹ط·آ¨ط·آ± ط·آ§ط¸â€‍ط·آ¨ط·آ±ط¸ظ¹ط·آ¯' : 'Email Request'}
                                         </button>
                                     </div>
 
@@ -828,11 +828,11 @@ export default function DashboardPage() {
                                                 <Zap className="text-primary" size={24} />
                                             </div>
                                             <h4 className="font-bold text-text-main mb-2">
-                                                {language === 'ar' ? 'طلب شراء نقاط' : 'Points Purchase Request'}
+                                                {language === 'ar' ? 'ط·آ·ط¸â€‍ط·آ¨ ط·آ´ط·آ±ط·آ§ط·طŒ ط¸â€ ط¸â€ڑط·آ§ط·آ·' : 'Points Purchase Request'}
                                             </h4>
                                             <p className="text-xs text-text-muted leading-relaxed">
                                                 {language === 'ar' 
-                                                    ? 'سيتم إرسال طلبك عبر البريد الإلكتروني إلى فريق المبيعات. سنتواصل معك قريباً لإتمام عملية الدفع وتفعيل النقاط.' 
+                                                    ? 'ط·آ³ط¸ظ¹ط·ع¾ط¸â€¦ ط·آ¥ط·آ±ط·آ³ط·آ§ط¸â€‍ ط·آ·ط¸â€‍ط·آ¨ط¸ئ’ ط·آ¹ط·آ¨ط·آ± ط·آ§ط¸â€‍ط·آ¨ط·آ±ط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط·آ¥ط¸â€‍ط¸ئ’ط·ع¾ط·آ±ط¸ث†ط¸â€ ط¸ظ¹ ط·آ¥ط¸â€‍ط¸â€° ط¸ظ¾ط·آ±ط¸ظ¹ط¸â€ڑ ط·آ§ط¸â€‍ط¸â€¦ط·آ¨ط¸ظ¹ط·آ¹ط·آ§ط·ع¾. ط·آ³ط¸â€ ط·ع¾ط¸ث†ط·آ§ط·آµط¸â€‍ ط¸â€¦ط·آ¹ط¸ئ’ ط¸â€ڑط·آ±ط¸ظ¹ط·آ¨ط·آ§ط¸â€¹ ط¸â€‍ط·آ¥ط·ع¾ط¸â€¦ط·آ§ط¸â€¦ ط·آ¹ط¸â€¦ط¸â€‍ط¸ظ¹ط·آ© ط·آ§ط¸â€‍ط·آ¯ط¸ظ¾ط·آ¹ ط¸ث†ط·ع¾ط¸ظ¾ط·آ¹ط¸ظ¹ط¸â€‍ ط·آ§ط¸â€‍ط¸â€ ط¸â€ڑط·آ§ط·آ·.' 
                                                     : 'Your request will be sent via email to our sales team. We will contact you shortly to complete the payment and activate your points.'}
                                             </p>
                                         </div>
@@ -845,7 +845,7 @@ export default function DashboardPage() {
                                         <button type="submit" disabled={processing} className="flex-1 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all flex items-center justify-center gap-2">
                                             {processing && <Loader2 className="animate-spin" size={16} />}
                                             {language === 'ar' 
-                                                ? (paymentMethod === 'card' ? `دفع ${selectedPlan.price}` : 'إرسال الطلب')
+                                                ? (paymentMethod === 'card' ? `ط·آ¯ط¸ظ¾ط·آ¹ ${selectedPlan.price}` : 'ط·آ¥ط·آ±ط·آ³ط·آ§ط¸â€‍ ط·آ§ط¸â€‍ط·آ·ط¸â€‍ط·آ¨')
                                                 : (paymentMethod === 'card' ? `Pay ${selectedPlan.price}` : 'Send Request')}
                                         </button>
                                     </div>
@@ -898,7 +898,7 @@ export default function DashboardPage() {
                     <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-border-color" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                         <div className="bg-primary/5 p-6 border-b border-border-color flex justify-between items-center">
                             <div>
-                                <h3 className="text-lg font-black text-text-main uppercase tracking-tight">{language === 'ar' ? 'ترويج الإعلان' : 'Promote Ad'}</h3>
+                                <h3 className="text-lg font-black text-text-main uppercase tracking-tight">{language === 'ar' ? 'ط·ع¾ط·آ±ط¸ث†ط¸ظ¹ط·آ¬ ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ' : 'Promote Ad'}</h3>
                                 <p className="text-sm text-text-muted mt-1">{promoteModal.adTitle}</p>
                             </div>
                             <button onClick={() => setPromoteModal({ ...promoteModal, open: false })} className="text-text-muted hover:text-text-main transition-colors">
@@ -911,11 +911,11 @@ export default function DashboardPage() {
                                 <Zap className="w-6 h-6 text-yellow-500 shrink-0" />
                                 <div>
                                     <h4 className="font-bold text-yellow-700 dark:text-yellow-500 text-sm mb-1">
-                                        {language === 'ar' ? 'لماذا تروج إعلانك؟' : 'Why promote?'}
+                                        {language === 'ar' ? 'ط¸â€‍ط¸â€¦ط·آ§ط·آ°ط·آ§ ط·ع¾ط·آ±ط¸ث†ط·آ¬ ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط¸ئ’ط·ع؛' : 'Why promote?'}
                                     </h4>
                                     <p className="text-xs text-yellow-600 dark:text-yellow-400 leading-relaxed">
                                         {language === 'ar' 
-                                            ? 'تظهر الإعلانات المروجة في أعلى القائمة وفي الشريط المتحرك، مما يزيد المشاهدات بنسبة 500%.' 
+                                            ? 'ط·ع¾ط·آ¸ط¸â€،ط·آ± ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾ ط·آ§ط¸â€‍ط¸â€¦ط·آ±ط¸ث†ط·آ¬ط·آ© ط¸ظ¾ط¸ظ¹ ط·آ£ط·آ¹ط¸â€‍ط¸â€° ط·آ§ط¸â€‍ط¸â€ڑط·آ§ط·آ¦ط¸â€¦ط·آ© ط¸ث†ط¸ظ¾ط¸ظ¹ ط·آ§ط¸â€‍ط·آ´ط·آ±ط¸ظ¹ط·آ· ط·آ§ط¸â€‍ط¸â€¦ط·ع¾ط·آ­ط·آ±ط¸ئ’ط·إ’ ط¸â€¦ط¸â€¦ط·آ§ ط¸ظ¹ط·آ²ط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط¸â€¦ط·آ´ط·آ§ط¸â€،ط·آ¯ط·آ§ط·ع¾ ط·آ¨ط¸â€ ط·آ³ط·آ¨ط·آ© 500%.' 
                                             : 'Promoted ads appear at the top and in the ticker, increasing views by 500%.'}
                                     </p>
                                 </div>
@@ -924,7 +924,7 @@ export default function DashboardPage() {
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-bold text-text-muted uppercase mb-2">
-                                        {language === 'ar' ? 'مدة الترويج (أيام)' : 'Duration (Days)'}
+                                        {language === 'ar' ? 'ط¸â€¦ط·آ¯ط·آ© ط·آ§ط¸â€‍ط·ع¾ط·آ±ط¸ث†ط¸ظ¹ط·آ¬ (ط·آ£ط¸ظ¹ط·آ§ط¸â€¦)' : 'Duration (Days)'}
                                     </label>
                                     <div className="flex items-center gap-4 bg-card border border-border-color rounded-xl p-2">
                                         <button 
@@ -947,7 +947,7 @@ export default function DashboardPage() {
                                                 }}
                                                 className="w-full text-center text-2xl font-black text-primary bg-transparent border-none focus:ring-0 p-0"
                                             />
-                                            <span className="text-xs font-bold text-text-muted block uppercase tracking-wider">{language === 'ar' ? 'أيام' : 'Days'}</span>
+                                            <span className="text-xs font-bold text-text-muted block uppercase tracking-wider">{language === 'ar' ? 'ط·آ£ط¸ظ¹ط·آ§ط¸â€¦' : 'Days'}</span>
                                         </div>
                                         <button 
                                             onClick={() => setPromoteModal(p => ({ ...p, days: Math.min(30, p.days + 1) }))}
@@ -959,24 +959,24 @@ export default function DashboardPage() {
                                 </div>
 
                                 <div className="flex items-center justify-between p-4 bg-card border border-border-color rounded-xl">
-                                    <span className="text-sm font-bold text-text-muted uppercase tracking-wider">{language === 'ar' ? 'التكلفة الإجمالية' : 'Total Cost'}</span>
+                                    <span className="text-sm font-bold text-text-muted uppercase tracking-wider">{language === 'ar' ? 'ط·آ§ط¸â€‍ط·ع¾ط¸ئ’ط¸â€‍ط¸ظ¾ط·آ© ط·آ§ط¸â€‍ط·آ¥ط·آ¬ط¸â€¦ط·آ§ط¸â€‍ط¸ظ¹ط·آ©' : 'Total Cost'}</span>
                                     <div className="text-right">
                                         <span className="text-2xl font-black text-text-main block">{promoteModal.days * 1}</span>
-                                        <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">{language === 'ar' ? 'نقاط' : 'POINTS'}</span>
+                                        <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">{language === 'ar' ? 'ط¸â€ ط¸â€ڑط·آ§ط·آ·' : 'POINTS'}</span>
                                     </div>
                                 </div>
 
                                 <div className="pt-2">
                                     <div className="flex justify-between text-xs font-bold text-text-muted mb-2">
-                                        <span>{language === 'ar' ? 'رصيدك الحالي' : 'Your Balance'}</span>
+                                        <span>{language === 'ar' ? 'ط·آ±ط·آµط¸ظ¹ط·آ¯ط¸ئ’ ط·آ§ط¸â€‍ط·آ­ط·آ§ط¸â€‍ط¸ظ¹' : 'Your Balance'}</span>
                                         <span className={(user?.points || 0) < promoteModal.days ? 'text-red-500' : 'text-green-500'}>
-                                            {user?.points || 0} {language === 'ar' ? 'نقطة' : 'PTS'}
+                                            {user?.points || 0} {language === 'ar' ? 'ط¸â€ ط¸â€ڑط·آ·ط·آ©' : 'PTS'}
                                         </span>
                                     </div>
                                     {(user?.points || 0) < promoteModal.days && (
                                         <div className="text-red-500 text-xs font-bold mb-4 flex items-center gap-1">
                                             <AlertTriangle size={12} />
-                                            {language === 'ar' ? 'رصيد غير كافي' : 'Insufficient balance'}
+                                            {language === 'ar' ? 'ط·آ±ط·آµط¸ظ¹ط·آ¯ ط·ط›ط¸ظ¹ط·آ± ط¸ئ’ط·آ§ط¸ظ¾ط¸ظ¹' : 'Insufficient balance'}
                                         </div>
                                     )}
                                 </div>
@@ -995,7 +995,7 @@ export default function DashboardPage() {
                                     className="flex-1 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {processing ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
-                                    {language === 'ar' ? 'ترويج الآن' : 'Promote Now'}
+                                    {language === 'ar' ? 'ط·ع¾ط·آ±ط¸ث†ط¸ظ¹ط·آ¬ ط·آ§ط¸â€‍ط·آ¢ط¸â€ ' : 'Promote Now'}
                                 </button>
                             </div>
                         </div>

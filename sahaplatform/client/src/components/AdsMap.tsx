@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
@@ -59,6 +59,7 @@ export default function AdsMap({
     mapZoom,
     t,
 }: AdsMapProps) {
+    const [imgError, setImgError] = useState<Record<string, boolean>>({});
     const highlightedAd = ads.find((ad) => ad.id === highlightedAdId);
 
     return (
@@ -95,13 +96,14 @@ export default function AdsMap({
                 <div className="absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-border-color shadow-lg z-10 animate-in slide-in-from-bottom-5">
                     <Link href={`/ads/${highlightedAdId}`} className="flex items-center gap-3">
                         <div className="w-16 h-16 rounded-md overflow-hidden shrink-0">
-                            {highlightedAd?.images && highlightedAd.images.length > 0 ? (
+                            {highlightedAd?.images && highlightedAd.images.length > 0 && !imgError[highlightedAd.id] ? (
                                 <Image
                                     src={highlightedAd.images[0]}
                                     alt={highlightedAd.title}
                                     width={64}
                                     height={64}
                                     className="object-cover"
+                                    onError={() => setImgError(prev => ({ ...prev, [highlightedAd.id]: true }))}
                                 />
                             ) : (
                                 <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-xs">

@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 
 import { useAuthStore } from "@/store/useAuthStore";
@@ -247,10 +247,10 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                         <h1 className="text-[11px] font-black uppercase tracking-[0.2em] leading-none mb-1">
-                            {language === 'ar' ? 'بوابة الإشراف المركزية' : 'CENTRAL ADMINISTRATION PORTAL'}
+                            {language === 'ar' ? 'ط·آ¨ط¸ث†ط·آ§ط·آ¨ط·آ© ط·آ§ط¸â€‍ط·آ¥ط·آ´ط·آ±ط·آ§ط¸ظ¾ ط·آ§ط¸â€‍ط¸â€¦ط·آ±ط¸ئ’ط·آ²ط¸ظ¹ط·آ©' : 'CENTRAL ADMINISTRATION PORTAL'}
                         </h1>
                         <div className="flex items-center gap-2">
-                            <span className="text-[8px] font-bold text-gray-500 tracking-widest">{language === 'ar' ? 'نواة صحة 3.0' : 'saha core v3.0'}</span>
+                            <span className="text-[8px] font-bold text-gray-500 tracking-widest">{language === 'ar' ? 'ط¸â€ ط¸ث†ط·آ§ط·آ© ط·آµط·آ­ط·آ© 3.0' : 'saha core v3.0'}</span>
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
                         </div>
                     </div>
@@ -260,7 +260,7 @@ export default function AdminDashboard() {
                     <div className="hidden md:flex items-center gap-4 border-l border-border-color pl-6 h-14">
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] font-black text-white leading-none uppercase">{user.name}</span>
-                            <span className="text-[8px] font-bold text-primary uppercase mt-1">{language === 'ar' ? 'مدير عام' : 'SUPER_ADMIN'}</span>
+                            <span className="text-[8px] font-bold text-primary uppercase mt-1">{language === 'ar' ? 'ط¸â€¦ط·آ¯ط¸ظ¹ط·آ± ط·آ¹ط·آ§ط¸â€¦' : 'SUPER_ADMIN'}</span>
                         </div>
                         <button onClick={() => { logout(); router.push('/'); }} className="w-8 h-8 rounded-full bg-card hover:bg-red-500/20 text-text-muted hover:text-red-500 flex items-center justify-center transition-all border border-transparent hover:border-red-500/30">
                             <LogOut size={16} />
@@ -272,14 +272,14 @@ export default function AdminDashboard() {
             <div className="flex flex-1 overflow-hidden">
                 {/* Sleek Dark Sidebar */}
                 <aside className="w-64 bg-gray-bg border-r border-border-color p-4 flex flex-col gap-1.5">
-                    <div className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 mt-2 px-3">{language === 'ar' ? 'وحدات النظام' : 'System Modules'}</div>
+                    <div className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 mt-2 px-3">{language === 'ar' ? 'ط¸ث†ط·آ­ط·آ¯ط·آ§ط·ع¾ ط·آ§ط¸â€‍ط¸â€ ط·آ¸ط·آ§ط¸â€¦' : 'System Modules'}</div>
                     {[
-                        { id: 'overview', label: language === 'ar' ? 'نظرة عامة' : 'DASHBOARD OVERVIEW', icon: <BarChart3 size={18} /> },
-                        { id: 'messages', label: language === 'ar' ? 'رسائل الدعم' : 'SUPPORT MESSAGES', icon: <MessageSquare size={18} />, badge: stats.supportTickets },
-                        { id: 'subscriptions', label: language === 'ar' ? 'طلبات الاشتراكات' : 'PAID AD REQUESTS', icon: <DollarSign size={18} />, badge: stats.pendingSubscriptions },
-                        { id: 'reports', label: language === 'ar' ? 'البلاغات' : 'USER REPORTS', icon: <Flag size={18} />, badge: stats.totalReports > 0 ? stats.totalReports : undefined },
-                        { id: 'ads', label: language === 'ar' ? 'إدارة الإعلانات' : 'AD MODERATION', icon: <Package size={18} /> },
-                        { id: 'users', label: language === 'ar' ? 'قاعدة المستخدمين' : 'USER DATABASE', icon: <Users size={18} /> },
+                        { id: 'overview', label: language === 'ar' ? 'ط¸â€ ط·آ¸ط·آ±ط·آ© ط·آ¹ط·آ§ط¸â€¦ط·آ©' : 'DASHBOARD OVERVIEW', icon: <BarChart3 size={18} /> },
+                        { id: 'messages', label: language === 'ar' ? 'ط·آ±ط·آ³ط·آ§ط·آ¦ط¸â€‍ ط·آ§ط¸â€‍ط·آ¯ط·آ¹ط¸â€¦' : 'SUPPORT MESSAGES', icon: <MessageSquare size={18} />, badge: stats.supportTickets },
+                        { id: 'subscriptions', label: language === 'ar' ? 'ط·آ·ط¸â€‍ط·آ¨ط·آ§ط·ع¾ ط·آ§ط¸â€‍ط·آ§ط·آ´ط·ع¾ط·آ±ط·آ§ط¸ئ’ط·آ§ط·ع¾' : 'PAID AD REQUESTS', icon: <DollarSign size={18} />, badge: stats.pendingSubscriptions },
+                        { id: 'reports', label: language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ¨ط¸â€‍ط·آ§ط·ط›ط·آ§ط·ع¾' : 'USER REPORTS', icon: <Flag size={18} />, badge: stats.totalReports > 0 ? stats.totalReports : undefined },
+                        { id: 'ads', label: language === 'ar' ? 'ط·آ¥ط·آ¯ط·آ§ط·آ±ط·آ© ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾' : 'AD MODERATION', icon: <Package size={18} /> },
+                        { id: 'users', label: language === 'ar' ? 'ط¸â€ڑط·آ§ط·آ¹ط·آ¯ط·آ© ط·آ§ط¸â€‍ط¸â€¦ط·آ³ط·ع¾ط·آ®ط·آ¯ط¸â€¦ط¸ظ¹ط¸â€ ' : 'USER DATABASE', icon: <Users size={18} /> },
                     ].map((item) => (
                         <button
                             key={item.id}
@@ -313,7 +313,7 @@ export default function AdminDashboard() {
                                     <ShieldCheck size={24} className="text-primary/50" />
                                 </div>
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] mt-8 text-primary animate-pulse">{language === 'ar' ? 'جاري تهيئة الواجهة...' : 'Initializing Interface...'}</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] mt-8 text-primary animate-pulse">{language === 'ar' ? 'ط·آ¬ط·آ§ط·آ±ط¸ظ¹ ط·ع¾ط¸â€،ط¸ظ¹ط·آ¦ط·آ© ط·آ§ط¸â€‍ط¸ث†ط·آ§ط·آ¬ط¸â€،ط·آ©...' : 'Initializing Interface...'}</span>
                         </div>
                     ) : (
                         <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -322,12 +322,12 @@ export default function AdminDashboard() {
                             <div className="flex items-end justify-between border-b border-white/5 pb-6">
                                 <div>
                                     <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2 italic">
-                                        {view === 'overview' && (language === 'ar' ? 'النظرة العامة' : 'SYSTEM STATUS')}
-                                        {view === 'messages' && (language === 'ar' ? 'رسائل الدعم الفني' : 'SUPPORT CENTER')}
-                                        {view === 'subscriptions' && (language === 'ar' ? 'الاشتراكات المدفوعة' : 'FINANCIAL OPS')}
-                                        {view === 'reports' && (language === 'ar' ? 'بلاغات المستخدمين' : 'USER REPORTS')}
-                                        {view === 'ads' && (language === 'ar' ? 'الرقابة على الإعلانات' : 'CONTENT MODERATION')}
-                                        {view === 'users' && (language === 'ar' ? 'قاعدة البيانات' : 'USER INFRASTRUCTURE')}
+                                        {view === 'overview' && (language === 'ar' ? 'ط·آ§ط¸â€‍ط¸â€ ط·آ¸ط·آ±ط·آ© ط·آ§ط¸â€‍ط·آ¹ط·آ§ط¸â€¦ط·آ©' : 'SYSTEM STATUS')}
+                                        {view === 'messages' && (language === 'ar' ? 'ط·آ±ط·آ³ط·آ§ط·آ¦ط¸â€‍ ط·آ§ط¸â€‍ط·آ¯ط·آ¹ط¸â€¦ ط·آ§ط¸â€‍ط¸ظ¾ط¸â€ ط¸ظ¹' : 'SUPPORT CENTER')}
+                                        {view === 'subscriptions' && (language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ§ط·آ´ط·ع¾ط·آ±ط·آ§ط¸ئ’ط·آ§ط·ع¾ ط·آ§ط¸â€‍ط¸â€¦ط·آ¯ط¸ظ¾ط¸ث†ط·آ¹ط·آ©' : 'FINANCIAL OPS')}
+                                        {view === 'reports' && (language === 'ar' ? 'ط·آ¨ط¸â€‍ط·آ§ط·ط›ط·آ§ط·ع¾ ط·آ§ط¸â€‍ط¸â€¦ط·آ³ط·ع¾ط·آ®ط·آ¯ط¸â€¦ط¸ظ¹ط¸â€ ' : 'USER REPORTS')}
+                                        {view === 'ads' && (language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ±ط¸â€ڑط·آ§ط·آ¨ط·آ© ط·آ¹ط¸â€‍ط¸â€° ط·آ§ط¸â€‍ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾' : 'CONTENT MODERATION')}
+                                        {view === 'users' && (language === 'ar' ? 'ط¸â€ڑط·آ§ط·آ¹ط·آ¯ط·آ© ط·آ§ط¸â€‍ط·آ¨ط¸ظ¹ط·آ§ط¸â€ ط·آ§ط·ع¾' : 'USER INFRASTRUCTURE')}
                                     </h2>
                                     <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Real-time synchronization active &bull; No latency detected</p>
                                 </div>
@@ -379,7 +379,7 @@ export default function AdminDashboard() {
                                             <div className="p-4 border-b border-border-color flex justify-between items-center">
                                                 <h3 className="text-[11px] font-black tracking-[0.2em] flex items-center gap-2">
                                                     <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                                                    {language === 'ar' ? 'أحدث الأصول' : 'RECENT ASSETS'}
+                                                    {language === 'ar' ? 'ط·آ£ط·آ­ط·آ¯ط·آ« ط·آ§ط¸â€‍ط·آ£ط·آµط¸ث†ط¸â€‍' : 'RECENT ASSETS'}
                                                 </h3>
                                                 <button onClick={() => setView('ads')} className="text-[9px] font-black text-primary hover:tracking-widest transition-all uppercase">DECRYPT ALL</button>
                                             </div>
@@ -635,7 +635,7 @@ export default function AdminDashboard() {
                                                                     className="flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm hover:bg-primary hover:text-black transition-all"
                                                                 >
                                                                     <MessageSquare size={14} />
-                                                                    {language === 'ar' ? 'رد' : 'REPLY'}
+                                                                    {language === 'ar' ? 'ط·آ±ط·آ¯' : 'REPLY'}
                                                                 </button>
                                                             )}
                                                         </div>

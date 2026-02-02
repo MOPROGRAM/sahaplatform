@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 
 import { useState, useEffect, useCallback } from "react";
@@ -422,7 +422,7 @@ export default function PostAdPage() {
                                                         checked={formData.isBoosted} 
                                                         onChange={(e) => {
                                                             if (user.points < (formData.boostDays || 7) && e.target.checked) {
-                                                                setError(language === 'ar' ? "رصيد النقاط غير كافٍ" : "Insufficient points balance");
+                                                                setError(language === 'ar' ? "ط·آ±ط·آµط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط¸â€ ط¸â€ڑط·آ§ط·آ· ط·ط›ط¸ظ¹ط·آ± ط¸ئ’ط·آ§ط¸ظ¾ط¸ع†" : "Insufficient points balance");
                                                                 return;
                                                             }
                                                             handleInputChange(e);
@@ -430,7 +430,7 @@ export default function PostAdPage() {
                                                         }}
                                                         className="hidden" 
                                                     />
-                                                    <span className="font-bold">{language === 'ar' ? 'نعم، أريد تمييز إعلاني' : 'Yes, I want to promote my ad'}</span>
+                                                    <span className="font-bold">{language === 'ar' ? 'ط¸â€ ط·آ¹ط¸â€¦ط·إ’ ط·آ£ط·آ±ط¸ظ¹ط·آ¯ ط·ع¾ط¸â€¦ط¸ظ¹ط¸ظ¹ط·آ² ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط¸ظ¹' : 'Yes, I want to promote my ad'}</span>
                                                 </label>
 
                                                 {formData.isBoosted && (
@@ -452,7 +452,7 @@ export default function PostAdPage() {
                                                                     if (days > 30) return; // Max 30
                                                                     
                                                                     if (user.points < days) {
-                                                                        setError(language === 'ar' ? "رصيد النقاط غير كافٍ لهذه المدة" : "Insufficient points for this duration");
+                                                                        setError(language === 'ar' ? "ط·آ±ط·آµط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط¸â€ ط¸â€ڑط·آ§ط·آ· ط·ط›ط¸ظ¹ط·آ± ط¸ئ’ط·آ§ط¸ظ¾ط¸ع† ط¸â€‍ط¸â€،ط·آ°ط¸â€، ط·آ§ط¸â€‍ط¸â€¦ط·آ¯ط·آ©" : "Insufficient points for this duration");
                                                                     } else {
                                                                         setError("");
                                                                     }
@@ -465,7 +465,7 @@ export default function PostAdPage() {
                                                             </span>
                                                         </div>
                                                         <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-2 rounded-lg">
-                                                            {language === 'ar' ? `التكلفة: ${formData.boostDays || 0} نقطة` : `Cost: ${formData.boostDays || 0} Points`}
+                                                            {language === 'ar' ? `ط·آ§ط¸â€‍ط·ع¾ط¸ئ’ط¸â€‍ط¸ظ¾ط·آ©: ${formData.boostDays || 0} ط¸â€ ط¸â€ڑط·آ·ط·آ©` : `Cost: ${formData.boostDays || 0} Points`}
                                                         </span>
                                                         {user.points < (formData.boostDays || 1) && (
                                                             <Link href="/dashboard" className="text-xs font-bold text-primary hover:underline ml-auto">
@@ -484,7 +484,7 @@ export default function PostAdPage() {
                                     disabled={loading || (formData.isBoosted && user.points < formData.boostDays)}
                                     className="btn-saha-primary w-full py-4 text-lg shadow-xl shadow-primary/20"
                                 >
-                                    {loading ? <Loader2 className="animate-spin mx-auto" /> : (formData.isBoosted ? (language === 'ar' ? `نشر وترويج (-${formData.boostDays} نقطة)` : `Post & Promote (-${formData.boostDays} Points)`) : t('deployListing'))}
+                                    {loading ? <Loader2 className="animate-spin mx-auto" /> : (formData.isBoosted ? (language === 'ar' ? `ط¸â€ ط·آ´ط·آ± ط¸ث†ط·ع¾ط·آ±ط¸ث†ط¸ظ¹ط·آ¬ (-${formData.boostDays} ط¸â€ ط¸â€ڑط·آ·ط·آ©)` : `Post & Promote (-${formData.boostDays} Points)`) : t('deployListing'))}
                                 </button>
                             </div>
                         </form>

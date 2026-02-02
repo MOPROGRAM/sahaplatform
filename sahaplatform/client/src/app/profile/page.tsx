@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 import { Suspense, useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -557,7 +557,7 @@ function ProfileContent() {
                                             <div className="flex flex-col items-center justify-center h-64 text-text-muted">
                                                 <MessageSquare size={48} className="opacity-10 mb-4" />
                                                 <p className="text-sm font-bold">
-                                                    {language === 'ar' ? 'لا توجد محادثات' : 'No conversations found'}
+                                                    {language === 'ar' ? 'ط¸â€‍ط·آ§ ط·ع¾ط¸ث†ط·آ¬ط·آ¯ ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ§ط·ع¾' : 'No conversations found'}
                                                 </p>
                                             </div>
                                         )}
@@ -573,7 +573,7 @@ function ProfileContent() {
                             <div className="px-4 py-3 bg-card border-b border-border-color flex items-center gap-2">
                                 <Heart size={14} className="text-red-500" />
                                 <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">
-                                    {language === 'ar' ? 'المفضلة' : 'Favorites'}
+                                    {language === 'ar' ? 'ط·آ§ط¸â€‍ط¸â€¦ط¸ظ¾ط·آ¶ط¸â€‍ط·آ©' : 'Favorites'}
                                 </h3>
                             </div>
                             
@@ -602,12 +602,12 @@ function ProfileContent() {
                     {activeTab === 'settings' && (
                         <div className="bg-card border border-border-color p-6 rounded-sm shadow-sm">
                             <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-6">
-                                {language === 'ar' ? 'تحديث المعلومات' : 'Update Profile'}
+                                {language === 'ar' ? 'ط·ع¾ط·آ­ط·آ¯ط¸ظ¹ط·آ« ط·آ§ط¸â€‍ط¸â€¦ط·آ¹ط¸â€‍ط¸ث†ط¸â€¦ط·آ§ط·ع¾' : 'Update Profile'}
                             </h3>
                             <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-lg">
                                 <div>
                                     <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
-                                        {language === 'ar' ? 'الاسم' : 'Name'}
+                                        {language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ§ط·آ³ط¸â€¦' : 'Name'}
                                     </label>
                                     <input
                                         type="text"
@@ -618,7 +618,7 @@ function ProfileContent() {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
-                                        {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                                        {language === 'ar' ? 'ط·آ§ط¸â€‍ط·آ¨ط·آ±ط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط·آ¥ط¸â€‍ط¸ئ’ط·ع¾ط·آ±ط¸ث†ط¸â€ ط¸ظ¹' : 'Email'}
                                     </label>
                                     <input
                                         type="email"
@@ -630,12 +630,12 @@ function ProfileContent() {
 
                                 <div className="pt-4 border-t border-gray-100">
                                     <h4 className="text-sm font-bold text-secondary mb-4">
-                                        {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
+                                        {language === 'ar' ? 'ط·ع¾ط·ط›ط¸ظ¹ط¸ظ¹ط·آ± ط¸ئ’ط¸â€‍ط¸â€¦ط·آ© ط·آ§ط¸â€‍ط¸â€¦ط·آ±ط¸ث†ط·آ±' : 'Change Password'}
                                     </h4>
                                     <div className="space-y-4">
                                         <div>
                                             <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
-                                                {language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}
+                                                {language === 'ar' ? 'ط¸ئ’ط¸â€‍ط¸â€¦ط·آ© ط·آ§ط¸â€‍ط¸â€¦ط·آ±ط¸ث†ط·آ± ط·آ§ط¸â€‍ط·آ­ط·آ§ط¸â€‍ط¸ظ¹ط·آ©' : 'Current Password'}
                                             </label>
                                             <input
                                                 type="password"
@@ -646,7 +646,7 @@ function ProfileContent() {
                                         </div>
                                         <div>
                                             <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
-                                                {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
+                                                {language === 'ar' ? 'ط¸ئ’ط¸â€‍ط¸â€¦ط·آ© ط·آ§ط¸â€‍ط¸â€¦ط·آ±ط¸ث†ط·آ± ط·آ§ط¸â€‍ط·آ¬ط·آ¯ط¸ظ¹ط·آ¯ط·آ©' : 'New Password'}
                                             </label>
                                             <input
                                                 type="password"
@@ -657,7 +657,7 @@ function ProfileContent() {
                                         </div>
                                         <div>
                                             <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">
-                                                {language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                                {language === 'ar' ? 'ط·ع¾ط·آ£ط¸ئ’ط¸ظ¹ط·آ¯ ط¸ئ’ط¸â€‍ط¸â€¦ط·آ© ط·آ§ط¸â€‍ط¸â€¦ط·آ±ط¸ث†ط·آ±' : 'Confirm Password'}
                                             </label>
                                             <input
                                                 type="password"
@@ -670,7 +670,7 @@ function ProfileContent() {
                                 </div>
 
                                 {updateMessage && (
-                                    <div className={`p-3 rounded-xs text-xs font-bold ${updateMessage.includes('success') || updateMessage.includes('بنجاح') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                    <div className={`p-3 rounded-xs text-xs font-bold ${updateMessage.includes('success') || updateMessage.includes('ط·آ¨ط¸â€ ط·آ¬ط·آ§ط·آ­') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                                         {updateMessage}
                                     </div>
                                 )}
@@ -684,7 +684,7 @@ function ProfileContent() {
                                         {updating ? (
                                             <Loader2 className="animate-spin mx-auto" size={16} />
                                         ) : (
-                                            language === 'ar' ? 'حفظ التغييرات' : 'Save Changes'
+                                            language === 'ar' ? 'ط·آ­ط¸ظ¾ط·آ¸ ط·آ§ط¸â€‍ط·ع¾ط·ط›ط¸ظ¹ط¸ظ¹ط·آ±ط·آ§ط·ع¾' : 'Save Changes'
                                         )}
                                     </button>
                                 </div>
@@ -692,11 +692,11 @@ function ProfileContent() {
 
                             <div className="mt-12 pt-8 border-t border-border-color">
                                 <h4 className="text-sm font-bold text-red-600 mb-2">
-                                    {language === 'ar' ? 'منطقة الخطر' : 'Danger Zone'}
+                                    {language === 'ar' ? 'ط¸â€¦ط¸â€ ط·آ·ط¸â€ڑط·آ© ط·آ§ط¸â€‍ط·آ®ط·آ·ط·آ±' : 'Danger Zone'}
                                 </h4>
                                 <p className="text-xs text-text-muted mb-4">
                                     {language === 'ar' 
-                                        ? 'حذف الحساب هو إجراء نهائي لا يمكن التراجع عنه. سيتم حذف جميع بياناتك وإعلاناتك.' 
+                                        ? 'ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط·آ­ط·آ³ط·آ§ط·آ¨ ط¸â€،ط¸ث† ط·آ¥ط·آ¬ط·آ±ط·آ§ط·طŒ ط¸â€ ط¸â€،ط·آ§ط·آ¦ط¸ظ¹ ط¸â€‍ط·آ§ ط¸ظ¹ط¸â€¦ط¸ئ’ط¸â€  ط·آ§ط¸â€‍ط·ع¾ط·آ±ط·آ§ط·آ¬ط·آ¹ ط·آ¹ط¸â€ ط¸â€،. ط·آ³ط¸ظ¹ط·ع¾ط¸â€¦ ط·آ­ط·آ°ط¸ظ¾ ط·آ¬ط¸â€¦ط¸ظ¹ط·آ¹ ط·آ¨ط¸ظ¹ط·آ§ط¸â€ ط·آ§ط·ع¾ط¸ئ’ ط¸ث†ط·آ¥ط·آ¹ط¸â€‍ط·آ§ط¸â€ ط·آ§ط·ع¾ط¸ئ’.' 
                                         : 'Deleting your account is permanent. All your data and listings will be removed.'}
                                 </p>
                                 <button
@@ -708,8 +708,8 @@ function ProfileContent() {
                                         <Loader2 className="animate-spin" size={14} />
                                     ) : (
                                         deleteConfirm 
-                                            ? (language === 'ar' ? 'تأكيد الحذف النهائي' : 'Confirm Permanent Deletion') 
-                                            : (language === 'ar' ? 'حذف الحساب' : 'Delete Account')
+                                            ? (language === 'ar' ? 'ط·ع¾ط·آ£ط¸ئ’ط¸ظ¹ط·آ¯ ط·آ§ط¸â€‍ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط¸â€ ط¸â€،ط·آ§ط·آ¦ط¸ظ¹' : 'Confirm Permanent Deletion') 
+                                            : (language === 'ar' ? 'ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط·آ­ط·آ³ط·آ§ط·آ¨' : 'Delete Account')
                                     )}
                                 </button>
                             </div>
@@ -736,12 +736,12 @@ function ProfileContent() {
                             </div>
                             
                             <h3 className="text-lg font-black text-secondary dark:text-white mb-2 uppercase tracking-tight">
-                                {language === 'ar' ? 'حذف المحادثة' : 'Delete Conversation'}
+                                {language === 'ar' ? 'ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ©' : 'Delete Conversation'}
                             </h3>
                             
                             <p className="text-xs text-text-muted dark:text-gray-400 mb-6 leading-relaxed">
                                 {language === 'ar' 
-                                    ? 'هل أنت متأكد من حذف هذه المحادثة؟ سيتم حذفها من قائمتك فقط ولن تختفي عند الطرف الآخر.' 
+                                    ? 'ط¸â€،ط¸â€‍ ط·آ£ط¸â€ ط·ع¾ ط¸â€¦ط·ع¾ط·آ£ط¸ئ’ط·آ¯ ط¸â€¦ط¸â€  ط·آ­ط·آ°ط¸ظ¾ ط¸â€،ط·آ°ط¸â€، ط·آ§ط¸â€‍ط¸â€¦ط·آ­ط·آ§ط·آ¯ط·آ«ط·آ©ط·ع؛ ط·آ³ط¸ظ¹ط·ع¾ط¸â€¦ ط·آ­ط·آ°ط¸ظ¾ط¸â€،ط·آ§ ط¸â€¦ط¸â€  ط¸â€ڑط·آ§ط·آ¦ط¸â€¦ط·ع¾ط¸ئ’ ط¸ظ¾ط¸â€ڑط·آ· ط¸ث†ط¸â€‍ط¸â€  ط·ع¾ط·آ®ط·ع¾ط¸ظ¾ط¸ظ¹ ط·آ¹ط¸â€ ط·آ¯ ط·آ§ط¸â€‍ط·آ·ط·آ±ط¸ظ¾ ط·آ§ط¸â€‍ط·آ¢ط·آ®ط·آ±.' 
                                     : 'Are you sure you want to delete this conversation? It will be removed from your list only and will remain for the other party.'}
                             </p>
                             
@@ -750,13 +750,13 @@ function ProfileContent() {
                                     onClick={() => setConversationToDelete(null)}
                                     className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 rounded-md font-bold text-[10px] uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                                 >
-                                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                    {language === 'ar' ? 'ط·آ¥ط¸â€‍ط·ط›ط·آ§ط·طŒ' : 'Cancel'}
                                 </button>
                                 <button
                                     onClick={confirmDeleteConversation}
                                     className="flex-1 py-2.5 bg-red-600 text-white rounded-md font-bold text-[10px] uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all active:scale-95"
                                 >
-                                    {language === 'ar' ? 'حذف الآن' : 'Delete Now'}
+                                    {language === 'ar' ? 'ط·آ­ط·آ°ط¸ظ¾ ط·آ§ط¸â€‍ط·آ¢ط¸â€ ' : 'Delete Now'}
                                 </button>
                             </div>
                         </div>

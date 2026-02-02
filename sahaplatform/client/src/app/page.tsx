@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
@@ -12,6 +12,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
 import PromotedBanner from '@/components/PromotedBanner';
+import PixelWaterBackground from "@/components/PixelWaterBackground";
 import { clsx } from "clsx";
 
 // Skeleton Loader Component

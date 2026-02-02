@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 
 import { useState, useEffect } from "react";
@@ -162,7 +162,7 @@ export default function SettingsPage() {
                 </div>
 
                 {message && (
-                    <div className={`mb-6 p-4 rounded-md ${message.includes('نجاح') || message.includes('successfully') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                    <div className={`mb-6 p-4 rounded-md ${message.includes('تم') || message.includes('successfully') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                         {message}
                     </div>
                 )}
