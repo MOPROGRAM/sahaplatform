@@ -201,12 +201,12 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                             }
 
                             // Try to find an optimistic message by signature
-                            const optimisticId = pendingSigRef.current.get(sig);
-                            if (optimisticId) {
-                                messageIdsRef.current.add(processedMessage.id);
-                                pendingSigRef.current.delete(sig);
-                                return prev.map(m => m.id === optimisticId ? { ...processedMessage } : m);
-                            }
+                        const optimisticId = pendingSigRef.current.get(sig);
+                        if (optimisticId) {
+                            messageIdsRef.current.add(processedMessage.id);
+                            // Do not delete from ref inside updater to avoid Strict Mode side effects
+                            return prev.map(m => m.id === optimisticId ? { ...processedMessage } : m);
+                        }
 
                             // Fallback: append if unique
                             const next = [...prev, processedMessage];
