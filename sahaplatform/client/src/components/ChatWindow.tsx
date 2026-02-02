@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Play, Pause, Phone, PhoneOff, Maximize2, Plus, Minus, AlertTriangle } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Music, MoreVertical, Trash, Trash2, Play, Pause, Phone, PhoneOff, Maximize2, Plus, Minus, AlertTriangle, MessageSquare, Heart, MessageCircle, Mail, Clock, User } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -376,6 +376,19 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
         } catch (error: any) {
             console.error("Failed to delete message:", error);
             alert((error && error.message) ? error.message : (language === 'ar' ? 'فشل حذف الرسالة' : 'Failed to delete message'));
+        }
+    };
+
+    const [isPlaying, setIsPlaying] = useState<string | null>(null);
+
+    // Audio Play/Pause Toggle
+    const toggleAudio = (msgId: string, audioEl: HTMLAudioElement) => {
+        if (audioEl.paused) {
+            audioEl.play();
+            setIsPlaying(msgId);
+        } else {
+            audioEl.pause();
+            setIsPlaying(null);
         }
     };
 
@@ -921,15 +934,11 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                         <button 
                                             onClick={(e) => {
                                                 const audio = (e.currentTarget.parentElement?.querySelector('audio') as HTMLAudioElement);
-                                                if (audio.paused) {
-                                                    audio.play();
-                                                } else {
-                                                    audio.pause();
-                                                }
+                                                toggleAudio(msg.id, audio);
                                             }}
                                             className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center shadow-md hover:bg-primary/90 transition-all active:scale-95 shrink-0"
                                         >
-                                            <Play size={18} fill="currentColor" />
+                                            {isPlaying === msg.id ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
                                         </button>
                                         
                                         <div className="flex-1 flex flex-col gap-1">
@@ -963,15 +972,10 @@ function ChatWindowContent({ conversationId, onClose }: ChatWindowProps) {
                                                 const bar = audio.parentElement?.querySelector('.bg-primary.w-0') as HTMLElement;
                                                 if (bar) bar.style.width = `${progress}%`;
                                             }}
-                                            onPlay={(e) => {
-                                                const btn = e.currentTarget.parentElement?.querySelector('button');
-                                                if (btn) btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
-                                            }}
-                                            onPause={(e) => {
-                                                const btn = e.currentTarget.parentElement?.querySelector('button');
-                                                if (btn) btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
-                                            }}
+                                            onPlay={() => setIsPlaying(msg.id)}
+                                            onPause={() => setIsPlaying(null)}
                                             onEnded={(e) => {
+                                                setIsPlaying(null);
                                                 const audio = e.currentTarget;
                                                 const bar = audio.parentElement?.querySelector('.bg-primary.w-0') as HTMLElement;
                                                 if (bar) bar.style.width = '0%';

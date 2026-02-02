@@ -562,8 +562,15 @@ export default function AdCard({
     };
 
     return (
-        <Link
-            href={`/ads/${id}`}
+        <div
+            onClick={(e) => {
+                // If the user clicked a link or button inside, don't navigate to the ad page
+                const target = e.target as HTMLElement;
+                if (target.closest('button') || target.closest('a')) {
+                    return;
+                }
+                router.push(`/ads/${id}`);
+            }}
             className={`bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} ${
                 isFeatured 
                     ? "border-[#ffd700] ring-1 ring-[#ffd700]/50" 
@@ -604,6 +611,6 @@ export default function AdCard({
                     </div>
                 </motion.div>
             </div>
-        </Link>
+        </div>
     );
 }
