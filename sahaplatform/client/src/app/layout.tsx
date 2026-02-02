@@ -38,7 +38,7 @@ const readex = Readex_Pro({
 export const runtime = "edge";
 
 export const metadata: Metadata = {
-    title: "ساحة - مساحة واسعة من الفرص",
+    title: "Saha Platform V2",
     description: "مساحة واسعة من الفرص - منصة شاملة للإعلانات والخدمات في الشرق الأوسط",
     icons: {
         icon: '/favicon.ico',
