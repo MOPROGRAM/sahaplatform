@@ -4,8 +4,5 @@ compatibility_flags = ["nodejs_compat"]
 
 pages_build_output_dir = ".vercel/output/static"
 
-[site]
-bucket = ".vercel/output/static"
-
 [env.production.vars]
 # Add production environment variables here if not using Cloudflare Dashboard
