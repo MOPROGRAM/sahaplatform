@@ -11,27 +11,27 @@ import LoadingSpinner from '@/components/LoadingSpinner'; // Using LoadingSpinne
 const inter = Inter({
     subsets: ['latin'],
     variable: '--font-inter',
-    display: 'swap',
+    display: 'optional', // Changed from 'swap' to reduce preload warnings
 });
 
 const cairo = Cairo({
     subsets: ['arabic', 'latin'],
     variable: '--font-cairo',
-    display: 'swap',
+    display: 'optional', // Changed from 'swap' to reduce preload warnings
     weight: ['300', '400', '500', '600', '700'],
 });
 
 const tajawal = Tajawal({
     subsets: ['arabic', 'latin'],
     variable: '--font-tajawal',
-    display: 'swap',
+    display: 'optional', // Changed from 'swap' to reduce preload warnings
     weight: ['300', '400', '500', '700'],
 });
 
 const readex = Readex_Pro({
     subsets: ['latin'],
     variable: '--font-readex',
-    display: 'swap',
+    display: 'optional', // Changed from 'swap' to reduce preload warnings
     weight: ['300', '400', '600', '700']
 });
 
