@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     // Cloudflare Pages compatibility
-    runtime: 'edge',
     poweredByHeader: false,
     compress: true,
     reactStrictMode: true,
