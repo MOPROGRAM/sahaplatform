@@ -64,32 +64,37 @@ export default function ProfilePage() {
         if (activeTab === 'listings') {
             fetchUserAds();
         } else if (activeTab === 'favorites') {
-            try {
-                // First try to get from Supabase if user is logged in
-                if (user?.id) {
-                    const { data, error } = await supabase
-                        .from('favorites')
-                        .select('*')
-                        .eq('user_id', user.id)
-                        .order('created_at', { ascending: false });
-                    
-                    if (!error && data) {
-                        setFavorites(data);
-                        // Also sync to local storage for offline access
-                        if (typeof window !== 'undefined') {
-                            window.localStorage.setItem('saha:favorites', JSON.stringify(data));
+            const fetchFavorites = async () => {
+                try {
+                    // First try to get from Supabase if user is logged in
+                    if (user?.id) {
+                        const { data, error } = await supabase
+                            .from('favorites')
+                            .select('*')
+                            .eq('user_id', user.id)
+                            .order('created_at', { ascending: false });
+                        
+                        if (!error && data) {
+                            setFavorites(data);
+                            // Also sync to local storage for offline access
+                            if (typeof window !== 'undefined') {
+                                window.localStorage.setItem('saha:favorites', JSON.stringify(data));
+                            }
+                            return;
                         }
-                        return;
                     }
+                    
+                    // Fallback to local storage
+                    const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
+                    const list = raw ? JSON.parse(raw) : [];
+                    setFavorites(Array.isArray(list) ? list : []);
+                } catch {
+                    setFavorites([]);
+                } finally {
+                    setLoading(false);
                 }
-                
-                // Fallback to local storage
-                const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
-                const list = raw ? JSON.parse(raw) : [];
-                setFavorites(Array.isArray(list) ? list : []);
-            } catch {
-                setFavorites([]);
-            }
+            };
+            fetchFavorites();
         } else {
             setLoading(false);
         }

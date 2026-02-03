@@ -43,7 +43,7 @@ export default function PromotedBanner() {
     return (
         <div className="w-full my-3 px-4">
             {strips.map((stripAds, index) => (
-                <div className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-orange-500 via-orange-400 to-white rounded-[2rem] shadow-2xl overflow-hidden border-2 border-orange-300 transition-all duration-500 group transform-gpu hover:shadow-[0_35px_60px_-15px_rgba(255,140,0,0.3)] hover:scale-[1.01] hover:rotate-[0.5deg]">
+                <div key={index} className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-orange-500 via-orange-400 to-white rounded-[2rem] shadow-2xl overflow-hidden border-2 border-orange-300 transition-all duration-500 group transform-gpu hover:shadow-[0_35px_60px_-15px_rgba(255,140,0,0.3)] hover:scale-[1.01] hover:rotate-[0.5deg]">
                     
                     {/* Orange & White Wave Effect - Always Visible */}
                     <div className="absolute inset-0 z-0">
