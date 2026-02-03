@@ -128,6 +128,11 @@ export default function HomePage() {
             <Header />
 
             <main className="w-full max-w-[1920px] mx-auto p-1 grid grid-cols-12 gap-1 flex-1">
+                {/* Promoted Banner */}
+                <div className="col-span-12">
+                    <PromotedBanner />
+                </div>
+
                 {/* Bento Grid Sidebar - Categories */}
                 <aside className={`col-span-2 hidden xl:block space-y-1`}>
                     <div className="bento-card p-0 flex flex-col sticky top-20 bg-white dark:bg-[#1a1a1a]">
@@ -145,7 +150,7 @@ export default function HomePage() {
                                         <div className="text-gray-400 group-hover:text-primary transition-colors">
                                             <cat.icon size={14} />
                                         </div>
-                                        <span className="font-bold text-xs text-text-main group-hover:text-primary transition-colors line-clamp-1">{(t as any)[cat.key] || cat.key}</span>
+                                        <span className="font-bold text-xs text-text-main group-hover:text-primary transition-colors line-clamp-1">{t(cat.key as any)}</span>
                                     </div>
                                     <span className="text-[10px] font-bold text-text-muted bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">{categoryCounts[cat.key] || 0}</span>
                                 </Link>
@@ -189,7 +194,7 @@ export default function HomePage() {
                                     className="px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 text-text-main hover:bg-gray-100"
                                 >
                                     <cat.icon size={14} />
-                                    <span>{(t as any)[cat.key] || cat.key}</span>
+                                    <span>{t(cat.key as any)}</span>
                                     <span className="text-[10px] font-bold text-text-muted bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">
                                         {categoryCounts[cat.key] || 0}
                                     </span>

@@ -298,6 +298,57 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         return { fileUrl: urlData.publicUrl, fileName: file.name, fileSize: file.size };
     };
 
+    // تسجيل صوتي مباشر
+    const [isRecording, setIsRecording] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+    const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const recorder = new MediaRecorder(stream);
+            const chunks: Blob[] = [];
+
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    chunks.push(e.data);
+                }
+            };
+
+            recorder.onstop = async () => {
+                const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+                const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: 'audio/webm' });
+                
+                // رفع الملف الصوتي
+                const uploadData = await handleFileUpload(audioFile, 'file');
+                if (uploadData) {
+                    handleSend('voice', `Voice message`, uploadData);
+                }
+
+                // إيقاف الميكروفون
+                stream.getTracks().forEach(track => track.stop());
+                setAudioChunks([]);
+            };
+
+            recorder.start();
+            setMediaRecorder(recorder);
+            setIsRecording(true);
+            setAudioChunks([]);
+
+        } catch (error) {
+            console.error('Error starting recording:', error);
+            alert(language === 'ar' ? 'لا يمكن الوصول إلى الميكروفون' : 'Cannot access microphone');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            setIsRecording(false);
+            setMediaRecorder(null);
+        }
+    };
+
     const otherMember = participants.find(p => p.id !== user?.id) || { name: "User", role: "Member" };
 
     if (!mounted) return null;
@@ -501,6 +552,27 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             <div className="p-2 bg-card border-t border-[#2a2d3a] flex gap-2 overflow-x-auto no-scrollbar">
                 <button onClick={shareLocation} className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95">
                     <MapPin size={12} /> SHARE LOCATION
+                </button>
+                
+                {/* زر تسجيل صوتي مباشر */}
+                <button 
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-sm text-[9px] font-black transition-all whitespace-nowrap shadow-sm active:scale-95 ${
+                        isRecording 
+                            ? 'bg-red-500 text-white border-red-600 hover:bg-red-600' 
+                            : 'bg-card border-[#2a2d3a] text-gray-500 hover:text-primary hover:border-primary'
+                    }`}
+                >
+                    {isRecording ? (
+                        <>
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                            RECORDING...
+                        </>
+                    ) : (
+                        <>
+                            <Mic size={12} /> RECORD VOICE
+                        </>
+                    )}
                 </button>
                 <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
                     <Paperclip size={12} /> ATTACH DOCUMENT

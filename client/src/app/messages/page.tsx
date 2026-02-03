@@ -13,7 +13,8 @@ import {
     ShieldCheck, 
     Inbox,
     PlusCircle,
-    Loader2
+    Loader2,
+    Trash2
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -40,6 +41,29 @@ export default function MessagesPage() {
             setLoading(false);
         }
     }, []);
+
+    const handleDeleteConversation = async (conversationId: string) => {
+        if (!confirm(language === 'ar' ? 'هل تريد حذف هذه المحادثة؟' : 'Are you sure you want to delete this conversation?')) {
+            return;
+        }
+
+        try {
+            await conversationsService.deleteConversation(conversationId);
+            
+            // تحديث القائمة محلياً
+            setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+            
+            // إذا كانت المحادثة المحددة هي التي تم حذفها
+            if (selectedId === conversationId) {
+                setSelectedId(null);
+            }
+            
+            alert(language === 'ar' ? 'تم حذف المحادثة بنجاح' : 'Conversation deleted successfully');
+        } catch (error: any) {
+            console.error('Failed to delete conversation:', error);
+            alert(error.message || (language === 'ar' ? 'فشل في حذف المحادثة' : 'Failed to delete conversation'));
+        }
+    };
 
     useEffect(() => {
         if (user) {
@@ -102,9 +126,21 @@ export default function MessagesPage() {
                                         <div className="flex-1 min-w-0 text-right">
                                             <div className="flex justify-between items-start">
                                                 <h4 className={`text-[12px] font-black truncate uppercase tracking-tight ${isSelected ? 'text-primary' : 'text-text-main'}`}>{otherMember.name}</h4>
-                                                <span className="text-[8px] font-black text-text-muted uppercase" suppressHydrationWarning>
-                                                    {conv?.last_message_time ? new Date(conv.last_message_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[8px] font-black text-text-muted uppercase" suppressHydrationWarning>
+                                                        {conv?.last_message_time ? new Date(conv.last_message_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                                    </span>
+                                                    <button 
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteConversation(conv.id);
+                                                        }}
+                                                        className="text-red-400 hover:text-red-600 transition-colors"
+                                                        title={language === 'ar' ? 'حذف المحادثة' : 'Delete conversation'}
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className="flex items-center gap-1 mt-0.5 mb-1">
                                                 {conv.ad ? (

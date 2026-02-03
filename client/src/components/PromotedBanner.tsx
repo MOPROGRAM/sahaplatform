@@ -41,17 +41,16 @@ export default function PromotedBanner() {
     const strips = [ads.slice(0, 20), ads.slice(20, 40)].filter(s => s.length > 0);
 
     return (
-        <div className="w-full my-6 px-4 space-y-6">
+        <div className="w-full my-3 px-4 space-y-3">
             {strips.map((stripAds, index) => (
-                <div key={index} className="relative w-full bg-gradient-to-br from-[#ff6b35] via-[#ff8a4a] to-white rounded-[2rem] shadow-xl overflow-hidden">
+                <div className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-[#ff6b35] via-[#ff8a4a] to-white rounded-[2rem] shadow-xl overflow-hidden border-2 border-amber-300 transition-all duration-500 hover:bg-gradient-to-br hover:from-gray-200 hover:via-gray-300 hover:to-white hover:border-gray-400 group">
                     
-                    {/* Wavy Pattern / Texture Effect */}
-                    <div className="absolute inset-0 z-0">
-                         <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <path d="M0 60 Q 20 40 40 60 T 80 60 T 120 40 V 100 H 0 Z" fill="rgba(255,255,255,0.15)" />
-                            <path d="M0 40 Q 25 70 50 40 T 100 50 V 100 H 0 Z" fill="rgba(255,255,255,0.1)" />
-                            <path d="M0 80 Q 30 50 60 80 T 120 70 V 100 H 0 Z" fill="rgba(255,255,255,0.2)" />
-                         </svg>
+                    {/* Pixel Pattern Effect */}
+                    <div className="absolute inset-0 z-0 opacity-30 group-hover:opacity-0 transition-opacity duration-500">
+                         <div className="w-full h-full" style={{
+                             backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255, 140, 0, 0.3) 1px, transparent 0)',
+                             backgroundSize: '20px 20px'
+                         }} />
                     </div>
                     
                     {/* Content Container - Horizontal Scroll */}
