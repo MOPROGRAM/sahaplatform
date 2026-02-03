@@ -26,20 +26,21 @@ jobs:
           cd client
           npm ci
           
-      - name: Build Next.js app
+      - name: Build Next.js app for Cloudflare Pages
         run: |
           cd client
           npm run build
+          npx @cloudflare/next-on-pages@1
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages Production
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: sahaplatform
-          directory: client/.next
+          directory: client/.vercel/output/static
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: feature-cloudflare-migration
+          wranglerVersion: '3'
