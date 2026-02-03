@@ -47,5 +47,9 @@
     "bugs": {
         "url": "https://github.com/your-username/saha-platform/issues"
     },
-    "homepage": "https://github.com/your-username/saha-platform#readme"
+    "homepage": "https://github.com/your-username/saha-platform#readme",
+    "dependencies": {
+        "@supabase/supabase-js": "^2.94.0",
+        "dotenv": "^17.2.3"
+    }
 }
