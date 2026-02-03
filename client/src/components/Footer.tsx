@@ -7,7 +7,7 @@ export default function Footer() {
     const { t, language } = useLanguage();
 
     return (
-        <footer className="mt-auto border-t border-border-color py-6 px-4 relative min-h-[80px]">
+        <footer className="mt-auto border-t border-border-color py-3 px-4 relative min-h-[40px]">
             <PixelWaterBackground className="absolute bottom-0 left-0 right-0 w-full h-[25%]" />
             <div className="max-w-7xl mx-auto flex justify-center items-center relative z-10">
                 <span className="font-[1000] text-text-main tracking-tighter text-sm">
