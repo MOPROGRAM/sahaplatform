@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --primary: #FF4D00;
-  --primary-rgb: 255, 77, 0;
-  --primary-hover: #FF9E00;
-  --primary-dark: #E63900;
+  --primary: #064e3b;
+  --primary-rgb: 6, 78, 59;
+  --primary-hover: #065f46;
+  --primary-dark: #044e3b;
   --navy: #1e293b;
   --emerald: #10b981;
   --amber: #f59e0b;
