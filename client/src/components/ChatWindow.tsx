@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -250,6 +250,35 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
+    const handleDeleteMessage = async (messageId: string) => {
+        if (!confirm(language === 'ar' ? 'هل تريد حذف هذه الرسالة؟' : 'Are you sure you want to delete this message?')) {
+            return;
+        }
+
+        try {
+            await conversationsService.deleteMessage(messageId);
+            setMessages(prev => prev.filter(msg => msg.id !== messageId));
+        } catch (error: any) {
+            console.error("Failed to delete message:", error);
+            alert(error.message || (language === 'ar' ? 'فشل في حذف الرسالة' : 'Failed to delete message'));
+        }
+    };
+
+    const handleDeleteConversation = async () => {
+        if (!confirm(language === 'ar' ? 'هل تريد حذف هذه المحادثة؟' : 'Are you sure you want to delete this conversation?')) {
+            return;
+        }
+
+        try {
+            await conversationsService.deleteConversation(conversationId);
+            if (onClose) onClose();
+            alert(language === 'ar' ? 'تم حذف المحادثة' : 'Conversation deleted');
+        } catch (error: any) {
+            console.error("Failed to delete conversation:", error);
+            alert(error.message || (language === 'ar' ? 'فشل في حذف المحادثة' : 'Failed to delete conversation'));
+        }
+    };
+
     const handleFileUpload = async (file: File, type: 'file' | 'image') => {
         const fileName = `${Date.now()}-${file.name}`;
         const bucket = type === 'image' ? 'chat-images' : 'chat-files';
@@ -314,6 +343,13 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             <span className="text-[9px] font-black text-secondary truncate max-w-[100px] uppercase italic">{adInfo.title}</span>
                         </div>
                     )}
+                    <button
+                        onClick={handleDeleteConversation}
+                        className="p-1.5 hover:bg-red-50 text-text-muted hover:text-red-500 transition-all rounded-xs"
+                        title={language === 'ar' ? 'حذف المحادثة' : 'Delete conversation'}
+                    >
+                        <Trash2 size={16} />
+                    </button>
                     <button onClick={onClose} className="p-1.5 hover:bg-red-50 text-text-muted hover:text-red-500 transition-all rounded-xs"><X size={16} /></button>
                 </div>
             </div>
@@ -383,7 +419,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                     <div className={`flex items-center gap-3 p-2 rounded-lg ${isMe ? 'bg-black/5' : 'bg-gray-100'}`}>
                                         <FileText size={24} className={'text-primary'} />
                                         <div className="flex flex-col min-w-0">
-                                            <span className="text-[10px] font-black truncate max-w-[150px]">{msg.file_name || 'Attached File'}</span>
+                                            <span className="text-[10px] font-black truncate max-w-[150px]"
+>{msg.file_name || 'Attached File'}</span>
                                             <button
                                                 onClick={() => handleDownload(msg.file_url!, msg.file_name || 'file')}
                                                 className={`flex items-center justify-start gap-1 text-[9px] font-black hover:underline text-primary text-right`}
@@ -391,6 +428,43 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                                 <Download size={10} /> {language === 'ar' ? 'تحميل' : 'DOWNLOAD NOW'}
                                             </button>
                                         </div>
+                                    </div>
+                                )}
+
+                                {msg.message_type === 'voice' && msg.file_url && (
+                                    <div className={`flex items-center gap-3 p-3 rounded-lg ${isMe ? 'bg-blue-50 border border-blue-200' : 'bg-gray-100 border border-gray-200'}`}>
+                                        <Mic size={20} className="text-blue-600" />
+                                        <div className="flex flex-col flex-1">
+                                            <span className="text-[10px] font-black text-blue-800">VOICE MESSAGE</span>
+                                            <audio controls className="w-full mt-2 h-8">
+                                                <source src={msg.file_url} type="audio/mpeg" />
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                            <button
+                                                onClick={() => handleDownload(msg.file_url!, msg.file_name || 'voice-message.mp3')}
+                                                className="flex items-center gap-1 text-[9px] font-black text-blue-600 hover:underline mt-2"
+                                            >
+                                                <Download size={10} /> {language === 'ar' ? 'تحميل الصوت' : 'Download Audio'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {msg.message_type === 'video' && msg.file_url && (
+                                    <div className="space-y-2">
+                                        <div className={`flex items-center gap-2 text-[10px] font-black border-b pb-1 mb-2 ${isMe ? 'border-black/5' : 'border-black/5'}`}>
+                                            <Video size={12} /> VIDEO MESSAGE
+                                        </div>
+                                        <video controls className="w-full max-w-[300px] rounded-lg border">
+                                            <source src={msg.file_url} type="video/mp4" />
+                                            Your browser does not support the video element.
+                                        </video>
+                                        <button
+                                            onClick={() => handleDownload(msg.file_url!, msg.file_name || 'video-message.mp4')}
+                                            className={`flex items-center gap-1 text-[9px] font-black hover:underline ${isMe ? 'text-primary' : 'text-primary'}`}
+                                        >
+                                            <Download size={10} /> {language === 'ar' ? 'تحميل الفيديو' : 'Download Video'}
+                                        </button>
                                     </div>
                                 )}
 
@@ -405,6 +479,15 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                         <span className={msg.is_read ? 'text-blue-500' : 'text-gray-400'}>
                                             {msg.is_read ? <CheckCheck size={14} /> : <Check size={14} />}
                                         </span>
+                                    )}
+                                    {isMe && (
+                                        <button
+                                            onClick={() => handleDeleteMessage(msg.id)}
+                                            className="text-red-400 hover:text-red-600 transition-colors ml-1"
+                                            title={language === 'ar' ? 'حذف الرسالة' : 'Delete message'}
+                                        >
+                                            <Trash2 size={12} />
+                                        </button>
                                     )}
                                 </div>
                             </div>
@@ -427,6 +510,42 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                             const uploadData = await handleFileUpload(file, 'file');
                             if (uploadData) {
                                 handleSend('file', `Attached: ${file.name}`, uploadData);
+                            }
+                        }
+                    }} />
+                </label>
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                    <ImageIcon size={12} /> SEND IMAGE
+                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            const uploadData = await handleFileUpload(file, 'image');
+                            if (uploadData) {
+                                handleSend('image', `Image: ${file.name}`, uploadData);
+                            }
+                        }
+                    }} />
+                </label>
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                    <Mic size={12} /> VOICE MESSAGE
+                    <input type="file" accept="audio/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            const uploadData = await handleFileUpload(file, 'file');
+                            if (uploadData) {
+                                handleSend('voice', `Voice message`, uploadData);
+                            }
+                        }
+                    }} />
+                </label>
+                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
+                    <Video size={12} /> VIDEO MESSAGE
+                    <input type="file" accept="video/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            const uploadData = await handleFileUpload(file, 'file');
+                            if (uploadData) {
+                                handleSend('video', `Video message`, uploadData);
                             }
                         }
                     }} />

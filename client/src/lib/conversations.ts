@@ -295,5 +295,45 @@ export const conversationsService = {
 
     unsubscribe(channel: RealtimeChannel): void {
         supabase.removeChannel(channel);
+    },
+
+    // حذف المحادثة بشكل مشروط (للمستخدم الحالي فقط)
+    async deleteConversation(conversationId: string): Promise<void> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        // حذف المستخدم من المشاركين فقط (لا يحذف المحادثة كلياً)
+        const { error } = await (supabase as any)
+            .from('conversation_participants')
+            .delete()
+            .eq('conversation_id', conversationId)
+            .eq('user_id', user.id);
+
+        if (error) throw new Error('Failed to delete conversation');
+    },
+
+    // حذف رسالة بشكل مشروط (للمستخدم الحالي فقط)
+    async deleteMessage(messageId: string): Promise<void> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        // التحقق من أن المستخدم هو مرسل الرسالة
+        const { data: message } = await (supabase as any)
+            .from('messages')
+            .select('sender_id')
+            .eq('id', messageId)
+            .single();
+
+        if (!message || message.sender_id !== user.id) {
+            throw new Error('You can only delete your own messages');
+        }
+
+        // حذف الرسالة
+        const { error } = await (supabase as any)
+            .from('messages')
+            .delete()
+            .eq('id', messageId);
+
+        if (error) throw new Error('Failed to delete message');
     }
 };
