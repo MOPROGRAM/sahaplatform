@@ -33,7 +33,7 @@
     "license": "MIT",
     "devDependencies": {
         "concurrently": "^8.2.2",
-        "next": "14.2.18",
+        "next": "^14.2.35",
         "wrangler": "^3.19.0"
     },
     "engines": {
@@ -50,6 +50,7 @@
     "homepage": "https://github.com/your-username/saha-platform#readme",
     "dependencies": {
         "@supabase/supabase-js": "^2.94.0",
-        "dotenv": "^17.2.3"
+        "dotenv": "^17.2.3",
+        "eslint": "^9.39.2"
     }
 }
