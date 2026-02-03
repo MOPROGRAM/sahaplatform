@@ -1,7 +1,5 @@
 "use client";
 
-export const runtime = 'edge';
-
 import Link from 'next/link';
 import { ArrowLeft, HelpCircle, MessageSquare, Mail, Phone, MapPin } from 'lucide-react';
 import { useLanguage } from '@/lib/language-context';
