@@ -15,5 +15,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         autoRefreshToken: typeof window !== 'undefined',
         persistSession: typeof window !== 'undefined',
         detectSessionInUrl: typeof window !== 'undefined',
+    },
+    global: {
+        // Edge Runtime compatibility
+        fetch: (...args) => fetch(...args),
     }
 })
