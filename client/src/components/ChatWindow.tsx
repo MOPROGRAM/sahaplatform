@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Trash2 } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Paperclip, FileText, ImageIcon, Loader2, X, Download, Check, CheckCheck, Star, Mic, Video, Trash2, MoreVertical } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { conversationsService } from "@/lib/conversations";
 import { supabase } from "@/lib/supabase";
@@ -112,6 +112,20 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    // إغلاق قائمة الوسائط عند النقر خارجها
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (mediaMenuRef.current && !mediaMenuRef.current.contains(event.target as Node)) {
+                setShowMediaMenu(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     // Socket functionality disabled for now
     // const setupSocket = () => {
@@ -264,6 +278,35 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
+    const canModifyMessage = (message: Message): boolean => {
+        if (message.sender_id !== user?.id) return false;
+        
+        const createdAt = new Date(message.created_at);
+        const now = new Date();
+        const diffInHours = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+        
+        return diffInHours < 1; // أقل من ساعة
+    };
+
+    const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+    const [editContent, setEditContent] = useState('');
+
+    const handleEditMessage = async (messageId: string, newContent: string, createdAt: string) => {
+        try {
+            await conversationsService.editMessage(messageId, newContent, createdAt);
+            setMessages(prev => prev.map(msg => 
+                msg.id === messageId 
+                    ? { ...msg, content: newContent, is_edited: true }
+                    : msg
+            ));
+            setEditingMessageId(null);
+            setEditContent('');
+        } catch (error: any) {
+            console.error("Failed to edit message:", error);
+            alert(error.message || (language === 'ar' ? 'فشل في تعديل الرسالة' : 'Failed to edit message'));
+        }
+    };
+
     const handleDeleteConversation = async () => {
         if (!confirm(language === 'ar' ? 'هل تريد حذف هذه المحادثة؟' : 'Are you sure you want to delete this conversation?')) {
             return;
@@ -302,6 +345,10 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
     const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+    
+    // حالة القائمة المنبثقة للوسائط
+    const [showMediaMenu, setShowMediaMenu] = useState(false);
+    const mediaMenuRef = useRef<HTMLDivElement>(null);
 
     const startRecording = async () => {
         try {
@@ -532,15 +579,63 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                         </span>
                                     )}
                                     {isMe && (
-                                        <button
-                                            onClick={() => handleDeleteMessage(msg.id)}
-                                            className="text-red-400 hover:text-red-600 transition-colors ml-1"
-                                            title={language === 'ar' ? 'حذف الرسالة' : 'Delete message'}
-                                        >
-                                            <Trash2 size={12} />
-                                        </button>
+                                        <div className="relative group/menu">
+                                            <button
+                                                className="text-gray-400 hover:text-gray-600 transition-colors ml-1 opacity-0 group-hover:opacity-100"
+                                                title={language === 'ar' ? 'خيارات الرسالة' : 'Message options'}
+                                            >
+                                                <MoreVertical size={12} />
+                                            </button>
+                                            <div className="absolute top-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[120px] p-1 opacity-0 pointer-events-none group-hover/menu:opacity-100 group-hover/menu:pointer-events-auto transition-all duration-200">
+                                                {canModifyMessage(msg) && msg.messageType === 'text' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingMessageId(msg.id);
+                                                            setEditContent(msg.content);
+                                                        }}
+                                                        className="w-full text-left px-3 py-2 text-[11px] font-bold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+                                                    >
+                                                        {language === 'ar' ? 'تعديل' : 'Edit'}
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => handleDeleteMessage(msg.id)}
+                                                    className="w-full text-left px-3 py-2 text-[11px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                                                >
+                                                    {language === 'ar' ? 'حذف' : 'Delete'}
+                                                </button>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
+                                {editingMessageId === msg.id && (
+                                    <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                        <textarea
+                                            value={editContent}
+                                            onChange={(e) => setEditContent(e.target.value)}
+                                            className="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 resize-none"
+                                            rows={3}
+                                            placeholder={language === 'ar' ? 'قم بتعديل رسالتك...' : 'Edit your message...'}
+                                        />
+                                        <div className="flex gap-2 mt-2">
+                                            <button
+                                                onClick={() => handleEditMessage(msg.id, editContent, msg.createdAt)}
+                                                className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                            >
+                                                {language === 'ar' ? 'حفظ' : 'Save'}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setEditingMessageId(null);
+                                                    setEditContent('');
+                                                }}
+                                                className="px-3 py-1.5 text-xs bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                                            >
+                                                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     );
@@ -554,7 +649,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     <MapPin size={12} /> SHARE LOCATION
                 </button>
                 
-                {/* زر تسجيل صوتي مباشر */}
+                {/* زر تسجيل صوتي مباشر وإرسال */}
                 <button 
                     onClick={isRecording ? stopRecording : startRecording}
                     className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-sm text-[9px] font-black transition-all whitespace-nowrap shadow-sm active:scale-95 ${
@@ -566,62 +661,88 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     {isRecording ? (
                         <>
                             <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                            RECORDING...
+                            {language === 'ar' ? 'جاري التسجيل...' : 'RECORDING...'}
                         </>
                     ) : (
                         <>
-                            <Mic size={12} /> RECORD VOICE
+                            <Mic size={12} /> {language === 'ar' ? 'تسجيل وإرسال' : 'RECORD & SEND'}
                         </>
                     )}
                 </button>
-                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
-                    <Paperclip size={12} /> ATTACH DOCUMENT
-                    <input type="file" className="hidden" onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                            const uploadData = await handleFileUpload(file, 'file');
-                            if (uploadData) {
-                                handleSend('file', `Attached: ${file.name}`, uploadData);
-                            }
-                        }
-                    }} />
-                </label>
-                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
-                    <ImageIcon size={12} /> SEND IMAGE
-                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                            const uploadData = await handleFileUpload(file, 'image');
-                            if (uploadData) {
-                                handleSend('image', `Image: ${file.name}`, uploadData);
-                            }
-                        }
-                    }} />
-                </label>
-                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
-                    <Mic size={12} /> VOICE MESSAGE
-                    <input type="file" accept="audio/*" className="hidden" onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                            const uploadData = await handleFileUpload(file, 'file');
-                            if (uploadData) {
-                                handleSend('voice', `Voice message`, uploadData);
-                            }
-                        }
-                    }} />
-                </label>
-                <label className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all cursor-pointer whitespace-nowrap shadow-sm active:scale-95">
-                    <Video size={12} /> VIDEO MESSAGE
-                    <input type="file" accept="video/*" className="hidden" onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                            const uploadData = await handleFileUpload(file, 'file');
-                            if (uploadData) {
-                                handleSend('video', `Video message`, uploadData);
-                            }
-                        }
-                    }} />
-                </label>
+                
+                {/* زر إرفاق وسائط موحد */}
+                <div className="relative" ref={mediaMenuRef}>
+                    <button 
+                        onClick={() => setShowMediaMenu(!showMediaMenu)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-[#2a2d3a] rounded-sm text-[9px] font-black text-gray-500 hover:text-primary hover:border-primary transition-all whitespace-nowrap shadow-sm active:scale-95"
+                    >
+                        <Paperclip size={12} /> ATTACH
+                    </button>
+                    
+                    {showMediaMenu && (
+                        <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[180px] p-2">
+                            <label className="flex items-center gap-2 px-3 py-2 text-[11px] font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer transition-colors">
+                                <ImageIcon size={14} />
+                                <span>صورة</span>
+                                <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        const uploadData = await handleFileUpload(file, 'image');
+                                        if (uploadData) {
+                                            handleSend('image', `Image: ${file.name}`, uploadData);
+                                        }
+                                    }
+                                    setShowMediaMenu(false);
+                                }} />
+                            </label>
+                            
+                            <label className="flex items-center gap-2 px-3 py-2 text-[11px] font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer transition-colors">
+                                <Video size={14} />
+                                <span>فيديو</span>
+                                <input type="file" accept="video/*" className="hidden" onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        const uploadData = await handleFileUpload(file, 'file');
+                                        if (uploadData) {
+                                            handleSend('video', `Video message`, uploadData);
+                                        }
+                                    }
+                                    setShowMediaMenu(false);
+                                }} />
+                            </label>
+                            
+                            <label className="flex items-center gap-2 px-3 py-2 text-[11px] font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer transition-colors">
+                                <FileText size={14} />
+                                <span>ملف</span>
+                                <input type="file" className="hidden" onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        const uploadData = await handleFileUpload(file, 'file');
+                                        if (uploadData) {
+                                            handleSend('file', `Attached: ${file.name}`, uploadData);
+                                        }
+                                    }
+                                    setShowMediaMenu(false);
+                                }} />
+                            </label>
+                            
+                            <label className="flex items-center gap-2 px-3 py-2 text-[11px] font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer transition-colors">
+                                <Mic size={14} />
+                                <span>رسالة صوتية</span>
+                                <input type="file" accept="audio/*" className="hidden" onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        const uploadData = await handleFileUpload(file, 'file');
+                                        if (uploadData) {
+                                            handleSend('voice', `Voice message`, uploadData);
+                                        }
+                                    }
+                                    setShowMediaMenu(false);
+                                }} />
+                            </label>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Input Main */}
