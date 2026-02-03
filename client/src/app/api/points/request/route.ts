@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
-    const resendApiKey = process.env.RESEND_API_KEY;
+    const resendApiKey = process.env.RESEND_API_KEY || process.env.NEXT_PUBLIC_RESEND_API_KEY;
     
     if (!resendApiKey) {
         console.error('RESEND_API_KEY is missing');

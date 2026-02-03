@@ -60,8 +60,17 @@ export default function ProfilePage() {
             router.push('/login');
             return;
         }
+
         if (activeTab === 'listings') {
             fetchUserAds();
+        } else if (activeTab === 'favorites') {
+            try {
+                const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
+                const list = raw ? JSON.parse(raw) : [];
+                setFavorites(Array.isArray(list) ? list : []);
+            } catch {
+                setFavorites([]);
+            }
         } else {
             setLoading(false);
         }
@@ -69,7 +78,7 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (user && mounted) {
-             setProfileData(prev => ({
+            setProfileData(prev => ({
                 ...prev,
                 name: user.name || '',
                 email: user.email || ''
@@ -78,17 +87,6 @@ export default function ProfilePage() {
     }, [user, mounted]);
 
     if (!mounted) return <div className="min-h-screen bg-background"></div>;
-
-    useEffect(() => {
-        if (activeTab !== 'favorites') return;
-        try {
-            const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
-            const list = raw ? JSON.parse(raw) : [];
-            setFavorites(Array.isArray(list) ? list : []);
-        } catch {
-            setFavorites([]);
-        }
-    }, [activeTab]);
 
     const fetchUserAds = async () => {
         try {

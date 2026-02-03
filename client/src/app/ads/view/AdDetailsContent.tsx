@@ -216,8 +216,8 @@ export default function AdDetailsContent({ id }: { id: string }) {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 opacity-30"></div>
                         <div className="relative z-10">
                             <div className="flex justify-between items-start mb-4">
-                                <div className="flex flex-col gap-1">
-                                    <h1 className="text-2xl font-black text-text-main leading-tight tracking-tight">{ad.title}</h1>
+                                <div className="flex flex-col gap-1 min-w-0 flex-1">
+                                    <h1 className="text-2xl font-black text-text-main leading-tight tracking-tight break-words">{ad.title}</h1>
                                     <span className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full inline-block uppercase tracking-widest w-fit">{ad.category}</span>
                                 </div>
                                 <div className="text-right flex flex-col items-end">
