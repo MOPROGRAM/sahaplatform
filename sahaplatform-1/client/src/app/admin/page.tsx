@@ -350,7 +350,7 @@ export default function AdminDashboard() {
                                                                 <span className={`text-[10px] font-black uppercase tracking-widest ${log.highlight ? 'text-primary' : 'text-white'}`}>{log.title}</span>
                                                                 <span className="text-[8px] font-bold text-gray-500">@{log.time}</span>
                                                             </div>
-                                                            <p className="text-[10px] font-bold text-text-muted italic">"{log.desc}"</p>
+                                                            <p className="text-[10px] font-bold text-text-muted italic">&quot;{log.desc}&quot;</p>
                                                         </div>
                                                     </div>
                                                 ))}

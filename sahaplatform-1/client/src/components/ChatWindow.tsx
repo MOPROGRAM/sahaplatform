@@ -349,7 +349,6 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                     ? { 
                         ...msg, 
                         content: editInput.trim(),
-                        updatedAt: data.updatedAt || new Date().toISOString(),
                         isEdited: true
                     }
                     : msg
@@ -672,15 +671,5 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 </div>
             </div>
         </div>
-        
-        {/* Voice Call Modal */}
-        {showVoiceCall && user?.id && (
-            <VoiceCall 
-                callerId={user.id}
-                calleeId={otherMember.id}
-                onEndCall={() => setShowVoiceCall(false)}
-                isIncoming={false}
-            />
-        )}
     );
 }
