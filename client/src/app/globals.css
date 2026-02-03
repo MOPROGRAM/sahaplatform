@@ -328,6 +328,16 @@ body {
   background: #94a3b8;
 }
 
+/* Wave Animation for Promoted Banner */
+@keyframes wave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 /* Bento Grid Layout */
 .bento-grid {
   display: grid;

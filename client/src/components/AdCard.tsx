@@ -154,15 +154,18 @@ export default function AdCard({
         setFaceIndex(nextImage);
     };
 
-    const handleFavoriteClick = (e: React.MouseEvent) => {
+    const handleFavoriteClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         const next = !isFavorite;
         setIsFavorite(next);
+        
         try {
+            // Update local storage
             const key = 'saha:favorites';
             const raw = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
             const list = raw ? JSON.parse(raw) as any[] : [];
+            
             if (next) {
                 const fav = {
                     id,
@@ -176,9 +179,50 @@ export default function AdCard({
                 const exists = list.some(a => a.id === id);
                 const updated = exists ? list.map(a => a.id === id ? fav : a) : [...list, fav];
                 window.localStorage.setItem(key, JSON.stringify(updated));
+                
+                // Save to Supabase if user is logged in
+                if (user?.id) {
+                    try {
+                        const { error } = await supabase
+                            .from('favorites')
+                            .upsert({
+                                user_id: user.id,
+                                ad_id: id,
+                                title: currentTitle,
+                                price: price,
+                                currency: currencyCode,
+                                location: location || '',
+                                image_url: images[0] || '',
+                                created_at: new Date().toISOString()
+                            });
+                        
+                        if (error) {
+                            console.error('Error saving favorite to Supabase:', error);
+                        }
+                    } catch (dbError) {
+                        console.error('Failed to save favorite to database:', dbError);
+                    }
+                }
             } else {
                 const updated = list.filter(a => a.id !== id);
                 window.localStorage.setItem(key, JSON.stringify(updated));
+                
+                // Remove from Supabase if user is logged in
+                if (user?.id) {
+                    try {
+                        const { error } = await supabase
+                            .from('favorites')
+                            .delete()
+                            .eq('user_id', user.id)
+                            .eq('ad_id', id);
+                        
+                        if (error) {
+                            console.error('Error removing favorite from Supabase:', error);
+                        }
+                    } catch (dbError) {
+                        console.error('Failed to remove favorite from database:', dbError);
+                    }
+                }
             }
         } catch { }
     };
@@ -497,9 +541,9 @@ export default function AdCard({
                 <div className="flex flex-col gap-1.5 w-full px-1">
                     <button
                         onClick={handleStartChat}
-                        className="flex items-center justify-center gap-2 w-full py-1.5 bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-colors shadow-sm"
+                        className="flex items-center justify-center gap-2 w-full py-1 bg-white border border-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-50 transition-colors"
                     >
-                        <MessageCircle size={10} />
+                        <MessageCircle size={8} className="text-blue-500" />
                         {(t as any)("messages")}
                     </button>
 
@@ -508,9 +552,9 @@ export default function AdCard({
                             <a
                                 href={`tel:${phone}`}
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center justify-center gap-2 w-full py-1.5 bg-primary text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-sm"
+                                className="flex items-center justify-center gap-2 w-full py-1 bg-white border border-primary rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary/10 transition-colors"
                             >
-                                <Phone size={10} />
+                                <Phone size={8} className="text-primary" />
                                 {(t as any)("call")}
                             </a>
                             <a
@@ -518,9 +562,9 @@ export default function AdCard({
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center justify-center gap-2 w-full py-1.5 bg-[#25D366] text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#26bd5c] transition-colors shadow-sm"
+                                className="flex items-center justify-center gap-2 w-full py-1 bg-white border border-[#25D366] rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#25D366]/10 transition-colors"
                             >
-                                <Logo className="w-3 h-3 invert" />
+                                <Logo className="w-2.5 h-2.5" />
                                 {(t as any)("whatsapp")}
                             </a>
                         </>
@@ -530,9 +574,9 @@ export default function AdCard({
                         <a
                             href={`mailto:${email}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center justify-center gap-2 w-full py-1.5 bg-gray-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-gray-700 transition-colors shadow-sm"
+                            className="flex items-center justify-center gap-2 w-full py-1 bg-white border border-gray-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
                         >
-                            <Mail size={10} />
+                            <Mail size={8} className="text-gray-600" />
                             {(t as any)("email" as any)}
                         </a>
                     )}

@@ -38,18 +38,27 @@ export default function PromotedBanner() {
 
     if (!ads.length) return null;
 
-    const strips = [ads.slice(0, 20), ads.slice(20, 40)].filter(s => s.length > 0);
+    const strips = [ads.slice(0, 20)].filter(s => s.length > 0);
 
     return (
-        <div className="w-full my-3 px-4 space-y-3">
+        <div className="w-full my-3 px-4">
             {strips.map((stripAds, index) => (
-                <div className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-[#ff6b35] via-[#ff8a4a] to-white rounded-[2rem] shadow-xl overflow-hidden border-2 border-amber-300 transition-all duration-500 hover:bg-gradient-to-br hover:from-gray-200 hover:via-gray-300 hover:to-white hover:border-gray-400 group">
+                <div className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-orange-500 via-orange-400 to-white rounded-[2rem] shadow-2xl overflow-hidden border-2 border-orange-300 transition-all duration-500 group transform-gpu hover:shadow-[0_35px_60px_-15px_rgba(255,140,0,0.3)] hover:scale-[1.01] hover:rotate-[0.5deg]">
                     
-                    {/* Pixel Pattern Effect */}
-                    <div className="absolute inset-0 z-0 opacity-30 group-hover:opacity-0 transition-opacity duration-500">
+                    {/* Orange & White Wave Effect - Always Visible */}
+                    <div className="absolute inset-0 z-0">
                          <div className="w-full h-full" style={{
-                             backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255, 140, 0, 0.3) 1px, transparent 0)',
-                             backgroundSize: '20px 20px'
+                             backgroundImage: 'linear-gradient(90deg, rgba(255,165,0,0.2) 0%, rgba(255,255,255,0.4) 50%, rgba(255,165,0,0.2) 100%)',
+                             backgroundSize: '200% 100%',
+                             animation: 'wave 6s ease-in-out infinite'
+                         }} />
+                    </div>
+
+                    {/* Orange Sparkle Particles */}
+                    <div className="absolute inset-0 z-0 opacity-60">
+                         <div className="w-full h-full" style={{
+                             backgroundImage: 'radial-gradient(circle at 20% 35%, rgba(255,255,255,0.8) 1px, transparent 1px), radial-gradient(circle at 80% 65%, rgba(255,255,255,0.6) 1px, transparent 1px), radial-gradient(circle at 40% 20%, rgba(255,255,255,0.7) 1px, transparent 1px)',
+                             backgroundSize: '50px 50px, 70px 70px, 30px 30px'
                          }} />
                     </div>
                     
@@ -73,13 +82,16 @@ export default function PromotedBanner() {
                                         {...ad}
                                         images={images}
                                         layout="vertical"
-                                        className="h-full relative isolate
-                                            bg-gradient-to-br from-[#fff7e6] via-[#ffe2a8] to-[#ffd58a] dark:from-[#2a2108] dark:via-[#3a2a0e] dark:to-[#4a3512]
-                                            shadow-[0_2px_6px_rgba(255,191,0,0.15),0_12px_24px_rgba(255,191,0,0.12),0_24px_32px_-8px_rgba(0,0,0,0.1)] 
-                                            hover:shadow-[0_16px_32px_-8px_rgba(255,191,0,0.25)]
-                                            border-[0.5px] border-amber-200 dark:border-amber-300/30
-                                            ring-1 ring-inset ring-amber-300/60 dark:ring-amber-200/20
-                                            hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500 ease-out"
+                                        className="h-full relative isolate transform-gpu
+                                            bg-gradient-to-br from-white via-orange-50 to-orange-100 dark:from-[#2a2108] dark:via-[#3a2a0e] dark:to-[#4a3512]
+                                            shadow-[0_8px_32px_rgba(255,140,0,0.2),0_16px_48px_rgba(255,165,0,0.15),inset_0_1px_0_rgba(255,255,255,0.8)] 
+                                            hover:shadow-[0_20px_60px_rgba(255,140,0,0.3),0_32px_80px_rgba(255,165,0,0.25),inset_0_2px_0_rgba(255,255,255,0.9)]
+                                            border-2 border-orange-200 dark:border-orange-300/40
+                                            ring-2 ring-inset ring-orange-100/50 dark:ring-orange-200/20
+                                            hover:scale-[1.03] hover:-translate-y-2 hover:rotate-[1deg] 
+                                            transition-all duration-500 ease-out backdrop-blur-sm
+                                            transform-style: preserve-3d
+                                            perspective: 1000px"
                                         isFeatured={true}
                                         language={language}
                                     />

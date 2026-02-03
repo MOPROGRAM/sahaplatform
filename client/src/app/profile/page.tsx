@@ -65,6 +65,25 @@ export default function ProfilePage() {
             fetchUserAds();
         } else if (activeTab === 'favorites') {
             try {
+                // First try to get from Supabase if user is logged in
+                if (user?.id) {
+                    const { data, error } = await supabase
+                        .from('favorites')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .order('created_at', { ascending: false });
+                    
+                    if (!error && data) {
+                        setFavorites(data);
+                        // Also sync to local storage for offline access
+                        if (typeof window !== 'undefined') {
+                            window.localStorage.setItem('saha:favorites', JSON.stringify(data));
+                        }
+                        return;
+                    }
+                }
+                
+                // Fallback to local storage
                 const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
                 const list = raw ? JSON.parse(raw) : [];
                 setFavorites(Array.isArray(list) ? list : []);
@@ -407,55 +426,102 @@ export default function ProfilePage() {
 
                     {/* Favorites Tab (for seekers) */}
                     {activeTab === 'favorites' && (
-                        <div className="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <Heart size={18} className="text-primary" />
-                                    <h3 className="text-[12px] font-black uppercase tracking-widest text-secondary">
-                                        {language === 'ar' ? 'المفضلة' : 'Favorites'}
-                                    </h3>
+                        <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden">
+                            <div className="px-6 py-4 bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-200">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                                            <Heart size={20} className="text-primary" fill="currentColor" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[14px] font-black uppercase tracking-widest text-secondary">
+                                                {language === 'ar' ? 'المفضلة' : 'Favorites'}
+                                            </h3>
+                                            <p className="text-[10px] text-gray-600 mt-1">
+                                                {language === 'ar' ? 'الإعلانات التي قمت بحفظها للرجوع إليها لاحقاً' : 'Ads you saved for later reference'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-primary/20 px-3 py-1 rounded-full">
+                                        <span className="text-[12px] font-black text-primary">{favorites.length}</span>
+                                    </div>
                                 </div>
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{favorites.length}</span>
                             </div>
+                            
                             {favorites.length === 0 ? (
-                                <div className="text-center">
-                                    <Heart size={48} className="text-gray-300 mx-auto mb-4" />
-                                    <p className="text-[12px] text-gray-500 mt-2">
-                                        {language === 'ar' ? 'لم تقم بإضافة أي إعلانات للمفضلة بعد' : "You haven't added any favorites yet"}
+                                <div className="text-center py-12 px-6">
+                                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Heart size={32} className="text-gray-400" />
+                                    </div>
+                                    <h4 className="text-[14px] font-black text-gray-500 uppercase tracking-widest mb-2">
+                                        {language === 'ar' ? 'قائمة المفضلة فارغة' : 'Your favorites list is empty'}
+                                    </h4>
+                                    <p className="text-[12px] text-gray-400 max-w-md mx-auto mb-6">
+                                        {language === 'ar' ? 'لم تقم بإضافة أي إعلانات للمفضلة بعد. انقر على أيقونة القلب في أي إعلان لحفظه هنا.' : "You haven't added any favorites yet. Click the heart icon on any ad to save it here."}
                                     </p>
+                                    <Link 
+                                        href="/" 
+                                        className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-white text-[12px] font-black rounded-sm hover:bg-primary-hover transition-all shadow-lg shadow-primary/20"
+                                    >
+                                        {language === 'ar' ? 'تصفح الإعلانات' : 'Browse Ads'}
+                                    </Link>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {favorites.map((fav) => (
-                                        <div key={fav.id} className="relative">
+                                <div className="p-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {favorites.map((fav) => (
+                                            <div key={fav.id} className="relative group">
+                                                <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => {
+                                                            try {
+                                                                const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
+                                                                const list = raw ? JSON.parse(raw) : [];
+                                                                const updated = Array.isArray(list) ? list.filter((a: any) => a.id !== fav.id) : [];
+                                                                if (typeof window !== 'undefined') window.localStorage.setItem('saha:favorites', JSON.stringify(updated));
+                                                                setFavorites(updated);
+                                                            } catch {}
+                                                        }}
+                                                        className="w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-all"
+                                                        title={language === 'ar' ? 'إزالة من المفضلة' : 'Remove from favorites'}
+                                                    >
+                                                        <Heart size={14} fill="currentColor" />
+                                                    </button>
+                                                </div>
+                                                <AdCard
+                                                    id={fav.id}
+                                                    title={fav.title}
+                                                    price={fav.price}
+                                                    currency={fav.currency}
+                                                    location={fav.location}
+                                                    images={fav.image ? [fav.image] : []}
+                                                    createdAt={fav.createdAt}
+                                                    language={language}
+                                                    layout="vertical"
+                                                    imageHeight="h-[140px]"
+                                                    className="group-hover:shadow-lg transition-all duration-300"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    {/* Clear All Button */}
+                                    {favorites.length > 0 && (
+                                        <div className="mt-8 text-center">
                                             <button
                                                 onClick={() => {
-                                                    try {
-                                                        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('saha:favorites') : null;
-                                                        const list = raw ? JSON.parse(raw) : [];
-                                                        const updated = Array.isArray(list) ? list.filter((a: any) => a.id !== fav.id) : [];
-                                                        if (typeof window !== 'undefined') window.localStorage.setItem('saha:favorites', JSON.stringify(updated));
-                                                        setFavorites(updated);
-                                                    } catch {}
+                                                    if (confirm(language === 'ar' ? 'هل تريد حذف جميع الإعلانات من المفضلة؟' : 'Are you sure you want to clear all favorites?')) {
+                                                        if (typeof window !== 'undefined') window.localStorage.setItem('saha:favorites', JSON.stringify([]));
+                                                        setFavorites([]);
+                                                    }
                                                 }}
-                                                className="absolute top-2 left-2 z-10 px-2 py-1 text-[10px] font-black uppercase tracking-widest bg-red-600 text-white rounded-xs shadow hover:bg-red-700 transition-all"
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 text-[11px] font-black rounded-sm hover:bg-gray-200 transition-all"
                                             >
-                                                {language === 'ar' ? 'إزالة' : 'Remove'}
+                                                <Trash2 size={14} />
+                                                {language === 'ar' ? 'حذف الكل' : 'Clear All'}
                                             </button>
-                                            <AdCard
-                                                id={fav.id}
-                                                title={fav.title}
-                                                price={fav.price}
-                                                currency={fav.currency}
-                                                location={fav.location}
-                                                images={fav.image ? [fav.image] : []}
-                                                createdAt={fav.createdAt}
-                                                language={language}
-                                                layout="vertical"
-                                                imageHeight="h-[120px]"
-                                            />
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             )}
                         </div>
