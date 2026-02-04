@@ -44,13 +44,14 @@ export default function PromotedBanner() {
                 .card {
                     --background: linear-gradient(to left, #f7ba2b 0%, #ea5358 100%);
                     width: 100%;
-                    height: 254px;
                     padding: 5px;
                     border-radius: 1rem;
                     overflow: visible;
                     background: var(--background);
                     position: relative;
                     z-index: 1;
+                    min-height: 220px;
+                    height: auto;
                 }
 
                 .card::after {
@@ -69,7 +70,7 @@ export default function PromotedBanner() {
                 }
 
                 .card-info {
-                    background: white;
+                    background: rgba(255, 255, 255, 0.95);
                     color: black;
                     display: flex;
                     justify-content: center;
@@ -78,6 +79,8 @@ export default function PromotedBanner() {
                     height: 100%;
                     overflow: visible;
                     border-radius: .7rem;
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
                 }
 
                 /*Hover*/
@@ -105,12 +108,12 @@ export default function PromotedBanner() {
                                 }
 
                                 return (
-                                    <div key={ad.id} className="snap-start shrink-0 w-[180px] h-[150px]">
+                                    <div key={ad.id} className="snap-start shrink-0">
                                         <AdCard 
                                             {...ad}
                                             images={images}
                                             layout="vertical"
-                                            className="h-full w-full bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+                                            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
                                             isFeatured={true}
                                             language={language}
                                         />
