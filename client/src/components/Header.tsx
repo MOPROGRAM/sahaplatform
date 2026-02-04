@@ -25,14 +25,10 @@ export default function Header() {
     const [searchQuery, setSearchQuery] = useState("");
     const [mounted, setMounted] = useState(false);
 
-    const userMenuRef = useRef<HTMLDivElement>(null);
     const regionRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-                setShowUserMenu(false);
-            }
             if (regionRef.current && !regionRef.current.contains(event.target as Node)) {
                 setShowRegion(false);
             }
@@ -245,7 +241,7 @@ export default function Header() {
                         </div>
 
                         {mounted && user ? (
-                            <div className="relative" ref={userMenuRef}>
+                            <div className="relative">
                                 <button
                                     onClick={() => setShowUserMenu(!showUserMenu)}
                                     className="flex items-center gap-2 px-2 py-1 hover:bg-primary/10 rounded-full transition-all group border border-transparent hover:border-primary/20"
