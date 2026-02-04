@@ -4,7 +4,6 @@ import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { Search, PlusCircle, MessageSquare, Bell, User, LayoutDashboard, LogOut, ShieldCheck, Globe, Moon, Sun, ChevronDown, Settings, X, MapPin, Menu, Banknote } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
-import PromotedBanner from "@/components/PromotedBanner";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
@@ -331,7 +330,7 @@ export default function Header() {
 
                 return shouldShow ? (
                     <div className="w-full">
-                        <PromotedBanner />
+
                     </div>
                 ) : null;
             })()}

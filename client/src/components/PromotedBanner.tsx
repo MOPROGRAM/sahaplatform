@@ -43,24 +43,7 @@ export default function PromotedBanner() {
     return (
         <div className="w-full my-3 px-4">
             {strips.map((stripAds, index) => (
-                <div key={index} className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-orange-500 via-orange-400 to-white rounded-[2rem] shadow-2xl overflow-hidden border-2 border-orange-300 transition-all duration-500 group transform-gpu hover:shadow-[0_35px_60px_-15px_rgba(255,140,0,0.3)] hover:scale-[1.01] hover:rotate-[0.5deg]">
-                    
-                    {/* Orange & White Wave Effect - Always Visible */}
-                    <div className="absolute inset-0 z-0">
-                         <div className="w-full h-full" style={{
-                             backgroundImage: 'linear-gradient(90deg, rgba(255,165,0,0.2) 0%, rgba(255,255,255,0.4) 50%, rgba(255,165,0,0.2) 100%)',
-                             backgroundSize: '200% 100%',
-                             animation: 'wave 6s ease-in-out infinite'
-                         }} />
-                    </div>
-
-                    {/* Orange Sparkle Particles */}
-                    <div className="absolute inset-0 z-0 opacity-60">
-                         <div className="w-full h-full" style={{
-                             backgroundImage: 'radial-gradient(circle at 20% 35%, rgba(255,255,255,0.8) 1px, transparent 1px), radial-gradient(circle at 80% 65%, rgba(255,255,255,0.6) 1px, transparent 1px), radial-gradient(circle at 40% 20%, rgba(255,255,255,0.7) 1px, transparent 1px)',
-                             backgroundSize: '50px 50px, 70px 70px, 30px 30px'
-                         }} />
-                    </div>
+                <div key={index} className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-orange-500 via-orange-400 to-white rounded-[2rem] shadow-2xl overflow-hidden border-2 border-orange-300">
                     
                     {/* Content Container - Horizontal Scroll */}
                     <div className="relative flex items-center gap-2 p-2 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
