@@ -43,28 +43,28 @@ export default function PromotedBanner() {
             <style jsx>{`
                 .card {
                     width: 100%;
-                    padding: 12px;
-                    border-radius: 1rem;
+                    padding: 16px;
+                    border-radius: 2rem;
                     overflow: visible;
-                    background: white;
+                    background: var(--card-bg);
                     position: relative;
                     z-index: 1;
-                    min-height: 220px;
+                    min-height: 240px;
                     height: auto;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-                    border: 2px solid var(--border-color);
+                    box-shadow: 0 8px 32px rgba(var(--primary-rgb), 0.15), 0 0 0 2px var(--primary);
+                    border: 2px solid var(--primary);
                 }
 
                 .card-info {
-                    background: white;
-                    color: black;
+                    background: var(--card-bg);
+                    color: var(--text-main);
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     width: 100%;
                     height: 100%;
                     overflow: visible;
-                    border-radius: .7rem;
+                    border-radius: 1.5rem;
                     position: relative;
                 }
 
@@ -75,10 +75,10 @@ export default function PromotedBanner() {
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300d4aa' fill-opacity='0.08' fill-rule='evenodd'%3E%3Ccircle cx='25' cy='25' r='2'/%3E%3Ccircle cx='75' cy='25' r='2'/%3E%3Ccircle cx='25' cy='75' r='2'/%3E%3Ccircle cx='75' cy='75' r='2'/%3E%3Cpath d='M1 1h14v14H1V1zm28 0h14v14H29V1zm28 0h14v14H57V1zm0 28h14v14H57V29zm-28 0h14v14H29V29zm-28 0h14v14H1V29zm0 28h14v14H1V57zm28 0h14v14H29V57zm28 0h14v14H57V57zm0 28h14v14H57V85zm-28 0h14v14H29V85zm-28 0h14v14H1V85z'/%3E%3C/g%3E%3C/svg%3E");
-                    opacity: 0.5;
+                    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23FF7D00' stroke-width='0.5' stroke-opacity='0.1'%3E%3Cpath d='M1 1h98v98H1V1zm20 20h58v58H21V21z'/%3E%3C/g%3E%3Cg fill='%23FF7D00' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3Ccircle cx='50' cy='20' r='2'/%3E%3Ccircle cx='80' cy='20' r='2'/%3E%3Ccircle cx='20' cy='50' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3Ccircle cx='80' cy='50' r='2'/%3E%3Ccircle cx='20' cy='80' r='2'/%3E%3Ccircle cx='50' cy='80' r='2'/%3E%3Ccircle cx='80' cy='80' r='2'/%3E%3C/g%3E%3C/svg%3E");
+                    opacity: 0.8;
                     z-index: -1;
-                    border-radius: .7rem;
+                    border-radius: 1.5rem;
                 }
             `}</style>
             
