@@ -8,6 +8,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { conversationsService } from "@/lib/conversations";
+import PromotedBanner from "./PromotedBanner";
 
 
 
@@ -321,7 +322,7 @@ export default function Header() {
 
                 return shouldShow ? (
                     <div className="w-full">
-
+                        <PromotedBanner />
                     </div>
                 ) : null;
             })()}

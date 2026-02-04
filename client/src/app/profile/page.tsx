@@ -24,6 +24,7 @@ import { adsService, Ad } from "@/lib/ads";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AdCard from "@/components/AdCard";
+import { supabase } from "@/lib/supabase";
 
 
 
@@ -326,6 +327,110 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Favorites Tab */}
+                    {activeTab === 'favorites' && (
+                        <div className="bg-card border border-border-color rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+                            <div className="px-4 py-3 bg-card border-b border-border-color flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Heart size={14} className="text-primary" />
+                                    <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-text-main">
+                                        {language === 'ar' ? 'المفضلة' : 'Favorites'}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div className="overflow-x-auto flex-1">
+                                {loading ? (
+                                    <div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={24} /></div>
+                                ) : favorites.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                                        {favorites.map(fav => (
+                                            <div key={fav.id} className="bg-white dark:bg-gray-800 rounded-sm shadow-sm overflow-hidden">
+                                                <div className="relative h-32 overflow-hidden">
+                                                    {fav.image_url ? (
+                                                        <img 
+                                                            src={fav.image_url} 
+                                                            alt={fav.title} 
+                                                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                                            <Heart size={24} className="text-gray-300 dark:text-gray-600" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="p-3">
+                                                    <h4 className="text-sm font-bold text-text-main line-clamp-2">{fav.title}</h4>
+                                                    <div className="flex items-center justify-between mt-2">
+                                                        <p className="text-lg font-black text-primary">
+                                                            {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(fav.price)}
+                                                            <span className="text-[10px] font-normal text-text-muted mx-1">{fav.currency}</span>
+                                                        </p>
+                                                    </div>
+                                                    {fav.location && (
+                                                        <div className="flex items-center gap-1 mt-2 text-[10px] text-text-muted">
+                                                            <MapPin size={10} />
+                                                            <span>{fav.location}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-1 mt-1 text-[10px] text-text-muted">
+                                                        <Calendar size={10} />
+                                                        <span>{new Date(fav.created_at).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mt-3">
+                                                        <Link 
+                                                            href={`/ad/${fav.ad_id}`} 
+                                                            className="flex-1 py-1.5 bg-primary/10 text-primary hover:bg-primary text-[10px] font-black rounded-lg transition-all hover:text-white uppercase tracking-wider text-center"
+                                                        >
+                                                            {language === 'ar' ? 'عرض' : 'View'}
+                                                        </Link>
+                                                        <button 
+                                                            onClick={async () => {
+                                                                try {
+                                                                    if (user?.id) {
+                                                                        await supabase
+                                                                            .from('favorites')
+                                                                            .delete()
+                                                                            .eq('user_id', user.id)
+                                                                            .eq('ad_id', fav.ad_id);
+                                                                    }
+                                                                    // Update local storage
+                                                                    const key = 'saha:favorites';
+                                                                    const raw = window.localStorage.getItem(key);
+                                                                    if (raw) {
+                                                                        const list = JSON.parse(raw) as any[];
+                                                                        const updated = list.filter(item => item.ad_id !== fav.ad_id);
+                                                                        window.localStorage.setItem(key, JSON.stringify(updated));
+                                                                        setFavorites(updated);
+                                                                    }
+                                                                } catch (error) {
+                                                                    console.error('Failed to remove from favorites:', error);
+                                                                }
+                                                            }} 
+                                                            className="px-3 py-1.5 bg-red-100 dark:bg-red-900/20 text-red-600 hover:bg-red-500 hover:text-white text-[10px] font-black rounded-lg transition-all"
+                                                        >
+                                                            {language === 'ar' ? 'حذف' : 'Remove'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="h-48 flex flex-col items-center justify-center text-text-muted">
+                                        <Heart size={48} className="opacity-20 mb-2" />
+                                        <p className="text-[12px] font-black uppercase tracking-widest">
+                                            {language === 'ar' ? 'لا يوجد عناصر مفضلة' : 'No favorites yet'}
+                                        </p>
+                                        <Link href="/ads" className="mt-3 text-primary hover:underline text-[10px] font-black">
+                                            {language === 'ar' ? 'ابحث عن إعلانات' : 'Browse ads'}
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

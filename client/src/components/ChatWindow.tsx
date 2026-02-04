@@ -581,13 +581,13 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                     {isMe && (
                                         <div className="relative group/menu">
                                             <button
-                                                className="text-gray-400 hover:text-gray-600 transition-colors ml-1 opacity-0 group-hover:opacity-100"
+                                                className="text-gray-400 hover:text-gray-600 transition-colors ml-1 opacity-100"
                                                 title={language === 'ar' ? 'خيارات الرسالة' : 'Message options'}
                                             >
                                                 <MoreVertical size={12} />
                                             </button>
                                             <div className="absolute top-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[120px] p-1 opacity-0 pointer-events-none group-hover/menu:opacity-100 group-hover/menu:pointer-events-auto transition-all duration-200">
-                                                {canModifyMessage(msg) && msg.messageType === 'text' && (
+                                                {canModifyMessage(msg) && msg.message_type === 'text' && (
                                                     <button
                                                         onClick={() => {
                                                             setEditingMessageId(msg.id);
@@ -598,12 +598,14 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                                                         {language === 'ar' ? 'تعديل' : 'Edit'}
                                                     </button>
                                                 )}
-                                                <button
-                                                    onClick={() => handleDeleteMessage(msg.id)}
-                                                    className="w-full text-left px-3 py-2 text-[11px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                                                >
-                                                    {language === 'ar' ? 'حذف' : 'Delete'}
-                                                </button>
+                                                {canModifyMessage(msg) && (
+                                                    <button
+                                                        onClick={() => handleDeleteMessage(msg.id)}
+                                                        className="w-full text-left px-3 py-2 text-[11px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                                                    >
+                                                        {language === 'ar' ? 'حذف' : 'Delete'}
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     )}

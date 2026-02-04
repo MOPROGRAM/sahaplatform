@@ -76,9 +76,9 @@ export default function HelpPage() {
                         <p className="text-text-muted text-sm mb-4">
                             {language === 'ar' ? 'تحدث معنا مباشرة' : 'Chat with us directly'}
                         </p>
-                        <button className="btn-saha-primary w-full py-2 rounded-lg text-sm" onClick={() => window.open('https://wa.me/96650000000', '_blank')}>
+                        <Link href="/messages" className="btn-saha-primary w-full py-2 rounded-lg text-sm inline-block">
                             {language === 'ar' ? 'ابدأ المحادثة' : 'Start Chat'}
-                        </button>
+                        </Link>
                     </div>
 
                     <div className="bento-card p-6 text-center group hover:border-primary transition-all">
