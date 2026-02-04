@@ -43,7 +43,7 @@ export default function PromotedBanner() {
             <style jsx>{`
                 .card {
                     width: 100%;
-                    padding: 16px;
+                    padding: 4px;
                     border-radius: 2rem;
                     overflow: visible;
                     background: var(--card-bg);
@@ -64,8 +64,9 @@ export default function PromotedBanner() {
                     width: 100%;
                     height: 100%;
                     overflow: visible;
-                    border-radius: 1.5rem;
+                    border-radius: 1.8rem;
                     position: relative;
+                    padding: 0.5rem;
                 }
 
                 .card-info::before {
@@ -78,16 +79,16 @@ export default function PromotedBanner() {
                     background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23FF7D00' stroke-width='0.5' stroke-opacity='0.1'%3E%3Cpath d='M1 1h98v98H1V1zm20 20h58v58H21V21z'/%3E%3C/g%3E%3Cg fill='%23FF7D00' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3Ccircle cx='50' cy='20' r='2'/%3E%3Ccircle cx='80' cy='20' r='2'/%3E%3Ccircle cx='20' cy='50' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3Ccircle cx='80' cy='50' r='2'/%3E%3Ccircle cx='20' cy='80' r='2'/%3E%3Ccircle cx='50' cy='80' r='2'/%3E%3Ccircle cx='80' cy='80' r='2'/%3E%3C/g%3E%3C/svg%3E");
                     opacity: 0.8;
                     z-index: -1;
-                    border-radius: 1.5rem;
+                    border-radius: 1.8rem;
                 }
             `}</style>
             
             {/* Main Card */}
             <div className="card max-w-[1920px] mx-auto">
                 <div className="card-info">
-                    <div className="w-full h-full p-5">
+                    <div className="w-full h-full p-2">
                         {/* Horizontal Scroll for Ads with proper card sizing */}
-                        <div className="flex items-center gap-3 overflow-hidden snap-x touch-pan-x">
+                        <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-2">
                             {ads.slice(0, 10).map((ad) => {
                                 let images: string[] = [];
                                 try {
@@ -101,7 +102,7 @@ export default function PromotedBanner() {
                                 }
 
                                 return (
-                                    <div key={ad.id} className="snap-start shrink-0 basis-[calc(50%-8px)] sm:basis-[calc(33.333%-8px)] md:basis-[calc(25%-8px)] lg:basis-[calc(20%-8px)] xl:basis-[calc(16.666%-8px)] 2xl:basis-[calc(14.285%-8px)]">
+                                    <div key={ad.id} className="snap-start shrink-0 flex-shrink-0 basis-[calc(50%-4px)] sm:basis-[calc(33.333%-4px)] md:basis-[calc(25%-4px)] lg:basis-[calc(20%-4px)] xl:basis-[calc(16.666%-4px)] 2xl:basis-[calc(14.285%-4px)]">
                                         <AdCard 
                                             {...ad}
                                             images={images}
