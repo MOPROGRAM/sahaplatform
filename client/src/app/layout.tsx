@@ -65,10 +65,10 @@ export default function RootLayout({
                 <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
                     <LanguageProvider initialLanguage={lang}>
                         <ErrorBoundary>
-                            <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+                            <div className="flex min-h-screen bg-gray-bg">
                                 <main className="flex-1 w-full">
                                     <Suspense fallback={
-                                        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+                                        <div className="flex items-center justify-center min-h-screen bg-gray-bg">
                                             <LoadingSpinner size={48} />
                                         </div>
                                     }>
