@@ -42,11 +42,38 @@ export default function PromotedBanner() {
 
     return (
         <div className="w-full my-3 px-4">
+            <style jsx>{`
+                .card {
+                    --background: linear-gradient(to left, #f7ba2b 0%, #ea5358 100%);
+                    background: var(--background);
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .card::after {
+                    position: absolute;
+                    content: "";
+                    top: 30px;
+                    left: 0;
+                    right: 0;
+                    z-index: -1;
+                    height: 100%;
+                    width: 100%;
+                    transform: scale(0.8);
+                    filter: blur(25px);
+                    background: var(--background);
+                    transition: opacity 0.5s;
+                }
+
+                .card:hover::after {
+                    opacity: 0;
+                }
+            `}</style>
             {strips.map((stripAds, index) => (
-                <div key={index} className="relative w-full max-w-[1920px] mx-auto bg-gradient-to-br from-orange-500 via-orange-400 to-white rounded-[2rem] shadow-2xl overflow-hidden border-2 border-orange-300">
+                <div key={index} className="card w-full max-w-[1920px] mx-auto rounded-[1rem] shadow-2xl overflow-hidden">
                     
                     {/* Content Container - Horizontal Scroll */}
-                    <div className="relative flex items-center gap-2 p-2 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
+                    <div className="relative flex items-center gap-2 p-5 overflow-x-auto no-scrollbar snap-x touch-pan-x z-10">
                         {stripAds.map((ad) => {
                             let images: string[] = [];
                             try {
@@ -66,9 +93,9 @@ export default function PromotedBanner() {
                                         images={images}
                                         layout="vertical"
                                         className="h-full relative isolate transform-gpu
-                                            bg-gradient-to-br from-white via-orange-50 to-orange-100 dark:from-[#2a2108] dark:via-[#3a2a0e] dark:to-[#4a3512]
-                                            shadow-[0_8px_32px_rgba(255,140,0,0.2),0_16px_48px_rgba(255,165,0,0.15),inset_0_1px_0_rgba(255,255,255,0.8)] 
-                                            hover:shadow-[0_20px_60px_rgba(255,140,0,0.3),0_32px_80px_rgba(255,165,0,0.25),inset_0_2px_0_rgba(255,255,255,0.9)]
+                                            bg-white dark:from-[#181818] dark:via-[#282828] dark:to-[#181818]
+                                            shadow-[0_8px_32px_rgba(247,186,43,0.2),0_16px_48px_rgba(234,83,88,0.15),inset_0_1px_0_rgba(255,255,255,0.8)] 
+                                            hover:shadow-[0_20px_60px_rgba(247,186,43,0.3),0_32px_80px_rgba(234,83,88,0.25),inset_0_2px_0_rgba(255,255,255,0.9)]
                                             border-2 border-orange-200 dark:border-orange-300/40
                                             ring-2 ring-inset ring-orange-100/50 dark:ring-orange-200/20
                                             hover:scale-[1.03] hover:-translate-y-2 hover:rotate-[1deg] 
