@@ -265,6 +265,77 @@ export default function AdCard({
 
 
     // Render Functions
+    const renderFeatured3DFace = () => (
+        <div className="parent w-full h-full perspective-1000">
+            <div className="card h-full rounded-2xl bg-gradient-to-br from-cyan-400 to-green-400 transition-all duration-500 ease-in-out transform-style-preserve-3d shadow-[rgba(5,71,17,0)_40px_50px_25px_-40px,rgba(5,71,17,0.2)_0px_25px_25px_-5px]">
+                {/* Glass Layer */}
+                <div className="glass absolute inset-2 rounded-2xl border-tl-0 border-tr-[100px] bg-gradient-to-t from-white/35 to-white/82 transform translate3d(0px,0px,25px) border-l border-b border-white/30 transition-all duration-500 ease-in-out"></div>
+                
+                {/* Logo Circles */}
+                <div className="logo absolute right-0 top-0 transform-style-preserve-3d">
+                    <span className="circle circle1 block w-44 aspect-square rounded-full absolute top-2 right-2 bg-cyan-400/20 backdrop-blur-sm transition-all duration-500 ease-in-out transform translate3d(0,0,20px)"></span>
+                    <span className="circle circle2 block w-36 aspect-square rounded-full absolute top-3 right-3 bg-cyan-400/20 backdrop-blur-sm transition-all duration-500 ease-in-out transform translate3d(0,0,40px) delay-400"></span>
+                    <span className="circle circle3 block w-28 aspect-square rounded-full absolute top-5 right-5 bg-cyan-400/20 backdrop-blur-sm transition-all duration-500 ease-in-out transform translate3d(0,0,60px) delay-800"></span>
+                    <span className="circle circle4 block w-20 aspect-square rounded-full absolute top-7 right-7 bg-cyan-400/20 backdrop-blur-sm transition-all duration-500 ease-in-out transform translate3d(0,0,80px) delay-1200"></span>
+                    <span className="circle circle5 block w-14 aspect-square rounded-full absolute top-9 right-9 bg-cyan-400/20 backdrop-blur-sm transition-all duration-500 ease-in-out transform translate3d(0,0,100px) delay-1600 flex items-center justify-center">
+                        <HomeIcon className="w-6 h-6 text-white" />
+                    </span>
+                </div>
+                
+                {/* Content */}
+                <div className="content p-8 translate3d(0,0,26px)" style={{paddingTop: '80px'}}>
+                    <h3 className="title block text-[#00894d] font-black text-xl mb-3">{currentTitle}</h3>
+                    <p className="text block text-[#00894d]/75 text-sm">
+                        {currentDescription ? currentDescription.substring(0, 100) + '...' : t('no_description')}
+                    </p>
+                    <div className="mt-3 text-lg font-black text-[#00894d]">
+                        {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
+                        <span className="text-xs font-normal text-[#00894d]/75 mx-1">{currencyCode}</span>
+                    </div>
+                </div>
+                
+                {/* Bottom Section with Buttons */}
+                <div className="bottom p-3 absolute bottom-2 left-2 right-2 flex items-center justify-between transform translate3d(0,0,26px)">
+                    {/* Social Buttons */}
+                    <div className="social-buttons-container flex gap-2 transform-style-preserve-3d">
+                        <button 
+                            onClick={handleFavoriteClick}
+                            className="social-button w-8 aspect-square p-1 bg-white rounded-full border-none grid place-content-center shadow-[rgba(5,71,17,0.5)_0px_7px_5px_-5px] transition-transform duration-200 ease-in-out delay-400 hover:bg-black active:bg-yellow-300"
+                        >
+                            <Heart className="svg w-4" fill={isFavorite ? "#00894d" : "#00894d"} />
+                        </button>
+                        <button 
+                            onClick={handleStartChat}
+                            className="social-button w-8 aspect-square p-1 bg-white rounded-full border-none grid place-content-center shadow-[rgba(5,71,17,0.5)_0px_7px_5px_-5px] transition-transform duration-200 ease-in-out delay-600 hover:bg-black active:bg-yellow-300"
+                        >
+                            <MessageCircle className="svg w-4" fill="#00894d" />
+                        </button>
+                        <button 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                router.push(`/ads?category=${category}`);
+                            }}
+                            className="social-button w-8 aspect-square p-1 bg-white rounded-full border-none grid place-content-center shadow-[rgba(5,71,17,0.5)_0px_7px_5px_-5px] transition-transform duration-200 ease-in-out delay-800 hover:bg-black active:bg-yellow-300"
+                        >
+                            <TagIcon className="svg w-4" fill="#00894d" />
+                        </button>
+                    </div>
+                    
+                    {/* View More Button */}
+                    <div className="view-more flex items-center justify-end w-2/5 transition-all duration-200 ease-in-out hover:translate3d(0,0,10px)">
+                        <button 
+                            onClick={handleNextFace}
+                            className="view-more-button bg-none border-none text-[#00c37b] font-bold text-xs"
+                        >
+                            {t('details')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
     const renderStandardFace = () => (
         <div className={`w-full h-full flex bg-white/70 dark:bg-[#1a1a1a]/70 backdrop-blur-xl border border-white/20 dark:border-white/10 ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
@@ -596,24 +667,25 @@ export default function AdCard({
 
     const renderContent = (type: string) => {
         switch (type) {
-            case 'image': return renderStandardFace();
+            case 'image': return isFeatured ? renderFeatured3DFace() : renderStandardFace();
             case 'details': return renderDetailsFace();
             case 'details_more': return renderDetailsMoreFace();
             case 'contact': return renderContactFace();
-            default: return renderStandardFace();
+            default: return isFeatured ? renderFeatured3DFace() : renderStandardFace();
         }
     };
 
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} ${isFeatured
-                ? "border-amber-400 ring-2 ring-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-                : (isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-gray-300 dark:border-gray-700")
-                } rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block ${className}`}
+            className={`bento-card bento-card-hover group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} ${isFeatured
+                ? "border-transparent ring-2 ring-cyan-300/50 shadow-[0_0_25px_rgba(0,255,214,0.3)]"
+                : (isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-transparent")
+                } rounded-3xl overflow-hidden relative cursor-pointer block ${className}`}
             style={{
+                perspective: '1000px',
                 height: isVertical && !imageHeight ? '180px' : 'auto'
-            }}
+            }}>
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >

@@ -42,35 +42,21 @@ export default function PromotedBanner() {
         <div className="w-full my-3 px-4">
             <style jsx>{`
                 .card {
-                    --background: linear-gradient(to left, #f7ba2b 0%, #ea5358 100%);
                     width: 100%;
-                    padding: 5px;
+                    padding: 12px;
                     border-radius: 1rem;
                     overflow: visible;
-                    background: var(--background);
+                    background: white;
                     position: relative;
                     z-index: 1;
                     min-height: 220px;
                     height: auto;
-                }
-
-                .card::after {
-                    position: absolute;
-                    content: "";
-                    top: 30px;
-                    left: 0;
-                    right: 0;
-                    z-index: -1;
-                    height: 100%;
-                    width: 100%;
-                    transform: scale(0.8);
-                    filter: blur(25px);
-                    background: var(--background);
-                    transition: opacity .5s;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                    border: 1px solid rgba(0, 255, 214, 0.3);
                 }
 
                 .card-info {
-                    background: rgba(255, 255, 255, 0.95);
+                    background: white;
                     color: black;
                     display: flex;
                     justify-content: center;
@@ -79,13 +65,6 @@ export default function PromotedBanner() {
                     height: 100%;
                     overflow: visible;
                     border-radius: .7rem;
-                    backdrop-filter: blur(10px);
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-                }
-
-                /*Hover*/
-                .card:hover::after {
-                    opacity: 0;
                 }
             `}</style>
             
@@ -94,7 +73,7 @@ export default function PromotedBanner() {
                 <div className="card-info">
                     <div className="w-full h-full p-5">
                         {/* Horizontal Scroll for Ads with proper card sizing */}
-                        <div className="flex items-center gap-3 overflow-x-auto no-scrollbar snap-x touch-pan-x">
+                        <div className="flex items-center gap-3 overflow-hidden snap-x touch-pan-x">
                             {ads.slice(0, 10).map((ad) => {
                                 let images: string[] = [];
                                 try {
