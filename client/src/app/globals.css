@@ -17,11 +17,11 @@
   --black: #0a0a0a;
   /* Ultra Dark Background */
   --white: #ffffff;
-  --gray-bg: #0a0a0a;
-  --card-bg: #0f0f0f;
-  --text-main: #ffffff;
-  --text-muted: #b0b0b0;
-  --border-color: rgba(0, 0, 0, 0.4);
+  --gray-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+  --card-bg: #ffffff;
+  --text-main: #0a0a0a;
+  --text-muted: #64748b;
+  --border-color: rgba(0, 0, 0, 0.2);
 
   /* Depth & Glow Variables (enhanced borders) */
   --glow-border: 1px solid rgba(0, 0, 0, 0.3);
@@ -32,23 +32,19 @@
 
 .dark,
 [data-theme="dark"] {
-  --gray-bg: #070708;
-  --card-bg: #0a0a0a;
+  --gray-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  --card-bg: rgba(30, 41, 59, 0.8);
   --text-main: #ffffff;
-  --text-muted: #9aa4b2;
-  --border-color: rgba(255, 255, 255, 0.3);
+  --text-muted: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.2);
   --black: #ffffff;
   --white: #0a0a0a;
 
   /* Dark Depth & Matte Variables (enhanced borders) */
   --glow-border: 1px solid rgba(255, 255, 255, 0.2);
   --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.6);
-  --glow-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+  --glow-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   --glow-shadow-hover: 0 10px 32px rgba(var(--primary-rgb), 0.2);
-  --card-bg: #0a0a0a;
-  /* solid dark cards */
-  --gray-bg: #000000;
-  /* absolute black */
   --primary: #FF7D00;
   --primary-rgb: 255, 125, 0;
   --primary-hover: #FF9A3C;
