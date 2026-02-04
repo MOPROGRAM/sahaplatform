@@ -3,13 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --primary: #FF4D00;
-  --primary-rgb: 255, 77, 0;
-  --primary-hover: #FF9E00;
-  --primary-dark: #E63900;
+  /* Primary Orange Palette - Premium & Harmonious */
+  --primary: #FF7D00;
+  --primary-rgb: 255, 125, 0;
+  --primary-hover: #FF9A3C;
+  --primary-dark: #E66A00;
+  --primary-light: #FFB870;
+  --primary-soft: #FFF2E5;
+  
+  /* Supporting Colors */
   --navy: #1e293b;
-  --emerald: #10b981;
-  --amber: #f59e0b;
+  --amber: #FFC107;
   --black: #0a0a0a;
   /* Ultra Dark Background */
   --white: #ffffff;
@@ -21,9 +25,9 @@
 
   /* Depth & Glow Variables (enhanced borders) */
   --glow-border: 1px solid rgba(0, 0, 0, 0.3);
-  --glow-border-hover: 1px solid rgba(0, 0, 0, 0.5);
+  --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.5);
   --glow-shadow: 0 2px 8px rgba(2, 6, 23, 0.1);
-  --glow-shadow-hover: 0 4px 12px rgba(2, 6, 23, 0.15);
+  --glow-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.15);
 }
 
 .dark,
@@ -38,20 +42,23 @@
 
   /* Dark Depth & Matte Variables (enhanced borders) */
   --glow-border: 1px solid rgba(255, 255, 255, 0.2);
-  --glow-border-hover: 1px solid rgba(255, 255, 255, 0.3);
+  --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.6);
   --glow-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
-  --glow-shadow-hover: 0 10px 32px rgba(255, 255, 255, 0.15);
+  --glow-shadow-hover: 0 10px 32px rgba(var(--primary-rgb), 0.2);
   --card-bg: #0a0a0a;
   /* solid dark cards */
   --gray-bg: #000000;
   /* absolute black */
-  --primary: #FF4D00;
-  --primary-rgb: 255, 77, 0;
-  --primary-hover: #FF9E00;
+  --primary: #FF7D00;
+  --primary-rgb: 255, 125, 0;
+  --primary-hover: #FF9A3C;
+  --primary-dark: #E66A00;
+  --primary-light: #FFB870;
+  --primary-soft: rgba(255, 125, 0, 0.1);
 }
 
 :root {
-  --glow-orange: 0 8px 30px rgba(var(--primary-rgb), 0.103);
+  --glow-orange: 0 8px 30px rgba(var(--primary-rgb), 0.15);
 }
 
 /* Simple Light Theme (explicit) */
@@ -69,9 +76,17 @@
 
   /* Light Depth & Enhanced Variables (clear borders) */
   --glow-border: 1px solid rgba(0, 0, 0, 0.3);
-  --glow-border-hover: 1px solid rgba(0, 0, 0, 0.5);
+  --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.5);
   --glow-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  --glow-shadow-hover: 0 10px 32px rgba(0, 0, 0, 0.15);
+  --glow-shadow-hover: 0 10px 32px rgba(var(--primary-rgb), 0.15);
+  
+  /* Light Theme Orange Palette */
+  --primary: #FF7D00;
+  --primary-rgb: 255, 125, 0;
+  --primary-hover: #FF9A3C;
+  --primary-dark: #E66A00;
+  --primary-light: #FFB870;
+  --primary-soft: #FFF2E5;
 }
 
 * {
