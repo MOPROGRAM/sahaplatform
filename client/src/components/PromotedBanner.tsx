@@ -52,7 +52,7 @@ export default function PromotedBanner() {
                     min-height: 220px;
                     height: auto;
                     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-                    border: 1px solid rgba(0, 255, 214, 0.3);
+                    border: 2px solid var(--border-color);
                 }
 
                 .card-info {

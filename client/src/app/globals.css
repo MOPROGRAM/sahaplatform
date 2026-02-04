@@ -21,11 +21,11 @@
   --card-bg: #ffffff;
   --text-main: #0a0a0a;
   --text-muted: #64748b;
-  --border-color: rgba(0, 0, 0, 0.2);
+  --border-color: rgba(0, 0, 0, 0.4);
 
   /* Depth & Glow Variables (enhanced borders) */
-  --glow-border: 1px solid rgba(0, 0, 0, 0.3);
-  --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.5);
+  --glow-border: 1px solid rgba(0, 0, 0, 0.5);
+  --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.7);
   --glow-shadow: 0 2px 8px rgba(2, 6, 23, 0.1);
   --glow-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.15);
 }
@@ -36,13 +36,13 @@
   --card-bg: rgba(30, 41, 59, 0.8);
   --text-main: #ffffff;
   --text-muted: #94a3b8;
-  --border-color: rgba(255, 255, 255, 0.2);
+  --border-color: rgba(255, 255, 255, 0.4);
   --black: #ffffff;
   --white: #0a0a0a;
 
   /* Dark Depth & Matte Variables (enhanced borders) */
-  --glow-border: 1px solid rgba(255, 255, 255, 0.2);
-  --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.6);
+  --glow-border: 1px solid rgba(255, 255, 255, 0.4);
+  --glow-border-hover: 1px solid rgba(var(--primary-rgb), 0.8);
   --glow-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   --glow-shadow-hover: 0 10px 32px rgba(var(--primary-rgb), 0.2);
   --primary: #FF7D00;

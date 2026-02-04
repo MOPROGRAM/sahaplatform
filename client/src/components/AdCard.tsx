@@ -607,9 +607,9 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bento-card bento-card-hover group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} ${isFeatured
-                ? "border-transparent ring-2 ring-cyan-300/50 shadow-[0_0_25px_rgba(0,255,214,0.3)]"
-                : (isHighlighted ? "border-primary ring-2 ring-primary/50" : "border-transparent")
+            className={`bento-card bento-card-hover group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} border-2 border-border-color ${isFeatured
+                ? "ring-2 ring-cyan-300/50 shadow-[0_0_25px_rgba(0,255,214,0.3)]"
+                : (isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50")
                 } rounded-3xl overflow-hidden relative cursor-pointer block ${className}`}
             style={{
                 perspective: '1000px',
