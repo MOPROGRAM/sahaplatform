@@ -43,7 +43,7 @@ export default function PromotedBanner() {
             <style jsx>{`
                 .card {
                     width: 100%;
-                    padding: 2px 4px;
+                    padding: 4px;
                     border-radius: 2rem;
                     overflow: visible;
                     background: var(--card-bg);
@@ -66,7 +66,7 @@ export default function PromotedBanner() {
                     overflow: visible;
                     border-radius: 1.8rem;
                     position: relative;
-                    padding: 0.25rem 0.5rem;
+                    padding: 0.5rem;
                 }
 
                 .card-info::before {
@@ -76,8 +76,8 @@ export default function PromotedBanner() {
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23FF7D00' stroke-width='0.5' stroke-opacity='0.1'%3E%3Cpath d='M1 1h98v98H1V1zm20 20h58v58H21V21z'/%3E%3C/g%3E%3Cg fill='%23FF7D00' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3Ccircle cx='50' cy='20' r='2'/%3E%3Ccircle cx='80' cy='20' r='2'/%3E%3Ccircle cx='20' cy='50' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3Ccircle cx='80' cy='50' r='2'/%3E%3Ccircle cx='20' cy='80' r='2'/%3E%3Ccircle cx='50' cy='80' r='2'/%3E%3Ccircle cx='80' cy='80' r='2'/%3E%3C/g%3E%3C/svg%3E");
-                    opacity: 0.8;
+                    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='decorative-pattern' width='10' height='10' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='5' cy='5' r='1' fill='%23FF7D00' opacity='0.2'/%3E%3Cline x1='0' y1='0' x2='10' y2='10' stroke='%23FF7D00' stroke-width='0.5' opacity='0.1'/%3E%3Cline x1='0' y1='10' x2='10' y2='0' stroke='%23FF7D00' stroke-width='0.5' opacity='0.1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23decorative-pattern)'/%3E%3C/svg%3E");
+                    opacity: 0.9;
                     z-index: -1;
                     border-radius: 1.8rem;
                 }
@@ -86,9 +86,9 @@ export default function PromotedBanner() {
             {/* Main Card */}
             <div className="card max-w-[1920px] mx-auto">
                 <div className="card-info">
-                    <div className="w-full h-full p-0.5 pt-1 pb-1">
+                    <div className="w-full h-full p-2">
                         {/* Horizontal Scroll for Ads with proper card sizing */}
-                        <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-1">
+                        <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x">
                             {ads.slice(0, 10).map((ad) => {
                                 let images: string[] = [];
                                 try {
