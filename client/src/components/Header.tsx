@@ -90,7 +90,7 @@ export default function Header() {
     };
 
     return (
-        <header className={`sticky top-0 z-[100] backdrop-blur-lg border-b border-border-color bg-white/80 dark:bg-[#0a0a0a]/90 ${headerShrunk ? "py-2 shadow-lg" : "py-3"} relative overflow-hidden`}>
+        <header className={`sticky top-0 z-[100] backdrop-blur-lg border-b border-border-color bg-white/80 dark:bg-[#0a0a0a]/90 ${headerShrunk ? "py-2 shadow-lg" : "py-3"} relative`}>
 
             <div className="relative">
                 <div className="max-w-[1920px] mx-auto px-4 flex items-center justify-between gap-4 relative z-50">
