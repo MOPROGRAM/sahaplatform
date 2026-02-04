@@ -113,7 +113,7 @@ export default function PromotedBanner() {
                                             {...ad}
                                             images={images}
                                             layout="vertical"
-                                            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+                                            className="bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-amber-400 ring-2 ring-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.3)] rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block"
                                             isFeatured={true}
                                             language={language}
                                         />
