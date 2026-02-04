@@ -43,7 +43,7 @@ export default function PromotedBanner() {
             <style jsx>{`
                 .card {
                     width: 100%;
-                    padding: 4px;
+                    padding: 2px 4px;
                     border-radius: 2rem;
                     overflow: visible;
                     background: var(--card-bg);
@@ -66,7 +66,7 @@ export default function PromotedBanner() {
                     overflow: visible;
                     border-radius: 1.8rem;
                     position: relative;
-                    padding: 0.5rem;
+                    padding: 0.25rem 0.5rem;
                 }
 
                 .card-info::before {
@@ -86,9 +86,9 @@ export default function PromotedBanner() {
             {/* Main Card */}
             <div className="card max-w-[1920px] mx-auto">
                 <div className="card-info">
-                    <div className="w-full h-full p-2">
+                    <div className="w-full h-full p-0.5 pt-1 pb-1">
                         {/* Horizontal Scroll for Ads with proper card sizing */}
-                        <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-2">
+                        <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-1">
                             {ads.slice(0, 10).map((ad) => {
                                 let images: string[] = [];
                                 try {
