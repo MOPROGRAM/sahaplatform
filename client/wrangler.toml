@@ -4,8 +4,5 @@ compatibility_flags = ["nodejs_compat"]
 
 pages_build_output_dir = ".vercel/output/static"
 
-[vars]
-NPM_FLAGS = "--legacy-peer-deps"
-
-[env.production.vars]
-# Add production environment variables here if not using Cloudflare Dashboard
+[env.production]
+vars = { NPM_FLAGS = "--legacy-peer-deps" }
