@@ -93,7 +93,7 @@ export default function PromotedBanner() {
             <div className="card max-w-[1920px] mx-auto">
                 <div className="card-info">
                     <div className="w-full h-full p-5">
-                        {/* Horizontal Scroll for Ads */}
+                        {/* Horizontal Scroll for Ads with proper card sizing */}
                         <div className="flex items-center gap-3 overflow-x-auto no-scrollbar snap-x touch-pan-x">
                             {ads.slice(0, 10).map((ad) => {
                                 let images: string[] = [];
@@ -108,12 +108,12 @@ export default function PromotedBanner() {
                                 }
 
                                 return (
-                                    <div key={ad.id} className="snap-start shrink-0">
+                                    <div key={ad.id} className="snap-start shrink-0 basis-[calc(50%-8px)] sm:basis-[calc(33.333%-8px)] md:basis-[calc(25%-8px)] lg:basis-[calc(20%-8px)] xl:basis-[calc(16.666%-8px)] 2xl:basis-[calc(14.285%-8px)]">
                                         <AdCard 
                                             {...ad}
                                             images={images}
                                             layout="vertical"
-                                            className="bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-amber-400 ring-2 ring-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.3)] rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block"
+                                            className="bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-amber-400 ring-2 ring-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.3)] rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block h-full"
                                             isFeatured={true}
                                             language={language}
                                         />
