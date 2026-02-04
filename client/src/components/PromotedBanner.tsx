@@ -48,7 +48,6 @@ export default function PromotedBanner() {
                     padding: 5px;
                     border-radius: 1rem;
                     overflow: visible;
-                    background: #f7ba2b;
                     background: var(--background);
                     position: relative;
                     z-index: 1;
@@ -65,15 +64,13 @@ export default function PromotedBanner() {
                     width: 100%;
                     transform: scale(0.8);
                     filter: blur(25px);
-                    background: #f7ba2b;
                     background: var(--background);
                     transition: opacity .5s;
                 }
 
                 .card-info {
-                    --color: #181818;
-                    background: var(--color);
-                    color: var(--color);
+                    background: white;
+                    color: black;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -83,19 +80,9 @@ export default function PromotedBanner() {
                     border-radius: .7rem;
                 }
 
-                .card .title {
-                    font-weight: bold;
-                    letter-spacing: .1em;
-                }
-
                 /*Hover*/
                 .card:hover::after {
                     opacity: 0;
-                }
-
-                .card:hover .card-info {
-                    color: #f7ba2b;
-                    transition: color 1s;
                 }
             `}</style>
             
@@ -103,8 +90,6 @@ export default function PromotedBanner() {
             <div className="card max-w-[1920px] mx-auto">
                 <div className="card-info">
                     <div className="w-full h-full p-5">
-                        <h3 className="title text-white text-2xl mb-4">{t('promotedAds') || 'الاعلانات المميزة'}</h3>
-                        
                         {/* Horizontal Scroll for Ads */}
                         <div className="flex items-center gap-3 overflow-x-auto no-scrollbar snap-x touch-pan-x">
                             {ads.slice(0, 10).map((ad) => {

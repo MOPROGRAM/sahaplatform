@@ -8,7 +8,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLanguage } from "@/lib/language-context";
 import { conversationsService } from "@/lib/conversations";
-import PromotedBanner from "./PromotedBanner";
 
 
 
@@ -303,29 +302,6 @@ export default function Header() {
                     </div>
                 </div>
             </div>
-
-            {/* Promoted Ads Banner (sticky under header content) */}
-            {(() => {
-                const hiddenPaths = [
-                    '/help',
-                    '/advertise',
-                    '/profile',
-                    '/messages',
-                    '/dashboard',
-                    '/ads/my',
-                    '/settings',
-                    '/notifications',
-                    '/login',
-                    '/admin'
-                ];
-                const shouldShow = !hiddenPaths.some(path => pathname?.startsWith(path));
-
-                return shouldShow ? (
-                    <div className="w-full">
-                        <PromotedBanner />
-                    </div>
-                ) : null;
-            })()}
 
             {/* Mobile Menu Drawer */}
             {showMobileMenu && (
