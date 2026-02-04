@@ -58,7 +58,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 const newItem = payload.new;
                 const newItemConversationId = newItem.conversationId || newItem.conversation_id;
 
-                if (payload.eventType === 'INSERT' && newItemConversationId === conversationId) {
+                if (payload.eventType === 'INSERT' && newItemConversationId === conversationId && (newItem.senderId || newItem.sender_id) !== user?.id) {
                     const newMessage = newItem;
 
                     // Transform raw DB fields to UI interface
@@ -72,7 +72,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                         sender: { name: '...' } // Temporary placeholder
                     };
 
-                    // Optimistically add message
+                    // Add message if it doesn't already exist
                     setMessages(prev => {
                         if (prev.find(m => m.id === processedMessage.id)) return prev;
                         return [...prev, processedMessage];
