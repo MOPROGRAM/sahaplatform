@@ -224,7 +224,7 @@ export const conversationsService = {
     },
 
     // إرسال رسالة
-    async sendMessage(conversationId: string, content: string, messageType: string = 'text'): Promise<Message> {
+    async sendMessage(conversationId: string, content: string, messageType: string = 'text', metadata: any = {}): Promise<Message> {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) throw new Error('User not authenticated');
@@ -239,15 +239,22 @@ export const conversationsService = {
 
         const receiverId = participants[0].user_id;
 
+        // إعداد بيانات الرسالة مع بيانات الملف إذا كانت موجودة
+        const messageData = {
+            content,
+            message_type: messageType,
+            sender_id: user.id,
+            receiver_id: receiverId,
+            conversation_id: conversationId,
+            // إضافة بيانات الملف إذا كانت موجودة
+            ...(metadata.fileUrl && { file_url: metadata.fileUrl }),
+            ...(metadata.fileName && { file_name: metadata.fileName }),
+            ...(metadata.fileSize && { file_size: metadata.fileSize })
+        };
+
         const { data: message, error: messageError } = await (supabase as any)
             .from('messages')
-            .insert({
-                content,
-                message_type: messageType,
-                sender_id: user.id,
-                receiver_id: receiverId,
-                conversation_id: conversationId,
-            })
+            .insert(messageData)
             .select(`
                 *,
                 sender:users!sender_id(id, name, email)

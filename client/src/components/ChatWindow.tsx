@@ -177,7 +177,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 messageType: type,
                 ...fileData
             };
-            const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType);
+            // Pass fileData as metadata to the sendMessage function
+            const sentMessage = await conversationsService.sendMessage(conversationId, payload.content, payload.messageType, fileData);
 
             // Normalize returned fields (snake_case)
             const id = sentMessage.id;
@@ -185,6 +186,11 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             const messageType = sentMessage.message_type || type;
             const createdAt = sentMessage.created_at || new Date().toISOString();
             const senderId = sentMessage.sender_id || user?.id;
+            
+            // Add file data if available
+            const fileUrl = sentMessage.file_url || fileData?.fileUrl;
+            const fileName = sentMessage.file_name || fileData?.fileName;
+            const fileSize = sentMessage.file_size || fileData?.fileSize;
 
             // Add message locally immediately
             const newMessage: Message = {
@@ -193,7 +199,10 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 content: contentResp,
                 message_type: messageType as any,
                 created_at: createdAt,
-                sender: { name: user?.name || 'You' }
+                sender: { name: user?.name || 'You' },
+                ...(fileUrl && { file_url: fileUrl }),
+                ...(fileName && { file_name: fileName }),
+                ...(fileSize && { file_size: fileSize })
             };
             setMessages(prev => [...prev, newMessage]);
 
