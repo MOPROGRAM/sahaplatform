@@ -23,7 +23,6 @@ export default function Header() {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [mounted, setMounted] = useState(false);
 
     const regionRef = useRef<HTMLDivElement>(null);
 
@@ -38,10 +37,6 @@ export default function Header() {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, []);
-
-    useEffect(() => {
-        setMounted(true);
     }, []);
 
     useEffect(() => {
@@ -233,18 +228,18 @@ export default function Header() {
 
                         <div className="hidden sm:flex items-center gap-2 text-gray-500 dark:text-gray-400">
                             <button onClick={toggleTheme} className="p-2 border border-border-color rounded-full hover:border-primary hover:text-primary transition-colors">
-                                {mounted ? (theme === "light" ? <Moon size={18} /> : <Sun size={18} />) : <Moon size={18} className="opacity-0" />}
+                                {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
                             </button>
                             <button onClick={() => setLanguage(language === "ar" ? "en" : "ar")} className="p-2 border border-border-color rounded-full hover:border-primary hover:text-primary transition-colors">
                                 <Globe size={18} />
                             </button>
                         </div>
 
-                        {mounted && user ? (
-                            <div className="relative">
+                        {user ? (
+                            <div className="relative z-[1000]">
                                 <button
                                     onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className="flex items-center gap-2 px-2 py-1 hover:bg-primary/10 rounded-full transition-all group border border-transparent hover:border-primary/20"
+                                    className="flex items-center gap-2 px-2 py-1 hover:bg-primary/10 rounded-full transition-all border border-transparent hover:border-primary/20"
                                 >
                                     <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm uppercase shrink-0">
                                         {(user.name || user.email || 'U').substring(0, 1).toUpperCase()}
@@ -256,39 +251,39 @@ export default function Header() {
                                 </button>
 
                                 {showUserMenu && (
-                                    <div className="absolute top-full right-0 mt-2 w-56 bg-white text-black dark:bg-gray-800 dark:text-white py-2 z-50 rounded-lg shadow-lg">
+                                    <div className="absolute top-full right-0 mt-2 w-56 bg-white text-black dark:bg-gray-800 dark:text-white py-2 z-[2000] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
                                         <div className="space-y-1 p-1">
                                             {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
-                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative" onClick={() => setShowUserMenu(false)}>
+                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors" onClick={() => setShowUserMenu(false)}>
                                                     <ShieldCheck size={14} />
                                                     {t("systemManagement")}
                                                 </Link>
                                             )}
-                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" prefetch={false} onClick={() => setShowUserMenu(false)}>
                                                 <LayoutDashboard size={14} />
                                                 {t("dashboard")}
                                             </Link>
-                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/ads/my" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" prefetch={false} onClick={() => setShowUserMenu(false)}>
                                                 <ShieldCheck size={14} />
                                                 {t("myAds")}
                                             </Link>
-                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/messages" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" prefetch={false} onClick={() => setShowUserMenu(false)}>
                                                 <MessageSquare size={14} />
                                                 {t("messages")}
                                                 {unreadCount > 0 && (
                                                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">{unreadCount}</span>
                                                 )}
                                             </Link>
-                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/notifications" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" prefetch={false} onClick={() => setShowUserMenu(false)}>
                                                 <Bell size={14} />
                                                 {t("notifications")}
                                             </Link>
-                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors relative" prefetch={false} onClick={() => setShowUserMenu(false)}>
+                                            <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-text-main hover:bg-primary/10 transition-colors" prefetch={false} onClick={() => setShowUserMenu(false)}>
                                                 <Settings size={14} />
                                                 {t("settings")}
                                             </Link>
                                             <div className="border-t border-border-color my-1"></div>
-                                            <button onClick={() => { logout(); setShowUserMenu(false); }} className={`flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full relative ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                                            <button onClick={() => { logout(); setShowUserMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full">
                                                 <LogOut size={14} />
                                                 {t("logout")}
                                             </button>
@@ -358,7 +353,7 @@ export default function Header() {
 
                             {/* User Profile / Login */}
                             <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-border-color">
-                                {mounted && user ? (
+                                {user ? (
                                     <div className="space-y-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary font-black text-xl uppercase">
