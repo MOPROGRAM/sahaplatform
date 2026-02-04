@@ -260,7 +260,7 @@ export default function Header() {
                                 </button>
 
                                 {showUserMenu && (
-                                    <div className="absolute top-full right-0 mt-2 w-56 bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl shadow-2xl py-2 z-[1010] rounded-2xl border border-white/20 dark:border-white/10">
+                                    <div className="absolute top-full right-0 mt-2 w-56 bg-white text-black dark:bg-gray-800 dark:text-white py-2 z-50 rounded-lg shadow-lg">
                                         <div className="space-y-1 p-1">
                                             {(user.role === "ADMIN" || user.email === "motwasel@yahoo.com") && (
                                                 <Link href="/admin" className="flex items-center gap-3 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#0ea5e9] hover:bg-sky-50 dark:hover:bg-sky-900/10 transition-colors relative" onClick={() => setShowUserMenu(false)}>
