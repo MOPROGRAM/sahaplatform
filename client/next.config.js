@@ -19,11 +19,14 @@ const nextConfig = {
             { protocol: 'https', hostname: '**.githubusercontent.com' }
         ]
     },
-    webpack: (config) => {
-        config.resolve.alias = {
-            ...config.resolve.alias,
-            '@': require('path').resolve(__dirname, 'src'),
-        };
+    webpack: (config, { isServer }) => {
+        if (isServer) {
+            config.resolve.alias = {
+                ...config.resolve.alias,
+                '@': require('path').resolve(__dirname, 'src'),
+                'async_hooks': false,
+            };
+        }
         return config;
     },
 };
