@@ -21,8 +21,8 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 8.0, // Higher intensity for more vibrant colors
-            ambientColor: 0x111111, // Very low ambient to make colored lights pop
+            lightIntensity: 12.0, // Much higher intensity for vibrant colors
+            ambientColor: 0x444444, // Higher ambient to ensure waves are visible
             light1Color: 0x1E90FF, // Dodger Blue - vibrant blue
             light2Color: 0x9370DB, // Medium Purple - vibrant purple
             light3Color: 0x00FFFF, // Cyan - bright turquoise
@@ -134,7 +134,7 @@ const InteractiveBackground = () => {
             const lightDistance = 500;
 
             // Add ambient light to ensure no part of the waves is completely black
-            const ambientLight = new THREE.AmbientLight(conf.ambientColor, 1.5);
+            const ambientLight = new THREE.AmbientLight(conf.ambientColor, 2.0);
             scene.add(ambientLight);
 
             light1 = new THREE.PointLight(conf.light1Color, conf.lightIntensity, lightDistance);
