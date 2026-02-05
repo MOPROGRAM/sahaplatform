@@ -43,7 +43,7 @@ export default function PromotedBanner() {
                     {loading ? (
                         // Skeleton Loading State
                         Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="min-w-[260px] sm:min-w-[280px] h-[250px] bg-white/5 dark:bg-black/20 rounded-2xl animate-pulse border border-white/10" />
+                            <div key={i} className="min-w-[260px] sm:min-w-[280px] h-[14rem] bg-white/5 dark:bg-black/20 rounded-2xl animate-pulse border border-white/10" />
                         ))
                     ) : (
                         ads.slice(0, 10).map((ad) => (
