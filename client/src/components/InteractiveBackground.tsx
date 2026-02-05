@@ -21,7 +21,7 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 80.0, // 4x intensity for super vibrant colors
+            lightIntensity: 320.0, // 16x intensity for ultra bright wave colors
             ambientColor: 0x666666, // Bright ambient to ensure waves are fully visible
             light1Color: 0x1E90FF, // Dodger Blue - vibrant blue
             light2Color: 0x9370DB, // Medium Purple - vibrant purple
