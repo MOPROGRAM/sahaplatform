@@ -53,8 +53,14 @@ const InteractiveBackground = () => {
         let animationId: number;
 
         const init = () => {
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                antialias: true, 
+                alpha: true,
+                powerPreference: "high-performance"
+            });
             renderer.setClearColor(0x000000, 0); // Set clear color to transparent
+            renderer.setPixelRatio(window.devicePixelRatio);
             camera = new THREE.PerspectiveCamera(conf.fov);
             camera.position.z = conf.cameraZ;
 
@@ -102,9 +108,15 @@ const InteractiveBackground = () => {
 
         const initScene = () => {
             scene = new THREE.Scene();
+            scene.background = null; // Ensure scene background is null
             initLights();
 
-            const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+            const mat = new THREE.MeshLambertMaterial({ 
+                color: 0xffffff, 
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.9
+            });
             const geo = new THREE.PlaneGeometry(wWidth, wHeight, wWidth / 2, wHeight / 2);
             plane = new THREE.Mesh(geo, mat);
             scene.add(plane);
