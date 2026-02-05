@@ -266,7 +266,7 @@ export default function AdCard({
 
     // Render Functions
     const renderStandardFace = () => (
-        <div className={`w-full h-full flex overflow-hidden ${isFeatured ? "bg-gray-50 dark:bg-zinc-800" : "bg-white dark:bg-[#050505]"} ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
+        <div className={`w-full h-full flex overflow-hidden bg-white dark:bg-[#050505] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
             <div className={`relative shrink-0 overflow-hidden bg-gray-50 dark:bg-zinc-900 ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-16") : "w-[35%] h-full"}`}>
                     {/* Shine Effect */}
@@ -390,7 +390,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gray-50 dark:bg-zinc-800" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -460,7 +460,7 @@ export default function AdCard({
 
     const renderDetailsMoreFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-gray-50 dark:bg-zinc-800" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -503,7 +503,7 @@ export default function AdCard({
 
     const renderContactFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center ${isFeatured ? "bg-gray-50 dark:bg-zinc-800" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -607,7 +607,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden ${isFeatured ? "bg-gray-50 dark:bg-zinc-800" : "bg-white dark:bg-black"} ${
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden bg-white dark:bg-black ${
                 isFeatured 
                     ? "border-2 border-yellow-400/80 shadow-[0_0_15px_rgba(250,204,21,0.3)] z-10"
                     : `border border-gray-300 dark:border-zinc-700 shadow-sm hover:shadow-xl ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
