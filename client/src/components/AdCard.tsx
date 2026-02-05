@@ -268,7 +268,7 @@ export default function AdCard({
     const renderStandardFace = () => (
         <div className={`w-full h-full flex overflow-hidden bg-white dark:bg-[#050505] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden bg-gray-50 dark:bg-zinc-900 ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-16") : "w-[35%] h-full"}`}>
+            <div className={`relative shrink-0 overflow-hidden bg-gray-50 dark:bg-zinc-900 ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-[35%]") : "w-[35%] h-full"}`}>
                     {/* Shine Effect */}
                     <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
@@ -538,13 +538,13 @@ export default function AdCard({
                     <span className="text-[8px] font-black text-gray-500 dark:text-gray-400">({authorRatingsCount})</span>
                 </div>
 
-                <div className="flex flex-col gap-1.5 w-full px-1">
+                <div className="flex flex-wrap items-center justify-center gap-2 w-full px-1">
                     <button
                         onClick={handleStartChat}
-                        className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-blue-500/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 transition-colors"
+                        className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-blue-500/30 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 transition-colors"
+                        title={(t as any)("messages")}
                     >
-                        <MessageCircle size={8} className="text-blue-500" />
-                        {(t as any)("messages")}
+                        <MessageCircle size={14} className="text-blue-500" />
                     </button>
 
                     {phone && (
@@ -552,20 +552,20 @@ export default function AdCard({
                             <a
                                 href={`tel:${phone}`}
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-primary/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary/10 transition-colors text-primary"
+                                className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-primary/30 rounded-full hover:bg-primary/10 transition-colors text-primary"
+                                title={(t as any)("call")}
                             >
-                                <Phone size={8} className="text-primary" />
-                                {(t as any)("call")}
+                                <Phone size={14} className="text-primary" />
                             </a>
                             <a
                                 href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-[#25D366]/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#25D366]/10 transition-colors text-[#25D366]"
+                                className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-[#25D366]/30 rounded-full hover:bg-[#25D366]/10 transition-colors text-[#25D366]"
+                                title={(t as any)("whatsapp")}
                             >
-                                <Logo className="w-2.5 h-2.5" />
-                                {(t as any)("whatsapp")}
+                                <Logo className="w-4 h-4" />
                             </a>
                         </>
                     )}
@@ -574,10 +574,10 @@ export default function AdCard({
                         <a
                             href={`mailto:${email}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-gray-600/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-gray-600 dark:text-gray-400"
+                            className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-gray-600/30 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-gray-600 dark:text-gray-400"
+                            title={(t as any)("email" as any)}
                         >
-                            <Mail size={8} className="text-gray-600 dark:text-gray-400" />
-                            {(t as any)("email" as any)}
+                            <Mail size={14} className="text-gray-600 dark:text-gray-400" />
                         </a>
                     )}
                 </div>
@@ -607,7 +607,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden ${
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden ${isVertical ? "w-[90%] mx-auto" : ""} ${
                 isFeatured 
                     ? "bg-gray-50 dark:bg-zinc-800 border-2 border-amber-400 dark:border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:shadow-[0_0_20px_rgba(251,191,36,0.6)]" 
                     : "bg-white dark:bg-black border border-gray-400 dark:border-zinc-600 shadow-sm hover:shadow-xl"
@@ -618,7 +618,8 @@ export default function AdCard({
             }`}
             style={{
                 perspective: '1000px',
-                minHeight: isVertical ? '120px' : 'auto'
+                height: isVertical ? '14rem' : 'auto',
+                minHeight: isVertical ? '14rem' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
