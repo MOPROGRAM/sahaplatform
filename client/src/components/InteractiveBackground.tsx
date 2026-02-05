@@ -21,12 +21,12 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 0.9,
-            ambientColor: 0x000000,
-            light1Color: 0x0E09DC, // Blue (Original)
-            light2Color: 0x1CD1E1, // Cyan (Original)
-            light3Color: 0x18C02C, // Green (Original)
-            light4Color: 0xee3bcf  // Pink (Original)
+            lightIntensity: 2.0, // Increased intensity
+            ambientColor: 0x222222, // Subtle ambient light
+            light1Color: 0x0E09DC, // Blue
+            light2Color: 0x1CD1E1, // Cyan
+            light3Color: 0x18C02C, // Green
+            light4Color: 0xee3bcf  // Pink
         };
 
         let renderer: THREE.WebGLRenderer;
@@ -108,14 +108,15 @@ const InteractiveBackground = () => {
 
         const initScene = () => {
             scene = new THREE.Scene();
-            scene.background = null; // Ensure scene background is null
+            scene.background = null;
             initLights();
 
-            const mat = new THREE.MeshLambertMaterial({ 
+            const mat = new THREE.MeshPhongMaterial({ 
                 color: 0xffffff, 
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.9
+                opacity: 0.8,
+                shininess: 100
             });
             const geo = new THREE.PlaneGeometry(wWidth, wHeight, wWidth / 2, wHeight / 2);
             plane = new THREE.Mesh(geo, mat);
@@ -218,7 +219,7 @@ const InteractiveBackground = () => {
     }, []);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-transparent z-0">
+        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-b from-blue-50/20 to-purple-50/20 dark:from-zinc-900/50 dark:to-zinc-950/50 z-0">
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full outline-none" />
         </div>
     );
