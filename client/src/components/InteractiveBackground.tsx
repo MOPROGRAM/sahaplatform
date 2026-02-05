@@ -54,6 +54,7 @@ const InteractiveBackground = () => {
 
         const init = () => {
             renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setClearColor(0x000000, 0); // Set clear color to transparent
             camera = new THREE.PerspectiveCamera(conf.fov);
             camera.position.z = conf.cameraZ;
 
