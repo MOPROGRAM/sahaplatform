@@ -21,12 +21,12 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 3.0, // Increased intensity for more vibrancy
-            ambientColor: 0x444444, // Brighter ambient light to avoid black areas
-            light1Color: 0x1E90FF, // Dodger Blue
-            light2Color: 0x9370DB, // Medium Purple
-            light3Color: 0x00CED1, // Dark Turquoise
-            light4Color: 0x48D1CC  // Medium Turquoise
+            lightIntensity: 5.0, // Further increased for more vibrancy
+            ambientColor: 0x888888, // Much brighter ambient to completely eliminate black
+            light1Color: 0x0000FF, // Pure Blue
+            light2Color: 0x8A2BE2, // Blue Violet (Purple)
+            light3Color: 0x00FFFF, // Cyan (Turquoise)
+            light4Color: 0x40E0D0  // Turquoise
         };
 
         let renderer: THREE.WebGLRenderer;
@@ -111,12 +111,13 @@ const InteractiveBackground = () => {
             scene.background = null;
             initLights();
 
-            const mat = new THREE.MeshPhongMaterial({ 
+            const mat = new THREE.MeshStandardMaterial({ 
                 color: 0xffffff, 
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.8,
-                shininess: 100
+                opacity: 0.95,
+                roughness: 0.3,
+                metalness: 0.2
             });
             const geo = new THREE.PlaneGeometry(wWidth, wHeight, wWidth / 2, wHeight / 2);
             plane = new THREE.Mesh(geo, mat);
@@ -131,6 +132,10 @@ const InteractiveBackground = () => {
             const r = 30;
             const y = 10;
             const lightDistance = 500;
+
+            // Add ambient light to ensure no part of the waves is completely black
+            const ambientLight = new THREE.AmbientLight(conf.ambientColor, 1.5);
+            scene.add(ambientLight);
 
             light1 = new THREE.PointLight(conf.light1Color, conf.lightIntensity, lightDistance);
             light1.position.set(0, y, r);
