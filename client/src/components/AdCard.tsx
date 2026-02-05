@@ -266,9 +266,9 @@ export default function AdCard({
 
     // Render Functions
     const renderStandardFace = () => (
-        <div className={`w-full h-full flex overflow-hidden ${isFeatured ? "bg-gradient-to-br from-slate-50 to-slate-200 dark:from-zinc-900 dark:to-zinc-800 border border-slate-300 dark:border-zinc-700" : "bg-white dark:bg-[#050505]"} ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
+        <div className={`w-full h-full flex overflow-hidden bg-white dark:bg-[#050505] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-52") : "w-[35%] h-full"}`}>
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-20") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
                 <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
@@ -390,7 +390,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -398,7 +398,7 @@ export default function AdCard({
             {/* Close/Next Controls */}
             <div className="absolute top-1 left-1 z-20">
                 <motion.button
-                    className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-amber-400 text-black" : "bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100"}`}
+                    className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100`}
                     drag="y"
                     dragMomentum={false}
                     onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -460,7 +460,7 @@ export default function AdCard({
 
     const renderDetailsMoreFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -503,7 +503,7 @@ export default function AdCard({
 
     const renderContactFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -607,23 +607,23 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} ${
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover bg-white dark:bg-black overflow-hidden ${
                 isFeatured 
-                    ? "bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] p-[5px] overflow-visible z-10"
-                    : `bento-card bento-card-hover border border-gray-300 dark:border-zinc-700 shadow-sm hover:shadow-xl bg-white dark:bg-black overflow-hidden ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
+                    ? "border-2 border-yellow-400/80 shadow-[0_0_15px_rgba(250,204,21,0.3)] z-10"
+                    : `border border-gray-300 dark:border-zinc-700 shadow-sm hover:shadow-xl ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
             }`}
             style={{
                 perspective: '1000px',
-                minHeight: isVertical ? '380px' : 'auto'
+                minHeight: isVertical ? '250px' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
             {isFeatured && (
-                <div className="absolute top-[30px] left-0 right-0 h-full w-full scale-[0.8] blur-[25px] bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] -z-10 transition-opacity duration-500 opacity-100 group-hover:opacity-0" />
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-transparent opacity-50 pointer-events-none" />
             )}
             
-            <div className={`relative w-full h-full ${isFeatured ? 'z-[2] rounded-xl overflow-hidden' : ''}`} style={{ perspective: 1000 }}>
+            <div className="relative w-full h-full" style={{ perspective: 1000 }}>
                 <motion.div
                     className="w-full h-full relative"
                     style={{ transformStyle: 'preserve-3d' }}
