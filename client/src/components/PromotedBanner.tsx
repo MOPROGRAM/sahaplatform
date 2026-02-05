@@ -4,13 +4,11 @@ import { useEffect, useState } from "react";
 import { adsService } from "@/lib/ads";
 import { useLanguage } from '@/lib/language-context';
 import AdCard from "./AdCard";
-import HoneycombBackground from "./HoneycombBackground";
 
 export default function PromotedBanner() {
     const [ads, setAds] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const { t, language } = useLanguage();
-    const [mouseState, setMouseState] = useState({ x: 0, y: 0, active: false });
 
     useEffect(() => {
         let mounted = true;
@@ -28,34 +26,10 @@ export default function PromotedBanner() {
         return () => { mounted = false; };
     }, []);
 
-    const handleMouseMove = (e: React.MouseEvent) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setMouseState({
-            x: e.clientX - rect.left - rect.width / 2,
-            y: e.clientY - rect.top - rect.height / 2,
-            active: true
-        });
-    };
-
-    const handleMouseLeave = () => {
-        setMouseState(prev => ({ ...prev, active: false }));
-    };
-
     if (!loading && !ads.length) return null;
 
     return (
-        <div 
-            className="w-full my-1 px-0 sm:px-2 relative group overflow-hidden"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-        >
-            {/* Animated Honeycomb Background */}
-            <HoneycombBackground 
-                mouseX={mouseState.x} 
-                mouseY={mouseState.y} 
-                isActive={mouseState.active} 
-            />
-
+        <div className="w-full my-1 px-0 sm:px-2 relative group overflow-hidden">
             <div className="relative w-full z-10">
                 <div className="flex items-center gap-2 mb-1 px-2 pt-1">
                     <div className="w-1 h-4 bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
