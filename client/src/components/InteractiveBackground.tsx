@@ -21,12 +21,12 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 2.0, // Increased intensity
-            ambientColor: 0x222222, // Subtle ambient light
-            light1Color: 0x0E09DC, // Blue
-            light2Color: 0x1CD1E1, // Cyan
-            light3Color: 0x18C02C, // Green
-            light4Color: 0xee3bcf  // Pink
+            lightIntensity: 3.0, // Increased intensity for more vibrancy
+            ambientColor: 0x444444, // Brighter ambient light to avoid black areas
+            light1Color: 0x1E90FF, // Dodger Blue
+            light2Color: 0x9370DB, // Medium Purple
+            light3Color: 0x00CED1, // Dark Turquoise
+            light4Color: 0x48D1CC  // Medium Turquoise
         };
 
         let renderer: THREE.WebGLRenderer;
@@ -219,7 +219,7 @@ const InteractiveBackground = () => {
     }, []);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-b from-blue-50/20 to-purple-50/20 dark:from-zinc-900/50 dark:to-zinc-950/50 z-0">
+        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-br from-blue-100/20 via-purple-100/20 to-turquoise-100/20 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-zinc-900/20 z-0">
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full outline-none" />
         </div>
     );
