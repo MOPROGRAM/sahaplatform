@@ -50,7 +50,10 @@
     "homepage": "https://github.com/your-username/saha-platform#readme",
     "dependencies": {
         "@supabase/supabase-js": "^2.94.0",
+        "@types/three": "^0.182.0",
         "dotenv": "^17.2.3",
-        "eslint": "^9.39.2"
+        "eslint": "^9.39.2",
+        "simplex-noise": "^4.0.3",
+        "three": "^0.182.0"
     }
 }
