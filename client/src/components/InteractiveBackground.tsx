@@ -59,8 +59,8 @@ const InteractiveBackground = () => {
                     x,
                     y,
                     z,
-                    vx: (Math.random() - 0.5) * 0.5 * z,
-                    vy: (Math.random() - 0.5) * 0.5 * z,
+                    vx: (Math.random() - 0.5) * 0.1 * z, // Reduced speed from 0.5 to 0.1
+                    vy: (Math.random() - 0.5) * 0.1 * z, // Reduced speed from 0.5 to 0.1
                     radius: Math.random() * 2 * z,
                     baseX: x,
                     baseY: y,
@@ -73,7 +73,7 @@ const InteractiveBackground = () => {
             ctx.clearRect(0, 0, width, height);
             
             // Draw connecting lines first (behind particles)
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 1; // Increased line width from 0.5 to 1
             
             particles.forEach((p, index) => {
                 // Update position
@@ -111,7 +111,8 @@ const InteractiveBackground = () => {
 
                     if (distance < connectionDistance) {
                         ctx.beginPath();
-                        const opacity = (1 - distance / connectionDistance) * 0.2 * p.z;
+                        // Increased opacity multiplier from 0.2 to 0.5 for clearer lines
+                        const opacity = (1 - distance / connectionDistance) * 0.5 * p.z;
                         ctx.strokeStyle = isDark 
                             ? `rgba(245, 158, 11, ${opacity})` 
                             : `rgba(251, 191, 36, ${opacity})`;
@@ -125,7 +126,8 @@ const InteractiveBackground = () => {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
-                ctx.globalAlpha = 0.6 * p.z; // Depth effect via opacity
+                // Increased global alpha from 0.6 to 0.9 for more vibrant colors
+                ctx.globalAlpha = 0.9 * p.z; 
                 ctx.fill();
                 ctx.globalAlpha = 1;
             });
