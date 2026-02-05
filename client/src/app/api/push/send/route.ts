@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import webpush from 'web-push';
+import { sendPushNotification } from '@/lib/push-sender';
 
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 // Initialize Supabase client
@@ -11,18 +11,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Configure web-push
-// Note: In production, these keys should be strictly checked
+// Configure VAPID keys
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
-
-if (vapidPublicKey && vapidPrivateKey) {
-  webpush.setVapidDetails(
-    'mailto:support@sahaplatform.com',
-    vapidPublicKey,
-    vapidPrivateKey
-  );
-}
 
 // Send push notification
 export async function POST(request: NextRequest) {
@@ -59,43 +50,36 @@ export async function POST(request: NextRequest) {
 
     const subscription = subscriptionData.subscription;
 
-    // Prepare notification payload
-    const payload = JSON.stringify({
-      title,
-      body,
-      icon: '/icon-192x192.png',
-      badge: '/icon-72x72.png',
-      tag: 'saha-notification',
-      data: {
-        ...data,
-        url: data.url || '/notifications',
-        timestamp: new Date().toISOString()
-      }
-    });
+    // Store notification in database FIRST
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: userId,
+        title,
+        message: body,
+        type: 'push',
+        data: data,
+        is_read: false,
+        created_at: new Date().toISOString()
+      });
 
-    // Send push notification
+    if (notificationError) {
+      console.error('Failed to store notification:', notificationError);
+    }
+
+    // Send push notification using Edge-compatible custom sender
+    // Note: Payload is not sent due to encryption complexity in Edge. 
+    // SW will fetch details or show generic message.
     try {
-      await webpush.sendNotification(
+      await sendPushNotification(
         subscription,
-        payload
+        null, // No payload
+        {
+            publicKey: vapidPublicKey,
+            privateKey: vapidPrivateKey,
+            subject: 'mailto:support@sahaplatform.com'
+        }
       );
-
-      // Store notification in database
-      const { error: notificationError } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: userId,
-          title,
-          message: body,
-          type: 'push',
-          data: data,
-          is_read: false,
-          created_at: new Date().toISOString()
-        });
-
-      if (notificationError) {
-        console.error('Failed to store notification:', notificationError);
-      }
 
       return NextResponse.json({
         success: true,
@@ -104,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     } catch (pushError: any) {
       // Handle specific push errors
-      if (pushError.statusCode === 410) {
+      if (pushError.message === 'Subscription expired') {
         // Subscription expired, remove it
         await supabase
           .from('push_subscriptions')
@@ -119,7 +103,7 @@ export async function POST(request: NextRequest) {
 
       console.error('Push notification failed:', pushError);
       return NextResponse.json(
-        { error: 'Failed to send push notification' },
+        { error: 'Failed to send push notification', details: pushError.message },
         { status: 500 }
       );
     }
@@ -153,7 +137,6 @@ export async function PUT(request: NextRequest) {
     }
 
     let successCount = 0;
-    let failureCount = 0;
 
     // Get all subscriptions for the users
     const { data: subscriptions, error } = await supabase
@@ -168,61 +151,43 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Store notifications first
+    const notificationsToInsert = userIds.map(uid => ({
+        user_id: uid,
+        title,
+        message: body,
+        type: 'push',
+        data: data,
+        is_read: false,
+        created_at: new Date().toISOString()
+    }));
+    
+    await supabase.from('notifications').insert(notificationsToInsert);
+
     // Send notifications to all subscribers
     for (const subscriptionData of subscriptions || []) {
       try {
-        const payload = JSON.stringify({
-          title,
-          body,
-          icon: '/icon-192x192.png',
-          badge: '/icon-72x72.png',
-          tag: 'saha-broadcast',
-          data: {
-            ...data,
-            url: data.url || '/notifications',
-            timestamp: new Date().toISOString()
-          }
-        });
-
-        await webpush.sendNotification(
+        await sendPushNotification(
           subscriptionData.subscription,
-          payload
+          null,
+          {
+            publicKey: vapidPublicKey,
+            privateKey: vapidPrivateKey,
+            subject: 'mailto:support@sahaplatform.com'
+          }
         );
 
         successCount++;
 
-        // Store notification in database
-        await supabase
-          .from('notifications')
-          .insert({
-            user_id: subscriptionData.user_id,
-            title,
-            message: body,
-            type: 'push',
-            data: data,
-            is_read: false,
-            created_at: new Date().toISOString()
-          });
-
-      } catch (pushError: any) {
-        failureCount++;
-        
-        // Handle expired subscriptions
-        if (pushError.statusCode === 410) {
-          await supabase
-            .from('push_subscriptions')
-            .delete()
-            .eq('user_id', subscriptionData.user_id);
-        }
+      } catch (e) {
+        console.error(`Failed to send to user ${subscriptionData.user_id}`, e);
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Broadcast completed',
       successCount,
-      failureCount,
-      total: subscriptions?.length || 0
+      total: userIds.length
     });
 
   } catch (error) {
