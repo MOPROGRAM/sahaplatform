@@ -618,8 +618,8 @@ export default function AdCard({
             }`}
             style={{
                 perspective: '1000px',
-                height: isVertical ? '14rem' : 'auto',
-                minHeight: isVertical ? '14rem' : 'auto'
+                height: isVertical ? '9.5rem' : 'auto',
+                minHeight: isVertical ? '9.5rem' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
