@@ -23,10 +23,10 @@ const InteractiveBackground = () => {
             zCoef: 10,
             lightIntensity: 0.9,
             ambientColor: 0x000000,
-            light1Color: 0xf59e0b, // Amber
-            light2Color: 0x7c3aed, // Purple
-            light3Color: 0xd97706, // Deep Orange
-            light4Color: 0xc026d3  // Fuchsia
+            light1Color: 0x0E09DC, // Blue (Original)
+            light2Color: 0x1CD1E1, // Cyan (Original)
+            light3Color: 0x18C02C, // Green (Original)
+            light4Color: 0xee3bcf  // Pink (Original)
         };
 
         let renderer: THREE.WebGLRenderer;
@@ -61,20 +61,42 @@ const InteractiveBackground = () => {
             window.addEventListener('resize', updateSize, false);
 
             document.addEventListener('mousemove', handleMouseMove);
-
+            
             initScene();
             animate();
         };
 
         const handleMouseMove = (e: MouseEvent) => {
+            if (!container) return;
+            const rect = container.getBoundingClientRect();
+            
+            // Check if mouse is within the container bounds
+            const isInside = (
+                e.clientX >= rect.left &&
+                e.clientX <= rect.right &&
+                e.clientY >= rect.top &&
+                e.clientY <= rect.bottom
+            );
+
+            if (!isInside) return;
+
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
             const v = new THREE.Vector3();
             camera.getWorldDirection(v);
             v.normalize();
             mousePlane.normal = v;
-            mouse.x = (e.clientX / width) * 2 - 1;
-            mouse.y = - (e.clientY / height) * 2 + 1;
+            
+            mouse.x = (x / width) * 2 - 1;
+            mouse.y = - (y / height) * 2 + 1;
+            
             raycaster.setFromCamera(mouse, camera);
             raycaster.ray.intersectPlane(mousePlane, mousePosition);
+        };
+
+        const handleMouseLeave = () => {
+             // Optional: Reset mouse interaction or stop movement when leaving
         };
 
         const initScene = () => {
@@ -182,9 +204,8 @@ const InteractiveBackground = () => {
     }, []);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-br from-amber-50/50 via-purple-100/30 to-orange-50/50 dark:from-zinc-900 dark:via-purple-900/10 dark:to-zinc-900 z-0">
+        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-transparent z-0">
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full outline-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent dark:from-black/40 pointer-events-none" />
         </div>
     );
 };
