@@ -41,8 +41,8 @@ const InteractiveBackground = () => {
         const connectionDistance = 100;
         const mouseRadius = 150;
         const colors = isDark 
-            ? ['#f59e0b', '#d97706', '#b45309'] // Dark mode: Deep Amber/Orange
-            : ['#fbbf24', '#f59e0b', '#fcd34d']; // Light mode: Bright Amber/Yellow
+            ? ['#f59e0b', '#d97706', '#8b5cf6', '#7c3aed', '#c026d3'] // Dark mode: Amber, Orange, Violet, Purple, Fuchsia
+            : ['#fbbf24', '#f59e0b', '#a78bfa', '#c084fc', '#e879f9']; // Light mode: Bright Amber, Light Violet, Purple
 
         const init = () => {
             width = container.clientWidth;
@@ -167,7 +167,7 @@ const InteractiveBackground = () => {
     }, [theme]);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-br from-orange-50/50 via-amber-100/30 to-orange-50/50 dark:from-zinc-900 dark:via-zinc-800/50 dark:to-zinc-900 z-0">
+        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-br from-amber-50/50 via-purple-100/30 to-orange-50/50 dark:from-zinc-900 dark:via-purple-900/10 dark:to-zinc-900 z-0">
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
             {/* Gradient Overlay for blending */}
             <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent dark:from-black/40 pointer-events-none" />
