@@ -52,7 +52,7 @@ export default function HoneycombBackground({ mouseX, mouseY, isActive }: Honeyc
         if (hash < 20) { // Increased to 20% chance
             const iconIndex = (row + col) % icons.length;
             const Icon = icons[iconIndex];
-            return <Icon size={12} className="text-amber-600/60 opacity-80" />; // Increased visibility
+            return <Icon size={14} className="text-amber-700 dark:text-amber-500 opacity-90" />; // Increased visibility
         }
         return null;
     };
@@ -63,7 +63,7 @@ export default function HoneycombBackground({ mouseX, mouseY, isActive }: Honeyc
 
     return (
         <div 
-            className="absolute inset-0 overflow-hidden -z-10 pointer-events-none"
+            className="absolute inset-0 overflow-hidden -z-10 pointer-events-none bg-amber-50/50 dark:bg-amber-900/10"
         >
             <div 
                 className="absolute inset-[-100px] flex flex-col justify-center transition-transform ease-out"
@@ -80,10 +80,10 @@ export default function HoneycombBackground({ mouseX, mouseY, isActive }: Honeyc
                         {Array.from({ length: cols }).map((_, c) => (
                             <div 
                                 key={`${r}-${c}`}
-                                className="w-[44px] h-[50px] mx-[1px] relative flex items-center justify-center shrink-0"
+                                className="w-[44px] h-[50px] mx-[1px] relative flex items-center justify-center shrink-0 transition-colors duration-300"
                                 style={{
                                     clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                    backgroundColor: "rgba(245, 158, 11, 0.15)" // Increased opacity (orange)
+                                    backgroundColor: "rgba(245, 158, 11, 0.2)" // Stronger orange
                                 }}
                             >
                                 {/* Inner border effect */}
@@ -91,11 +91,11 @@ export default function HoneycombBackground({ mouseX, mouseY, isActive }: Honeyc
                                     className="absolute inset-[1px] flex items-center justify-center"
                                     style={{
                                         clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                        backgroundColor: "rgba(255, 255, 255, 0.5)" // Lighter inner for contrast
+                                        backgroundColor: "rgba(255, 255, 255, 0.1)" // Reduced washout
                                     }}
                                 >
                                      <div 
-                                        className="absolute inset-[1px] flex items-center justify-center bg-white/30 dark:bg-black/20"
+                                        className="absolute inset-[1px] flex items-center justify-center bg-white/10 dark:bg-black/10 hover:bg-amber-500/20 transition-colors"
                                         style={{
                                             clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
                                         }}

@@ -45,7 +45,7 @@ export default function PromotedBanner() {
 
     return (
         <div 
-            className="w-full my-0 px-0 sm:px-2 relative group overflow-hidden min-h-[280px]"
+            className="w-full my-4 px-0 sm:px-2 relative group overflow-hidden"
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
@@ -65,7 +65,7 @@ export default function PromotedBanner() {
                 </div>
 
                 {/* Horizontal Scroll for Ads */}
-                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-4 scrollbar-hide px-2">
+                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-2 scrollbar-hide px-2">
                     {loading ? (
                         // Skeleton Loading State
                         Array.from({ length: 4 }).map((_, i) => (
@@ -73,7 +73,7 @@ export default function PromotedBanner() {
                         ))
                     ) : (
                         ads.slice(0, 10).map((ad) => (
-                            <div key={ad.id} className="min-w-[260px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01] p-2">
+                            <div key={ad.id} className="min-w-[260px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01] py-1 px-1">
                                 <div className="dark h-full">
                                     <AdCard 
                                         {...ad} 
