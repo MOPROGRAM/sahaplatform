@@ -21,12 +21,12 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 5.0,
-            ambientColor: 0x888888,
+            lightIntensity: 6.0, // More power to the colored lights
+            ambientColor: 0x222222, // Lower ambient to emphasize colored lights on waves
             light1Color: 0x0000FF, // Pure Blue
             light2Color: 0x800080, // Purple
             light3Color: 0x00FFFF, // Turquoise/Cyan
-            light4Color: 0x40E0D0  // Turquoise
+            light4Color: 0x00CED1  // Dark Turquoise
         };
 
         let renderer: THREE.WebGLRenderer;
@@ -112,12 +112,12 @@ const InteractiveBackground = () => {
             initLights();
 
             const mat = new THREE.MeshStandardMaterial({ 
-                color: 0xffffff, 
+                color: 0xe0ffff, // Light Cyan/Turquoise base color for the waves
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.95,
-                roughness: 0.3,
-                metalness: 0.2
+                opacity: 0.9,
+                roughness: 0.2,
+                metalness: 0.1
             });
             const geo = new THREE.PlaneGeometry(wWidth, wHeight, wWidth / 2, wHeight / 2);
             plane = new THREE.Mesh(geo, mat);
@@ -224,7 +224,7 @@ const InteractiveBackground = () => {
     }, []);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-br from-blue-400/30 via-purple-400/30 to-turquoise-400/30 dark:from-blue-900/40 dark:via-purple-900/40 dark:to-cyan-900/40 z-0">
+        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-transparent z-0">
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full outline-none" />
         </div>
     );
