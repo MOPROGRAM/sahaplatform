@@ -607,7 +607,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden ${isVertical ? "w-[90%] mx-auto" : ""} ${
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden ${isVertical ? "w-full" : ""} ${
                 isFeatured 
                     ? "bg-gray-50 dark:bg-zinc-800 shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:shadow-[0_0_20px_rgba(251,191,36,0.6)]" 
                     : "bg-white dark:bg-black shadow-sm hover:shadow-xl"
