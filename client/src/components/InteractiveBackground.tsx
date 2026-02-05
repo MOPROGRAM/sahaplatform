@@ -21,11 +21,11 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 5.0, // Further increased for more vibrancy
-            ambientColor: 0x888888, // Much brighter ambient to completely eliminate black
+            lightIntensity: 5.0,
+            ambientColor: 0x888888,
             light1Color: 0x0000FF, // Pure Blue
-            light2Color: 0x8A2BE2, // Blue Violet (Purple)
-            light3Color: 0x00FFFF, // Cyan (Turquoise)
+            light2Color: 0x800080, // Purple
+            light3Color: 0x00FFFF, // Turquoise/Cyan
             light4Color: 0x40E0D0  // Turquoise
         };
 
@@ -224,7 +224,7 @@ const InteractiveBackground = () => {
     }, []);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-br from-blue-100/20 via-purple-100/20 to-turquoise-100/20 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-zinc-900/20 z-0">
+        <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-br from-blue-400/30 via-purple-400/30 to-turquoise-400/30 dark:from-blue-900/40 dark:via-purple-900/40 dark:to-cyan-900/40 z-0">
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full outline-none" />
         </div>
     );

@@ -343,7 +343,7 @@ export default function AdCard({
             </div>
 
             {/* Content Section */}
-            <div className={`flex-1 flex flex-col p-2 ${isVertical ? "gap-0.5" : "justify-center"}`}>
+            <div className={`flex-[2] flex flex-col p-2 ${isVertical ? "gap-0.5" : "justify-center"}`}>
                 <div className="flex items-start justify-between gap-2">
                     <h3 className="text-[10px] sm:text-xs font-bold text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-300">
                         {currentTitle}
