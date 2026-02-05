@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DepthInput from '@/components/ui/DepthInput';
+import PushNotificationToggle from '@/components/PushNotificationToggle';
 
 export default function SettingsPage() {
     const { language, setLanguage, t, theme, toggleTheme } = useLanguage();
@@ -229,27 +230,9 @@ export default function SettingsPage() {
                             </h2>
                         </div>
 
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="font-semibold text-text-main">
-                                        {language === 'ar' ? 'إشعارات الدفع' : 'Push Notifications'}
-                                    </p>
-                                    <p className="text-sm text-text-muted">
-                                        {language === 'ar' ? 'تلقي إشعارات حول العروض الجديدة' : 'Receive notifications about new offers'}
-                                    </p>
-                                </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="sr-only peer"
-                                        checked={notifications}
-                                        onChange={(e) => setNotifications(e.target.checked)}
-                                    />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
-                            </div>
-
+                        <div className="space-y-6">
+                            <PushNotificationToggle />
+                            
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="font-semibold text-text-main">

@@ -353,7 +353,7 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     // تسجيل صوتي مباشر
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-    const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+    const chunksRef = useRef<Blob[]>([]);
     
     // حالة القائمة المنبثقة للوسائط
     const [showMediaMenu, setShowMediaMenu] = useState(false);
@@ -362,34 +362,59 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const recorder = new MediaRecorder(stream);
-            const chunks: Blob[] = [];
+            
+            // Check for supported MIME types
+            let mimeType = 'audio/webm';
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                mimeType = 'audio/webm;codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                mimeType = 'audio/mp4';
+            }
+            
+            const recorder = new MediaRecorder(stream, { mimeType });
+            chunksRef.current = []; // Reset chunks
 
             recorder.ondataavailable = (e) => {
                 if (e.data.size > 0) {
-                    chunks.push(e.data);
+                    chunksRef.current.push(e.data);
                 }
             };
 
             recorder.onstop = async () => {
-                const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-                const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: 'audio/webm' });
+                const blob = new Blob(chunksRef.current, { type: mimeType });
+                
+                if (blob.size === 0) {
+                    console.error("No audio recorded");
+                    return;
+                }
+                
+                // Determine extension based on mimeType
+                const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+                const audioFile = new File([blob], `voice-message-${Date.now()}.${ext}`, { type: mimeType });
                 
                 // رفع الملف الصوتي
-                const uploadData = await handleFileUpload(audioFile, 'file');
-                if (uploadData) {
-                    handleSend('voice', `Voice message`, uploadData);
+                try {
+                    // Force type to 'file' to use chat-files bucket which should handle audio
+                    const uploadData = await handleFileUpload(audioFile, 'file');
+                    
+                    if (uploadData) {
+                        await handleSend('voice', `Voice message`, uploadData);
+                    } else {
+                        throw new Error("Upload failed");
+                    }
+                } catch (error) {
+                    console.error("Failed to send voice message:", error);
+                    alert(language === 'ar' ? 'فشل إرسال الرسالة الصوتية' : 'Failed to send voice message');
                 }
 
                 // إيقاف الميكروفون
                 stream.getTracks().forEach(track => track.stop());
-                setAudioChunks([]);
+                chunksRef.current = [];
             };
 
             recorder.start();
             setMediaRecorder(recorder);
             setIsRecording(true);
-            setAudioChunks([]);
 
         } catch (error) {
             console.error('Error starting recording:', error);

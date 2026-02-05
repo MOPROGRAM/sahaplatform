@@ -29,6 +29,7 @@
     "resend": "^6.8.0",
     "socket.io-client": "^4.7.5",
     "tailwind-merge": "^2.3.0",
+    "web-push": "^3.6.7",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.4.23",
     "eslint": "^8",
     "eslint-config-next": "14.2.18",

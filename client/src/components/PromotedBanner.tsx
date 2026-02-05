@@ -28,9 +28,9 @@ export default function PromotedBanner() {
 
     if (loading) {
         return (
-            <div className="w-full my-6 px-4">
-                <div className="w-full h-[254px] bg-gray-100 dark:bg-[#1a1a1a] rounded-[1rem] animate-pulse relative overflow-hidden">
-                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
+            <div className="w-full my-1 px-4">
+                <div className="w-full h-[254px] bg-[#1a1a1a] rounded-[1rem] animate-pulse relative overflow-hidden border border-white/5 shadow-inner">
+                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
                 </div>
             </div>
         );
@@ -39,83 +39,27 @@ export default function PromotedBanner() {
     if (!ads.length) return null;
 
     return (
-        <div className="w-full my-3 px-4">
-            <style jsx>{`
-                .card {
-                    width: 100%;
-                    padding: 4px;
-                    border-radius: 2rem;
-                    overflow: visible;
-                    background: var(--card-bg);
-                    position: relative;
-                    z-index: 1;
-                    min-height: 240px;
-                    height: auto;
-                    box-shadow: 0 8px 32px rgba(var(--primary-rgb), 0.15), 0 0 0 2px var(--primary);
-                    border: 2px solid var(--primary);
-                }
+        <div className="w-full my-1 px-0 sm:px-2">
+            <div className="relative w-full">
+                <div className="flex items-center gap-2 mb-2 px-2">
+                    <div className="w-1 h-4 bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+                    <h3 className="text-amber-500 text-xs font-black uppercase tracking-widest shadow-amber-500/20 drop-shadow-sm">
+                        {language === 'ar' ? 'إعلانات مميزة' : 'PROMOTED'}
+                    </h3>
+                </div>
 
-                .card-info {
-                    background: var(--card-bg);
-                    color: var(--text-main);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    height: 100%;
-                    overflow: visible;
-                    border-radius: 1.8rem;
-                    position: relative;
-                    padding: 0.5rem;
-                }
-
-                .card-info::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='decorative-pattern' width='10' height='10' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='5' cy='5' r='1' fill='%23FF7D00' opacity='0.2'/%3E%3Cline x1='0' y1='0' x2='10' y2='10' stroke='%23FF7D00' stroke-width='0.5' opacity='0.1'/%3E%3Cline x1='0' y1='10' x2='10' y2='0' stroke='%23FF7D00' stroke-width='0.5' opacity='0.1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23decorative-pattern)'/%3E%3C/svg%3E");
-                    opacity: 0.9;
-                    z-index: -1;
-                    border-radius: 1.8rem;
-                }
-            `}</style>
-            
-            {/* Main Card */}
-            <div className="card max-w-[1920px] mx-auto">
-                <div className="card-info">
-                    <div className="w-full h-full p-2">
-                        {/* Horizontal Scroll for Ads with proper card sizing */}
-                        <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x">
-                            {ads.slice(0, 10).map((ad) => {
-                                let images: string[] = [];
-                                try {
-                                    if (Array.isArray(ad.images)) {
-                                        images = ad.images;
-                                    } else if (typeof ad.images === 'string') {
-                                        images = JSON.parse(ad.images);
-                                    }
-                                } catch (e) {
-                                    images = [];
-                                }
-
-                                return (
-                                    <div key={ad.id} className="snap-start shrink-0 flex-shrink-0 basis-[calc(50%-4px)] sm:basis-[calc(33.333%-4px)] md:basis-[calc(25%-4px)] lg:basis-[calc(20%-4px)] xl:basis-[calc(16.666%-4px)] 2xl:basis-[calc(14.285%-4px)]">
-                                        <AdCard 
-                                            {...ad}
-                                            images={images}
-                                            layout="vertical"
-                                            className="bento-card bento-card-hover group flex shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-amber-400 ring-2 ring-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.3)] rounded-2xl bg-white dark:bg-[#1a1a1a] overflow-hidden relative cursor-pointer block h-full"
-                                            isFeatured={true}
-                                            language={language}
-                                        />
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+                {/* Horizontal Scroll for Ads */}
+                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-2 scrollbar-hide px-2">
+                    {ads.slice(0, 10).map((ad) => (
+                         <div key={ad.id} className="min-w-[260px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01]">
+                            <div className="dark h-full">
+                                <AdCard 
+                                    {...ad} 
+                                    className="!bg-[#050505] !border-white/10 hover:!border-amber-500/30 transition-all duration-300 !shadow-lg h-full" 
+                                />
+                            </div>
+                         </div>
+                    ))}
                 </div>
             </div>
         </div>
