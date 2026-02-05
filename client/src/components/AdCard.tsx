@@ -610,11 +610,11 @@ export default function AdCard({
             className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} ${
                 isFeatured 
                     ? "bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] p-[5px] overflow-visible z-10"
-                    : `bento-card bento-card-hover border border-transparent dark:border-white/5 shadow-sm hover:shadow-xl bg-white dark:bg-black overflow-hidden ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
+                    : `bento-card bento-card-hover border border-gray-300 dark:border-zinc-700 shadow-sm hover:shadow-xl bg-white dark:bg-black overflow-hidden ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
             }`}
             style={{
                 perspective: '1000px',
-                height: isVertical && !imageHeight ? '180px' : 'auto'
+                minHeight: isVertical ? '280px' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}

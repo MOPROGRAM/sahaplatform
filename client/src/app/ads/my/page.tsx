@@ -137,7 +137,7 @@ export default function MyAdsPage() {
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
                         {ads.map((ad) => (
-                            <div key={ad.id} className="h-full">
+                            <div key={ad.id} className="h-full flex flex-col">
                                 <AdCard
                                     id={ad.id}
                                     title={ad.title}
@@ -152,6 +152,7 @@ export default function MyAdsPage() {
                                     email={ad.author?.email}
                                     authorRating={ad.author?.avg_rating}
                                     authorRatingsCount={ad.author?.ratings_count}
+                                    className="flex-1"
                                 />
                                 <div className="mt-2 flex justify-end gap-2 px-2">
                                     <button
