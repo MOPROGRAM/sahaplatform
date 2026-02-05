@@ -266,7 +266,7 @@ export default function AdCard({
 
     // Render Functions
     const renderStandardFace = () => (
-        <div className={`w-full h-full flex overflow-hidden ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"} ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
+        <div className={`w-full h-full flex overflow-hidden ${isFeatured ? "bg-gradient-to-br from-slate-50 to-slate-200 dark:from-zinc-900 dark:to-zinc-800 border border-slate-300 dark:border-zinc-700" : "bg-white dark:bg-[#050505]"} ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
             <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-32") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}

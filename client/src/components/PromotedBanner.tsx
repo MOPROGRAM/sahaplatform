@@ -45,7 +45,7 @@ export default function PromotedBanner() {
 
     return (
         <div 
-            className="w-full my-4 px-0 sm:px-2 relative group overflow-hidden"
+            className="w-full my-1 px-0 sm:px-2 relative group overflow-hidden"
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
@@ -57,7 +57,7 @@ export default function PromotedBanner() {
             />
 
             <div className="relative w-full z-10">
-                <div className="flex items-center gap-2 mb-2 px-2 pt-2">
+                <div className="flex items-center gap-2 mb-1 px-2 pt-1">
                     <div className="w-1 h-4 bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
                     <h3 className="text-amber-500 text-xs font-black uppercase tracking-widest shadow-amber-500/20 drop-shadow-sm">
                         {language === 'ar' ? 'إعلانات مميزة' : 'PROMOTED'}
@@ -65,7 +65,7 @@ export default function PromotedBanner() {
                 </div>
 
                 {/* Horizontal Scroll for Ads */}
-                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-2 scrollbar-hide px-2">
+                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-1 scrollbar-hide px-2">
                     {loading ? (
                         // Skeleton Loading State
                         Array.from({ length: 4 }).map((_, i) => (
