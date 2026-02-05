@@ -78,7 +78,7 @@ export default function MessagesPage() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-bg">
+        <div className="flex flex-col h-full bg-gray-bg">
             <Header />
 
             <main className="max-w-[1920px] mx-auto w-full flex-1 flex overflow-hidden p-4 gap-4">

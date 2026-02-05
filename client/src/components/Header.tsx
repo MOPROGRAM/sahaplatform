@@ -94,37 +94,16 @@ export default function Header() {
 
             <div className="relative">
                 <div className="max-w-[1920px] mx-auto px-4 flex items-center justify-between gap-4 relative z-50">
-                    {/* Brand & Left Mobile Controls */}
+                    {/* Brand & Logo */}
                     <div className="flex items-center gap-4 shrink-0">
-                        <button
-                            onClick={() => setShowMobileMenu(true)}
-                            className="lg:hidden p-2 -ml-2 text-text-main hover:bg-primary/10 rounded-full transition-colors"
-                        >
-                            <Menu size={24} />
-                        </button>
-                        <Link href="/" className="group flex items-center gap-2 relative" prefetch={false}>
-                            {/* Hover Glow Effect */}
-                            <div className="hover-glow-circle" />
-
-                            <div className="relative flex items-center gap-2">
-                                {/* Mobile Logo */}
-                                <Logo className="h-9 w-auto sm:hidden text-primary transition-all duration-1000 group-hover:scale-110" strokeWidth="8.11" />
-
-                                {/* Desktop Logo (Name + Underline) */}
-                                <div className="hidden sm:flex flex-col items-center">
-                                    <span
-                                        className="text-3xl font-black tracking-tighter italic transition-all duration-1000 group-hover:scale-105 leading-none text-primary"
-                                    >
-                                        {t("siteName")}
-                                    </span>
-                                    <Logo
-                                        viewBox="14 22 72 36"
-                                        preserveAspectRatio="none"
-                                        className="h-4 w-[101.1%] transition-all duration-1000 group-hover:scale-110 text-primary"
-                                        strokeWidth="8.11"
-                                    />
-                                </div>
-                            </div>
+                        {/* Mobile Menu Button Removed - Moved to Bottom Nav */}
+                        
+                        <Link href="/" className="flex items-center gap-2 group">
+                            <Logo className="w-8 h-8 sm:w-10 sm:h-10 text-primary transition-transform duration-300 group-hover:scale-110" />
+                            <span className="text-xl sm:text-2xl font-black tracking-tighter hidden sm:block">
+                                <span className="text-primary">SAHA</span>
+                                <span className="text-text-primary dark:text-white">PLATFORM</span>
+                            </span>
                         </Link>
                     </div>
 
@@ -177,7 +156,7 @@ export default function Header() {
                     </div>
 
                     {/* Search Bar - Responsive Toggle */}
-                    <div className={`flex-1 transition-all duration-300 ${showSearch ? "fixed inset-x-0 top-0 z-[110] p-4 bg-white dark:bg-[#0a0a0a]" : "relative md:mx-4 md:max-w-md"} lg:block ${!showSearch && "hidden md:block"}`}>
+                    <div className="hidden md:block flex-1 relative mx-4 max-w-md">
                         <div className="flex border border-border-color rounded-full bg-gray-100/50 dark:bg-white/5 focus-within:bg-white dark:focus-within:bg-[#1a1a1a] focus-within:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md group items-center">
                             <Search size={18} className="text-text-muted ml-4 shrink-0 transition-colors group-focus-within:text-primary" />
                             <input
@@ -186,17 +165,9 @@ export default function Header() {
                                 className="flex-1 px-3 py-2 bg-transparent outline-none text-sm font-bold text-text-main placeholder-gray-400 dark:placeholder-gray-500"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === "Enter") { handleSearchSubmit(); setShowSearch(false); } }}
+                                onKeyDown={(e) => { if (e.key === "Enter") { handleSearchSubmit(); } }}
                             />
-                            {showSearch && (
-                                <button
-                                    onClick={() => setShowSearch(false)}
-                                    className="p-2 mr-2 text-text-muted hover:text-red-500"
-                                >
-                                    <X size={20} />
-                                </button>
-                            )}
-                            {searchQuery && !showSearch && (
+                            {searchQuery && (
                                 <button
                                     type="button"
                                     onClick={() => { setSearchQuery(""); handleSearchSubmit(); }}
@@ -207,16 +178,6 @@ export default function Header() {
                             )}
                         </div>
                     </div>
-
-                    {/* Mobile Search Toggle */}
-                    {!showSearch && (
-                        <button
-                            onClick={() => setShowSearch(true)}
-                            className="p-2 text-text-muted hover:text-primary md:hidden"
-                        >
-                            <Search size={22} />
-                        </button>
-                    )}
 
                     {/* Navigation & Actions */}
                     <nav className="hidden xl:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
@@ -295,167 +256,13 @@ export default function Header() {
                             <Link href="/login" className="hidden sm:flex btn-saha-attract !px-4 !py-1.5 !text-[11px] !border-b-[3px]">{t("login")}</Link>
                         )}
 
-                        <Link href="/post-ad" className="btn-saha-primary !px-5 !py-1.5 !text-[12px] !border-b-[3px]">
+                        <Link href="/post-ad" className="hidden sm:flex btn-saha-primary !px-5 !py-1.5 !text-[12px] !border-b-[3px]">
                             <PlusCircle size={16} />
                             {t("postAd")}
                         </Link>
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Menu Drawer */}
-            {showMobileMenu && (
-                <div className="fixed inset-0 z-[2000] lg:hidden">
-                    {/* Backdrop */}
-                    <div
-                        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
-                        onClick={() => setShowMobileMenu(false)}
-                    />
-
-                    {/* Drawer Content */}
-                    <div className={`absolute top-0 ${language === 'ar' ? 'right-0' : 'left-0'} h-full w-[85%] max-w-sm bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl shadow-2xl animate-in slide-in-from-${language === 'ar' ? 'right' : 'left'} duration-300 overflow-y-auto border-r border-white/20 dark:border-white/10`}>
-                        <div className="p-6 space-y-8 pb-20">
-                            {/* Close & Logo */}
-                            <div className="flex items-center justify-between">
-                                <Link href="/" onClick={() => setShowMobileMenu(false)}>
-                                    <Logo className="h-8 w-auto text-primary" />
-                                </Link>
-                                <button
-                                    onClick={() => setShowMobileMenu(false)}
-                                    className="p-2 text-text-muted hover:text-red-500 transition-colors"
-                                >
-                                    <X size={24} />
-                                </button>
-                            </div>
-
-                            {/* User Profile / Login */}
-                            <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-border-color">
-                                {user ? (
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary font-black text-xl uppercase">
-                                                {(user.name || user.email || 'U').substring(0, 1).toUpperCase()}
-                                            </div>
-                                            <div>
-                                                <p className="font-black text-text-main line-clamp-1">{user.name || user.email?.split('@')[0]}</p>
-                                                <p className="text-[10px] text-text-muted uppercase tracking-widest">{t((user.role || 'USER') as any)}</p>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2 pt-2">
-                                            <Link
-                                                href="/dashboard"
-                                                onClick={() => setShowMobileMenu(false)}
-                                                className="flex flex-col items-center justify-center p-3 bg-white dark:bg-black/40 rounded-xl border border-border-color text-center hover:border-primary transition-all"
-                                            >
-                                                <LayoutDashboard size={20} className="mb-2 text-primary" />
-                                                <span className="text-[10px] font-black uppercase tracking-tighter">{t('dashboard')}</span>
-                                            </Link>
-                                            <Link
-                                                href="/ads/my"
-                                                onClick={() => setShowMobileMenu(false)}
-                                                className="flex flex-col items-center justify-center p-3 bg-white dark:bg-black/40 rounded-xl border border-border-color text-center hover:border-primary transition-all"
-                                            >
-                                                <ShieldCheck size={20} className="mb-2 text-blue-500" />
-                                                <span className="text-[10px] font-black uppercase tracking-tighter">{t('myAds')}</span>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="text-center space-y-3">
-                                        <p className="text-sm font-bold text-text-main">{t('welcomeGuest') || 'مرحباً بك في ساحة'}</p>
-                                        <Link
-                                            href="/login"
-                                            onClick={() => setShowMobileMenu(false)}
-                                            className="block w-full btn-saha-primary py-3"
-                                        >
-                                            {t('login')}
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Settings & Switchers */}
-                            <div className="space-y-6">
-                                {/* Theme & Language Toggle Row */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button
-                                        onClick={toggleTheme}
-                                        className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-border-color hover:border-primary transition-all"
-                                    >
-                                        {theme === 'light' ? <Moon size={24} className="mb-2" /> : <Sun size={24} className="mb-2" />}
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{theme === 'light' ? t('darkMode') || 'وضع ليلي' : t('lightMode') || 'وضع نهاري'}</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
-                                        className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-border-color hover:border-primary transition-all"
-                                    >
-                                        <Globe size={24} className="mb-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{language === 'ar' ? 'ENGLISH' : 'العربية'}</span>
-                                    </button>
-                                </div>
-
-                                {/* Region Selection */}
-                                <div className="space-y-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-text-muted flex items-center gap-2">
-                                        <MapPin size={12} />
-                                        {t('region') || 'شخصية الدولة والعملة'}
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {['sa', 'ae', 'kw', 'qa', 'bh', 'om', 'eg'].map(c => (
-                                            <button
-                                                key={c}
-                                                onClick={() => handleRegionSelect(c)}
-                                                className={`px-3 py-2 text-[10px] font-black rounded-lg border transition-all uppercase tracking-tighter ${country === c ? 'border-primary text-primary bg-primary/5' : 'border-border-color text-text-main'}`}
-                                            >
-                                                {t(c as any)} ({t(currencyMap[c] as any || 'sar')})
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Navigation Links */}
-                                <div className="space-y-2 pt-4 border-t border-border-color">
-                                    <Link
-                                        href="/ads"
-                                        onClick={() => setShowMobileMenu(false)}
-                                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl hover:text-primary transition-colors font-black text-sm uppercase"
-                                    >
-                                        {t('categories')}
-                                        <ChevronDown size={16} className={language === 'ar' ? 'rotate-90' : '-rotate-90'} />
-                                    </Link>
-                                    <Link
-                                        href="/messages"
-                                        onClick={() => setShowMobileMenu(false)}
-                                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl hover:text-primary transition-colors font-black text-sm uppercase"
-                                    >
-                                        {t('messages')}
-                                        {unreadCount > 0 && <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px]">{unreadCount}</span>}
-                                    </Link>
-                                    <Link
-                                        href="/notifications"
-                                        onClick={() => setShowMobileMenu(false)}
-                                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl hover:text-primary transition-colors font-black text-sm uppercase"
-                                    >
-                                        {t('notifications')}
-                                        <Bell size={16} />
-                                    </Link>
-                                </div>
-
-                                {/* Logout */}
-                                {user && (
-                                    <button
-                                        onClick={() => { logout(); setShowMobileMenu(false); }}
-                                        className="w-full flex items-center justify-center gap-3 p-4 text-red-500 font-black text-sm uppercase tracking-widest bg-red-50 dark:bg-red-500/10 rounded-xl mt-8"
-                                    >
-                                        <LogOut size={18} />
-                                        {t('logout')}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </header>
     );
 }

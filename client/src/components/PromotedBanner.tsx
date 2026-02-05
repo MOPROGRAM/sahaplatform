@@ -10,6 +10,7 @@ export default function PromotedBanner() {
     const [ads, setAds] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const { t, language } = useLanguage();
+    const [mouseState, setMouseState] = useState({ x: 0, y: 0, active: false });
 
     useEffect(() => {
         let mounted = true;
@@ -27,25 +28,36 @@ export default function PromotedBanner() {
         return () => { mounted = false; };
     }, []);
 
-    if (loading) {
-        return (
-            <div className="w-full my-0 px-4">
-                <div className="w-full h-[254px] bg-[#1a1a1a] rounded-[1rem] animate-pulse relative overflow-hidden">
-                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 translate-x-[-100%] animate-shimmer" />
-                </div>
-            </div>
-        );
-    }
+    const handleMouseMove = (e: React.MouseEvent) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setMouseState({
+            x: e.clientX - rect.left - rect.width / 2,
+            y: e.clientY - rect.top - rect.height / 2,
+            active: true
+        });
+    };
 
-    if (!ads.length) return null;
+    const handleMouseLeave = () => {
+        setMouseState(prev => ({ ...prev, active: false }));
+    };
+
+    if (!loading && !ads.length) return null;
 
     return (
-        <div className="w-full my-0 px-0 sm:px-2 relative group">
+        <div 
+            className="w-full my-0 px-0 sm:px-2 relative group overflow-hidden min-h-[280px]"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+        >
             {/* Animated Honeycomb Background */}
-            <HoneycombBackground />
+            <HoneycombBackground 
+                mouseX={mouseState.x} 
+                mouseY={mouseState.y} 
+                isActive={mouseState.active} 
+            />
 
             <div className="relative w-full z-10">
-                <div className="flex items-center gap-2 mb-2 px-2">
+                <div className="flex items-center gap-2 mb-2 px-2 pt-2">
                     <div className="w-1 h-4 bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
                     <h3 className="text-amber-500 text-xs font-black uppercase tracking-widest shadow-amber-500/20 drop-shadow-sm">
                         {language === 'ar' ? 'إعلانات مميزة' : 'PROMOTED'}
@@ -53,19 +65,25 @@ export default function PromotedBanner() {
                 </div>
 
                 {/* Horizontal Scroll for Ads */}
-                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-10 scrollbar-hide px-2">
-                    {ads.slice(0, 10).map((ad) => (
-                        <div key={ad.id} className="min-w-[180px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01] p-2">
-                            <div className="dark h-full">
-                                <AdCard 
-                                    {...ad} 
-                                    isFeatured={true}
-                                    className="h-full shadow-lg" 
-                                    imageHeight="h-[100px] sm:h-32"
-                                />
+                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-4 scrollbar-hide px-2">
+                    {loading ? (
+                        // Skeleton Loading State
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="min-w-[260px] sm:min-w-[280px] h-[250px] bg-white/5 dark:bg-black/20 rounded-2xl animate-pulse border border-white/10" />
+                        ))
+                    ) : (
+                        ads.slice(0, 10).map((ad) => (
+                            <div key={ad.id} className="min-w-[260px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01] p-2">
+                                <div className="dark h-full">
+                                    <AdCard 
+                                        {...ad} 
+                                        isFeatured={true}
+                                        className="h-full shadow-lg" 
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>
