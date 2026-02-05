@@ -343,7 +343,7 @@ export default function AdCard({
             </div>
 
             {/* Content Section */}
-            <div className={`flex-1 flex flex-col p-0.5 ${isVertical ? "gap-0.5" : "justify-center"}`}>
+            <div className={`flex-1 flex flex-col px-0.5 pt-0.5 pb-0 ${isVertical ? "gap-0.5" : "justify-center"}`}>
                 <div className="flex items-start justify-between gap-2">
                     <h3 className="text-[10px] sm:text-xs font-bold text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-300">
                         {currentTitle}
@@ -357,7 +357,7 @@ export default function AdCard({
                     </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-1 mt-1">
+                <div className="flex items-center justify-between pt-0.5 mt-0">
                     <div className="flex items-center gap-2">
                         {location && (
                             <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-gray-500 dark:text-gray-400">
@@ -390,7 +390,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-0.5 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
+            className={`w-full h-full px-0.5 pt-0.5 pb-0 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -503,7 +503,7 @@ export default function AdCard({
 
     const renderContactFace = () => (
         <div
-            className={`w-full h-full p-0.5 relative overflow-hidden flex flex-col items-center justify-center bg-white dark:bg-[#050505]`}
+            className={`w-full h-full px-0.5 pt-0.5 pb-0 relative overflow-hidden flex flex-col items-center justify-center bg-white dark:bg-[#050505]`}
             onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
