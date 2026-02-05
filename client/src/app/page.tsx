@@ -158,7 +158,7 @@ export default function HomePage() {
                 </aside>
 
                 {/* Central Grid Feed */}
-                <section className={`col-span-12 xl:col-span-10 flex flex-col gap-2`}>
+                <section className={`col-span-12 xl:col-span-10 flex flex-col gap-1`}>
                     {/* Bento Filter Bar */}
                     <div className="bento-card p-1 flex items-center justify-between bg-white dark:bg-[#1a1a1a]">
                         <div className="flex items-center gap-2 px-3 py-2">
