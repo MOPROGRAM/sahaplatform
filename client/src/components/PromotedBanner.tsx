@@ -39,7 +39,7 @@ export default function PromotedBanner() {
                 </div>
 
                 {/* Horizontal Scroll for Ads */}
-                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-1 scrollbar-hide px-2">
+                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x py-4 scrollbar-hide px-2">
                     {loading ? (
                         // Skeleton Loading State
                         Array.from({ length: 4 }).map((_, i) => (
