@@ -268,7 +268,7 @@ export default function AdCard({
     const renderStandardFace = () => (
         <div className={`w-full h-full flex overflow-hidden bg-white dark:bg-[#050505] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-20") : "w-[35%] h-full"}`}>
+            <div className={`relative shrink-0 overflow-hidden bg-gray-50 dark:bg-zinc-900 ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-24") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
                 <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
@@ -332,7 +332,7 @@ export default function AdCard({
                         alt={title}
                         fill
                         priority={isFeatured}
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="object-contain transition-transform duration-700 group-hover:scale-105"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                 ) : (
@@ -614,7 +614,7 @@ export default function AdCard({
             }`}
             style={{
                 perspective: '1000px',
-                minHeight: isVertical ? '250px' : 'auto'
+                minHeight: isVertical ? '175px' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
