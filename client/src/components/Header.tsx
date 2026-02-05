@@ -98,12 +98,29 @@ export default function Header() {
                     <div className="flex items-center gap-4 shrink-0">
                         {/* Mobile Menu Button Removed - Moved to Bottom Nav */}
                         
-                        <Link href="/" className="flex items-center gap-2 group">
-                            <Logo className="w-8 h-8 sm:w-10 sm:h-10 text-primary transition-transform duration-300 group-hover:scale-110" />
-                            <span className="text-xl sm:text-2xl font-black tracking-tighter hidden sm:block">
-                                <span className="text-primary">SAHA</span>
-                                <span className="text-text-primary dark:text-white">PLATFORM</span>
-                            </span>
+                        <Link href="/" className="group flex items-center gap-2 relative" prefetch={false}>
+                            {/* Hover Glow Effect */}
+                            <div className="hover-glow-circle" />
+
+                            <div className="relative flex items-center gap-2">
+                                {/* Mobile Logo */}
+                                <Logo className="h-9 w-auto sm:hidden text-primary transition-all duration-1000 group-hover:scale-110" strokeWidth="8.11" />
+
+                                {/* Desktop Logo (Name + Underline) */}
+                                <div className="hidden sm:flex flex-col items-center">
+                                    <span
+                                        className="text-3xl font-black tracking-tighter italic transition-all duration-1000 group-hover:scale-105 leading-none text-primary"
+                                    >
+                                        {t("siteName")}
+                                    </span>
+                                    <Logo
+                                        viewBox="14 22 72 36"
+                                        preserveAspectRatio="none"
+                                        className="h-4 w-[101.1%] transition-all duration-1000 group-hover:scale-110 text-primary"
+                                        strokeWidth="8.11"
+                                    />
+                                </div>
+                            </div>
                         </Link>
                     </div>
 
