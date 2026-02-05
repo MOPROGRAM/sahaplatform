@@ -607,7 +607,15 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden bg-white dark:bg-black border border-gray-300 dark:border-zinc-700 shadow-sm hover:shadow-xl ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`}
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden ${
+                isFeatured 
+                    ? "bg-gray-50 dark:bg-zinc-800 border-2 border-amber-400 dark:border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:shadow-[0_0_20px_rgba(251,191,36,0.6)]" 
+                    : "bg-white dark:bg-black border border-gray-400 dark:border-zinc-600 shadow-sm hover:shadow-xl"
+            } ${
+                isHighlighted && !isFeatured 
+                    ? "ring-2 ring-primary/50" 
+                    : (!isFeatured ? "hover:ring-1 hover:ring-primary/50" : "")
+            }`}
             style={{
                 perspective: '1000px',
                 minHeight: isVertical ? '175px' : 'auto'

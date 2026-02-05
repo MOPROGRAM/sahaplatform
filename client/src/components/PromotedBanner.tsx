@@ -51,6 +51,7 @@ export default function PromotedBanner() {
                                 <div className="h-full">
                                     <AdCard 
                                         {...ad} 
+                                        isFeatured={true}
                                         className="h-full" 
                                     />
                                 </div>
