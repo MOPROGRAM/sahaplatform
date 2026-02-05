@@ -268,7 +268,7 @@ export default function AdCard({
     const renderStandardFace = () => (
         <div className={`w-full h-full flex overflow-hidden ${isFeatured ? "bg-gradient-to-br from-slate-50 to-slate-200 dark:from-zinc-900 dark:to-zinc-800 border border-slate-300 dark:border-zinc-700" : "bg-white dark:bg-[#050505]"} ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-32") : "w-[35%] h-full"}`}>
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-52") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
                 <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
@@ -614,7 +614,7 @@ export default function AdCard({
             }`}
             style={{
                 perspective: '1000px',
-                minHeight: isVertical ? (isFeatured ? 'auto' : '280px') : 'auto'
+                minHeight: isVertical ? '380px' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
