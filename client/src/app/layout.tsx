@@ -6,7 +6,8 @@ import { ThemeProvider } from "next-themes";
 import { cookies } from "next/headers";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Suspense } from 'react'; // Added Suspense
-import LoadingSpinner from '@/components/LoadingSpinner'; // Using LoadingSpinner for fallback, as LogoAnimation requires specific props which are not available here. I\"ll use a simple spinner for now for global loading state.
+import LoadingSpinner from '@/components/LoadingSpinner'; // Using LoadingSpinner for fallback, as LogoAnimation requires specific props which are not available here. I"ll use a simple spinner for now for global loading state.
+import BottomNav from "@/components/BottomNav";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -66,7 +67,7 @@ export default function RootLayout({
                     <LanguageProvider initialLanguage={lang}>
                         <ErrorBoundary>
                             <div className="flex min-h-screen bg-gray-bg">
-                                <main className="flex-1 w-full">
+                                <main className="flex-1 w-full pb-20 lg:pb-0">
                                     <Suspense fallback={
                                         <div className="flex items-center justify-center min-h-screen bg-gray-bg">
                                             <LoadingSpinner size={48} />
@@ -75,6 +76,7 @@ export default function RootLayout({
                                         {children}
                                     </Suspense>
                                 </main>
+                                <BottomNav />
                             </div>
                         </ErrorBoundary>
                     </LanguageProvider>

@@ -266,7 +266,7 @@ export default function AdCard({
 
     // Render Functions
     const renderStandardFace = () => (
-        <div className={`w-full h-full flex bg-white dark:bg-[#050505] overflow-hidden ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
+        <div className={`w-full h-full flex overflow-hidden ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"} ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
             <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-32") : "w-[35%] h-full"}`}>
                 {/* Shine Effect */}
@@ -345,27 +345,27 @@ export default function AdCard({
             {/* Content Section */}
             <div className={`flex-1 flex flex-col p-2 ${isVertical ? "gap-0.5" : "justify-center"}`}>
                 <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-xs font-bold text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-300">
+                    <h3 className="text-[10px] sm:text-xs font-bold text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-300">
                         {currentTitle}
                     </h3>
                 </div>
 
                 <div className="flex items-center gap-2 mt-auto">
-                    <p className="text-sm font-black text-primary">
+                    <p className="text-xs sm:text-sm font-black text-primary">
                         {new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : 'en-US').format(price)}
-                        <span className="text-[9px] font-normal text-gray-500 dark:text-gray-400 mx-1">{currencyCode}</span>
+                        <span className="text-[8px] sm:text-[9px] font-normal text-gray-500 dark:text-gray-400 mx-1">{currencyCode}</span>
                     </p>
                 </div>
 
                 <div className="flex items-center justify-between pt-1 mt-1">
                     <div className="flex items-center gap-2">
                         {location && (
-                            <div className="flex items-center gap-1 text-[9px] text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-gray-500 dark:text-gray-400">
                                 <MapPin size={9} />
-                                <span className="truncate max-w-[50px]">{location.split(",")[0]}</span>
+                                <span className="truncate max-w-[65px]">{location.split(",")[0]}</span>
                             </div>
                         )}
-                        <div className="flex items-center gap-1 text-[9px] text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-gray-500 dark:text-gray-400">
                             <Clock size={9} />
                             <span>{createdAt ? formatRelativeTime(createdAt, language) : ''}</span>
                         </div>
@@ -373,7 +373,7 @@ export default function AdCard({
 
                     {category && (
                         <span
-                            className="text-[9px] font-medium text-primary/80 hover:text-primary cursor-pointer truncate max-w-[80px]"
+                            className="text-[8px] sm:text-[9px] font-medium text-primary/80 hover:text-primary cursor-pointer truncate max-w-[60px]"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -390,7 +390,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#1a1500]" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -460,7 +460,7 @@ export default function AdCard({
 
     const renderDetailsMoreFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#1a1500]" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -503,7 +503,7 @@ export default function AdCard({
 
     const renderContactFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center ${isFeatured ? "bg-[#fffce8] dark:bg-[#1a1500]" : "bg-white dark:bg-[#050505]"}`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
             onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
