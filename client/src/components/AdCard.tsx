@@ -266,16 +266,16 @@ export default function AdCard({
 
     // Render Functions
     const renderStandardFace = () => (
-        <div className={`w-full h-full flex overflow-hidden bg-white dark:bg-[#050505] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
+        <div className={`w-full h-full flex overflow-hidden ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"} ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden bg-gray-50 dark:bg-zinc-900 ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-[35%]") : "w-[35%] h-full"}`}>
-                    {/* Shine Effect */}
-                    <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
+            <div className={`relative shrink-0 overflow-hidden ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-32") : "w-[35%] h-full"}`}>
+                {/* Shine Effect */}
+                <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
                 {/* Flip/Peel Interaction */}
                 <div className="absolute top-1 left-1 z-20">
                     <motion.button
-                        className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 bg-black/40 text-white hover:bg-black/60`}
+                        className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-amber-500 text-black" : "bg-black/40 text-white hover:bg-black/60"}`}
                         drag="y"
                         dragMomentum={false}
                         onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -295,12 +295,12 @@ export default function AdCard({
                         }}
                         onClick={handleNextFace}
                     >
-                        {t("details")}
+                        {isFeatured ? t("featured") : t("details")}
                     </motion.button>
 
                     <div className="absolute inset-0 pointer-events-none">
                         <div
-                            className={`absolute top-0 left-0 shadow-2xl bg-white/90 dark:bg-[#1f1f1f]/90`}
+                            className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-gradient-to-br from-[#ff6b35] to-[#ff8a4a]" : "bg-white/90 dark:bg-[#1f1f1f]/90"}`}
                             style={{
                                 width: cornerMax,
                                 height: cornerMax,
@@ -326,7 +326,7 @@ export default function AdCard({
 
                 </div>
 
-                {images && images.length > 0 && images[0] ? (
+                {images.length > 0 ? (
                     <Image
                         src={images[0]}
                         alt={title}
@@ -357,7 +357,7 @@ export default function AdCard({
                     </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-0.5 mt-0">
+                <div className="flex items-center justify-between pt-1 mt-1">
                     <div className="flex items-center gap-2">
                         {location && (
                             <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-gray-500 dark:text-gray-400">
@@ -390,7 +390,7 @@ export default function AdCard({
 
     const renderDetailsFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -398,7 +398,7 @@ export default function AdCard({
             {/* Close/Next Controls */}
             <div className="absolute top-1 left-1 z-20">
                 <motion.button
-                    className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100`}
+                    className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-amber-400 text-black" : "bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100"}`}
                     drag="y"
                     dragMomentum={false}
                     onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -419,7 +419,7 @@ export default function AdCard({
                 </motion.button>
                 <div className="absolute inset-0 pointer-events-none">
                     <div
-                        className={`absolute top-0 left-0 shadow-2xl bg-gray-200 dark:bg-neutral-800`}
+                        className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-[#ffd700]/30" : "bg-gray-200 dark:bg-neutral-800"}`}
                         style={{
                             width: cornerMax,
                             height: cornerMax,
@@ -460,7 +460,7 @@ export default function AdCard({
 
     const renderDetailsMoreFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col bg-white dark:bg-[#050505]`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
             onClick={(e) => {
                 e.stopPropagation();
             }}
@@ -503,7 +503,7 @@ export default function AdCard({
 
     const renderContactFace = () => (
         <div
-            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center bg-white dark:bg-[#050505]`}
+            className={`w-full h-full p-2 relative overflow-hidden flex flex-col items-center justify-center ${isFeatured ? "bg-[#fffce8] dark:bg-[#18181b]" : "bg-white dark:bg-[#050505]"}`}
             onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -538,13 +538,13 @@ export default function AdCard({
                     <span className="text-[8px] font-black text-gray-500 dark:text-gray-400">({authorRatingsCount})</span>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-2 w-full px-1">
+                <div className="flex flex-col gap-1.5 w-full px-1">
                     <button
                         onClick={handleStartChat}
-                        className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-blue-500/30 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 transition-colors"
-                        title={(t as any)("messages")}
+                        className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-blue-500/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 transition-colors"
                     >
-                        <MessageCircle size={14} className="text-blue-500" />
+                        <MessageCircle size={8} className="text-blue-500" />
+                        {(t as any)("messages")}
                     </button>
 
                     {phone && (
@@ -552,20 +552,20 @@ export default function AdCard({
                             <a
                                 href={`tel:${phone}`}
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-primary/30 rounded-full hover:bg-primary/10 transition-colors text-primary"
-                                title={(t as any)("call")}
+                                className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-primary/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary/10 transition-colors text-primary"
                             >
-                                <Phone size={14} className="text-primary" />
+                                <Phone size={8} className="text-primary" />
+                                {(t as any)("call")}
                             </a>
                             <a
                                 href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-[#25D366]/30 rounded-full hover:bg-[#25D366]/10 transition-colors text-[#25D366]"
-                                title={(t as any)("whatsapp")}
+                                className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-[#25D366]/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#25D366]/10 transition-colors text-[#25D366]"
                             >
-                                <Logo className="w-4 h-4" />
+                                <Logo className="w-2.5 h-2.5" />
+                                {(t as any)("whatsapp")}
                             </a>
                         </>
                     )}
@@ -574,10 +574,10 @@ export default function AdCard({
                         <a
                             href={`mailto:${email}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 border border-gray-600/30 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-gray-600 dark:text-gray-400"
-                            title={(t as any)("email" as any)}
+                            className="flex items-center justify-center gap-2 w-full py-1 bg-white dark:bg-neutral-800 border border-gray-600/30 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-gray-600 dark:text-gray-400"
                         >
-                            <Mail size={14} className="text-gray-600 dark:text-gray-400" />
+                            <Mail size={8} className="text-gray-600 dark:text-gray-400" />
+                            {(t as any)("email" as any)}
                         </a>
                     )}
                 </div>
@@ -607,31 +607,23 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden ${isVertical ? "w-full" : ""} ${
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} ${
                 isFeatured 
-                    ? "bg-gray-50 dark:bg-zinc-800 shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:shadow-[0_0_20px_rgba(251,191,36,0.6)]" 
-                    : "bg-white dark:bg-black shadow-sm hover:shadow-xl"
+                    ? "bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] p-[5px] overflow-visible z-10"
+                    : `bento-card bento-card-hover border border-transparent dark:border-white/5 shadow-sm hover:shadow-xl bg-white dark:bg-black overflow-hidden ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
             }`}
             style={{
                 perspective: '1000px',
-                height: isVertical ? '9.5rem' : 'auto',
-                minHeight: isVertical ? '9.5rem' : 'auto'
+                height: isVertical && !imageHeight ? '180px' : 'auto'
             }}
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
-            {/* Border Overlay to prevent z-fighting/clipping during flip */}
-            <div className={`absolute inset-0 pointer-events-none rounded-2xl z-50 ${
-                isFeatured 
-                    ? "border-2 border-amber-400 dark:border-amber-400" 
-                    : "border border-gray-400 dark:border-zinc-600"
-            } ${
-                isHighlighted && !isFeatured 
-                    ? "ring-2 ring-primary/50" 
-                    : (!isFeatured ? "group-hover:ring-1 group-hover:ring-primary/50" : "")
-            }`} />
+            {isFeatured && (
+                <div className="absolute top-[30px] left-0 right-0 h-full w-full scale-[0.8] blur-[25px] bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] -z-10 transition-opacity duration-500 opacity-100 group-hover:opacity-0" />
+            )}
             
-            <div className="relative w-full h-full" style={{ perspective: 1000 }}>
+            <div className={`relative w-full h-full ${isFeatured ? 'z-[2] rounded-xl overflow-hidden' : ''}`} style={{ perspective: 1000 }}>
                 <motion.div
                     className="w-full h-full relative"
                     style={{ transformStyle: 'preserve-3d' }}
@@ -640,7 +632,7 @@ export default function AdCard({
                 >
                     {/* Invisible Spacer to maintain size */}
                     <div className="invisible pointer-events-none opacity-0 select-none relative" aria-hidden="true">
-                        {renderStandardFace()}
+                        {isFeatured ? renderDetailsFace() : renderStandardFace()}
                     </div>
 
                     {/* Front Physical Side */}
