@@ -22,7 +22,7 @@ const InteractiveBackground = () => {
             xyCoef: 50,
             zCoef: 10,
             lightIntensity: 0.9,
-            ambientColor: 0x000000,
+            ambientColor: 0xffffff, // Changed from 0x000000 to white to ensure visibility if lights fail
             light1Color: 0x0E09DC, // Blue (Original)
             light2Color: 0x1CD1E1, // Cyan (Original)
             light3Color: 0x18C02C, // Green (Original)
@@ -117,6 +117,10 @@ const InteractiveBackground = () => {
             const r = 30;
             const y = 10;
             const lightDistance = 500;
+
+            // Add Ambient Light to ensure the plane is visible even if point lights are far
+            const ambientLight = new THREE.AmbientLight(conf.ambientColor);
+            scene.add(ambientLight);
 
             light1 = new THREE.PointLight(conf.light1Color, conf.lightIntensity, lightDistance);
             light1.position.set(0, y, r);
