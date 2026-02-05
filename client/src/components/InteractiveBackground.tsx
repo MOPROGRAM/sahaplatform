@@ -21,12 +21,12 @@ const InteractiveBackground = () => {
             cameraZ: 75,
             xyCoef: 50,
             zCoef: 10,
-            lightIntensity: 6.0, // More power to the colored lights
-            ambientColor: 0x222222, // Lower ambient to emphasize colored lights on waves
-            light1Color: 0x0000FF, // Pure Blue
-            light2Color: 0x800080, // Purple
-            light3Color: 0x00FFFF, // Turquoise/Cyan
-            light4Color: 0x00CED1  // Dark Turquoise
+            lightIntensity: 8.0, // Higher intensity for more vibrant colors
+            ambientColor: 0x111111, // Very low ambient to make colored lights pop
+            light1Color: 0x1E90FF, // Dodger Blue - vibrant blue
+            light2Color: 0x9370DB, // Medium Purple - vibrant purple
+            light3Color: 0x00FFFF, // Cyan - bright turquoise
+            light4Color: 0x40E0D0  // Turquoise - vibrant turquoise
         };
 
         let renderer: THREE.WebGLRenderer;
@@ -112,12 +112,12 @@ const InteractiveBackground = () => {
             initLights();
 
             const mat = new THREE.MeshStandardMaterial({ 
-                color: 0xe0ffff, // Light Cyan/Turquoise base color for the waves
+                color: 0x87CEFA, // Light Sky Blue - base color that responds well to colored lights
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.9,
-                roughness: 0.2,
-                metalness: 0.1
+                opacity: 0.95,
+                roughness: 0.1,
+                metalness: 0.3
             });
             const geo = new THREE.PlaneGeometry(wWidth, wHeight, wWidth / 2, wHeight / 2);
             plane = new THREE.Mesh(geo, mat);
