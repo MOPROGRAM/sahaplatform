@@ -49,16 +49,17 @@ export default function PromotedBanner() {
                 </div>
 
                 {/* Horizontal Scroll for Ads */}
-                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-2 scrollbar-hide px-2">
+                <div className="flex items-start gap-2 overflow-x-auto snap-x touch-pan-x pb-10 scrollbar-hide px-2">
                     {ads.slice(0, 10).map((ad) => (
-                         <div key={ad.id} className="min-w-[260px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01]">
+                        <div key={ad.id} className="min-w-[260px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01] p-2">
                             <div className="dark h-full">
                                 <AdCard 
                                     {...ad} 
-                                    className="!bg-[#050505] !border-white/10 hover:!border-amber-500/30 transition-all duration-300 !shadow-lg h-full" 
+                                    isFeatured={true}
+                                    className="h-full shadow-lg" 
                                 />
                             </div>
-                         </div>
+                        </div>
                     ))}
                 </div>
             </div>

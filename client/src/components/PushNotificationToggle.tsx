@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Bell, BellOff, Settings, CheckCircle, AlertCircle } from 'lucide-react';
+import { Bell, BellOff, Settings, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { pushNotificationService } from '@/lib/push-notifications';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguage } from '@/lib/language-context';
@@ -17,28 +17,22 @@ export default function PushNotificationToggle() {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if push notifications are supported
     const checkSupport = async () => {
       const supported = await pushNotificationService.initialize();
       setIsSupported(supported);
 
       if (supported) {
-        // Check current permission status
-        const currentPermission = Notification.permission;
-        setPermission(currentPermission);
-
-        // Check if user is already subscribed
+        setPermission(Notification.permission);
         const subscription = await pushNotificationService.getSubscription();
         setIsSubscribed(!!subscription);
       }
     };
-
     checkSupport();
   }, []);
 
-  const handlePermissionRequest = async () => {
+  const handleToggle = async () => {
     if (!user) {
-      setError('Please login first');
+      setError(language === 'ar' ? 'يرجى تسجيل الدخول أولاً' : 'Please login first');
       return;
     }
 
@@ -47,172 +41,92 @@ export default function PushNotificationToggle() {
     setSuccess(null);
 
     try {
-      // Request permission
-      const newPermission = await pushNotificationService.requestPermission();
-      setPermission(newPermission);
-
-      if (newPermission === 'granted') {
-        // Subscribe to push notifications
-        const subscription = await pushNotificationService.subscribe();
-        
-        if (subscription) {
-          // Send subscription to server
-          const sentToServer = await pushNotificationService.sendSubscriptionToServer(subscription, user.id);
-          
-          if (sentToServer) {
-            setIsSubscribed(true);
-            setSuccess('Push notifications enabled successfully');
-          } else {
-            setError('Failed to save subscription on server');
-          }
-        } else {
-          setError('Failed to subscribe to push notifications');
-        }
-      } else if (newPermission === 'denied') {
-        setError('Push notifications permission denied. Please enable them in your browser settings.');
-      }
-    } catch (err) {
-      console.error('Permission request error:', err);
-      setError('An error occurred while requesting permissions');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUnsubscribe = async () => {
-    if (!user) {
-      setError('Please login first');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      // Unsubscribe from push notifications
-      const unsubscribed = await pushNotificationService.unsubscribe();
-      
-      if (unsubscribed) {
-        // Remove subscription from server
-        const removedFromServer = await pushNotificationService.removeSubscriptionFromServer(user.id);
-        
-        if (removedFromServer) {
+      if (isSubscribed) {
+        // Unsubscribe
+        const unsubscribed = await pushNotificationService.unsubscribe();
+        if (unsubscribed) {
+          await pushNotificationService.removeSubscriptionFromServer(user.id);
           setIsSubscribed(false);
-          setSuccess('Push notifications disabled successfully');
+          setSuccess(language === 'ar' ? 'تم إيقاف الإشعارات' : 'Notifications disabled');
         } else {
-          setError('Failed to remove subscription from server');
+          setError(language === 'ar' ? 'فشل إيقاف الإشعارات' : 'Failed to disable notifications');
         }
       } else {
-        setError('Failed to unsubscribe from push notifications');
+        // Subscribe
+        const newPermission = await pushNotificationService.requestPermission();
+        setPermission(newPermission);
+
+        if (newPermission === 'granted') {
+          const subscription = await pushNotificationService.subscribe();
+          if (subscription) {
+            const sent = await pushNotificationService.sendSubscriptionToServer(subscription, user.id);
+            if (sent) {
+              setIsSubscribed(true);
+              setSuccess(language === 'ar' ? 'تم تفعيل الإشعارات بنجاح' : 'Notifications enabled successfully');
+            } else {
+              setError(language === 'ar' ? 'فشل حفظ الاشتراك' : 'Failed to save subscription');
+            }
+          } else {
+            setError(language === 'ar' ? 'فشل الاشتراك في الإشعارات' : 'Failed to subscribe');
+          }
+        } else {
+          setError(language === 'ar' ? 'تم رفض الإذن' : 'Permission denied');
+        }
       }
     } catch (err) {
-      console.error('Unsubscribe error:', err);
-      setError('An error occurred while unsubscribing');
+      console.error('Toggle error:', err);
+      setError(language === 'ar' ? 'حدث خطأ ما' : 'An error occurred');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusIcon = () => {
-    if (!isSupported) return <AlertCircle className="w-5 h-5 text-gray-400" />;
-    if (permission === 'granted' && isSubscribed) return <CheckCircle className="w-5 h-5 text-green-500" />;
-    if (permission === 'denied') return <AlertCircle className="w-5 h-5 text-red-500" />;
-    return <Bell className="w-5 h-5 text-gray-400" />;
-  };
-
-  const getStatusText = () => {
-    if (!isSupported) return 'Not supported';
-    if (permission === 'granted' && isSubscribed) return 'Enabled';
-    if (permission === 'denied') return 'Blocked';
-    if (permission === 'default') return 'Not requested';
-    return 'Disabled';
-  };
-
-  if (!isSupported) {
-    return (
-      <div className="flex items-center justify-between p-4 border border-border-color rounded-lg bg-gray-50 dark:bg-gray-800">
-        <div className="flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-gray-400" />
-          <div>
-            <p className="font-semibold text-text-main">
-              {language === 'ar' ? 'الإشعارات غير مدعومة' : 'Push Notifications Not Supported'}
-            </p>
-            <p className="text-sm text-text-muted">
-              {language === 'ar' ? 'متصفحك لا يدعم الإشعارات الفورية' : 'Your browser does not support push notifications'}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!isSupported) return null;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between p-4 border border-border-color rounded-lg">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between p-4 bg-white dark:bg-white/5 border border-border-color rounded-2xl">
         <div className="flex items-center gap-3">
-          {getStatusIcon()}
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isSubscribed ? 'bg-primary/10 text-primary' : 'bg-gray-100 dark:bg-white/10 text-gray-400'}`}>
+            {isSubscribed ? <Bell size={20} /> : <BellOff size={20} />}
+          </div>
           <div>
-            <p className="font-semibold text-text-main">
-              {language === 'ar' ? 'الإشعارات الفورية' : 'Push Notifications'}
-            </p>
-            <p className="text-sm text-text-muted">
-              {getStatusText()}
+            <h3 className="text-sm font-black text-text-main">
+              {language === 'ar' ? 'إشعارات المتصفح' : 'Push Notifications'}
+            </h3>
+            <p className="text-[10px] text-text-muted">
+              {language === 'ar' 
+                ? 'تلقي تنبيهات عند وصول رسائل جديدة أو تحديثات' 
+                : 'Receive alerts for new messages and updates'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isSubscribed ? (
-            <button
-              onClick={handleUnsubscribe}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50"
-            >
-              <BellOff className="w-4 h-4" />
-              {loading ? '...' : (language === 'ar' ? 'إيقاف' : 'Disable')}
-            </button>
-          ) : (
-            <button
-              onClick={handlePermissionRequest}
-              disabled={loading || permission === 'denied'}
-              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Bell className="w-4 h-4" />
-              {loading ? '...' : (language === 'ar' ? 'تفعيل' : 'Enable')}
-            </button>
-          )}
-        </div>
+        <button
+          onClick={handleToggle}
+          disabled={loading}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+            isSubscribed ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700'
+          }`}
+        >
+          <span
+            className={`${
+              isSubscribed ? 'translate-x-6' : 'translate-x-1'
+            } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+          />
+        </button>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-500" />
-            <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
-          </div>
+        <div className="text-[10px] text-red-500 flex items-center gap-1 px-1">
+          <AlertCircle size={10} />
+          {error}
         </div>
       )}
-
       {success && (
-        <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <p className="text-sm text-green-700 dark:text-green-400">{success}</p>
-          </div>
-        </div>
-      )}
-
-      {permission === 'denied' && (
-        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Settings className="w-4 h-4 text-yellow-600" />
-            <p className="text-sm text-yellow-700 dark:text-yellow-400">
-              {language === 'ar' 
-                ? 'تم حظر الإشعارات. يرجى تفعيلها من إعدادات المتصفح.' 
-                : 'Notifications are blocked. Please enable them in your browser settings.'}
-            </p>
-          </div>
+        <div className="text-[10px] text-green-500 flex items-center gap-1 px-1">
+          <CheckCircle size={10} />
+          {success}
         </div>
       )}
     </div>

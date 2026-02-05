@@ -607,10 +607,11 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`bento-card bento-card-hover group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} border border-transparent dark:border-white/5 shadow-sm hover:shadow-xl ${isFeatured
-                ? "ring-2 ring-cyan-300/50 shadow-[0_0_25px_rgba(0,255,214,0.3)]"
-                : (isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50")
-                } rounded-2xl overflow-hidden relative cursor-pointer block bg-white dark:bg-black ${className}`}
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} ${
+                isFeatured 
+                    ? "bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] p-[5px] overflow-visible z-10"
+                    : `bento-card bento-card-hover border border-transparent dark:border-white/5 shadow-sm hover:shadow-xl bg-white dark:bg-black overflow-hidden ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
+            }`}
             style={{
                 perspective: '1000px',
                 height: isVertical && !imageHeight ? '180px' : 'auto'
@@ -619,18 +620,10 @@ export default function AdCard({
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
             {isFeatured && (
-                <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden rounded-2xl">
-                    {/* Animated Glitter Streak */}
-                    <div className="absolute inset-[-100%] bg-gradient-to-r from-transparent via-amber-100/60 to-transparent skew-x-[35deg] animate-shimmer"
-                        style={{ backgroundSize: '200% 100%', animationDuration: '2.5s' }}
-                    />
-                    {/* Golden Glow Border Outer */}
-                    <div className="absolute inset-0 border-2 border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.5)]" />
-                    {/* Corner Glint */}
-                    <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-white/20 to-transparent blur-md" />
-                </div>
+                <div className="absolute top-[30px] left-0 right-0 h-full w-full scale-[0.8] blur-[25px] bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] -z-10 transition-opacity duration-500 opacity-100 group-hover:opacity-0" />
             )}
-            <div className={`relative w-full h-full ${isFeatured ? 'z-[2]' : ''}`} style={{ perspective: 1000 }}>
+            
+            <div className={`relative w-full h-full ${isFeatured ? 'z-[2] rounded-xl overflow-hidden' : ''}`} style={{ perspective: 1000 }}>
                 <motion.div
                     className="w-full h-full relative"
                     style={{ transformStyle: 'preserve-3d' }}

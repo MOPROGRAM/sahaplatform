@@ -206,6 +206,19 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
             };
             setMessages(prev => [...prev, newMessage]);
 
+            // Trigger Push Notification
+            const receiver = participants.find(p => p.id !== user?.id);
+            if (receiver?.id) {
+                fetch('/api/push/trigger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        receiverId: receiver.id,
+                        type: 'chat'
+                    })
+                }).catch(err => console.error('Failed to trigger push:', err));
+            }
+
             if (type === 'text') setInput("");
         } catch (error: any) {
             console.error("Failed to send message:", error);
