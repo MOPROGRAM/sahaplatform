@@ -295,7 +295,7 @@ export default function AdCard({
                         }}
                         onClick={handleNextFace}
                     >
-                        {isFeatured ? t("featured") : t("details")}
+                        {t("details")}
                     </motion.button>
 
                     <div className="absolute inset-0 pointer-events-none">
@@ -625,7 +625,7 @@ export default function AdCard({
                 >
                     {/* Invisible Spacer to maintain size */}
                     <div className="invisible pointer-events-none opacity-0 select-none relative" aria-hidden="true">
-                        {isFeatured ? renderDetailsFace() : renderStandardFace()}
+                        {renderStandardFace()}
                     </div>
 
                     {/* Front Physical Side */}

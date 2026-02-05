@@ -48,11 +48,10 @@ export default function PromotedBanner() {
                     ) : (
                         ads.slice(0, 10).map((ad) => (
                             <div key={ad.id} className="min-w-[260px] sm:min-w-[280px] snap-center transform transition-transform duration-300 hover:scale-[1.01] py-1 px-1">
-                                <div className="dark h-full">
+                                <div className="h-full">
                                     <AdCard 
                                         {...ad} 
-                                        isFeatured={true}
-                                        className="h-full shadow-lg" 
+                                        className="h-full" 
                                     />
                                 </div>
                             </div>
