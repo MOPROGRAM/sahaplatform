@@ -268,9 +268,9 @@ export default function AdCard({
     const renderStandardFace = () => (
         <div className={`w-full h-full flex overflow-hidden bg-white dark:bg-[#050505] ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse" : "flex-row")}`}>
             {/* Image Section */}
-            <div className={`relative shrink-0 overflow-hidden bg-gray-50 dark:bg-zinc-900 ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-24") : "w-[35%] h-full"}`}>
-                {/* Shine Effect */}
-                <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
+            <div className={`relative shrink-0 overflow-hidden bg-gray-50 dark:bg-zinc-900 ${isVertical ? (imageHeight ? `w-full ${imageHeight}` : "w-full h-16") : "w-[35%] h-full"}`}>
+                    {/* Shine Effect */}
+                    <div className="absolute inset-0 -translate-x-[150%] group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 z-10 pointer-events-none duration-1000" />
 
                 {/* Flip/Peel Interaction */}
                 <div className="absolute top-1 left-1 z-20">
