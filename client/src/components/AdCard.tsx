@@ -326,7 +326,7 @@ export default function AdCard({
 
                 </div>
 
-                {images.length > 0 ? (
+                {images && images.length > 0 && images[0] ? (
                     <Image
                         src={images[0]}
                         alt={title}
