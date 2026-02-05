@@ -275,7 +275,7 @@ export default function AdCard({
                 {/* Flip/Peel Interaction */}
                 <div className="absolute top-1 left-1 z-20">
                     <motion.button
-                        className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 ${isFeatured ? "bg-amber-500 text-black" : "bg-black/40 text-white hover:bg-black/60"}`}
+                        className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm cursor-grab active:cursor-grabbing select-none flex items-center gap-1 bg-black/40 text-white hover:bg-black/60`}
                         drag="y"
                         dragMomentum={false}
                         onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -300,7 +300,7 @@ export default function AdCard({
 
                     <div className="absolute inset-0 pointer-events-none">
                         <div
-                            className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-gradient-to-br from-[#ff6b35] to-[#ff8a4a]" : "bg-white/90 dark:bg-[#1f1f1f]/90"}`}
+                            className={`absolute top-0 left-0 shadow-2xl bg-white/90 dark:bg-[#1f1f1f]/90`}
                             style={{
                                 width: cornerMax,
                                 height: cornerMax,
@@ -419,7 +419,7 @@ export default function AdCard({
                 </motion.button>
                 <div className="absolute inset-0 pointer-events-none">
                     <div
-                        className={`absolute top-0 left-0 shadow-2xl ${isFeatured ? "bg-[#ffd700]/30" : "bg-gray-200 dark:bg-neutral-800"}`}
+                        className={`absolute top-0 left-0 shadow-2xl bg-gray-200 dark:bg-neutral-800`}
                         style={{
                             width: cornerMax,
                             height: cornerMax,
@@ -607,11 +607,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden bg-white dark:bg-black ${
-                isFeatured 
-                    ? "border-2 border-yellow-400/80 shadow-[0_0_15px_rgba(250,204,21,0.3)] z-10"
-                    : `border border-gray-300 dark:border-zinc-700 shadow-sm hover:shadow-xl ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
-            }`}
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} bento-card bento-card-hover overflow-hidden bg-white dark:bg-black border border-gray-300 dark:border-zinc-700 shadow-sm hover:shadow-xl ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`}
             style={{
                 perspective: '1000px',
                 minHeight: isVertical ? '175px' : 'auto'
@@ -619,9 +615,6 @@ export default function AdCard({
             onMouseEnter={() => onMapHighlight && onMapHighlight(id)}
             onMouseLeave={() => onMapHighlight && onMapHighlight(null)}
         >
-            {isFeatured && (
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-transparent opacity-50 pointer-events-none" />
-            )}
             
             <div className="relative w-full h-full" style={{ perspective: 1000 }}>
                 <motion.div
