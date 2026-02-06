@@ -607,7 +607,7 @@ export default function AdCard({
     return (
         <Link
             href={`/ads/${id}`}
-            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-32" : "flex-row h-32")} rounded-2xl relative cursor-pointer block ${className} ${
+            className={`group flex transition-all duration-500 ease-in-out ${isVertical ? "flex-col" : (language === "ar" ? "flex-row-reverse h-28.8" : "flex-row h-28.8")} rounded-2xl relative cursor-pointer block ${className} ${
                 isFeatured 
                     ? "bg-gradient-to-l from-[#f7ba2b] to-[#ea5358] p-[5px] overflow-visible z-10"
                     : `bento-card bento-card-hover border border-transparent dark:border-white/5 shadow-sm hover:shadow-xl bg-white dark:bg-black overflow-hidden ${isHighlighted ? "ring-2 ring-primary/50" : "hover:ring-1 hover:ring-primary/50"}`
@@ -655,7 +655,7 @@ export default function AdCard({
             {showChat && conversationId && (
                 <ClientPortal>
                     <div
-                        className="fixed bottom-0 right-4 w-80 sm:w-96 z-[9999] animate-in slide-in-from-bottom-5 shadow-2xl rounded-t-xl overflow-hidden"
+                        className="fixed inset-0 md:bottom-0 md:right-4 md:w-80 md:sm:w-96 w-full h-full md:h-auto z-[9999] animate-in slide-in-from-bottom-5 shadow-2xl rounded-t-xl md:rounded-t-xl overflow-hidden"
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();

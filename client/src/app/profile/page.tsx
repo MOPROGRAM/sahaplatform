@@ -446,7 +446,9 @@ export default function ProfilePage() {
                                     </h3>
                                 </div>
                                 <Link href="/post-ad" className="bg-primary text-white text-[9px] font-black px-3 py-1.5 rounded-xs flex items-center gap-2 hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95 transition-all">
-                                    <Package size={12} /> {language === 'ar' ? 'إضافة جديد' : 'Add New'}
+                                    <Package size={12} className="hidden md:block" /> 
+                                    <span className="md:hidden">{language === 'ar' ? 'إضافة إعلانك' : 'Add Your Ad'}</span>
+                                    <span className="hidden md:inline">{language === 'ar' ? 'إضافة جديد' : 'Add New'}</span>
                                 </Link>
                             </div>
 
