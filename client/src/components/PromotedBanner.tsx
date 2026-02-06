@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { adsService } from "@/lib/ads";
 import { useLanguage } from '@/lib/language-context';
 import AdCard from "./AdCard";
-import InteractiveBackground from "./InteractiveBackground";
 
 export default function PromotedBanner() {
     const [ads, setAds] = useState<any[]>([]);
@@ -31,7 +30,6 @@ export default function PromotedBanner() {
 
     return (
         <div className="w-full my-1 px-0 sm:px-2 relative group overflow-hidden">
-            <InteractiveBackground />
             <div className="relative w-full z-10">
                 <div className="flex items-center gap-2 mb-0.35 px-2 pt-1">
                     <div className="w-1 h-4 bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
