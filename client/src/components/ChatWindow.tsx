@@ -344,9 +344,9 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
         }
     };
 
-    const handleFileUpload = async (file: File, type: 'file' | 'image') => {
+    const handleFileUpload = async (file: File, type: 'file' | 'image' | 'voice') => {
         const fileName = `${Date.now()}-${file.name}`;
-        const bucket = type === 'image' ? 'chat-images' : 'chat-files';
+        const bucket = type === 'image' ? 'chat-images' : (type === 'voice' ? 'chat-voice' : 'chat-files');
         const { error } = await supabase.storage
             .from(bucket)
             .upload(fileName, file);
@@ -407,8 +407,8 @@ export default function ChatWindow({ conversationId, onClose }: ChatWindowProps)
                 
                 // رفع الملف الصوتي
                 try {
-                    // Force type to 'file' to use chat-files bucket which should handle audio
-                    const uploadData = await handleFileUpload(audioFile, 'file');
+                    // Use 'voice' type to handle audio files properly
+                    const uploadData = await handleFileUpload(audioFile, 'voice');
                     
                     if (uploadData) {
                         await handleSend('voice', `Voice message`, uploadData);

@@ -66,8 +66,8 @@ export default function RootLayout({
                 <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
                     <LanguageProvider initialLanguage={lang}>
                         <ErrorBoundary>
-                            <div className="flex h-[100dvh] flex-col overflow-hidden bg-gray-bg">
-                                <main className="flex-1 w-full overflow-y-auto pb-20 lg:pb-0 scroll-smooth">
+                            <div className="flex h-[95dvh] flex-col overflow-hidden bg-gray-bg">
+                                <main className="flex-1 w-full overflow-y-auto pb-16 lg:pb-0 scroll-smooth">
                                     <Suspense fallback={
                                         <div className="flex items-center justify-center min-h-screen bg-gray-bg">
                                             <LoadingSpinner size={48} />
