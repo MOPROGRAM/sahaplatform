@@ -2,7 +2,19 @@
 node_modules
 .pnp
 .pnp.js
+ # Secrets and local development files
+.env
+.env.local
+credentials.json
+*.pem
+*.key
+*.crt
+secret.json
+*.log
 
+# Monorepo leftovers
+sahaplatform-2/
+sahaplatform-3/
 # Testing
 coverage
 
