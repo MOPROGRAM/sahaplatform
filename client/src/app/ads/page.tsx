@@ -164,36 +164,28 @@ function AdsContent() {
             <Header />
 
             <main className="w-full max-w-[1920px] mx-auto p-1 grid grid-cols-12 gap-1 flex-1">
-                {/* Bento Grid Sidebar - Categories (Matching HomePage) */}
-                <aside className={`col-span-12 lg:col-span-2 hidden lg:block space-y-1`}>
-                    <div className="bento-card p-0 flex flex-col sticky top-20 bg-white dark:bg-[#1a1a1a]">
-                        <div className="p-3 border-b border-border-color bg-gray-50 dark:bg-white/5">
-                            <h3 className="bento-title text-xs uppercase tracking-wider font-black">{t("categories")}</h3>
-                        </div>
-                        <nav className="flex flex-col p-1 space-y-0.5">
-                            <button
-                                onClick={() => handleCategoryChange(null)}
-                                className={cn("flex items-center justify-between px-3 py-2 rounded-lg transition-all group w-full text-right", !category ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 dark:hover:bg-white/5')}
-                            >
-                                <span className="font-bold text-xs">{t('allAds')}</span>
-                            </button>
-                            {mainCategories.map((cat, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => handleCategoryChange(cat.key)}
-                                    className={cn("flex items-center justify-between px-3 py-2 rounded-lg transition-all group w-full text-right", category === cat.key ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 dark:hover:bg-white/5')}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <div className={cn("transition-colors", category === cat.key ? 'text-primary' : 'text-gray-400 group-hover:text-primary')}>
-                                            <cat.icon size={14} />
-                                        </div>
-                                        <span className={cn("font-bold text-xs transition-colors line-clamp-1", category === cat.key ? 'text-primary' : 'text-text-main group-hover:text-primary')}>{cat.name}</span>
-                                    </div>
-                                </button>
-                            ))}
-                        </nav>
-                    </div>
-                </aside>
+                {/* Horizontal Categories Bar (replaces left vertical sidebar) */}
+                <div className="col-span-12 hidden lg:flex lg:items-center lg:overflow-x-auto lg:gap-2 border-b border-border-color pb-2">
+                    <button
+                        onClick={() => handleCategoryChange(null)}
+                        className={cn("px-3 py-1.5 rounded-lg text-sm font-bold transition-all", !category ? 'bg-primary text-white' : 'text-text-main hover:bg-gray-100')}
+                    >
+                        {t('allAds')}
+                    </button>
+                    {mainCategories.map((cat, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => handleCategoryChange(cat.key)}
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                                category === cat.key ? 'bg-primary text-white' : 'text-text-main hover:bg-gray-100'
+                            )}
+                        >
+                            <cat.icon size={14} className={category === cat.key ? 'inline-block mr-1 text-white' : 'inline-block mr-1 text-gray-600'} />
+                            <span className="align-middle">{cat.name}</span>
+                        </button>
+                    ))}
+                </div>
 
                 <section className="col-span-12 lg:col-span-10 flex flex-col gap-2">
                     {/* Mobile Categories Strip */}
