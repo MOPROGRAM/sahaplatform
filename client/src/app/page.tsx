@@ -3,15 +3,18 @@
 export const runtime = 'edge';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Sparkles, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/language-context';
 import { adsService } from '@/lib/ads';
+import { useFilterStore } from '@/store/useFilterStore';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdCard from '@/components/AdCard';
 import PromotedBanner from '@/components/PromotedBanner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { clsx } from "clsx";
 
 // Skeleton Loader Component
@@ -33,20 +36,35 @@ const AdsSkeleton = () => (
     </div>
 );
 
+type Filters = {
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    category?: string;
+    search?: string;
+    location?: string;
+    type?: string;
+    priceRange?: string;
+    hasMedia?: boolean;
+};
+
 interface Ad {
     id: string;
     title: string;
     titleAr?: string;
     titleEn?: string;
-    price: number | null;
-    location: string | null;
-    category: string;
-    description?: string;
+    description: string;
     descriptionAr?: string;
     descriptionEn?: string;
+    price: number | null;
+    category: string;
+    location: string | null;
     created_at: string;
     images: string;
-    is_boosted?: boolean;
+    phone?: string;
+    email?: string;
+    latitude?: number;
+    longitude?: number;
     author_id: string;
     author?: {
         name?: string;
@@ -57,9 +75,8 @@ interface Ad {
     city?: {
         name: string;
     };
-    phone?: string;
-    email?: string;
     currency?: string | { code: string; symbol: string; };
+    is_boosted?: boolean;
 }
 
 const categoriesList = [
@@ -71,35 +88,26 @@ const categoriesList = [
     { icon: Layers, key: 'other' }
 ];
 
-export default function HomePage() {
+function AdsContent() {
     const { language, t, currency } = useLanguage();
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const searchQueryParam = searchParams.get('search');
+    const categoryParam = searchParams.get('category');
+    const { category, tags, setCategory, toggleTag, resetFilters } = useFilterStore();
+
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'featured' | 'new'>('all');
     const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+    const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
 
-    const fetchAds = useCallback(async () => {
-        try {
-            setLoading(true);
-            const filters: any = {
-                limit: 20,
-                sortOrder: 'desc',
-                sortBy: 'createdAt'
-            };
-
-            if (filter === 'featured') {
-                filters.isBoosted = true;
-            }
-
-            const result = await adsService.getAds(filters);
-            setAds(result.data || []);
-        } catch (error) {
-            console.error('Failed to fetch ads:', error);
-            setAds([]);
-        } finally {
-            setLoading(false);
+    // Sync filters with URL on mount
+    useEffect(() => {
+        if (categoryParam && categoryParam !== category) {
+            setCategory(categoryParam);
         }
-    }, [filter]);
+    }, [categoryParam, category, setCategory]);
 
     const fetchCategoryCounts = useCallback(async () => {
         try {
@@ -117,6 +125,43 @@ export default function HomePage() {
             console.warn('Failed to fetch category counts:', error);
         }
     }, []);
+
+    const fetchAds = useCallback(async () => {
+        try {
+            setLoading(true);
+            const filters: any = {
+                limit: 50,
+                sortOrder: 'desc',
+                sortBy: 'created_at'
+            };
+
+            // Filter by category from store or URL
+            if (category) {
+                filters.category = category;
+            }
+
+            // Search in title and description
+            if (searchQuery) {
+                filters.search = searchQuery;
+            }
+
+            if (filter === 'featured') {
+                filters.isBoosted = true;
+            }
+
+            const result = await adsService.getAds(filters);
+            setAds(result.data || []);
+        } catch (error) {
+            console.error('Failed to fetch ads:', error);
+            setAds([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [category, filter, searchQuery]);
+
+    useEffect(() => {
+        setSearchQuery(searchQueryParam || '');
+    }, [searchQueryParam]);
 
     useEffect(() => {
         fetchAds();
@@ -156,14 +201,17 @@ export default function HomePage() {
 
                 {/* Central Grid Feed */}
                 <section className={`col-span-12 xl:col-span-10 flex flex-col gap-2`}>
-                    {/* Bento Filter Bar */}
+                    {/* Title Bar */}
                     <div className="bento-card p-1 flex items-center justify-between bg-white dark:bg-[#1a1a1a]">
                         <div className="flex items-center gap-2 px-3 py-2">
                             <div className="p-1.5 bg-primary/10 rounded-full text-primary">
                                 <Sparkles size={14} />
                             </div>
                             <div>
-                                <h2 className="text-sm font-black uppercase tracking-tight text-text-main leading-none">{t("latestOffers")}</h2>
+                                <h2 className="text-sm font-black uppercase tracking-tight text-text-main leading-none">
+                                    {category ? (t as any)[category] || category : t("latestOffers")}
+                                </h2>
+                                <p className="text-[10px] text-text-muted">{ads.length} {t('foundAds', { count: ads.length })}</p>
                             </div>
                         </div>
                         <div className="flex p-0.5 bg-gray-100 dark:bg-black/20 rounded-lg mx-2">
@@ -236,6 +284,7 @@ export default function HomePage() {
                                         <Layers size={32} />
                                     </div>
                                     <div className="text-text-muted font-bold uppercase tracking-widest text-xs">{t("noResults")}</div>
+                                    <button onClick={() => { resetFilters(); router.push('/'); }} className="text-primary font-bold hover:underline">{t('clearFilters')}</button>
                                 </div>
                             )}
                         </div>
@@ -245,5 +294,17 @@ export default function HomePage() {
 
             <Footer />
         </div>
+    );
+}
+
+export default function HomePage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-bg flex items-center justify-center">
+                <LoadingSpinner size={48} />
+            </div>
+        }>
+            <AdsContent />
+        </Suspense>
     );
 }

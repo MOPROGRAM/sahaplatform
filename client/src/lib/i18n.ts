@@ -220,6 +220,7 @@ export const translations = {
         noAccount: 'ليس لديك حساب؟',
         processing: 'جارٍ المعالجة...',
 
+<<<<<<< HEAD
         // Ad Creation/Editing
         editAd: 'تعديل الإعلان',
         updateAdDetails: 'قم بتحديث تفاصيل إعلانك',
@@ -311,6 +312,12 @@ export const translations = {
         totalImprints: 'إجمالي الطباعات',
         matrix: 'المصفوفة',
         noMissionData: 'لا توجد بيانات مهمة',
+=======
+        // Ads Page
+        allAds: 'جميع الإعلانات',
+        foundAds: 'تم العثور على {{count}} إعلان',
+        clearFilters: 'إزالة الفلاتر',
+>>>>>>> feature/cloudflare-migration
     },
     en: {
         siteName: 'Saha',
@@ -622,7 +629,36 @@ export const translations = {
         code: 'Code',
         totalImprints: 'Total Imprints',
         matrix: 'Matrix',
+<<<<<<< HEAD
         noMissionData: 'No Data Found',
+=======
+        noMissionData: 'No Mission Data Found',
+        startYourJourney: 'Start your journey by posting your first ad now',
+
+        // Modals
+        confirmDelete: 'Confirm Delete',
+        deleteWarning: 'Are you sure you want to delete this ad?',
+        thisActionCannotBeUndone: 'This action cannot be undone',
+        delete: 'Delete',
+
+        // Auth Pages
+        loginTitle: 'System Login',
+        registerTitle: 'Create New Account',
+        placeholderEmail: 'Enter email address...',
+        placeholderPassword: 'Enter your password...',
+        placeholderName: 'Full Name...',
+        btnSubmitLogin: 'Secure Login',
+        btnSubmitRegister: 'Start Journey Now',
+        backToHome: 'Back to Home',
+        alreadyHaveAccount: 'Already have an account?',
+        noAccount: 'Don\'t have an account?',
+        processing: 'Processing...',
+
+        // Ads Page
+        allAds: 'All Ads',
+        foundAds: 'Found {{count}} ads',
+        clearFilters: 'Clear Filters',
+>>>>>>> feature/cloudflare-migration
     }
 };
 
