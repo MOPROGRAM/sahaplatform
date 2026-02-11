@@ -163,7 +163,7 @@ function AdsContent() {
         <div className="min-h-screen bg-gray-bg flex flex-col">
             <Header />
 
-            <main className="w-full max-w-[1920px] mx-auto p-1 grid grid-cols-12 gap-1 flex-1">
+            <main className="w-full p-1 grid grid-cols-12 gap-1 flex-1">
                 {/* Horizontal Categories Bar (replaces left vertical sidebar) */}
                 <div className="col-span-12 hidden lg:flex lg:items-center lg:overflow-x-auto lg:gap-2 border-b border-border-color pb-2">
                     <button
