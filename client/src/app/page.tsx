@@ -1,13 +1,7 @@
-"use client";
+import { redirect } from 'next/navigation';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-// Redirect the homepage to the Ads page
+// Server-side redirect: root URL -> /ads
 export default function Page() {
-  const router = useRouter();
-  useEffect(() => {
-    router.push('/ads');
-  }, [router]);
+  redirect('/ads');
   return null;
 }
