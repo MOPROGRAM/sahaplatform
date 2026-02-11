@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { adsService } from '@/lib/ads';
 import { useLanguage } from '@/lib/language-context';
@@ -148,6 +148,16 @@ function AdsContent() {
         }
     }, [category, subCategory, tags, searchQuery, minPrice, maxPrice, minArea, maxArea, cityId, sortBy, sortOrder]);
 
+    // Order: featured ads first (newest first within featured), then non-featured ads (newest first)
+    const orderedAds = useMemo(() => {
+        const featured = ads.filter(a => a.is_boosted);
+        const non = ads.filter(a => !a.is_boosted);
+        const sortFn = (x: Ad, y: Ad) => new Date(y.created_at).getTime() - new Date(x.created_at).getTime();
+        featured.sort(sortFn);
+        non.sort(sortFn);
+        return [...featured, ...non];
+    }, [ads]);
+
     // Sync URL params to store state on initial load/URL change
     useEffect(() => {
         if (categoryParam !== category) setCategory(categoryParam);
@@ -260,16 +270,16 @@ function AdsContent() {
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                             <span className="text-[10px] font-black text-text-muted uppercase tracking-wider">
-                                {t('foundAds').replace('{{count}}', ads.length.toString())}
+                                {t('foundAds').replace('{{count}}', orderedAds.length.toString())}
                             </span>
                         </div>
                     </div>
 
                     {loading ? (
                         <AdsSkeleton />
-                    ) : ads.length > 0 ? (
+                    ) : orderedAds.length > 0 ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 pb-10">
-                            {ads.map((ad) => (
+                            {orderedAds.map((ad) => (
                                 <AdCard
                                     key={ad.id}
                                     id={ad.id}
