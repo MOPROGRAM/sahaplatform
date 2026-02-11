@@ -168,6 +168,11 @@ export const translations = {
         alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
         noAccount: 'ليس لديك حساب؟',
         processing: 'جارٍ المعالجة...',
+
+        // Ads Page
+        allAds: 'جميع الإعلانات',
+        foundAds: 'تم العثور على {{count}} إعلان',
+        clearFilters: 'إزالة الفلاتر',
     },
     en: {
         // Brand
@@ -335,6 +340,11 @@ export const translations = {
         alreadyHaveAccount: 'Already have an account?',
         noAccount: 'Don\'t have an account?',
         processing: 'Processing...',
+
+        // Ads Page
+        allAds: 'All Ads',
+        foundAds: 'Found {{count}} ads',
+        clearFilters: 'Clear Filters',
     }
 };
 

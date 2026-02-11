@@ -1,169 +1,210 @@
 "use client";
 
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { Sparkles, Building2, Briefcase, Car, ShoppingBag, Wrench, Layers } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { adsService } from '@/lib/ads';
 import { useLanguage } from '@/lib/language-context';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useFilterStore } from '@/store/useFilterStore';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import SearchBar from '@/components/SearchBar';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import AdCard from '@/components/AdCard';
+import LoadingSpinner from '@/components/LoadingSpinner';
+
+type Filters = {
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    category?: string;
+    search?: string;
+    location?: string;
+    type?: string;
+    priceRange?: string;
+    hasMedia?: boolean;
+};
 
 interface Ad {
     id: string;
     title: string;
+    description: string;
     price: number | null;
-    location: string | null;
     category: string;
-    created_at: string;
+    location: string | null;
     images: string;
-    is_boosted?: boolean;
+    phone?: string;
+    email?: string;
+    latitude?: number;
+    longitude?: number;
     author_id: string;
+    created_at: string;
+    author?: {
+        id: string;
+        name?: string;
+        email: string;
+    };
+    city?: {
+        id: string;
+        name: string;
+        name_ar?: string;
+        name_en?: string;
+    };
     currency?: {
+        id: string;
         code: string;
         symbol: string;
+        name: string;
     };
 }
 
-export default function HomePage() {
+function AdsContent() {
     const { language, t } = useLanguage();
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const searchQueryParam = searchParams.get('search');
+    const categoryParam = searchParams.get('category');
+    const { category, tags, setCategory, toggleTag, resetFilters } = useFilterStore();
+
     const [ads, setAds] = useState<Ad[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
+    const [showAllAds, setShowAllAds] = useState(true);
 
-    const [categoriesList, setCategoriesList] = useState([
-        { name: t('jobs'), icon: Briefcase, key: 'jobs', count: 0 },
-        { name: t('realEstate'), icon: Building2, key: 'realEstate', count: 0 },
-        { name: t('cars'), icon: Car, key: 'cars', count: 0 },
-        { name: t('goods'), icon: ShoppingBag, key: 'goods', count: 0 },
-        { name: t('services'), icon: Wrench, key: 'services', count: 0 },
-        { name: t('other'), icon: Layers, key: 'other', count: 0 }
-    ]);
-
+    // Sync filters with URL on mount
     useEffect(() => {
-        fetchAds();
-        fetchCategoryCounts();
-    }, []);
-
-    const fetchCategoryCounts = async () => {
-        try {
-            const updated = await Promise.all(categoriesList.map(async (cat) => {
-                const { count, error } = await supabase
-                    .from('Ad')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('is_active', true)
-                    .eq('category', cat.key);
-                return { key: cat.key, count: count || 0 };
-            }));
-
-            setCategoriesList(prev => prev.map(cat => ({
-                ...cat,
-                count: updated.find(u => u.key === cat.key)?.count || 0
-            })));
-        } catch (error) {
-            console.error('Failed to fetch category counts:', error);
+        if (categoryParam && categoryParam !== category) {
+            setCategory(categoryParam);
         }
-    };
+    }, [categoryParam, category, setCategory]);
 
-    const fetchAds = async () => {
+    const fetchAds = useCallback(async () => {
+        setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('Ad')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(20);
-
-            if (error) {
-                console.error('Failed to fetch ads:', error);
-                setAds([]);
-            } else {
-                setAds(Array.isArray(data) ? data : []);
+            const filters: Filters = {
+                limit: 50,
+                sortBy: 'created_at',
+                sortOrder: 'desc'
+            };
+            // Filter by category if specified
+            if (category) {
+                filters.category = category;
             }
+
+            // Search in title and description
+            if (searchQuery) {
+                filters.search = searchQuery;
+            }
+
+            // Location filter from tags
+            const regions = ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة'];
+            const selectedRegions = tags.filter(tag => regions.includes(tag));
+            if (selectedRegions.length > 0) {
+                filters.location = selectedRegions.join(',');
+            }
+
+            // Type filter from tags
+            const types = ['سكني', 'تجاري', 'إيجار', 'بيع', 'استثمار'];
+            const selectedTypes = tags.filter(tag => types.includes(tag));
+            if (selectedTypes.length > 0) {
+                filters.type = selectedTypes.join(',');
+            }
+
+            // Price filter from tags
+            const priceRanges = {
+                'أقل من 50k': { min: 0, max: 50000 },
+                '50k - 200k': { min: 50000, max: 200000 },
+                '200k - 500k': { min: 200000, max: 500000 },
+                '500k+': { min: 500000, max: Infinity }
+            };
+            const selectedPrices = tags.filter(tag => tag in priceRanges);
+            if (selectedPrices.length > 0) {
+                const priceFilters = selectedPrices.map(tag => {
+                    const range = priceRanges[tag as keyof typeof priceRanges];
+                    return `${range.min}-${range.max}`;
+                });
+                filters.priceRange = priceFilters.join(',');
+            }
+
+            // Filter ads based on media availability
+            if (!showAllAds) {
+                filters.hasMedia = true;
+            }
+
+            const data = await adsService.getAds(filters);
+            // Ensure data is always an array
+            setAds(Array.isArray(data as any) ? (data as any) : []);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [category, tags, searchQuery, showAllAds]);
+
+    useEffect(() => {
+        setSearchQuery(searchQueryParam || '');
+    }, [searchQueryParam]);
+
+    useEffect(() => {
+        fetchAds();
+    }, [fetchAds]);
 
     return (
-        <div className="min-h-screen flex flex-col" dir={language === "ar" ? "rtl" : "ltr"}>
+        <div className="min-h-screen bg-gray-bg flex flex-col" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <Header />
 
-            {/* Paid Ads Sticky Slider (replaced by PromotedBanner) */}
-            {/* Replaced with site-wide PromotedBanner via Header for consistent UX */}
-            
-
-            <main className="max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Left Sidebar */}
-                <aside className="lg:col-span-3 space-y-4">
-                    <div className="depth-card overflow-hidden">
-                        <div className="bg-card-bg px-4 py-3 text-sm font-black border-b border-border-color text-text-main uppercase tracking-tight">
-                            {t('categories')}
-                        </div>
-                        <nav className="flex flex-col">
-                            {categoriesList.map((cat, idx) => (
-                                <Link
-                                    key={idx}
-                                    href={`/ads?category=${cat.key}`}
-                                    className="flex items-center justify-between px-4 py-3 hover:bg-primary/10 text-sm font-bold text-text-muted hover:text-text-main transition-colors group border-b border-border-color last:border-0"
-                                >
-                                    <span className="flex items-center gap-3 group-hover:text-primary transition-colors">
-                                        <cat.icon size={16} className="text-text-muted group-hover:text-primary transition-colors" />
-                                        {cat.name}
-                                    </span>
-                                    <span className="text-sm text-text-muted font-bold group-hover:text-primary/50">{cat.count}</span>
-                                </Link>
-                            ))}
-                        </nav>
+            <main className="max-w-7xl mx-auto w-full p-4 flex-1">
+                <div className="depth-card p-4 mb-6">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-xl font-bold text-text-main">
+                            {category ? t(category) : t('allAds')}
+                        </h1>
+                        <span className="text-sm font-bold text-text-muted">
+                            {t('foundAds', { count: ads.length })}
+                        </span>
                     </div>
-                </aside>
+                </div>
 
-                {/* Central Grid Feed */}
-                <section className="lg:col-span-9 flex flex-col gap-6">
-                    <div className="depth-card flex items-center justify-between px-6 py-4">
-                        <div className="flex items-center gap-3">
-                            <Sparkles className="text-primary" size={20} />
-                            <h2 className="text-lg font-black uppercase tracking-tight text-text-main">{t('latestOffers')}</h2>
-                        </div>
-                        <div className="flex gap-4 text-sm font-bold text-text-muted">
-                            <span className="text-primary border-b-2 border-primary pb-1 cursor-pointer">{t('viewAll')}</span>
-                            <span className="hover:text-text-main cursor-pointer transition-colors uppercase">{t('featured')}</span>
-                            <span className="hover:text-text-main cursor-pointer transition-colors uppercase">{t('newAd')}</span>
-                        </div>
+                {loading ? (
+                    <div className="flex items-center justify-center p-20">
+                        <LoadingSpinner size={48} />
                     </div>
-
-                    {loading ? (
-                        <div className="depth-card h-64 flex items-center justify-center">
-                            <LoadingSpinner size={40} />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                            {ads.map((ad, idx) => (
-                                <AdCard
-                                    key={ad.id}
-                                    id={ad.id}
-                                    title={ad.title}
-                                    price={ad.price || 0}
-                                    currency="ريال"
-                                    location={ad.location || ''}
-                                    images={ad.images ? JSON.parse(ad.images) : []}
-                                    createdAt={ad.created_at}
-                                    category={ad.category}
-                                    language={language}
-                                    isFeatured={ad.is_boosted || false}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </section>
+                ) : ads.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        {ads.map((ad) => (
+                            <AdCard
+                                key={ad.id}
+                                id={ad.id}
+                                title={ad.title}
+                                price={ad.price || 0}
+                                currency={ad.currency?.code || "ريال"}
+                                location={ad.location}
+                                images={ad.images ? JSON.parse(ad.images) : []}
+                                createdAt={ad.created_at}
+                                category={ad.category}
+                                language={language}
+                                isFeatured={false}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center p-20 depth-card">
+                        <p className="text-text-muted font-bold text-lg">{t('noResults')}</p>
+                        <button onClick={() => { resetFilters(); router.push('/ads'); }} className="mt-4 text-primary font-bold hover:underline">{t('clearFilters')}</button>
+                    </div>
+                )}
             </main>
-
-            {/* Localized Footer */}
             <Footer />
         </div>
+    );
+}
+
+export default function HomePage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-bg flex items-center justify-center">
+                <LoadingSpinner size={48} />
+            </div>
+        }>
+            <AdsContent />
+        </Suspense>
     );
 }
