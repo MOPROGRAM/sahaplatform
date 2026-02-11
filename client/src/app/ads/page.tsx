@@ -282,6 +282,7 @@ function AdsContent() {
                             {orderedAds.map((ad) => (
                                 <AdCard
                                     key={ad.id}
+                                    dense={true}
                                     id={ad.id}
                                     title={ad.title}
                                     titleAr={ad.titleAr}
