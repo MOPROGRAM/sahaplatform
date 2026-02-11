@@ -150,7 +150,17 @@ function AdsContent() {
             }
 
             const result = await adsService.getAds(filters);
-            setAds(result.data || []);
+            
+            // ترتيب الإعلانات: المميزة أولاً، ثم الأحدث
+            const sortedAds = (result.data || []).sort((a: Ad, b: Ad) => {
+                // إذا كان أحدهما مميز والآخر لا، المميز يذهب أولاً
+                if (a.is_boosted && !b.is_boosted) return -1;
+                if (!a.is_boosted && b.is_boosted) return 1;
+                // إذا كان كلاهما مميز أو كلاهما غير مميز، رتب حسب التاريخ
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            });
+            
+            setAds(sortedAds);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
             setAds([]);
